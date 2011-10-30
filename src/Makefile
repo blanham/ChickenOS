@@ -13,7 +13,7 @@ ASFLAGS=-felf
 all: $(SOURCES) link
 
 clean:
-	rm *.o kernel.bin
+	rm *.o ./lib/*.o kernel.bin
 
 link:
 	/usr/local/cross/bin/i586-elf-ld $(LDFLAGS) -o kernel.bin $(SOURCES)
