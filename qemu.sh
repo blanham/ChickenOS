@@ -1,0 +1,2 @@
+qemu -kernel ./kernel.bin
+
