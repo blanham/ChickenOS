@@ -1,5 +1,4 @@
 #include <kernel/hw.h>
-#include <stdint.h>
 /* taken from: http://www.jamesmolloy.co.uk/ */
 void outb(uint16_t port, uint8_t value)
 {
