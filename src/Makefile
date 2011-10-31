@@ -2,7 +2,7 @@ CROSS=/usr/local/cross/bin
 CC=$(CROSS)/i586-elf-gcc
 IDIR=./include
 
-LIB_SRCS=./lib/stdio.o ./lib/string.o ./lib/sys.o 
+LIB_SRCS=./lib/stdio.o ./lib/string.o ./lib/sys.o ./lib/kernel/memory.o 
 SOURCES=kmain.o console.o hw.o loader.o $(LIB_SRCS) 
 LINKER=i586-elf-ld
 CFLAGS=-Wall -Wextra -Werror -I./include --std=gnu99\
