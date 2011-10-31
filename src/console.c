@@ -1,9 +1,10 @@
+#include <kernel/memory.h>
 #include <kernel/console.h>
 #include <kernel/hw.h>
-#include <stdint.h>
 #define NULL 0
 static  uint16_t * videoram = (uint16_t *) 0xb8000;
 #define BLANK 0x0700
+/* some stuff that will later be used to setup mutliple consoles */
 #define NUM_CONSOLES 3
 #define CURRENT_CONSOLE consoles[current_console]
 typedef struct {
@@ -27,15 +28,13 @@ static void console_cursor_move(uint16_t pos)
 /* rewrite this later with memcpy and memset */
 static void console_scroll()
 {
-	for(int i = 0; i < 24*80; i++)
+	/* move lines up one */
+	for(int i = 0; i < 24; i++)
 	{
-		console->videoram[i] = console->videoram[i + 80];
-
+		kmemcpyw(&console->videoram[i*80],&console->videoram[(i + 1)*80], 80);
 	}
-	for(int i = 24*80; i < 25*80; i++)
-	{
-		console->videoram[i] = BLANK;
-	}
+	/* blank last line */
+	kmemsetw(&console->videoram[24*80], BLANK, 80);
 
 	console->y = 24;
 }
@@ -48,6 +47,7 @@ void console_putc(uint8_t c)
 				console->x--;
 			break;
 		case 0x29://tab
+		case '\t'://tab
 			console->x = (console->x + 8) & ~(7);
 			break;
 		case '\n':
@@ -86,11 +86,7 @@ int console_puts(char *string)
 
 void console_clear()
 {
-	int i = 0;
-	for(i = 0; i < 80*25; i++)
-	{
-		console->videoram[i] = 0x0700;
-	}
+	kmemsetw(console->videoram, BLANK, 80*25);
 	console->y=console->x = 0;
 	console_cursor_move(0);
 }
@@ -99,6 +95,17 @@ void console_init()
 	console->x = console->y = 0;
 	console->videoram = videoram;
 	console_clear();
-
 }
+/*
+void console_switch(int num)
+{
+	//copy curent vram to buffer
 
+	//copy new consoles buffer to vram
+	
+	console = consoled[num];
+
+	//put cursor at correct postion
+	console_cursor_move(CURSOR_POS);
+}
+*/
