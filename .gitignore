@@ -1,0 +1,5 @@
+*.img
+*.sw*
+tmp/
+utils/
+
