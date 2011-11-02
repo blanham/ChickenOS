@@ -10,7 +10,7 @@ static  uint16_t * videoram = (uint16_t *) 0xb8000;
 typedef struct {
 	uint16_t *videoram;
 	uint8_t x,y;
-
+	uint16_t attribute;
 } console_t;
 console_t console0;
 console_t console1;
