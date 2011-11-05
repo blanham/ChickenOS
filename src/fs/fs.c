@@ -72,8 +72,10 @@ typedef struct ext2_directory {
 } ext2_directory_t;
 
 typedef struct inode_cached {
+	uint32_t group;
+	uint32_t inode;
 	
-
+//	inode_cached *next;
 
 
 } inode_cached_t;
@@ -102,7 +104,7 @@ typedef struct inode_cached {
 #define S_IXOTH 	0x0001 	execute
 /* inodes are indexed starting at 1 */
 #define INODE(x) (x-1)
-#define BLOCK(x) (1024*x)
+#define BLOCK(x) (1024*(x))
 
 #define EXT2_BAD_INO 			1
 #define EXT2_ROOT_INO			2
@@ -110,6 +112,14 @@ typedef struct inode_cached {
 #define EXT2_ACL_DATA_INO		4
 #define EXT2_BOOT_LOADER_INO	5
 #define EXT2_UNDEL_DIR_INO		6
+typedef struct vfs_file {
+	void *filesystem;
+	uint32_t inode;
+	char *name;//perhaps use name[255/256] instead?NO! what about other fses?
+	
+	
+
+} vfs_file_t;
 
 typedef struct ext2_filesystem {
 	ext2_superblock_t *superblock;
@@ -160,54 +170,107 @@ ext2_directory_t *open_root(uint8_t *fs, ext2_inode_t *inode_table)
 {
 	ext2_directory_t *root;
 	uint32_t block = inode_table[INODE(EXT2_ROOT_INO)].i_block[0];
-	printf("dir block %i\n", block);
+//	printf("dir block %i\n", block);
 	root = (ext2_directory_t *)&fs[BLOCK(block)];
 
 	return root;
 
 }
+ext2_directory_t *open_dir(uint8_t *fs, ext2_inode_t *inode_table, uint32_t inode)
+{
+	ext2_directory_t *root;
+	uint32_t block = inode_table[INODE(inode)].i_block[0];
+//	printf("dir block %i\n", block);
+	root = (ext2_directory_t *)&fs[BLOCK(block)];
+
+	return root;
+
+}
+
+/* ASSUMES 1024byte blocks */
+
+/*uint8_t *ext2_bg_pointer(uint8_t *fs, int block_group)
+{
+	if(block_group == 0)
+	{
+		return &fs[BLOCK(3)];
+
+	}else if(block_group == 1){
+
+		return &fs[BLOCK(block_group)];
+
+	}
+
+
+}*/
+
+uint8_t *ext2_open_block()
+{
+
+
+}
+typedef uint8_t * (*vfs_read_inode_t) (uint32_t inode, size_t length, size_t offset);
+typedef uint32_t (*vfs_write_inode_t) (uint32_t inode, size_t length, size_t offset, uint8_t *buffer);
+typedef struct vfs_fs {
+	vfs_read_block_t read;
+
+
+} vfs_fs_t;
 /*god damnit inode numbering starts with 1, not 0*/
+#include <string.h>
 void print_dir_entry(ext2_directory_t *dir)
 {
 	int i;
-	for(i = 0; i < dir[0].name_len; i++)
-		printf("%c",dir[0].name[i]);
-	printf("\n");
+	char buf[256];
+	memset(buf, 0, 256);
+	memcpy(buf, dir[0].name, dir[0].name_len);	
+//	for(i = 0; i < dir[0].name_len; i++)
+//		printf("%c",dir[0].name[i]);
+	printf("%-20s \t\tinode %i\n", buf, dir[0].inode);
 
-	printf("%x\n\n",&dir);
 
 }
-void list_files(ext2_directory_t *dir)
+
+int lookup_file(ext2_directory_t *dir, uint32_t len, char *filename)
 {
-	printf("dir size %i\n", dir[0].name_len);
-	uint8_t *ptr = (uint8_t *)dir;	
-	int i;	
-	int count;
-
-	print_dir_entry((ext2_directory_t *)ptr);
-
-	count = dir[0].name_len;
-	count %= count;
-	int corr =0;
-	if(count != 0)
-		corr = 4;
-	else
-		corr = 0;
-	count = 8 + (dir[0].name_len - count) + corr;
-	printf("count %i\n",count);
-	uint8_t *dir2 = dir;	
-//	ext2_directory_t *dir2 = (dir + 16);
-	dir = (ext2_directory_t *)(dir2 + count);
-	printf("%x %x\n",&dir);
+	int ret = -1;
+	while(len > 0)
+	{
+		if(dir[0].inode == 0)
+		{
+			len -= dir[0].rec_len;
+			dir = (ext2_directory_t *)((uint8_t *)dir + dir[0].rec_len);
 			
-	print_dir_entry(dir);
-//	ext2_directory_t *dir3 = (ext2_directory_t *)dir2;
-//	printf("dir size %i\n", dir3[0].name_len);
-//	for(i = 0; i < dir3[0].name_len; i++)
-//		printf("%c ",dir3[0].name[i]);// + i));
+			continue;
+		}		
 
+		//print_dir_entry((ext2_directory_t *)dir);
+		ret = strncmp(filename, dir[0].name, dir[0].name_len);
+		if(ret == 0)
+			return 1;
+		len -= dir[0].rec_len;
+		dir = (ext2_directory_t *)((uint8_t *)dir + dir[0].rec_len);
+	}
+	return 0;
+}
 
+void list_files(ext2_directory_t *dir, uint32_t len)
+{
+	while(len > 0)
+	{
+		if(dir[0].inode == 0)
+		{
+			len -= dir[0].rec_len;
+			dir = (ext2_directory_t *)((uint8_t *)dir + dir[0].rec_len);
+			
+			continue;
+		}		
 
+		print_dir_entry((ext2_directory_t *)dir);
+
+		len -= dir[0].rec_len;
+		dir = (ext2_directory_t *)((uint8_t *)dir + dir[0].rec_len);
+	}
 
 }
 int main(int argc, char **argv)
@@ -238,10 +301,10 @@ int main(int argc, char **argv)
 	}
 
 	int32_t groups = (1024/sizeof(ext2_group_descriptor_t));//superblock->s_blocks_count/superblock->s_blocks_per_group + 1; 
-//	uint32_t total_groups = superblock->s_blocks_count / superblock->s_blocks_per_group;
-//	uint32_t total_inodes = superblock->s_inodes_count / superblock->s_inodes_per_group;
+	uint32_t total_groups = superblock->s_blocks_count / superblock->s_blocks_per_group;
+	uint32_t total_inodes = superblock->s_inodes_count / superblock->s_inodes_per_group;
 
-//	printf("inodes %i groups %i\n",total_inodes,total_groups);
+	printf("inodes %i groups %i\n",total_inodes,total_groups);
 
 
 	ext2_group_descriptor_t *gd_table = malloc(sizeof(ext2_group_descriptor_t)*groups);
@@ -265,7 +328,16 @@ int main(int argc, char **argv)
 		inode_print(inode_table[21]);
 	
 	ext2_directory_t *root = open_root(fs, inode_table);
-	list_files(root);
+	list_files(root, inode_table[1].i_size);
+	printf("\n\n");
+	ext2_directory_t *dir = open_dir(fs, inode_table, 12);
+	list_files(dir, inode_table[11].i_size);
+
+int test =	lookup_file(dir, inode_table[11].i_size, "map");
+	if(test)
+		printf("awesome\n");
+
+	
 /*
 //		printf("\nsize %i\n",sizeof(ext2_inode_t));
 	printf("groups %i\n",groups);
