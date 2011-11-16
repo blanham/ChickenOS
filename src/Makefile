@@ -3,12 +3,12 @@ CC=$(CROSS)/i586-elf-gcc
 IDIR=./include
 
 LIB_SRCS=./lib/stdio.o ./lib/string.o ./lib/sys.o ./lib/kernel/memory.o 
-SOURCES2= gdt.o  interrupt.o intr-core.o 
-SOURCES=kmain.o console.o hw.o loader.o  timer.o $(LIB_SRCS) $(SOURCES2)
+SOURCES2=  interrupt.o intr-core.o 
+SOURCES=kmain.o console.o hw.o kbd.o loader.o  timer.o vm.o $(LIB_SRCS) $(SOURCES2)
 LINKER=i586-elf-ld
-CFLAGS=-Wall -Wextra -Werror -I./include --std=gnu99\
+CFLAGS=-g -Wall -Wextra -Werror -I./include --std=gnu99\
     -nostdlib -nostdinc -fno-builtin -nostartfiles -nodefaultlibs
-LDFLAGS=linker.ld
+LDFLAGS=-Tlinker.ld
 ASFLAGS=-felf
 
 all: $(SOURCES) link
