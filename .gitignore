@@ -1,5 +1,6 @@
 *.img
 *.sw*
+bochsout.txt
 tmp/
 utils/
 
