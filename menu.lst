@@ -1,0 +1,7 @@
+default = 0
+timeout = 1
+hiddenmenu
+title ChickenOS
+	root (fd0)
+	kernel /kernel
+	module /initrd

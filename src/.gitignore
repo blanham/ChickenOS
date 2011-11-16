@@ -1,3 +1,4 @@
 kernel.bin
+cscope.out
 *.sw*
 *.o
