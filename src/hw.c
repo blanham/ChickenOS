@@ -17,4 +17,14 @@ uint16_t inw(uint16_t port)
 	unsigned short ret;
 	asm volatile ("inw %1, %0" : "=a" (ret) : "dN" (port));
 	return ret;
+}
+/* shutsdown qemu/bochs */
+void shutdown()
+{
+	const char s[] = "Shutdown";
+	const char *p;
+	for (p = s; *p != '\0'; p++)
+    	outb (0x8900, *p);
+	asm volatile ("hlt");
+
 } 
