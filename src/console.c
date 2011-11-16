@@ -17,7 +17,9 @@ console_t console1;
 console_t console2;
 console_t *consoles[NUM_CONSOLES] = {&console0, &console1, &console2};
 console_t *console = &console0;
+
 #define CURSOR_POS (console->x + console->y*80)
+
 static void console_cursor_move(uint16_t pos)
 {
 	outb(0x3D4, 14); //cursor highbyte register selected
@@ -25,6 +27,11 @@ static void console_cursor_move(uint16_t pos)
 	outb(0x3D4, 15); //cursor lowbyte register selected
 	outb(0x3D5, pos & 0xFF);
 }
+void console_set_color(uint8_t bg_color, uint8_t fg_color)
+{
+	console->attribute = (bg_color << 12) | (fg_color << 8) ;
+}
+
 /* rewrite this later with memcpy and memset */
 static void console_scroll()
 {
@@ -46,7 +53,7 @@ void console_putc(uint8_t c)
 			if(console->x != 0)
 				console->x--;
 			break;
-		case 0x29://tab
+		//case 0x29://tab
 		case '\t'://tab
 			console->x = (console->x + 8) & ~(7);
 			break;
@@ -56,7 +63,7 @@ void console_putc(uint8_t c)
 			console->x = 0;
 			break;
 		default:
-			console->videoram[CURSOR_POS] = 0x0700 | c;
+			console->videoram[CURSOR_POS] = console->attribute | c;
 			console->x++;
 	}
 	if(console->x >= 80) 
@@ -93,8 +100,10 @@ void console_clear()
 void console_init()
 {
 	console->x = console->y = 0;
+	console->attribute = BLANK;
 	console->videoram = videoram;
 	console_clear();
+	kbd_init();
 }
 /*
 void console_switch(int num)
