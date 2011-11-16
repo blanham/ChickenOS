@@ -1,5 +1,8 @@
 #ifndef C_OS_TYPES_H
 #define C_OS_TYPES_H
+typedef unsigned int	size_t;
+typedef unsigned long	ssize_t;
+typedef unsigned int	off_t;
 typedef signed   char 	int8_t;
 typedef unsigned char 	uint8_t;
 typedef signed   short 	int16_t;
