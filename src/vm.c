@@ -1,10 +1,61 @@
 #include <kernel/vm.h>
+#include <kernel/interrupt.h>
 #include <stdio.h>
+#include "debug.h"
 extern unsigned int end;
 // Declare the page directory and a page table, both 4kb-aligned
 unsigned long kernelpagedir[1024] __attribute__ ((aligned (4096)));
 unsigned long lowpagetable[1024] __attribute__ ((aligned (4096)));
- 
+#define PAGE_VIOLATION 0x01
+#define PAGE_WRITE	   0x02
+#define PAGE_USER	   0x04
+void page_fault(struct registers * regs)
+{
+	void *faulting_addr;
+	uint32_t error_code = regs->err_code;
+
+	bool is_user, is_write, not_present;	
+		
+	is_user = ((PAGE_USER & error_code) ? TRUE : FALSE);
+	is_write = ((PAGE_WRITE & error_code) ? TRUE : FALSE);
+	not_present = ((PAGE_VIOLATION & error_code) ? FALSE : TRUE);
+	if(is_user)
+		printf("user space\n");
+	else
+		printf("kernel space\n");
+
+	if(is_write)
+		printf("write\n");
+	else
+		printf("read\n");
+	
+	if(not_present)
+		printf("page not present\n");
+	else
+		printf("protection violation\n");
+
+
+
+	asm volatile ("mov %%cr2, %0"
+				  : "=r" (faulting_addr)
+
+				 );
+	printf("PAGE FAULT! @ %x\n",faulting_addr);
+
+	if(!is_user)
+	{
+		dump_regs(regs);
+		PANIC("Page fault in kernel space");
+	}
+}
+
+void vm_init()
+{
+	printf("Kernel end %x\n", &end);
+
+	interrupt_register(14, &page_fault);
+}
+
 void paging_init()
 {
 // Pointers to the page directory and the page table
@@ -88,7 +139,4 @@ void gdt_install()
  
 	gdt_flush();
 }
-void vm_init()
-{
-	printf("Kernel end %x\n", &end);
-}
+
