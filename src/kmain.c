@@ -7,14 +7,7 @@
 #include <kernel/hw.h>
 #include <multiboot.h>
 #define NULL 0
-#define PANIC(x) panic(__FILE__, __LINE__, x);
-void panic(char *file, int line,char* msg)
-{
-	console_set_color(RED,WHITE);
-	console_puts("KERNEL PANIC\n");
-	printf("file:%s line:%i [%s]\n",file, line, msg);
-	while(1);
-}
+#include "debug.h"
 void print_mb(unsigned long addr, unsigned long magic)
 {
      #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -146,6 +139,8 @@ void kmain(uint32_t mbd, uint32_t magic)
 	console_set_color(BLACK,WHITE);
 	
 	printf("hello, world \n");
-	
+
+	char *p = (char *)0x8000000;
+	*p = *p;	
 	PANIC("kmain returned");
 }
