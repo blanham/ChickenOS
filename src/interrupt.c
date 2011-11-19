@@ -73,6 +73,16 @@ void interrupt_handler(struct registers *regs)
 	if(regs->int_no > NUM_ISRS)
 		pic_send_end(regs->int_no - NUM_ISRS);
 }
+void dump_regs(struct registers *regs)
+{
+	printf("edi %x esi %x ebp %x esp %x ebx %x edx %x ecx %x eax %x\n",
+		regs->edi,regs->esi,regs->ebp,regs->esp,regs->ebx,regs->edx,regs->ecx,regs->eax);
+	printf("eip %x cs %x eflags %x useresp %x ss %x\n",
+		regs->eip, regs->cs, regs->eflags, regs->useresp, regs->ss);
+
+
+
+}
 
 void pic_init()
 {
