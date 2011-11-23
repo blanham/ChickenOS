@@ -24,5 +24,5 @@ void interrupt_init();
 typedef void intr_handler (struct registers *);
 void interrupt_register(int irq, intr_handler *handler);
 
-enum { PTI_I, KBD_I = IRQ1, CASC_I, COM2_I, COM1_I, FD_I};
+enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};
 #endif
