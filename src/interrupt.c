@@ -18,7 +18,7 @@ idt_entry_t idt_table[NUM_INTRS];
 idt_ptr_t	idt_ptr;
 intr_handler *intr_handlers[NUM_INTRS];
 
-
+extern void syscall_isr();
 extern void idt_flush(uint32_t);
 static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags);
 
@@ -47,9 +47,11 @@ void interrupt_init()
 
 	for(int i = 0; i < NUM_ISRS + NUM_IRQS; i++)
 		idt_build_entry(&idt_table[i], (uint32_t)isrs[i], 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
+	
 	for(int i = 0; i < NUM_INTRS; i++)
 		interrupt_register(i, void_handler);
 	
+	idt_build_entry(&idt_table[0x80], (uint32_t)syscall_isr, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
 	idt_flush((uint32_t)&idt_ptr);
 
 	asm volatile("sti");
@@ -58,8 +60,9 @@ void interrupt_init()
 void interrupt_register(int irq, intr_handler *handler)
 {
 	intr_handlers[irq] = handler;
-	if(irq > NUM_ISRS)
-		pic_unmask(1);
+//	printf("irg %x pointer %x\n",irq,handler);
+	if(irq > NUM_ISRS && irq > NUM_ISRS + NUM_IRQS)
+		pic_unmask(irq-20);
 }
 
 void interrupt_handler(struct registers *regs)
@@ -70,7 +73,7 @@ void interrupt_handler(struct registers *regs)
 	} else {
 		printf("something wrong in interrupt.c\n");
 	}
-	if(regs->int_no > NUM_ISRS)
+	if(regs->int_no >= NUM_ISRS)
 		pic_send_end(regs->int_no - NUM_ISRS);
 }
 void dump_regs(struct registers *regs)
@@ -102,7 +105,7 @@ void pic_init()
 	outb(PIC1_DATA, 0x01);
 	outb(PIC2_DATA, 0x01);
 	/* finish init */
-	outb(PIC1_DATA, 0x01);//disables system timer for now
+	outb(PIC1_DATA, 0x0);//disables system timer for now
 	outb(PIC2_DATA, 0x0);
 }
 void pic_send_end(int irq)
