@@ -1,14 +1,38 @@
 #include <kernel/vm.h>
 #include <kernel/interrupt.h>
+#include <kernel/bitmap.h>
 #include <stdio.h>
 #include "debug.h"
+#define PAGE_SIZE 4096
+#define PAGE_MASK 0xFFFFF000
 extern unsigned int end;
+
+typedef uint32_t phys_addr_t;
+typedef uint32_t virt_addr_t;
+unsigned int placement = 0;
+phys_addr_t palloc_start = 0;
+virt_addr_t heap_start;
+bitmap_t page_bitmap;
+//uint32_t placement;
 // Declare the page directory and a page table, both 4kb-aligned
 unsigned long kernelpagedir[1024] __attribute__ ((aligned (4096)));
 unsigned long lowpagetable[1024] __attribute__ ((aligned (4096)));
+uint32_t palloc_bitmap_storage[1024] __attribute__ ((aligned (4096)));
+uint32_t *palloc_bitmap = palloc_bitmap_storage;
 #define PAGE_VIOLATION 0x01
 #define PAGE_WRITE	   0x02
 #define PAGE_USER	   0x04
+
+
+void gpf(struct registers *regs)
+{
+	regs = regs;
+
+	uint32_t error_code = regs->err_code;
+	printf("Error %x\n",error_code);
+	dump_regs(regs);
+	PANIC("GENERAL PROTECTION FAULT!");
+}
 void page_fault(struct registers * regs)
 {
 	void *faulting_addr;
@@ -46,15 +70,113 @@ void page_fault(struct registers * regs)
 	{
 		dump_regs(regs);
 		PANIC("Page fault in kernel space");
+	}else {
+		//kill process
+
 	}
 }
-
-void vm_init()
+void palloc_internal_free(void *addr, int pages)
 {
-	printf("Kernel end %x\n", &end);
-
-	interrupt_register(14, &page_fault);
+	uint32_t index = ((virt_addr_t)addr - palloc_start) / PAGE_SIZE;
+	bitmap_clear_multiple(&page_bitmap, index, pages);
+	//might copy pintos here and set entire page(s) to some magic number	
 }
+void palloc_free(void *addr)
+{
+	palloc_internal_free(addr,1);
+
+}
+void pallocn_free(void *addr, int pages)
+{
+	palloc_internal_free(addr,pages);
+
+}
+
+
+void *palloc_internal(phys_addr_t *phys, int pages)
+{
+	int32_t first;
+	virt_addr_t virt = 0xdeadbeef;
+	if((first = bitmap_find_multiple(&page_bitmap, pages)) == BITMAP_ERROR)
+		PANIC("NO MORE PAGES AVAILABLE");
+
+	bitmap_set_multiple(&page_bitmap, first,pages);
+	virt = palloc_start + (first * PAGE_SIZE);
+	if(phys != 0)
+		*phys = (phys_addr_t)(virt - PHYS_BASE);	
+
+	return (void *)virt;
+}
+
+void *palloc()
+{
+	return palloc_internal(0, 1);
+}
+
+void *pallocn(uint32_t count)
+{
+
+
+	return palloc_internal(0, count);
+
+}
+void palloc_init(uint32_t page_count, uint32_t placement)
+{
+	void *start = 0;
+	uint32_t bitmap_ptr = placement;
+ 	page_count = page_count;
+	uint32_t bitmap_length = (page_count/32);
+	start = (void *)(placement + bitmap_length);
+	if(((uint32_t)start & PAGE_MASK) != 0)
+		start = (void *)(((uint32_t)start & PAGE_MASK) + PAGE_SIZE);
+//	printf("b_t %x start %x\n", bitmap_ptr, (uint32_t)start);
+	bitmap_init_phys(&page_bitmap, page_count, (uint32_t *)bitmap_ptr);
+//	uint32_t first = bitmap_find_first(&page_bitmap);
+/*	printf("first %i\n",first);*/
+	palloc_start = (phys_addr_t)start;
+}
+void heap_init()
+{
+/*	void *test = pallocn(9);
+	void *test2 = palloc();
+	printf("test %x test2 %x\n", test, test2);
+	pallocn_free(test, 9);
+	test = pallocn(21);
+	void *test3 = palloc(); 
+
+	printf("test %x test2 %x test3 %x\n", test, test2, test3);*/
+}
+void vm_init(uint32_t size)
+{
+	if(placement == 0)
+		placement = (unsigned)&end;
+	placement = (placement & PAGE_MASK)  + PAGE_SIZE;
+	uint32_t temp = (placement - PHYS_BASE)/PAGE_SIZE; 
+	uint32_t page_count = (size/4) - temp;
+	printf("%iMB installed %i\n", (size)/1024 + 2);
+//	printf("Kernel end %X\n", placement);
+		
+//	printf("stack %x\n", &size);
+
+	interrupt_register(13, &gpf);
+	interrupt_register(14, &page_fault);
+
+	palloc_init(page_count, placement);
+	heap_init();
+	uint8_t *asdf = (uint8_t*) PHYS_BASE + 1024*1024*4 - 1;
+	*asdf = 0;
+}
+
+void install_pagedir(uint32_t *pd)
+{
+	asm volatile (	"mov %0, %%eax\n"
+				"mov %%eax, %%cr3\n"
+				"mov %%cr0, %%eax\n"
+				"orl $0x80000000, %%eax\n"
+				"mov %%eax, %%cr0\n" :: "m" (pd));
+
+}
+
 
 void paging_init()
 {
@@ -80,12 +202,14 @@ void paging_init()
 	kernelpagedir[0] = (unsigned long)lowpagetablePtr | 0x3;
 	kernelpagedir[768] = (unsigned long)lowpagetablePtr | 0x3;
 	// Copies the address of the page directory into the CR3 register and, finally, enables paging!
- 
+
+	install_pagedir((uint32_t *)kernelpagedirPtr);
+/* 
 	asm volatile (	"mov %0, %%eax\n"
 			"mov %%eax, %%cr3\n"
 			"mov %%cr0, %%eax\n"
 			"orl $0x80000000, %%eax\n"
-			"mov %%eax, %%cr0\n" :: "m" (kernelpagedirPtr));
+			"mov %%eax, %%cr0\n" :: "m" (kernelpagedirPtr));*/
 gdt_install();
 
 }
