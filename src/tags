@@ -1,0 +1,722 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ALLOCSIZE	lib/stdio.c	5;"	d	file:
+BCD_TO	timer.c	28;"	d	file:
+BITMAP_ERROR	include/kernel/bitmap.h	13;"	d
+BIT_HIGH	include/kernel/bitmap.h	12;"	d
+BKSPACE	kbd.c	9;"	d	file:
+BLACK	include/kernel/console.h	/^	BLACK, BLUE, GREEN, CYAN,$/;"	e	enum:console_color
+BLANK	console.c	6;"	d	file:
+BLOCK	fs/ext2fs.c	8;"	d	file:
+BLOCK	fs/fs.c	107;"	d	file:
+BLUE	include/kernel/console.h	/^	BLACK, BLUE, GREEN, CYAN,$/;"	e	enum:console_color
+BROWN	include/kernel/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
+CASC_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
+CHECK_FLAG	kmain.c	66;"	d	file:
+COM1_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
+COM2_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
+CR	kbd.c	12;"	d	file:
+CURRENT_CONSOLE	console.c	9;"	d	file:
+CURSOR_POS	console.c	21;"	d	file:
+CYAN	include/kernel/console.h	/^	BLACK, BLUE, GREEN, CYAN,$/;"	e	enum:console_color
+C_OS_BITMAP_H	include/kernel/bitmap.h	2;"	d
+C_OS_CONSOLE_H	include/kernel/console.h	2;"	d
+C_OS_HW_H	include/kernel/hw.h	2;"	d
+C_OS_INTERRUPT_H	include/kernel/interrupt.h	2;"	d
+C_OS_MEMORY_H	include/kernel/memory.h	2;"	d
+C_OS_STDINT_H	include/stdint.h	2;"	d
+C_OS_STDIO_H	include/stdio.h	2;"	d
+C_OS_STRING_H	include/string.h	2;"	d
+C_OS_SYSCALL_H	syscall.h	2;"	d
+C_OS_SYS_H	include/sys.h	2;"	d
+C_OS_THREAD_H	include/kernel/thread.h	2;"	d
+C_OS_TIMER_H	include/kernel/timer.h	2;"	d
+C_OS_TYPES_H	include/kernel/types.h	2;"	d
+C_OS_VFS_H	fs/vfs.h	2;"	d
+C_OS_VM_H	include/kernel/vm.h	2;"	d
+DK_GREY	include/kernel/console.h	/^	DK_GREY,LT_BLUE,LT_GREEN, LT_CYAN,$/;"	e	enum:console_color
+ESC	kbd.c	11;"	d	file:
+EXT2_ACL_DATA_INO	fs/ext2fs_defs.h	100;"	d
+EXT2_ACL_DATA_INO	fs/fs.c	112;"	d	file:
+EXT2_ACL_IDX_INO	fs/ext2fs_defs.h	99;"	d
+EXT2_ACL_IDX_INO	fs/fs.c	111;"	d	file:
+EXT2_BAD_INO	fs/ext2fs_defs.h	97;"	d
+EXT2_BAD_INO	fs/fs.c	109;"	d	file:
+EXT2_BOOT_LOADER_INO	fs/ext2fs_defs.h	101;"	d
+EXT2_BOOT_LOADER_INO	fs/fs.c	113;"	d	file:
+EXT2_ROOT_INO	fs/ext2fs_defs.h	98;"	d
+EXT2_ROOT_INO	fs/fs.c	110;"	d	file:
+EXT2_UNDEL_DIR_INO	fs/ext2fs_defs.h	102;"	d
+EXT2_UNDEL_DIR_INO	fs/fs.c	114;"	d	file:
+EXT_C	include/multiboot.h	38;"	d
+EXT_C	include/multiboot.h	40;"	d
+FALSE	include/kernel/types.h	13;"	d
+FD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
+GREEN	include/kernel/console.h	/^	BLACK, BLUE, GREEN, CYAN,$/;"	e	enum:console_color
+IDT_FLAG_BASE	i386-defs.h	21;"	d
+IDT_FLAG_PRESENT	i386-defs.h	22;"	d
+IDT_FLAG_RING0	i386-defs.h	23;"	d
+IDT_FLAG_RING1	i386-defs.h	24;"	d
+IDT_FLAG_RING2	i386-defs.h	25;"	d
+IDT_FLAG_RING3	i386-defs.h	26;"	d
+INIT_LIST_HEAD	fs/list.h	32;"	d
+INODE	fs/ext2fs.c	7;"	d	file:
+INODE	fs/fs.c	106;"	d	file:
+IRQ0	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon3
+IRQ10	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon3
+IRQ11	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon3
+IRQ12	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon3
+IRQ13	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon3
+IRQ14	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon3
+IRQ15	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon3
+IRQ1	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon3
+IRQ2	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon3
+IRQ3	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon3
+IRQ4	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon3
+IRQ5	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon3
+IRQ6	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon3
+IRQ7	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon3
+IRQ8	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon3
+IRQ9	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon3
+KBD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
+LIST_HEAD_INIT	fs/list.h	27;"	d
+LIST_HEAD	fs/list.h	29;"	d
+LT_BLUE	include/kernel/console.h	/^	DK_GREY,LT_BLUE,LT_GREEN, LT_CYAN,$/;"	e	enum:console_color
+LT_BROWN	include/kernel/console.h	/^	LT_RED, LT_MAGENTA, LT_BROWN, WHITE$/;"	e	enum:console_color
+LT_CYAN	include/kernel/console.h	/^	DK_GREY,LT_BLUE,LT_GREEN, LT_CYAN,$/;"	e	enum:console_color
+LT_GREEN	include/kernel/console.h	/^	DK_GREY,LT_BLUE,LT_GREEN, LT_CYAN,$/;"	e	enum:console_color
+LT_GREY	include/kernel/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
+LT_MAGENTA	include/kernel/console.h	/^	LT_RED, LT_MAGENTA, LT_BROWN, WHITE$/;"	e	enum:console_color
+LT_RED	include/kernel/console.h	/^	LT_RED, LT_MAGENTA, LT_BROWN, WHITE$/;"	e	enum:console_color
+L_CTRL	kbd.c	5;"	d	file:
+L_SHIFT	kbd.c	7;"	d	file:
+MAGENTA	include/kernel/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
+MULTIBOOT_BOOTLOADER_MAGIC	include/multiboot.h	31;"	d
+MULTIBOOT_HEADER_FLAGS	include/multiboot.h	25;"	d
+MULTIBOOT_HEADER_FLAGS	include/multiboot.h	27;"	d
+MULTIBOOT_HEADER_MAGIC	include/multiboot.h	21;"	d
+NULL	console.c	4;"	d	file:
+NULL	include/kernel.h	4;"	d
+NULL	kmain.c	10;"	d	file:
+NULL	lib/stdio.c	4;"	d	file:
+NUM_CONSOLES	console.c	8;"	d	file:
+NUM_INTRS	i386-defs.h	19;"	d
+NUM_IRQS	interrupt.c	14;"	d	file:
+NUM_ISRS	interrupt.c	15;"	d	file:
+P2V	include/kernel/vm.h	6;"	d
+PAGE_MASK	vm.c	7;"	d	file:
+PAGE_SIZE	vm.c	6;"	d	file:
+PAGE_USER	vm.c	24;"	d	file:
+PAGE_VIOLATION	vm.c	22;"	d	file:
+PAGE_WRITE	vm.c	23;"	d	file:
+PANIC	debug.h	3;"	d
+PHYS_BASE	include/kernel/vm.h	4;"	d
+PIC1_CMD	i386-defs.h	28;"	d
+PIC1_DATA	i386-defs.h	29;"	d
+PIC2_CMD	i386-defs.h	30;"	d
+PIC2_DATA	i386-defs.h	31;"	d
+PIC_EOI	i386-defs.h	32;"	d
+PIT0_DATA	timer.c	8;"	d	file:
+PIT1_DATA	timer.c	9;"	d	file:
+PIT2_DATA	timer.c	10;"	d	file:
+PIT_CMD	timer.c	11;"	d	file:
+PIT_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
+RED	include/kernel/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
+RTC_DATA	timer.c	14;"	d	file:
+RTC_REG	timer.c	13;"	d	file:
+RTC_UPDATE	timer.c	15;"	d	file:
+R_CTRL	kbd.c	6;"	d	file:
+R_SHIFT	kbd.c	8;"	d	file:
+SEEK_CUR	fs/vfs.h	8;"	d
+SEEK_END	fs/vfs.h	9;"	d
+SEEK_SET	fs/vfs.h	7;"	d
+STACK_SIZE	include/multiboot.h	34;"	d
+S_IFBLK	fs/ext2fs_defs.h	77;"	d
+S_IFBLK	fs/fs.c	86;"	d	file:
+S_IFCHR	fs/ext2fs_defs.h	79;"	d
+S_IFCHR	fs/fs.c	88;"	d	file:
+S_IFDIR	fs/ext2fs_defs.h	78;"	d
+S_IFDIR	fs/fs.c	87;"	d	file:
+S_IFIFO	fs/ext2fs_defs.h	80;"	d
+S_IFIFO	fs/fs.c	89;"	d	file:
+S_IFLNK	fs/ext2fs_defs.h	75;"	d
+S_IFLNK	fs/fs.c	84;"	d	file:
+S_IFMT	fs/ext2fs_defs.h	73;"	d
+S_IFMT	fs/fs.c	82;"	d	file:
+S_IFREG	fs/ext2fs_defs.h	76;"	d
+S_IFREG	fs/fs.c	85;"	d	file:
+S_IFSOCK	fs/ext2fs_defs.h	74;"	d
+S_IFSOCK	fs/fs.c	83;"	d	file:
+S_IRGRP	fs/ext2fs_defs.h	89;"	d
+S_IRGRP	fs/fs.c	98;"	d	file:
+S_IROTH	fs/ext2fs_defs.h	93;"	d
+S_IROTH	fs/fs.c	102;"	d	file:
+S_IRUSR	fs/ext2fs_defs.h	85;"	d
+S_IRUSR	fs/fs.c	94;"	d	file:
+S_IRWXG	fs/ext2fs_defs.h	88;"	d
+S_IRWXG	fs/fs.c	97;"	d	file:
+S_IRWXO	fs/ext2fs_defs.h	92;"	d
+S_IRWXO	fs/fs.c	101;"	d	file:
+S_IRWXU	fs/ext2fs_defs.h	84;"	d
+S_IRWXU	fs/fs.c	93;"	d	file:
+S_ISGID	fs/ext2fs_defs.h	82;"	d
+S_ISGID	fs/fs.c	91;"	d	file:
+S_ISUID	fs/ext2fs_defs.h	81;"	d
+S_ISUID	fs/fs.c	90;"	d	file:
+S_ISVTX	fs/ext2fs_defs.h	83;"	d
+S_ISVTX	fs/fs.c	92;"	d	file:
+S_IWGRP	fs/ext2fs_defs.h	90;"	d
+S_IWGRP	fs/fs.c	99;"	d	file:
+S_IWOTH	fs/ext2fs_defs.h	94;"	d
+S_IWOTH	fs/fs.c	103;"	d	file:
+S_IWUSR	fs/ext2fs_defs.h	86;"	d
+S_IWUSR	fs/fs.c	95;"	d	file:
+S_IXGRP	fs/ext2fs_defs.h	91;"	d
+S_IXGRP	fs/fs.c	100;"	d	file:
+S_IXOTH	fs/ext2fs_defs.h	95;"	d
+S_IXOTH	fs/fs.c	104;"	d	file:
+S_IXUSR	fs/ext2fs_defs.h	87;"	d
+S_IXUSR	fs/fs.c	96;"	d	file:
+TAB	kbd.c	10;"	d	file:
+TRUE	include/kernel/types.h	14;"	d
+UNUSED	fs/ext2fs.c	9;"	d	file:
+UNUSED	fs/vfs.c	7;"	d	file:
+V2P	include/kernel/vm.h	5;"	d
+WHITE	include/kernel/console.h	/^	LT_RED, LT_MAGENTA, LT_BROWN, WHITE$/;"	e	enum:console_color
+_ANSI_STDARG_H_	include/stdarg.h	32;"	d
+_BSD_VA_LIST	include/stdarg.h	67;"	d
+_STDARG_H	include/stdarg.h	31;"	d
+_VA_LIST_DEFINED	include/stdarg.h	114;"	d
+_VA_LIST_T_H	include/stdarg.h	117;"	d
+_VA_LIST_	include/stdarg.h	108;"	d
+_VA_LIST_	include/stdarg.h	76;"	d
+_VA_LIST	include/stdarg.h	111;"	d
+_VA_LIST	include/stdarg.h	63;"	d
+_VA_LIST	include/stdarg.h	79;"	d
+__GNUC_VA_LIST	include/stdarg.h	39;"	d
+__LIST_H	fs/list.h	2;"	d
+__VA_LIST	include/stdarg.h	84;"	d
+__gnuc_va_list	include/stdarg.h	/^typedef __builtin_va_list __gnuc_va_list;$/;"	t
+__list_add	fs/list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
+__list_del	fs/list.h	/^static inline void __list_del(struct list_head *prev, struct list_head *next)$/;"	f
+__list_splice	fs/list.h	/^static inline void __list_splice(struct list_head *list,$/;"	f
+__need___va_list	include/stdarg.h	34;"	d
+__va_copy	include/stdarg.h	53;"	d
+__va_list__	include/stdarg.h	120;"	d
+access	include/kernel/vm_defs.h	/^   uint8_t  access;              \/\/ Access flags, determine what ring this segment can be used in.$/;"	m	struct:gdt_entry_struct
+access	vm.c	/^	unsigned char access;$/;"	m	struct:gdt_entry	file:
+addr	include/multiboot.h	/^       unsigned long addr;$/;"	m	struct:aout_symbol_table
+addr	include/multiboot.h	/^       unsigned long addr;$/;"	m	struct:elf_section_header_table
+afree	lib/stdio.c	/^void afree(char *p)$/;"	f
+allocbuf	lib/stdio.c	/^static char allocbuf[ALLOCSIZE];$/;"	v	file:
+alloc	lib/stdio.c	/^char *alloc(int n)$/;"	f
+allocp	lib/stdio.c	/^static char *allocp = allocbuf;$/;"	v	file:
+always0	i386-defs.h	/^   uint8_t  always0;             \/\/ This must always be zero.$/;"	m	struct:idt_entry_struct
+aout_symbol_table	include/multiboot.h	/^     typedef struct aout_symbol_table$/;"	s
+aout_sym	include/multiboot.h	/^         multiboot_aout_symbol_table_t aout_sym;$/;"	m	union:multiboot_info::__anon2
+array	include/kernel/test.c	/^uint32_t array[1024];$/;"	v
+attribute	console.c	/^	uint16_t attribute;$/;"	m	struct:__anon1	file:
+base_addr_high	include/multiboot.h	/^       unsigned long base_addr_high;$/;"	m	struct:memory_map
+base_addr_low	include/multiboot.h	/^       unsigned long base_addr_low;$/;"	m	struct:memory_map
+base_high	include/kernel/vm_defs.h	/^   uint8_t  base_high;           \/\/ The last 8 bits of the base.$/;"	m	struct:gdt_entry_struct
+base_high	vm.c	/^	unsigned char base_high;$/;"	m	struct:gdt_entry	file:
+base_hi	i386-defs.h	/^   uint16_t base_hi;             \/\/ The upper 16 bits of the address to jump to.$/;"	m	struct:idt_entry_struct
+base_lo	i386-defs.h	/^   uint16_t base_lo;             \/\/ The lower 16 bits of the address to jump to when this interrupt fires.$/;"	m	struct:idt_entry_struct
+base_low	include/kernel/vm_defs.h	/^   uint16_t base_low;            \/\/ The lower 16 bits of the base.$/;"	m	struct:gdt_entry_struct
+base_low	vm.c	/^	unsigned short base_low;$/;"	m	struct:gdt_entry	file:
+base_middle	include/kernel/vm_defs.h	/^   uint8_t  base_middle;         \/\/ The next 8 bits of the base.$/;"	m	struct:gdt_entry_struct
+base_middle	vm.c	/^	unsigned char base_middle;$/;"	m	struct:gdt_entry	file:
+base	i386-defs.h	/^   uint32_t base;                \/\/ The address of the first element in our idt_entry_t array.$/;"	m	struct:idt_ptr_struct
+base	include/kernel/vm_defs.h	/^   uint32_t base;                \/\/ The address of the first gdt_entry_t struct.$/;"	m	struct:gdt_ptr_struct
+base	vm.c	/^	unsigned int base;$/;"	m	struct:gdt_ptr	file:
+bg_block_bitmap	fs/ext2fs_defs.h	/^	uint32_t bg_block_bitmap;\/\/address of block containing the block bitmap for this group$/;"	m	struct:ext2_group_descriptor
+bg_block_bitmap	fs/fs.c	/^	uint32_t bg_block_bitmap;\/\/address of block containing the block bitmap for this group$/;"	m	struct:ext2_group_descriptor	file:
+bg_free_blocks_count	fs/ext2fs_defs.h	/^	uint16_t bg_free_blocks_count;\/\/count of free blocks in group$/;"	m	struct:ext2_group_descriptor
+bg_free_blocks_count	fs/fs.c	/^	uint16_t bg_free_blocks_count;\/\/count of free blocks in group$/;"	m	struct:ext2_group_descriptor	file:
+bg_free_inodes_count	fs/ext2fs_defs.h	/^	uint16_t bg_free_inodes_count;\/\/count of free inodes in group$/;"	m	struct:ext2_group_descriptor
+bg_free_inodes_count	fs/fs.c	/^	uint16_t bg_free_inodes_count;\/\/count of free inodes in group$/;"	m	struct:ext2_group_descriptor	file:
+bg_inode_bitmap	fs/ext2fs_defs.h	/^	uint32_t bg_inode_bitmap;\/\/address of block containing the inode bitmap for this group$/;"	m	struct:ext2_group_descriptor
+bg_inode_bitmap	fs/fs.c	/^	uint32_t bg_inode_bitmap;\/\/address of block containing the inode bitmap for this group$/;"	m	struct:ext2_group_descriptor	file:
+bg_inode_table	fs/ext2fs_defs.h	/^	uint32_t bg_inode_table;\/\/address of the block containing the inode table for this group$/;"	m	struct:ext2_group_descriptor
+bg_inode_table	fs/fs.c	/^	uint32_t bg_inode_table;\/\/address of the block containing the inode table for this group$/;"	m	struct:ext2_group_descriptor	file:
+bg_pad	fs/ext2fs_defs.h	/^	uint16_t bg_pad;$/;"	m	struct:ext2_group_descriptor
+bg_pad	fs/fs.c	/^	uint16_t bg_pad;$/;"	m	struct:ext2_group_descriptor	file:
+bg_reserved	fs/ext2fs_defs.h	/^	uint32_t bg_reserved[3];$/;"	m	struct:ext2_group_descriptor
+bg_reserved	fs/fs.c	/^	uint32_t bg_reserved[3];$/;"	m	struct:ext2_group_descriptor	file:
+bg_used_dirs_count	fs/ext2fs_defs.h	/^	uint16_t bg_used_dirs_count; \/\/number of inodes in this group that are directories$/;"	m	struct:ext2_group_descriptor
+bg_used_dirs_count	fs/fs.c	/^	uint16_t bg_used_dirs_count; \/\/number of inodes in this group that are directories$/;"	m	struct:ext2_group_descriptor	file:
+bitmap_clear_multiple	include/kernel/bitmap.h	/^static inline int bitmap_clear_multiple(bitmap_t *bitmap, uint32_t index, uint32_t count)$/;"	f
+bitmap_clear	include/kernel/bitmap.h	/^static inline int bitmap_clear(bitmap_t *bitmap, uint32_t index)$/;"	f
+bitmap_find_first	include/kernel/bitmap.h	/^static inline uint32_t bitmap_find_first(bitmap_t *bitmap)$/;"	f
+bitmap_find_multiple	include/kernel/bitmap.h	/^static inline uint32_t bitmap_find_multiple(bitmap_t *bitmap, int count)$/;"	f
+bitmap_init_phys	include/kernel/bitmap.h	/^static inline void bitmap_init_phys(bitmap_t *bitmap, uint32_t size, uint32_t *ptr)$/;"	f
+bitmap_search	fs/fs.c	/^int bitmap_search(uint32_t *bitmap, uint32_t position, uint32_t length)$/;"	f
+bitmap_set_multiple	include/kernel/bitmap.h	/^static inline int bitmap_set_multiple(bitmap_t *bitmap, uint32_t index, uint32_t count)$/;"	f
+bitmap_set	include/kernel/bitmap.h	/^static inline int bitmap_set(bitmap_t *bitmap, uint32_t index)$/;"	f
+bitmap_test	include/kernel/bitmap.h	/^static inline int bitmap_test(bitmap_t *bitmap, uint32_t index)$/;"	f
+bitmap_t	include/kernel/bitmap.h	/^} bitmap_t;$/;"	t	typeref:struct:bitmap
+bitmap	include/kernel/bitmap.h	/^typedef struct bitmap {$/;"	s
+bitmap	include/kernel/test.c	/^bitmap_t bitmap = array;$/;"	v
+block_bitmap	fs/fs.c	/^	uint32_t *block_bitmap;$/;"	m	struct:ext2_filesystem	file:
+blocks_per_alloc	fs/fat.c	/^	uint8_t  blocks_per_alloc;$/;"	m	struct:fat_bootblock	file:
+blocks_per_track	fs/fat.c	/^	uint16_t blocks_per_track;$/;"	m	struct:fat_bootblock	file:
+bool	include/kernel/types.h	/^typedef uint32_t	    bool;$/;"	t
+boot_device	include/multiboot.h	/^       unsigned long boot_device;$/;"	m	struct:multiboot_info
+boot_record	fs/fat.c	/^	uint8_t  boot_record;$/;"	m	struct:fat_bootblock	file:
+boot	fs/fat.c	/^	uint8_t  boot[0x1c2];$/;"	m	struct:fat_bootblock	file:
+bss_end_addr	include/multiboot.h	/^       unsigned long bss_end_addr;$/;"	m	struct:multiboot_header
+bytes_per_block	fs/fat.c	/^	uint16_t bytes_per_block;$/;"	m	struct:fat_bootblock	file:
+c_os_time	timer.c	/^struct c_os_time {$/;"	s	file:
+century	timer.c	/^	uint8_t century;$/;"	m	struct:c_os_time	file:
+checksum	include/multiboot.h	/^       unsigned long checksum;$/;"	m	struct:multiboot_header
+cmdline	include/multiboot.h	/^       unsigned long cmdline;$/;"	m	struct:module
+cmdline	include/multiboot.h	/^       unsigned long cmdline;$/;"	m	struct:multiboot_info
+console0	console.c	/^console_t console0;$/;"	v
+console1	console.c	/^console_t console1;$/;"	v
+console2	console.c	/^console_t console2;$/;"	v
+console_clear	console.c	/^void console_clear()$/;"	f
+console_color	include/kernel/console.h	/^enum console_color {$/;"	g
+console_cursor_move	console.c	/^static void console_cursor_move(uint16_t pos)$/;"	f	file:
+console_init	console.c	/^void console_init()$/;"	f
+console_putc	console.c	/^void console_putc(uint8_t c)$/;"	f
+console_puts	console.c	/^int console_puts(char *string)$/;"	f
+console_scroll	console.c	/^static void console_scroll()$/;"	f	file:
+console_set_color	console.c	/^void console_set_color(uint8_t bg_color, uint8_t fg_color)$/;"	f
+console_t	console.c	/^} console_t;$/;"	t	typeref:struct:__anon1	file:
+consoles	console.c	/^console_t *consoles[NUM_CONSOLES] = {&console0, &console1, &console2};$/;"	v
+console	console.c	/^console_t *console = &console0;$/;"	v
+creat	fs/vfs.c	/^int creat(const char *path, uint32_t mode)$/;"	f
+cs	include/kernel/interrupt.h	/^   uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
+data	include/kernel/bitmap.h	/^	uint32_t *data;$/;"	m	struct:bitmap
+day	timer.c	/^	uint8_t day;$/;"	m	struct:c_os_time	file:
+days	timer.c	/^char * days[7] = {$/;"	v
+desc	fs/fat.c	/^	uint8_t desc[8];$/;"	m	struct:fat_bootblock	file:
+dir	fs/vfs.c	/^	struct file *dir;$/;"	m	struct:file	typeref:struct:file::file	file:
+disk_blocks2	fs/fat.c	/^	uint32_t disk_blocks2;$/;"	m	struct:fat_bootblock	file:
+disk_blocks	fs/fat.c	/^	uint16_t disk_blocks;\/\/0 if overflow$/;"	m	struct:fat_bootblock	file:
+drive_number	fs/fat.c	/^	uint16_t drive_number;$/;"	m	struct:fat_bootblock	file:
+ds	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
+dump_regs	interrupt.c	/^void dump_regs(struct registers *regs)$/;"	f
+eax	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+ebp	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+ebx	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+ecx	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+edi	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+edx	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+eflags	include/kernel/interrupt.h	/^   uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
+eip	include/kernel/interrupt.h	/^   uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
+elf_sec	include/multiboot.h	/^         multiboot_elf_section_header_table_t elf_sec;$/;"	m	union:multiboot_info::__anon2
+elf_section_header_table	include/multiboot.h	/^     typedef struct elf_section_header_table$/;"	s
+entry_addr	include/multiboot.h	/^       unsigned long entry_addr;$/;"	m	struct:multiboot_header
+err_code	include/kernel/interrupt.h	/^   uint32_t int_no, err_code;    \/\/ Interrupt number and error code (if applicable)$/;"	m	struct:registers
+esi	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+es	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
+esp	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
+ext2_directory_t	fs/ext2fs_defs.h	/^} ext2_directory_t;$/;"	t	typeref:struct:ext2_directory
+ext2_directory_t	fs/fs.c	/^} ext2_directory_t;$/;"	t	typeref:struct:ext2_directory	file:
+ext2_directory	fs/ext2fs_defs.h	/^typedef struct ext2_directory {$/;"	s
+ext2_directory	fs/fs.c	/^typedef struct ext2_directory {$/;"	s	file:
+ext2_filesystem_t	fs/ext2fs.c	/^} ext2_filesystem_t;$/;"	t	typeref:struct:ext2_filesystem	file:
+ext2_filesystem_t	fs/fs.c	/^} ext2_filesystem_t;$/;"	t	typeref:struct:ext2_filesystem	file:
+ext2_filesystem	fs/ext2fs.c	/^typedef struct ext2_filesystem {$/;"	s	file:
+ext2_filesystem	fs/fs.c	/^typedef struct ext2_filesystem {$/;"	s	file:
+ext2_group_descriptor_t	fs/ext2fs_defs.h	/^} ext2_group_descriptor_t;$/;"	t	typeref:struct:ext2_group_descriptor
+ext2_group_descriptor_t	fs/fs.c	/^} ext2_group_descriptor_t;$/;"	t	typeref:struct:ext2_group_descriptor	file:
+ext2_group_descriptor	fs/ext2fs_defs.h	/^typedef struct ext2_group_descriptor {$/;"	s
+ext2_group_descriptor	fs/fs.c	/^typedef struct ext2_group_descriptor {$/;"	s	file:
+ext2_inode_t	fs/ext2fs_defs.h	/^typedef struct ext2_inode ext2_inode_t;$/;"	t	typeref:struct:ext2_inode
+ext2_inode_t	fs/fs.c	/^typedef struct ext2_inode ext2_inode_t;$/;"	t	typeref:struct:ext2_inode	file:
+ext2_inode	fs/ext2fs_defs.h	/^struct ext2_inode {$/;"	s
+ext2_inode	fs/fs.c	/^struct ext2_inode {$/;"	s	file:
+ext2_load	fs/ext2fs.c	/^ext2_filesystem_t *ext2_load(char *filename)$/;"	f
+ext2_open_block	fs/fs.c	/^uint8_t *ext2_open_block()$/;"	f
+ext2_open_dir	fs/ext2fs.c	/^ext2_directory_t *ext2_open_dir()$/;"	f
+ext2_read_block	fs/ext2fs.c	/^int ext2_read_block(ext2_filesystem_t *ext2, uint32_t block, void *buf)$/;"	f
+ext2_read_blockon	fs/ext2fs.c	/^int ext2_read_blockon(ext2_filesystem_t *ext2, uint32_t block, void *buf, size_t offset, size_t length)$/;"	f
+ext2_read_inode	fs/ext2fs.c	/^int ext2_read_inode(ext2_filesystem_t *ext2, uint32_t inode_num, ext2_inode_t *inode)$/;"	f
+ext2_read_raw	fs/ext2fs.c	/^int ext2_read_raw(ext2_filesystem_t *ext2, void *buf, uint32_t offset, uint32_t size)$/;"	f
+ext2_superblock_t	fs/ext2fs_defs.h	/^} ext2_superblock_t;$/;"	t	typeref:struct:ext2_superblock
+ext2_superblock_t	fs/fs.c	/^} ext2_superblock_t;$/;"	t	typeref:struct:ext2_superblock	file:
+ext2_superblock	fs/ext2fs_defs.h	/^typedef struct ext2_superblock {$/;"	s
+ext2_superblock	fs/fs.c	/^typedef struct ext2_superblock {$/;"	s	file:
+ext2	fs/ext2fs.c	/^int ext2(char *filename)$/;"	f
+fat_blocks	fs/fat.c	/^	uint16_t fat_blocks;$/;"	m	struct:fat_bootblock	file:
+fat_bootblock_t	fs/fat.c	/^typedef struct fat_bootblock fat_bootblock_t;$/;"	t	typeref:struct:fat_bootblock	file:
+fat_bootblock	fs/fat.c	/^struct fat_bootblock {$/;"	s	file:
+file_system	fs/fat.c	/^	uint8_t  file_system[8];$/;"	m	struct:fat_bootblock	file:
+file_type	fs/ext2fs_defs.h	/^	uint8_t file_type;$/;"	m	struct:ext2_directory
+file_type	fs/fs.c	/^	uint8_t file_type;$/;"	m	struct:ext2_directory	file:
+file	fs/vfs.c	/^	struct file *file;$/;"	m	struct:file	typeref:struct:file::file	file:
+file	fs/vfs.c	/^struct file {$/;"	s	file:
+filesystem	fs/fs.c	/^	void *filesystem;$/;"	m	struct:vfs_file	file:
+filesystem	fs/vfs.c	/^	void *filesystem;$/;"	m	struct:vfs_file	file:
+flags	i386-defs.h	/^   uint8_t  flags;               \/\/ More flags. See documentation.$/;"	m	struct:idt_entry_struct
+flags	include/multiboot.h	/^       unsigned long flags;$/;"	m	struct:multiboot_header
+flags	include/multiboot.h	/^       unsigned long flags;$/;"	m	struct:multiboot_info
+fs	fs/ext2fs.c	/^	char *fs;$/;"	m	struct:ext2_filesystem	file:
+fs	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
+gd_print	fs/ext2fs.c	/^void gd_print(ext2_group_descriptor_t gdt)$/;"	f
+gd_print	fs/fs.c	/^void gd_print(ext2_group_descriptor_t gdt)$/;"	f
+gd_table	fs/fs.c	/^	ext2_group_descriptor_t *gd_table; $/;"	m	struct:ext2_filesystem	file:
+gdt_entry_struct	include/kernel/vm_defs.h	/^struct gdt_entry_struct$/;"	s
+gdt_entry_t	include/kernel/vm_defs.h	/^typedef struct gdt_entry_struct gdt_entry_t; $/;"	t	typeref:struct:gdt_entry_struct
+gdt_entry	vm.c	/^struct gdt_entry$/;"	s	file:
+gdt_init	gdt.c	/^void gdt_init()$/;"	f
+gdt_install	vm.c	/^void gdt_install()$/;"	f
+gdt_ptr_struct	include/kernel/vm_defs.h	/^struct gdt_ptr_struct$/;"	s
+gdt_ptr_t	include/kernel/vm_defs.h	/^typedef struct gdt_ptr_struct gdt_ptr_t; $/;"	t	typeref:struct:gdt_ptr_struct
+gdt_ptr	vm.c	/^struct gdt_ptr$/;"	s	file:
+gdt_set_gate	vm.c	/^void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran)$/;"	f
+gdt	vm.c	/^struct gdt_entry gdt[3];$/;"	v	typeref:struct:gdt_entry
+gpf	vm.c	/^void gpf(struct registers *regs)$/;"	f
+gp	vm.c	/^struct gdt_ptr gp;$/;"	v	typeref:struct:gdt_ptr
+granularity	include/kernel/vm_defs.h	/^   uint8_t  granularity;$/;"	m	struct:gdt_entry_struct
+granularity	vm.c	/^	unsigned char granularity;$/;"	m	struct:gdt_entry	file:
+group	fs/fs.c	/^	uint32_t group;$/;"	m	struct:inode_cached	file:
+group	fs/vfs.c	/^	uint32_t group;$/;"	m	struct:inode_cached	file:
+gs	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
+header_addr	include/multiboot.h	/^       unsigned long header_addr;$/;"	m	struct:multiboot_header
+heads	fs/fat.c	/^	uint16_t heads;$/;"	m	struct:fat_bootblock	file:
+heap_init	vm.c	/^void heap_init()$/;"	f
+heap_start	vm.c	/^virt_addr_t heap_start;$/;"	v
+hidden_blocks	fs/fat.c	/^	uint32_t hidden_blocks;$/;"	m	struct:fat_bootblock	file:
+hour	timer.c	/^	uint8_t hour;$/;"	m	struct:c_os_time	file:
+i_atime	fs/ext2fs_defs.h	/^	uint32_t i_atime;\/\/access time$/;"	m	struct:ext2_inode
+i_atime	fs/fs.c	/^	uint32_t i_atime;\/\/access time$/;"	m	struct:ext2_inode	file:
+i_block	fs/ext2fs_defs.h	/^	uint32_t i_block[15];\/\/pointers to blocks$/;"	m	struct:ext2_inode
+i_block	fs/fs.c	/^	uint32_t i_block[15];\/\/pointers to blocks$/;"	m	struct:ext2_inode	file:
+i_blocks	fs/ext2fs_defs.h	/^	uint32_t i_blocks;\/\/blocks count$/;"	m	struct:ext2_inode
+i_blocks	fs/fs.c	/^	uint32_t i_blocks;\/\/blocks count$/;"	m	struct:ext2_inode	file:
+i_ctime	fs/ext2fs_defs.h	/^	uint32_t i_ctime;\/\/creation time$/;"	m	struct:ext2_inode
+i_ctime	fs/fs.c	/^	uint32_t i_ctime;\/\/creation time$/;"	m	struct:ext2_inode	file:
+i_dir_acl	fs/ext2fs_defs.h	/^	uint32_t i_dir_acl;\/\/directory acl$/;"	m	struct:ext2_inode
+i_dir_acl	fs/fs.c	/^	uint32_t i_dir_acl;\/\/directory acl$/;"	m	struct:ext2_inode	file:
+i_dtime	fs/ext2fs_defs.h	/^	uint32_t i_dtime;\/\/deletion time$/;"	m	struct:ext2_inode
+i_dtime	fs/fs.c	/^	uint32_t i_dtime;\/\/deletion time$/;"	m	struct:ext2_inode	file:
+i_faddr	fs/ext2fs_defs.h	/^	uint8_t i_faddr;\/\/fragment address$/;"	m	struct:ext2_inode
+i_faddr	fs/fs.c	/^	uint8_t i_faddr;\/\/fragment address$/;"	m	struct:ext2_inode	file:
+i_file_acl	fs/ext2fs_defs.h	/^	uint32_t i_file_acl;\/\/file ACL$/;"	m	struct:ext2_inode
+i_file_acl	fs/fs.c	/^	uint32_t i_file_acl;\/\/file ACL$/;"	m	struct:ext2_inode	file:
+i_flags	fs/ext2fs_defs.h	/^	uint32_t i_flags;\/\/file flags$/;"	m	struct:ext2_inode
+i_flags	fs/fs.c	/^	uint32_t i_flags;\/\/file flags$/;"	m	struct:ext2_inode	file:
+i_fsize	fs/ext2fs_defs.h	/^	uint8_t i_fsize;\/\/fragment size$/;"	m	struct:ext2_inode
+i_fsize	fs/fs.c	/^	uint8_t i_fsize;\/\/fragment size$/;"	m	struct:ext2_inode	file:
+i_gid	fs/ext2fs_defs.h	/^	uint16_t i_gid;\/\/Group ID$/;"	m	struct:ext2_inode
+i_gid	fs/fs.c	/^	uint16_t i_gid;\/\/Group ID$/;"	m	struct:ext2_inode	file:
+i_links_count	fs/ext2fs_defs.h	/^	uint16_t i_links_count;\/\/links count$/;"	m	struct:ext2_inode
+i_links_count	fs/fs.c	/^	uint16_t i_links_count;\/\/links count$/;"	m	struct:ext2_inode	file:
+i_mode	fs/ext2fs_defs.h	/^	uint16_t i_mode;\/\/File mode$/;"	m	struct:ext2_inode
+i_mode	fs/fs.c	/^	uint16_t i_mode;\/\/File mode$/;"	m	struct:ext2_inode	file:
+i_mtime	fs/ext2fs_defs.h	/^	uint32_t i_mtime;\/\/modification time$/;"	m	struct:ext2_inode
+i_mtime	fs/fs.c	/^	uint32_t i_mtime;\/\/modification time$/;"	m	struct:ext2_inode	file:
+i_pad1	fs/ext2fs_defs.h	/^	uint16_t i_pad1;$/;"	m	struct:ext2_inode
+i_pad1	fs/fs.c	/^	uint16_t i_pad1;$/;"	m	struct:ext2_inode	file:
+i_reserved1	fs/ext2fs_defs.h	/^	uint32_t i_reserved1;$/;"	m	struct:ext2_inode
+i_reserved1	fs/fs.c	/^	uint32_t i_reserved1;$/;"	m	struct:ext2_inode	file:
+i_reserved2	fs/ext2fs_defs.h	/^	uint32_t i_reserved2[3];$/;"	m	struct:ext2_inode
+i_reserved2	fs/fs.c	/^	uint32_t i_reserved2[3];$/;"	m	struct:ext2_inode	file:
+i_size	fs/ext2fs_defs.h	/^	uint32_t i_size;\/\/size in bytes$/;"	m	struct:ext2_inode
+i_size	fs/fs.c	/^	uint32_t i_size;\/\/size in bytes$/;"	m	struct:ext2_inode	file:
+i_uid	fs/ext2fs_defs.h	/^	uint16_t i_uid;\/\/Owner UID$/;"	m	struct:ext2_inode
+i_uid	fs/fs.c	/^	uint16_t i_uid;\/\/Owner UID$/;"	m	struct:ext2_inode	file:
+i_version	fs/ext2fs_defs.h	/^	uint32_t i_version;$/;"	m	struct:ext2_inode
+i_version	fs/fs.c	/^	uint32_t i_version;$/;"	m	struct:ext2_inode	file:
+idt_build_entry	interrupt.c	/^static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags)$/;"	f	file:
+idt_entry_struct	i386-defs.h	/^struct idt_entry_struct$/;"	s
+idt_entry_t	i386-defs.h	/^typedef struct idt_entry_struct idt_entry_t;$/;"	t	typeref:struct:idt_entry_struct
+idt_ptr_struct	i386-defs.h	/^struct idt_ptr_struct$/;"	s
+idt_ptr_t	i386-defs.h	/^typedef struct idt_ptr_struct idt_ptr_t;$/;"	t	typeref:struct:idt_ptr_struct
+idt_ptr	interrupt.c	/^idt_ptr_t	idt_ptr;$/;"	v
+idt_table	interrupt.c	/^idt_entry_t idt_table[NUM_INTRS];$/;"	v
+inb	hw.c	/^uint8_t inb(uint16_t port)$/;"	f
+inode_bitmap	fs/fs.c	/^	uint32_t *inode_bitmap;$/;"	m	struct:ext2_filesystem	file:
+inode_cached_t	fs/fs.c	/^} inode_cached_t;$/;"	t	typeref:struct:inode_cached	file:
+inode_cached_t	fs/vfs.c	/^} inode_cached_t;$/;"	t	typeref:struct:inode_cached	file:
+inode_cached	fs/fs.c	/^typedef struct inode_cached {$/;"	s	file:
+inode_cached	fs/vfs.c	/^typedef struct inode_cached {$/;"	s	file:
+inode_print	fs/ext2fs.c	/^void inode_print(ext2_inode_t inode)$/;"	f
+inode_print	fs/fs.c	/^void inode_print(ext2_inode_t inode)$/;"	f
+inode	fs/ext2fs_defs.h	/^	uint32_t inode;$/;"	m	struct:ext2_directory
+inode	fs/fs.c	/^	uint32_t inode;$/;"	m	struct:ext2_directory	file:
+inode	fs/fs.c	/^	uint32_t inode;$/;"	m	struct:inode_cached	file:
+inode	fs/fs.c	/^	uint32_t inode;$/;"	m	struct:vfs_file	file:
+inode	fs/vfs.c	/^	uint32_t inode;$/;"	m	struct:inode_cached	file:
+inode	fs/vfs.c	/^	uint32_t inode;$/;"	m	struct:vfs_file	file:
+install_pagedir	vm.c	/^void install_pagedir(uint32_t *pd)$/;"	f
+int16_t	include/kernel/types.h	/^typedef signed   short 	int16_t;$/;"	t
+int16_t	include/stdint.h	/^typedef signed   short 	int16_t;$/;"	t
+int32_t	include/kernel/types.h	/^typedef signed   int 	int32_t;$/;"	t
+int32_t	include/stdint.h	/^typedef signed   int 	int32_t;$/;"	t
+int8_t	include/kernel/types.h	/^typedef signed   char 	int8_t;$/;"	t
+int8_t	include/stdint.h	/^typedef signed   char 	int8_t;$/;"	t
+int_no	include/kernel/interrupt.h	/^   uint32_t int_no, err_code;    \/\/ Interrupt number and error code (if applicable)$/;"	m	struct:registers
+int_to_string	lib/stdio.c	/^static char *int_to_string(int num, int base, int size)$/;"	f	file:
+interrupt_handler	interrupt.c	/^void interrupt_handler(struct registers *regs)$/;"	f
+interrupt_init	interrupt.c	/^void interrupt_init()$/;"	f
+interrupt_register	interrupt.c	/^void interrupt_register(int irq, intr_handler *handler)$/;"	f
+intr_handlers	interrupt.c	/^intr_handler *intr_handlers[NUM_INTRS];$/;"	v
+intr_handler	include/kernel/interrupt.h	/^typedef void intr_handler (struct registers *);$/;"	t
+inw	hw.c	/^uint16_t inw(uint16_t port)$/;"	f
+isrs	i386-defs.h	/^void (*isrs[])(void) = {$/;"	v
+jdt	timer.c	/^int32_t jdt(int8_t m, int8_t d, int16_t y)$/;"	f
+jmp	fs/fat.c	/^	uint8_t jmp[3];$/;"	m	struct:fat_bootblock	file:
+kbd_init	kbd.c	/^void kbd_init()$/;"	f
+kbd_intr	kbd.c	/^void kbd_intr()\/\/;\/\/struct registers * regs)$/;"	f
+kbd_map_shifted	kbd.c	/^char kbd_map_shifted[256] = {$/;"	v
+kbd_map_unshifted	kbd.c	/^char kbd_map_unshifted[256] = {$/;"	v
+kernelpagedir	vm.c	/^unsigned long kernelpagedir[1024] __attribute__ ((aligned (4096)));$/;"	v
+kmain	kmain.c	/^void kmain(uint32_t mbd, uint32_t magic)$/;"	f
+kmemcpy	lib/kernel/memory.c	/^uint8_t *kmemcpy(uint8_t *dest, uint8_t *src, size_t count)$/;"	f
+kmemcpyw	lib/kernel/memory.c	/^uint16_t *kmemcpyw(uint16_t *dest, uint16_t *src, size_t count)$/;"	f
+kmemset	lib/kernel/memory.c	/^uint8_t *kmemset(uint8_t *dest, uint8_t val, size_t count)$/;"	f
+kmemsetw	lib/kernel/memory.c	/^uint16_t *kmemsetw(uint16_t *dest, uint16_t val, size_t count)$/;"	f
+kstrlen	lib/kernel/memory.c	/^size_t kstrlen(uint8_t *str)$/;"	f
+length_high	include/multiboot.h	/^       unsigned long length_high;$/;"	m	struct:memory_map
+length_low	include/multiboot.h	/^       unsigned long length_low;$/;"	m	struct:memory_map
+limit_low	include/kernel/vm_defs.h	/^   uint16_t limit_low;           \/\/ The lower 16 bits of the limit.$/;"	m	struct:gdt_entry_struct
+limit_low	vm.c	/^	unsigned short limit_low;$/;"	m	struct:gdt_entry	file:
+limit	i386-defs.h	/^   uint16_t limit;$/;"	m	struct:idt_ptr_struct
+limit	include/kernel/vm_defs.h	/^   uint16_t limit;               \/\/ The upper 16 bits of all selector limits.$/;"	m	struct:gdt_ptr_struct
+limit	vm.c	/^	unsigned short limit;$/;"	m	struct:gdt_ptr	file:
+list_add_tail	fs/list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
+list_add	fs/list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
+list_del_init	fs/list.h	/^static inline void list_del_init(struct list_head *entry)$/;"	f
+list_del	fs/list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
+list_elem	include/kernel/list.h	/^struct list_elem {$/;"	s
+list_empty	fs/list.h	/^static inline int list_empty(struct list_head *head)$/;"	f
+list_entry	fs/list.h	192;"	d
+list_files	fs/ext2fs.c	/^void list_files(ext2_directory_t *dir, uint32_t len)$/;"	f
+list_files	fs/fs.c	/^void list_files(ext2_directory_t *dir, uint32_t len)$/;"	f
+list_for_each_entry_safe	fs/list.h	240;"	d
+list_for_each_entry	fs/list.h	228;"	d
+list_for_each_prev	fs/list.h	208;"	d
+list_for_each_safe	fs/list.h	218;"	d
+list_for_each	fs/list.h	200;"	d
+list_head	fs/list.h	/^struct list_head {$/;"	s
+list_move_tail	fs/list.h	/^static inline void list_move_tail(struct list_head *list,$/;"	f
+list_move	fs/list.h	/^static inline void list_move(struct list_head *list, struct list_head *head)$/;"	f
+list_splice_init	fs/list.h	/^static inline void list_splice_init(struct list_head *list,$/;"	f
+list_splice	fs/list.h	/^static inline void list_splice(struct list_head *list, struct list_head *head)$/;"	f
+load_addr	include/multiboot.h	/^       unsigned long load_addr;$/;"	m	struct:multiboot_header
+load_end_addr	include/multiboot.h	/^       unsigned long load_end_addr;$/;"	m	struct:multiboot_header
+lookup_file	fs/ext2fs.c	/^int lookup_file(ext2_directory_t *dir, uint32_t len, char *filename)$/;"	f
+lookup_file	fs/fs.c	/^int lookup_file(ext2_directory_t *dir, uint32_t len, char *filename)$/;"	f
+lookup	fs/ext2fs.c	/^void lookup(ext2_filesystem_t *ext2, char *name)$/;"	f
+lowpagetable	vm.c	/^unsigned long lowpagetable[1024] __attribute__ ((aligned (4096)));$/;"	v
+lseek	fs/vfs.c	/^off_t lseek(int fildes, off_t offset, int whence)$/;"	f
+magic	include/multiboot.h	/^       unsigned long magic;$/;"	m	struct:multiboot_header
+main	fs/fs.c	/^int main(int argc, char **argv)$/;"	f
+main	fs/vfs.c	/^int main(int argc, char **argv)$/;"	f
+main	include/kernel/test.c	/^int main(int argc, char **argv)$/;"	f
+main	init.c	/^int main (int argc, char **argv)$/;"	f
+media_desc	fs/fat.c	/^	uint8_t  media_desc;$/;"	m	struct:fat_bootblock	file:
+mem_lower	include/multiboot.h	/^       unsigned long mem_lower;$/;"	m	struct:multiboot_info
+mem_upper	include/multiboot.h	/^       unsigned long mem_upper;$/;"	m	struct:multiboot_info
+memory_map	include/multiboot.h	/^     typedef struct memory_map$/;"	s
+minute	timer.c	/^	uint8_t minute;$/;"	m	struct:c_os_time	file:
+mmap_addr	include/multiboot.h	/^       unsigned long mmap_addr;$/;"	m	struct:multiboot_info
+mmap_length	include/multiboot.h	/^       unsigned long mmap_length;$/;"	m	struct:multiboot_info
+mod_end	include/multiboot.h	/^       unsigned long mod_end;$/;"	m	struct:module
+mod_start	include/multiboot.h	/^       unsigned long mod_start;$/;"	m	struct:module
+mods_addr	include/multiboot.h	/^       unsigned long mods_addr;$/;"	m	struct:multiboot_info
+mods_count	include/multiboot.h	/^       unsigned long mods_count;$/;"	m	struct:multiboot_info
+module	include/multiboot.h	/^     typedef struct module$/;"	s
+month	timer.c	/^	uint8_t month;$/;"	m	struct:c_os_time	file:
+multiboot_aout_symbol_table_t	include/multiboot.h	/^     } multiboot_aout_symbol_table_t;$/;"	t	typeref:struct:aout_symbol_table
+multiboot_elf_section_header_table_t	include/multiboot.h	/^     } multiboot_elf_section_header_table_t;$/;"	t	typeref:struct:elf_section_header_table
+multiboot_header_t	include/multiboot.h	/^     } multiboot_header_t;$/;"	t	typeref:struct:multiboot_header
+multiboot_header	include/multiboot.h	/^     typedef struct multiboot_header$/;"	s
+multiboot_info_t	include/multiboot.h	/^     } multiboot_info_t;$/;"	t	typeref:struct:multiboot_info
+multiboot_info	include/multiboot.h	/^     typedef struct multiboot_info$/;"	s
+multiboot_memory_map_t	include/multiboot.h	/^     } multiboot_memory_map_t;$/;"	t	typeref:struct:memory_map
+multiboot_module_t	include/multiboot.h	/^     } multiboot_module_t;$/;"	t	typeref:struct:module
+name_len	fs/ext2fs_defs.h	/^	uint8_t name_len;$/;"	m	struct:ext2_directory
+name_len	fs/fs.c	/^	uint8_t name_len;$/;"	m	struct:ext2_directory	file:
+name	fs/ext2fs_defs.h	/^	uint8_t name[255];$/;"	m	struct:ext2_directory
+name	fs/fs.c	/^	char *name;\/\/perhaps use name[255\/256] instead?NO! what about other fses?$/;"	m	struct:vfs_file	file:
+name	fs/fs.c	/^	uint8_t name[255];$/;"	m	struct:ext2_directory	file:
+name	fs/vfs.c	/^	char *name;\/\/perhaps use name[255\/256] instead?NO! what about other fses?$/;"	m	struct:vfs_file	file:
+next	fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
+num_fats	fs/fat.c	/^	uint8_t	 num_fats;$/;"	m	struct:fat_bootblock	file:
+num	include/multiboot.h	/^       unsigned long num;$/;"	m	struct:elf_section_header_table
+off_t	include/kernel/types.h	/^typedef unsigned int	off_t;$/;"	t
+open_dir	fs/ext2fs.c	/^ext2_directory_t *open_dir(uint8_t *fs, ext2_inode_t *inode_table, uint32_t inode)$/;"	f
+open_dir	fs/fs.c	/^ext2_directory_t *open_dir(uint8_t *fs, ext2_inode_t *inode_table, uint32_t inode)$/;"	f
+open_root	fs/ext2fs.c	/^ext2_directory_t *open_root(uint8_t *fs, ext2_inode_t *inode_table)$/;"	f
+open_root	fs/fs.c	/^ext2_directory_t *open_root(uint8_t *fs, ext2_inode_t *inode_table)$/;"	f
+open	fs/vfs.c	/^int open(const char *path, int oflag)$/;"	f
+outb	hw.c	/^void outb(uint16_t port, uint8_t value)$/;"	f
+page_bitmap	vm.c	/^bitmap_t page_bitmap;$/;"	v
+page_fault	vm.c	/^void page_fault(struct registers * regs)$/;"	f
+paging_init	vm.c	/^void paging_init()$/;"	f
+palloc_bitmap_storage	vm.c	/^uint32_t palloc_bitmap_storage[1024] __attribute__ ((aligned (4096)));$/;"	v
+palloc_bitmap	vm.c	/^uint32_t *palloc_bitmap = palloc_bitmap_storage;$/;"	v
+palloc_free	vm.c	/^void palloc_free(void *addr)$/;"	f
+palloc_init	vm.c	/^void palloc_init(uint32_t page_count, uint32_t placement)$/;"	f
+palloc_internal_free	vm.c	/^void palloc_internal_free(void *addr, int pages)$/;"	f
+palloc_internal	vm.c	/^void *palloc_internal(phys_addr_t *phys, int pages)$/;"	f
+palloc_start	vm.c	/^phys_addr_t palloc_start = 0;$/;"	v
+palloc	vm.c	/^void *palloc()$/;"	f
+pallocn_free	vm.c	/^void pallocn_free(void *addr, int pages)$/;"	f
+pallocn	vm.c	/^void *pallocn(uint32_t count)$/;"	f
+panic	debug.h	/^static inline void panic(char *file, int line,char* msg)$/;"	f
+parent	fs/vfs.c	/^	struct file *parent;$/;"	m	struct:file	typeref:struct:file::file	file:
+pathsearch	fs/vfs.c	/^int pathsearch(char *path)$/;"	f
+phys_addr_t	vm.c	/^typedef uint32_t phys_addr_t;$/;"	t	file:
+pic_init	interrupt.c	/^void pic_init()$/;"	f
+pic_mask	interrupt.c	/^void pic_mask(int irq)$/;"	f
+pic_send_end	interrupt.c	/^void pic_send_end(int irq)$/;"	f
+pic_unmask	interrupt.c	/^void pic_unmask(int irq)$/;"	f
+placement	vm.c	/^unsigned int placement = 0;$/;"	v
+prev	fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
+print_dir_entry	fs/ext2fs.c	/^void print_dir_entry(ext2_directory_t *dir)$/;"	f
+print_dir_entry	fs/fs.c	/^void print_dir_entry(ext2_directory_t *dir)$/;"	f
+print_mb	kmain.c	/^void print_mb(unsigned long addr, unsigned long magic)$/;"	f
+printf	lib/stdio.c	/^void printf(char *fmt, ...)$/;"	f
+putc	lib/stdio.c	/^void putc(char c)$/;"	f
+puts	lib/stdio.c	/^int puts(char *string)$/;"	f
+read_rtc_reg	timer.c	/^uint8_t read_rtc_reg(uint8_t reg)$/;"	f
+read	fs/vfs.c	/^ssize_t read(int fildes, void *buf, size_t nbyte)$/;"	f
+read	fs/fs.c	/^	vfs_read_block_t read;$/;"	m	struct:vfs_fs	file:
+read	fs/vfs.c	/^	vfs_read_inode_t read;$/;"	m	struct:vfs_superblock_ops	file:
+rec_len	fs/ext2fs_defs.h	/^	uint16_t rec_len;$/;"	m	struct:ext2_directory
+rec_len	fs/fs.c	/^	uint16_t rec_len;$/;"	m	struct:ext2_directory	file:
+registers_t	include/kernel/interrupt.h	/^typedef struct registers registers_t;$/;"	t	typeref:struct:registers
+registers	include/kernel/interrupt.h	/^struct registers$/;"	s
+reserved_blocks	fs/fat.c	/^	uint16_t reserved_blocks;$/;"	m	struct:fat_bootblock	file:
+reserved	include/multiboot.h	/^       unsigned long reserved;$/;"	m	struct:aout_symbol_table
+reserved	include/multiboot.h	/^       unsigned long reserved;$/;"	m	struct:module
+return_value	syscall.c	/^int return_value = 0;$/;"	v
+root_directories	fs/fat.c	/^	uint16_t root_directories;$/;"	m	struct:fat_bootblock	file:
+root	fs/vfs.c	/^struct file root;$/;"	v	typeref:struct:file
+rtc_data_print	timer.c	/^void rtc_data_print(uint8_t *data)$/;"	f
+rtc_data	timer.c	/^uint8_t rtc_data[8];$/;"	v
+rtc_init	timer.c	/^void rtc_init()$/;"	f
+s_blocks_count	fs/ext2fs_defs.h	/^	uint32_t s_blocks_count; \/\/Count of blocks in fs$/;"	m	struct:ext2_superblock
+s_blocks_count	fs/fs.c	/^	uint32_t s_blocks_count; \/\/Count of blocks in fs$/;"	m	struct:ext2_superblock	file:
+s_blocks_per_group	fs/ext2fs_defs.h	/^	uint32_t s_blocks_per_group;\/\/Count of # of blocks in each block group$/;"	m	struct:ext2_superblock
+s_blocks_per_group	fs/fs.c	/^	uint32_t s_blocks_per_group;\/\/Count of # of blocks in each block group$/;"	m	struct:ext2_superblock	file:
+s_checkinterval	fs/ext2fs_defs.h	/^	uint32_t s_checkinterval;\/\/maximum time between checks$/;"	m	struct:ext2_superblock
+s_checkinterval	fs/fs.c	/^	uint32_t s_checkinterval;\/\/maximum time between checks$/;"	m	struct:ext2_superblock	file:
+s_creator_os	fs/ext2fs_defs.h	/^	uint32_t s_creator_os;\/\/indicator of which OS created $/;"	m	struct:ext2_superblock
+s_creator_os	fs/fs.c	/^	uint32_t s_creator_os;\/\/indicator of which OS created $/;"	m	struct:ext2_superblock	file:
+s_errors	fs/ext2fs_defs.h	/^	uint16_t s_errors;\/\/flags indicating errors$/;"	m	struct:ext2_superblock
+s_errors	fs/fs.c	/^	uint16_t s_errors;\/\/flags indicating errors$/;"	m	struct:ext2_superblock	file:
+s_first_data_block	fs/ext2fs_defs.h	/^	uint32_t s_first_data_block; \/\/First block that contains data$/;"	m	struct:ext2_superblock
+s_first_data_block	fs/fs.c	/^	uint32_t s_first_data_block; \/\/First block that contains data$/;"	m	struct:ext2_superblock	file:
+s_frags_per_group	fs/ext2fs_defs.h	/^	uint32_t s_frags_per_group;\/\/Count of # of fragments in each block group$/;"	m	struct:ext2_superblock
+s_frags_per_group	fs/fs.c	/^	uint32_t s_frags_per_group;\/\/Count of # of fragments in each block group$/;"	m	struct:ext2_superblock	file:
+s_free_blocks_count	fs/ext2fs_defs.h	/^	uint32_t s_free_blocks_count; \/\/Count of # of free blocksw$/;"	m	struct:ext2_superblock
+s_free_blocks_count	fs/fs.c	/^	uint32_t s_free_blocks_count; \/\/Count of # of free blocksw$/;"	m	struct:ext2_superblock	file:
+s_free_inodes_count	fs/ext2fs_defs.h	/^	uint32_t s_free_inodes_count; \/\/Count of # of free inodes$/;"	m	struct:ext2_superblock
+s_free_inodes_count	fs/fs.c	/^	uint32_t s_free_inodes_count; \/\/Count of # of free inodes$/;"	m	struct:ext2_superblock	file:
+s_inodes_count	fs/ext2fs_defs.h	/^	uint32_t s_inodes_count; \/\/Count of inodes in fs$/;"	m	struct:ext2_superblock
+s_inodes_count	fs/fs.c	/^	uint32_t s_inodes_count; \/\/Count of inodes in fs$/;"	m	struct:ext2_superblock	file:
+s_inodes_per_group	fs/ext2fs_defs.h	/^	uint32_t s_inodes_per_group;\/\/Count of # of inodes in each blcok group$/;"	m	struct:ext2_superblock
+s_inodes_per_group	fs/fs.c	/^	uint32_t s_inodes_per_group;\/\/Count of # of inodes in each blcok group$/;"	m	struct:ext2_superblock	file:
+s_lastcheck	fs/ext2fs_defs.h	/^	uint32_t s_lastcheck;\/\/time the fs was last checked$/;"	m	struct:ext2_superblock
+s_lastcheck	fs/fs.c	/^	uint32_t s_lastcheck;\/\/time the fs was last checked$/;"	m	struct:ext2_superblock	file:
+s_log_block_size	fs/ext2fs_defs.h	/^	uint32_t s_log_block_size; \/\/Indicator of block size$/;"	m	struct:ext2_superblock
+s_log_block_size	fs/fs.c	/^	uint32_t s_log_block_size; \/\/Indicator of block size$/;"	m	struct:ext2_superblock	file:
+s_log_frag_size	fs/ext2fs_defs.h	/^	int32_t  s_log_frag_size; \/\/Indicator of the size of fragments$/;"	m	struct:ext2_superblock
+s_log_frag_size	fs/fs.c	/^	int32_t  s_log_frag_size; \/\/Indicator of the size of fragments$/;"	m	struct:ext2_superblock	file:
+s_magic	fs/ext2fs_defs.h	/^	uint16_t s_magic;\/\/EXT2 Magic number$/;"	m	struct:ext2_superblock
+s_magic	fs/fs.c	/^	uint16_t s_magic;\/\/EXT2 Magic number$/;"	m	struct:ext2_superblock	file:
+s_max_mnt_count	fs/ext2fs_defs.h	/^	int16_t  s_max_mnt_count;\/\/number of times the file system can be mounted$/;"	m	struct:ext2_superblock
+s_max_mnt_count	fs/fs.c	/^	int16_t  s_max_mnt_count;\/\/number of times the file system can be mounted$/;"	m	struct:ext2_superblock	file:
+s_mnt_count	fs/ext2fs_defs.h	/^	uint16_t s_mnt_count;\/\/number of times the file system has been mounted$/;"	m	struct:ext2_superblock
+s_mnt_count	fs/fs.c	/^	uint16_t s_mnt_count;\/\/number of times the file system has been mounted$/;"	m	struct:ext2_superblock	file:
+s_mtime	fs/ext2fs_defs.h	/^	uint32_t s_mtime; \/\/time filesystem was last mounted$/;"	m	struct:ext2_superblock
+s_mtime	fs/fs.c	/^	uint32_t s_mtime; \/\/time filesystem was last mounted$/;"	m	struct:ext2_superblock	file:
+s_pad	fs/ext2fs_defs.h	/^	uint16_t s_pad;\/\/padding$/;"	m	struct:ext2_superblock
+s_pad	fs/fs.c	/^	uint16_t s_pad;\/\/padding$/;"	m	struct:ext2_superblock	file:
+s_r_blocks_count	fs/ext2fs_defs.h	/^	uint32_t s_r_blocks_count; \/\/Count of # of reserved blocks$/;"	m	struct:ext2_superblock
+s_r_blocks_count	fs/fs.c	/^	uint32_t s_r_blocks_count; \/\/Count of # of reserved blocks$/;"	m	struct:ext2_superblock	file:
+s_reserved	fs/ext2fs_defs.h	/^	uint32_t s_reserved[236];\/\/padding to 1024 bytesOS$/;"	m	struct:ext2_superblock
+s_reserved	fs/fs.c	/^	uint32_t s_reserved[236];\/\/padding to 1024 bytesOS$/;"	m	struct:ext2_superblock	file:
+s_rev_level	fs/ext2fs_defs.h	/^	uint32_t s_rev_level;\/\/EXT2 revision level$/;"	m	struct:ext2_superblock
+s_rev_level	fs/fs.c	/^	uint32_t s_rev_level;\/\/EXT2 revision level$/;"	m	struct:ext2_superblock	file:
+s_state	fs/ext2fs_defs.h	/^	uint16_t s_state;\/\/flags indicating current state of filesystem$/;"	m	struct:ext2_superblock
+s_state	fs/fs.c	/^	uint16_t s_state;\/\/flags indicating current state of filesystem$/;"	m	struct:ext2_superblock	file:
+s_wtime	fs/ext2fs_defs.h	/^	uint32_t s_wtime;\/\/time filesystem was last written to$/;"	m	struct:ext2_superblock
+s_wtime	fs/fs.c	/^	uint32_t s_wtime;\/\/time filesystem was last written to$/;"	m	struct:ext2_superblock	file:
+sec	timer.c	/^	uint8_t sec;$/;"	m	struct:c_os_time	file:
+sel	i386-defs.h	/^   uint16_t sel;                 \/\/ Kernel segment selector.$/;"	m	struct:idt_entry_struct
+shifts	kbd.c	/^uint16_t shifts;$/;"	v
+shndx	include/multiboot.h	/^       unsigned long shndx;$/;"	m	struct:elf_section_header_table
+shutdown	hw.c	/^void shutdown()$/;"	f
+signature	fs/fat.c	/^	uint16_t signature; $/;"	m	struct:fat_bootblock	file:
+size_t	include/kernel/types.h	/^typedef unsigned int	size_t;$/;"	t
+size	fs/ext2fs.c	/^	uint32_t size;$/;"	m	struct:ext2_filesystem	file:
+size	include/kernel/bitmap.h	/^	uint32_t size;$/;"	m	struct:bitmap
+size	include/multiboot.h	/^       unsigned long size;$/;"	m	struct:elf_section_header_table
+size	include/multiboot.h	/^       unsigned long size;$/;"	m	struct:memory_map
+ssize_t	include/kernel/types.h	/^typedef unsigned long	ssize_t;$/;"	t
+ss	include/kernel/interrupt.h	/^   uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
+strip_zeros	lib/stdio.c	/^static char *strip_zeros(char *str)$/;"	f	file:
+strlen	lib/string.c	/^int strlen(char *str)$/;"	f
+strsize	include/multiboot.h	/^       unsigned long strsize;$/;"	m	struct:aout_symbol_table
+superblock	fs/ext2fs.c	/^	ext2_superblock_t *superblock;$/;"	m	struct:ext2_filesystem	file:
+superblock	fs/fs.c	/^	ext2_superblock_t *superblock;$/;"	m	struct:ext2_filesystem	file:
+superblock	fs/vfs.c	/^	vfs_superblock_t superblock;$/;"	m	struct:vfs_fs	file:
+sys_dummy	syscall.c	/^void sys_dummy()$/;"	f
+sys_execv	thread.c	/^int sys_execv(const char *path, const char *arg[])$/;"	f
+syscall_handler	syscall.c	/^int syscall_handler (int test)$/;"	f
+syscall_init	syscall.c	/^void syscall_init()$/;"	f
+tabsize	include/multiboot.h	/^       unsigned long tabsize;$/;"	m	struct:aout_symbol_table
+test	interrupt.c	/^void test()$/;"	f
+time_init	timer.c	/^void time_init()$/;"	f
+timer_init	timer.c	/^void timer_init(uint32_t frequency)$/;"	f
+timer_intr	timer.c	/^void timer_intr(struct registers * regs)$/;"	f
+type	include/multiboot.h	/^       unsigned long type;$/;"	m	struct:memory_map
+uint16_t	include/kernel/types.h	/^typedef unsigned short 	uint16_t;$/;"	t
+uint16_t	include/stdint.h	/^typedef unsigned short 	uint16_t;$/;"	t
+uint32_t	include/kernel/types.h	/^typedef unsigned int 	uint32_t;$/;"	t
+uint32_t	include/stdint.h	/^typedef unsigned int 	uint32_t;$/;"	t
+uint8_t	include/kernel/types.h	/^typedef unsigned char 	uint8_t;$/;"	t
+uint8_t	include/stdint.h	/^typedef unsigned char 	uint8_t;$/;"	t
+u	include/multiboot.h	/^       } u;$/;"	m	struct:multiboot_info	typeref:union:multiboot_info::__anon2
+useresp	include/kernel/interrupt.h	/^   uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
+va_arg	include/stdarg.h	49;"	d
+va_copy	include/stdarg.h	51;"	d
+va_end	include/stdarg.h	48;"	d
+va_list	include/stdarg.h	/^typedef __gnuc_va_list va_list;$/;"	t
+va_start	include/stdarg.h	47;"	d
+vfs_file_t	fs/fs.c	/^} vfs_file_t;$/;"	t	typeref:struct:vfs_file	file:
+vfs_file_t	fs/vfs.c	/^} vfs_file_t;$/;"	t	typeref:struct:vfs_file	file:
+vfs_file	fs/fs.c	/^typedef struct vfs_file {$/;"	s	file:
+vfs_file	fs/vfs.c	/^typedef struct vfs_file {$/;"	s	file:
+vfs_fs_t	fs/fs.c	/^} vfs_fs_t;$/;"	t	typeref:struct:vfs_fs	file:
+vfs_fs_t	fs/vfs.c	/^} vfs_fs_t;$/;"	t	typeref:struct:vfs_fs	file:
+vfs_fs	fs/fs.c	/^typedef struct vfs_fs {$/;"	s	file:
+vfs_fs	fs/vfs.c	/^typedef struct vfs_fs {$/;"	s	file:
+vfs_init	fs/vfs.c	/^void vfs_init()$/;"	f
+vfs_malloc	fs/vfs.c	/^void *vfs_malloc(size_t size)$/;"	f
+vfs_read_inode_t	fs/fs.c	/^typedef uint8_t * (*vfs_read_inode_t) (uint32_t inode, size_t length, size_t offset);$/;"	t	file:
+vfs_read_inode_t	fs/vfs.h	/^typedef uint8_t * (*vfs_read_inode_t) (void * fs, uint32_t inode, size_t length, size_t offset);$/;"	t
+vfs_superblock_ops_t	fs/vfs.c	/^	vfs_superblock_ops_t;$/;"	m	struct:vfs_superblock	file:
+vfs_superblock_ops_t	fs/vfs.c	/^} vfs_superblock_ops_t;$/;"	t	typeref:struct:vfs_superblock_ops	file:
+vfs_superblock_ops	fs/vfs.c	/^typedef struct vfs_superblock_ops {$/;"	s	file:
+vfs_superblock_t	fs/vfs.c	/^} vfs_superblock_t;$/;"	t	typeref:struct:vfs_superblock	file:
+vfs_superblock	fs/vfs.c	/^typedef struct vfs_superblock {$/;"	s	file:
+vfs_write_inode_t	fs/fs.c	/^typedef uint32_t (*vfs_write_inode_t) (uint32_t inode, size_t length, size_t offset, uint8_t *buffer);$/;"	t	file:
+vfs_write_inode_t	fs/vfs.h	/^typedef uint32_t (*vfs_write_inode_t) (void *fs, uint32_t inode, size_t length, size_t offset, uint8_t *buffer);$/;"	t
+vfs	fs/vfs.c	/^	struct vfs_file *vfs;	$/;"	m	struct:file	typeref:struct:file::vfs_file	file:
+videoram	console.c	/^	uint16_t *videoram;$/;"	m	struct:__anon1	file:
+videoram	console.c	/^static  uint16_t * videoram = (uint16_t *) 0xc00b8000;$/;"	v	file:
+virt_addr_t	vm.c	/^typedef uint32_t virt_addr_t;$/;"	t	file:
+vm_init	vm.c	/^void vm_init(uint32_t size)$/;"	f
+void_handler	interrupt.c	/^void void_handler(struct registers *regs)$/;"	f
+volume_label	fs/fat.c	/^	uint32_t volume_label;$/;"	m	struct:fat_bootblock	file:
+volume_serial	fs/fat.c	/^	uint32_t volume_serial;$/;"	m	struct:fat_bootblock	file:
+vsprintf	lib/stdio.c	/^int vsprintf(char *buf, const char *fmt, __gnuc_va_list args)$/;"	f
+weekday	timer.c	/^	uint8_t weekday;$/;"	m	struct:c_os_time	file:
+write	fs/vfs.c	/^ssize_t write(int fildes, void *buf, size_t nbyte)$/;"	f
+write	fs/vfs.c	/^	vfs_write_inode_t write;$/;"	m	struct:vfs_superblock_ops	file:
+x	console.c	/^	uint8_t x,y;$/;"	m	struct:__anon1	file:
+year	timer.c	/^	uint8_t year;$/;"	m	struct:c_os_time	file:
+y	console.c	/^	uint8_t x,y;$/;"	m	struct:__anon1	file:
