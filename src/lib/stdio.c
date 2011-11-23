@@ -43,36 +43,26 @@ int puts(char *string)
 static char *strip_zeros(char *str)
 {
 	char *tmp = str;
-	int count, length;
-
-	while(*tmp != '\0')
-		tmp++;
-	length = tmp - str;
-	
-
-	tmp = str;
-	while(*tmp == '0')
-		tmp++;
-	count = tmp -str;
-	
-	//char *new = alloc(length - count);
-	
-	int i;
-	for(i = 0; i < length-count; i++)
-	{
-		str[i] = str[i + count];
-	}
-	for(;i < length; i++)
-		str[i] = NULL;
-	//afree(str);	
-	return str;	
+	if(str[0] != '0')
+		return str;
+	if(str[1] == 0)
+		return str;
+	while(*++tmp == '0');// && (*tmp + 2) != 0);
+	return tmp;
 }
 static char *int_to_string(int num, int base, int size)
 {
 	int i;
 	char *tmp = alloc(size);
+	for(i = 0; i < size; i++)
+		tmp[i] = 0;
 	char * ascii = {"0123456789ABCDEF"};
-	
+	if(num == 0)
+	{
+		tmp[0] = '0';
+		tmp[1] = 0;
+		return tmp;
+	}
 	switch(base)
 	{
 		case 2:
@@ -83,7 +73,7 @@ static char *int_to_string(int num, int base, int size)
 			}
 			break;
 		case 10:
-			for(i = 9; i >=0; i--)
+			for(i = size-1; i >=0; i--)
 			{
 				tmp[i] = ascii[num % 10];
 				num /= 10;	
@@ -122,6 +112,7 @@ void printf(char *fmt, ...)
 	va_list ap;
  	char *p;
 	char *s_val;
+	char *strip;
 	char c_val;
 	int i_val;
 	double d_val;
@@ -138,8 +129,8 @@ void printf(char *fmt, ...)
 			case 'b':
 				i_val = va_arg(ap, int);
 				s_val = int_to_string(i_val, 2, 32);
-				s_val = strip_zeros(s_val);
-				puts(s_val);
+				strip = strip_zeros(s_val);
+				puts(strip);
 				afree(s_val);
 				break;
 
@@ -151,8 +142,8 @@ void printf(char *fmt, ...)
 			case 'i':
 				i_val = va_arg(ap, int);
 				s_val = int_to_string(i_val, 10, 10);
-				s_val = strip_zeros(s_val);
-				puts(s_val);
+				strip = strip_zeros(s_val);
+				puts(strip);
 				afree(s_val);
 				break;
 			case 'f':
@@ -163,12 +154,14 @@ void printf(char *fmt, ...)
 				s_val = va_arg(ap, char *);
 				puts(s_val);
 				afree(s_val);
-				break;	
+				break;
+			case 'X':
+				puts("0x");	
 			case 'x':
 				i_val = va_arg(ap, int);
 				s_val = int_to_string(i_val, 16, 8);
-				s_val = strip_zeros(s_val);
-				puts(s_val);
+				strip = strip_zeros(s_val);
+				puts(strip);
 				afree(s_val);
 				break;
 
