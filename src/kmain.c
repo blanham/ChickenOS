@@ -1,13 +1,68 @@
 #include <kernel/types.h>
 #include <kernel/interrupt.h>
+#include "syscall.h"
 #include <stdio.h>
 #include <kernel/console.h>
 #include <kernel/timer.h>
 #include <kernel/vm.h>
 #include <kernel/hw.h>
+#include <kernel/thread.h>
 #include <multiboot.h>
 #define NULL 0
 #include "debug.h"
+
+extern void context_switch();
+void print_mb(unsigned long addr, unsigned long magic);
+//#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
+void kmain(uint32_t mbd, uint32_t magic)
+{
+	struct multiboot_info *mb;
+   	if ( magic != 0x2BADB002 )
+   	{
+      /* Something went not according to specs. Print an error */
+      /* message and halt, but do *not* rely on the multiboot */
+      /* data structure. */
+		puts("Bad magic number, halting\r");
+		return;
+   	}
+ 	mb = (struct multiboot_info *)mbd;
+	
+	/* begin initializations */
+	paging_init();	
+	interrupt_init();
+	console_init();
+	console_set_color(BLUE,WHITE);
+	thread_init();
+/*	if(mb->mods_count > 0 )
+	{
+		printf("Modules %i\n", mb->mods_count);
+		void *ptr = *(void **)mb->mods_addr; 
+		puts((char *)ptr);
+		puts("\n");
+		printf("addr %x\n", *(void **)(mb->mods_addr + 4));
+		printf("addr %x\n", *(void **)(mb->mods_addr));
+	//	initrd_init(*(void**)mb->mods_addr);
+		placement = (unsigned)*(void **)(mb->mods_addr + 4);	
+	}
+*/
+
+	console_puts("ChickenOS v0.01 booting\n");
+	time_init();
+	vm_init(mb->mem_upper);
+	syscall_init();//registers interrupt handler
+	
+	console_set_color(BLACK,WHITE);
+	
+	printf("hello, world \n");
+	//sys_dummy();
+//	char *p = (char *)0x8000000;
+//	*p = *p;
+	//asm volatile ( "mov $0,%%eip");	
+//	context_switch();
+	thread_t *cur = thread_current();
+	printf("pid %i\n",cur->pid);
+	PANIC("kmain returned");
+}
 void print_mb(unsigned long addr, unsigned long magic)
 {
      #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
@@ -28,7 +83,7 @@ void print_mb(unsigned long addr, unsigned long magic)
      
        /* Are mem_* valid? */
        if (CHECK_FLAG (mbi->flags, 0))
-         printf ("mem_lower = %uKB, mem_upper = %uKB\n",
+         printf ("mem_lower = %xKB, mem_upper = %xKB\n",
                  (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
      
        /* Is boot_device valid? */
@@ -108,39 +163,3 @@ void print_mb(unsigned long addr, unsigned long magic)
 
 }
 
-
-//#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
-void kmain(uint32_t mbd, uint32_t magic)
-{
-	struct multiboot_info *mb;
-   	if ( magic != 0x2BADB002 )
-   	{
-      /* Something went not according to specs. Print an error */
-      /* message and halt, but do *not* rely on the multiboot */
-      /* data structure. */
-		puts("Bad magic number, halting\r");
-		return;
-   	}
- 	mb = (struct multiboot_info *)mbd;
-
-
-	/* begin initializations */
-	paging_init();	
-	interrupt_init();
-	console_init();
-	console_set_color(BLUE,WHITE);
-	vm_init();
-	printf("Modules %i\n", mb->mods_count);
-	void *ptr = *(void **)mb->mods_addr; 
-	puts((char *)ptr);
-	puts("\n");
-	printf("addr %x\n", *(void **)(mb->mods_addr + 4));
-	printf("addr %x\n", *(void **)(mb->mods_addr));
-	console_set_color(BLACK,WHITE);
-	
-	printf("hello, world \n");
-
-	char *p = (char *)0x8000000;
-	*p = *p;	
-	PANIC("kmain returned");
-}
