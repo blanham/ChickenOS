@@ -112,3 +112,14 @@ idt_flush:
    mov eax, [esp+4]  ; Get the pointer to the IDT, passed as a parameter.
    lidt [eax]        ; Load the IDT pointer.
    ret
+
+[GLOBAL syscall_isr]
+[extern syscall_handler]
+syscall_isr:
+	cli
+	push eax
+	call syscall_handler
+	add esp,4	
+	sti
+	iret	
+
