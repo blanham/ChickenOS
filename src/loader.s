@@ -1,7 +1,8 @@
 
 global _loader                          ; Make entry point visible to linker.
 extern kmain                            ; _main is defined elsewhere
-extern end 
+extern end
+extern _sbss 
 ; setting up the Multiboot header - see GRUB docs for details
 MODULEALIGN equ  1<<0             ; align loaded modules on page boundaries
 MEMINFO     equ  1<<1             ; provide memory map
@@ -100,6 +101,7 @@ flush2:
 	ret 
  
 section .bss
-align 32
+align 4096
+[global stack]
 stack:
     resb STACKSIZE      ; reserve 16k stack on a quadword boundary
