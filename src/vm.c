@@ -1,14 +1,14 @@
 #include <kernel/vm.h>
 #include <kernel/interrupt.h>
 #include <kernel/bitmap.h>
+#include <string.h>
 #include <stdio.h>
 #include "debug.h"
 #define PAGE_SIZE 4096
 #define PAGE_MASK 0xFFFFF000
+#define PD_SIZE 4096
 extern unsigned int end;
 
-typedef uint32_t phys_addr_t;
-typedef uint32_t virt_addr_t;
 unsigned int placement = 0;
 phys_addr_t palloc_start = 0;
 virt_addr_t heap_start;
@@ -19,6 +19,7 @@ unsigned long kernelpagedir[1024] __attribute__ ((aligned (4096)));
 unsigned long lowpagetable[1024] __attribute__ ((aligned (4096)));
 uint32_t palloc_bitmap_storage[1024] __attribute__ ((aligned (4096)));
 uint32_t *palloc_bitmap = palloc_bitmap_storage;
+pagedir_t kernel_pd;
 #define PAGE_VIOLATION 0x01
 #define PAGE_WRITE	   0x02
 #define PAGE_USER	   0x04
@@ -166,6 +167,14 @@ void vm_init(uint32_t size)
 	uint8_t *asdf = (uint8_t*) PHYS_BASE + 1024*1024*4 - 1;
 	*asdf = 0;
 }
+pagedir_t pagedir_new()
+{
+	pagedir_t new = palloc();
+
+	memcpy(new, kernel_pd, PD_SIZE);	
+
+	return new;
+}
 
 void install_pagedir(uint32_t *pd)
 {
@@ -181,14 +190,14 @@ void install_pagedir(uint32_t *pd)
 void paging_init()
 {
 // Pointers to the page directory and the page table
-	void *kernelpagedirPtr = 0;
 	void *lowpagetablePtr = 0;
 	int k = 0;
  
-	kernelpagedirPtr = (char *)kernelpagedir + 0x40000000;	// Translate the page directory from
+	kernel_pd = (pagedir_t)((char*)kernelpagedir + 0x40000000);	// Translate the page directory from
 								// virtual address to physical address
 	lowpagetablePtr = (char *)lowpagetable + 0x40000000;	// Same for the page table
  
+
 	// Counts from 0 to 1023 to...
 	for (k = 0; k < 1024; k++)
 	{
@@ -203,7 +212,7 @@ void paging_init()
 	kernelpagedir[768] = (unsigned long)lowpagetablePtr | 0x3;
 	// Copies the address of the page directory into the CR3 register and, finally, enables paging!
 
-	install_pagedir((uint32_t *)kernelpagedirPtr);
+	install_pagedir(kernel_pd);
 /* 
 	asm volatile (	"mov %0, %%eax\n"
 			"mov %%eax, %%cr3\n"
