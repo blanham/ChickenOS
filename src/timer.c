@@ -2,6 +2,7 @@
 #include <kernel/timer.h>
 #include <kernel/interrupt.h>
 #include <kernel/console.h>
+#include <kernel/thread.h>
 #include <kernel/hw.h>
 #include <stdio.h>
 
@@ -101,16 +102,17 @@ void rtc_init()
 void timer_intr(struct registers * regs)
 {
 	regs = regs;
+	thread_scheduler();
 //	printf("lulz\n");
 }
 void timer_init(uint32_t frequency)
 {
 	frequency = frequency;
-/*	int div = 1193180 / frequency;
+	int div = 1193180 / frequency;
 	outb(PIT_CMD, 0x36);
 	outb(PIT0_DATA, div & 0xFF);
 	outb(PIT0_DATA, div >> 8);
-*/	
+	
 	interrupt_register(IRQ0, &timer_intr);
 }
 

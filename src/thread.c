@@ -1,7 +1,9 @@
 #include <kernel/types.h>
 #include <kernel/thread.h>
 #include <stdio.h>
+
 void *kernel_stack_bottom;
+
 thread_t *kernel_thread;
 
 extern uint32_t stack;
@@ -15,6 +17,8 @@ void thread_init()
 	asm ("mov %%esp, %0": "=m"(esp) );
 //	printf("esp %x\n",esp);// & ~0x3FFF);
 	kernel_thread->pid = 1;
+	INIT_LIST_HEAD(&kernel_thread->list);
+
 }
 
 thread_t * thread_current()
@@ -29,13 +33,20 @@ thread_t * thread_current()
 	return tmp;
 }
 
-void thread_schedule()
+void thread_scheduler()
+{
+
+	printf("switch\n");
+
+
+
+}
+pid_t fork()
 {
 
 
 
-
-
+	return 0;
 }
 /*
 
