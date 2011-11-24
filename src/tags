@@ -16,9 +16,8 @@ BLOCK	fs/fs.c	107;"	d	file:
 BLUE	include/kernel/console.h	/^	BLACK, BLUE, GREEN, CYAN,$/;"	e	enum:console_color
 BROWN	include/kernel/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
 BUCKET_BITLEN	include/kernel/hash_table.h	16;"	d
-BUCKET_BITLEN	include/kernel/hashtable/trunk/hash_table.h	16;"	d
 CASC_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
-CHECK_FLAG	kmain.c	75;"	d	file:
+CHECK_FLAG	kmain.c	83;"	d	file:
 COM1_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
 COM2_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
 CR	kbd.c	12;"	d	file:
@@ -60,7 +59,6 @@ FALSE	include/kernel/types.h	13;"	d
 FD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
 GREEN	include/kernel/console.h	/^	BLACK, BLUE, GREEN, CYAN,$/;"	e	enum:console_color
 HASH_FUNCTION_H	include/kernel/hash_function.h	2;"	d
-HASH_FUNCTION_H	include/kernel/hashtable/trunk/hash_function.h	2;"	d
 IDT_FLAG_BASE	i386-defs.h	21;"	d
 IDT_FLAG_PRESENT	i386-defs.h	22;"	d
 IDT_FLAG_RING0	i386-defs.h	23;"	d
@@ -68,7 +66,6 @@ IDT_FLAG_RING1	i386-defs.h	24;"	d
 IDT_FLAG_RING2	i386-defs.h	25;"	d
 IDT_FLAG_RING3	i386-defs.h	26;"	d
 INIT_LIST_HEAD	fs/list.h	32;"	d
-INIT_LIST_HEAD	include/kernel/hashtable/trunk/list.h	30;"	d
 INIT_LIST_HEAD	include/kernel/list.h	30;"	d
 INODE	fs/ext2fs.c	7;"	d	file:
 INODE	fs/fs.c	106;"	d	file:
@@ -90,10 +87,8 @@ IRQ8	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon3
 IRQ9	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon3
 KBD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon4
 LIST_HEAD_INIT	fs/list.h	27;"	d
-LIST_HEAD_INIT	include/kernel/hashtable/trunk/list.h	25;"	d
 LIST_HEAD_INIT	include/kernel/list.h	25;"	d
 LIST_HEAD	fs/list.h	29;"	d
-LIST_HEAD	include/kernel/hashtable/trunk/list.h	27;"	d
 LIST_HEAD	include/kernel/list.h	27;"	d
 LT_BLUE	include/kernel/console.h	/^	DK_GREY,LT_BLUE,LT_GREEN, LT_CYAN,$/;"	e	enum:console_color
 LT_BROWN	include/kernel/console.h	/^	LT_RED, LT_MAGENTA, LT_BROWN, WHITE$/;"	e	enum:console_color
@@ -111,6 +106,7 @@ MULTIBOOT_HEADER_FLAGS	include/multiboot.h	27;"	d
 MULTIBOOT_HEADER_MAGIC	include/multiboot.h	21;"	d
 NULL	console.c	4;"	d	file:
 NULL	include/kernel.h	4;"	d
+NULL	include/kernel/vm.h	10;"	d
 NULL	kmain.c	11;"	d	file:
 NULL	lib/stdio.c	4;"	d	file:
 NUM_CONSOLES	console.c	8;"	d	file:
@@ -119,10 +115,11 @@ NUM_IRQS	interrupt.c	14;"	d	file:
 NUM_ISRS	interrupt.c	15;"	d	file:
 P2V	include/kernel/vm.h	6;"	d
 PAGE_MASK	vm.c	7;"	d	file:
+PAGE_SIZE	thread.c	13;"	d	file:
 PAGE_SIZE	vm.c	6;"	d	file:
-PAGE_USER	vm.c	24;"	d	file:
-PAGE_VIOLATION	vm.c	22;"	d	file:
-PAGE_WRITE	vm.c	23;"	d	file:
+PAGE_USER	vm.c	23;"	d	file:
+PAGE_VIOLATION	vm.c	21;"	d	file:
+PAGE_WRITE	vm.c	22;"	d	file:
 PANIC	debug.h	3;"	d
 PHYS_BASE	include/kernel/vm.h	4;"	d
 PIC1_CMD	i386-defs.h	28;"	d
@@ -144,7 +141,9 @@ R_SHIFT	kbd.c	8;"	d	file:
 SEEK_CUR	fs/vfs.h	8;"	d
 SEEK_END	fs/vfs.h	9;"	d
 SEEK_SET	fs/vfs.h	7;"	d
+STACK_PAGES	thread.c	15;"	d	file:
 STACK_SIZE	include/multiboot.h	34;"	d
+STACK_SIZE	thread.c	14;"	d	file:
 S_IFBLK	fs/ext2fs_defs.h	77;"	d
 S_IFBLK	fs/fs.c	86;"	d	file:
 S_IFCHR	fs/ext2fs_defs.h	79;"	d
@@ -209,24 +208,17 @@ _VA_LIST	include/stdarg.h	63;"	d
 _VA_LIST	include/stdarg.h	79;"	d
 __GNUC_VA_LIST	include/stdarg.h	39;"	d
 __HASH_TABLE_H	include/kernel/hash_table.h	2;"	d
-__HASH_TABLE_H	include/kernel/hashtable/trunk/hash_table.h	2;"	d
 __LIST_H	fs/list.h	2;"	d
-__LIST_H	include/kernel/hashtable/trunk/list.h	2;"	d
 __LIST_H	include/kernel/list.h	2;"	d
 __VA_LIST	include/stdarg.h	84;"	d
 __gnuc_va_list	include/stdarg.h	/^typedef __builtin_va_list __gnuc_va_list;$/;"	t
 __hash	include/kernel/hash_function.h	/^uint32_t __hash(const char *data, int len)$/;"	f
-__hash	include/kernel/hashtable/trunk/hash_function.h	/^uint32_t __hash(const char *data, int len)$/;"	f
 __ht_i	include/kernel/hash_table.h	/^	unsigned int __ht_i;$/;"	m	struct:hash_table
-__ht_i	include/kernel/hashtable/trunk/hash_table.h	/^	unsigned int __ht_i;$/;"	m	struct:hash_table
 __list_add	fs/list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
-__list_add	include/kernel/hashtable/trunk/list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
 __list_add	include/kernel/list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
 __list_del	fs/list.h	/^static inline void __list_del(struct list_head *prev, struct list_head *next)$/;"	f
-__list_del	include/kernel/hashtable/trunk/list.h	/^static inline void __list_del(struct list_head *prev, struct list_head *next)$/;"	f
 __list_del	include/kernel/list.h	/^static inline void __list_del(struct list_head *prev, struct list_head *next)$/;"	f
 __list_splice	fs/list.h	/^static inline void __list_splice(struct list_head *list,$/;"	f
-__list_splice	include/kernel/hashtable/trunk/list.h	/^static inline void __list_splice(struct list_head *list, struct list_head *head)$/;"	f
 __list_splice	include/kernel/list.h	/^static inline void __list_splice(struct list_head *list, struct list_head *head)$/;"	f
 __need___va_list	include/stdarg.h	34;"	d
 __va_copy	include/stdarg.h	53;"	d
@@ -236,6 +228,7 @@ access	vm.c	/^	unsigned char access;$/;"	m	struct:gdt_entry	file:
 addr	include/multiboot.h	/^       unsigned long addr;$/;"	m	struct:aout_symbol_table
 addr	include/multiboot.h	/^       unsigned long addr;$/;"	m	struct:elf_section_header_table
 afree	lib/stdio.c	/^void afree(char *p)$/;"	f
+all_list	thread.c	/^struct list_head *all_list;$/;"	v	typeref:struct:list_head
 allocbuf	lib/stdio.c	/^static char allocbuf[ALLOCSIZE];$/;"	v	file:
 alloc	lib/stdio.c	/^char *alloc(int n)$/;"	f
 allocp	lib/stdio.c	/^static char *allocp = allocbuf;$/;"	v	file:
@@ -244,7 +237,6 @@ aout_symbol_table	include/multiboot.h	/^     typedef struct aout_symbol_table$/;
 aout_sym	include/multiboot.h	/^         multiboot_aout_symbol_table_t aout_sym;$/;"	m	union:multiboot_info::__anon2
 array	include/kernel/test.c	/^uint32_t array[1024];$/;"	v
 attribute	console.c	/^	uint16_t attribute;$/;"	m	struct:__anon1	file:
-bar	include/kernel/hashtable/trunk/test_hashtable.c	/^	unsigned int bar;$/;"	m	struct:myitem	file:
 base_addr_high	include/multiboot.h	/^       unsigned long base_addr_high;$/;"	m	struct:memory_map
 base_addr_low	include/multiboot.h	/^       unsigned long base_addr_low;$/;"	m	struct:memory_map
 base_high	include/kernel/vm_defs.h	/^   uint8_t  base_high;           \/\/ The last 8 bits of the base.$/;"	m	struct:gdt_entry_struct
@@ -295,9 +287,7 @@ boot_record	fs/fat.c	/^	uint8_t  boot_record;$/;"	m	struct:fat_bootblock	file:
 boot	fs/fat.c	/^	uint8_t  boot[0x1c2];$/;"	m	struct:fat_bootblock	file:
 bss_end_addr	include/multiboot.h	/^       unsigned long bss_end_addr;$/;"	m	struct:multiboot_header
 bucket_locks	include/kernel/hash_table.h	/^	pthread_mutex_t *bucket_locks;$/;"	m	struct:hash_table
-bucket_locks	include/kernel/hashtable/trunk/hash_table.h	/^	pthread_mutex_t *bucket_locks;$/;"	m	struct:hash_table
 buckets	include/kernel/hash_table.h	/^	unsigned int buckets;$/;"	m	struct:hash_table
-buckets	include/kernel/hashtable/trunk/hash_table.h	/^	unsigned int buckets;$/;"	m	struct:hash_table
 bytes_per_block	fs/fat.c	/^	uint16_t bytes_per_block;$/;"	m	struct:fat_bootblock	file:
 c_os_time	timer.c	/^struct c_os_time {$/;"	s	file:
 century	timer.c	/^	uint8_t century;$/;"	m	struct:c_os_time	file:
@@ -329,6 +319,7 @@ disk_blocks2	fs/fat.c	/^	uint32_t disk_blocks2;$/;"	m	struct:fat_bootblock	file:
 disk_blocks	fs/fat.c	/^	uint16_t disk_blocks;\/\/0 if overflow$/;"	m	struct:fat_bootblock	file:
 drive_number	fs/fat.c	/^	uint16_t drive_number;$/;"	m	struct:fat_bootblock	file:
 ds	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
+dummy	thread.c	/^void dummy()$/;"	f
 dump_regs	interrupt.c	/^void dump_regs(struct registers *regs)$/;"	f
 eax	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
 ebp	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
@@ -341,7 +332,6 @@ eip	include/kernel/interrupt.h	/^   uint32_t eip, cs, eflags, useresp, ss; \/\/ 
 elf_sec	include/multiboot.h	/^         multiboot_elf_section_header_table_t elf_sec;$/;"	m	union:multiboot_info::__anon2
 elf_section_header_table	include/multiboot.h	/^     typedef struct elf_section_header_table$/;"	s
 entry_addr	include/multiboot.h	/^       unsigned long entry_addr;$/;"	m	struct:multiboot_header
-entry	include/kernel/hashtable/trunk/test_hashtable.c	/^	struct hash_entry entry;$/;"	m	struct:myitem	typeref:struct:myitem::hash_entry	file:
 err_code	include/kernel/interrupt.h	/^   uint32_t int_no, err_code;    \/\/ Interrupt number and error code (if applicable)$/;"	m	struct:registers
 esi	include/kernel/interrupt.h	/^   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
 es	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
@@ -387,7 +377,7 @@ filesystem	fs/vfs.c	/^	void *filesystem;$/;"	m	struct:vfs_file	file:
 flags	i386-defs.h	/^   uint8_t  flags;               \/\/ More flags. See documentation.$/;"	m	struct:idt_entry_struct
 flags	include/multiboot.h	/^       unsigned long flags;$/;"	m	struct:multiboot_header
 flags	include/multiboot.h	/^       unsigned long flags;$/;"	m	struct:multiboot_info
-foo	include/kernel/hashtable/trunk/test_hashtable.c	/^	unsigned char foo[32];$/;"	m	struct:myitem	file:
+fork	thread.c	/^pid_t fork()$/;"	f
 fs	fs/ext2fs.c	/^	char *fs;$/;"	m	struct:ext2_filesystem	file:
 fs	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
 gd_print	fs/ext2fs.c	/^void gd_print(ext2_group_descriptor_t gdt)$/;"	f
@@ -406,9 +396,6 @@ gdt	vm.c	/^struct gdt_entry gdt[3];$/;"	v	typeref:struct:gdt_entry
 get16bits	include/kernel/hash_function.h	11;"	d
 get16bits	include/kernel/hash_function.h	15;"	d
 get16bits	include/kernel/hash_function.h	8;"	d
-get16bits	include/kernel/hashtable/trunk/hash_function.h	11;"	d
-get16bits	include/kernel/hashtable/trunk/hash_function.h	15;"	d
-get16bits	include/kernel/hashtable/trunk/hash_function.h	8;"	d
 gpf	vm.c	/^void gpf(struct registers *regs)$/;"	f
 gp	vm.c	/^struct gdt_ptr gp;$/;"	v	typeref:struct:gdt_ptr
 granularity	include/kernel/vm_defs.h	/^   uint8_t  granularity;$/;"	m	struct:gdt_entry_struct
@@ -417,59 +404,32 @@ group	fs/fs.c	/^	uint32_t group;$/;"	m	struct:inode_cached	file:
 group	fs/vfs.c	/^	uint32_t group;$/;"	m	struct:inode_cached	file:
 gs	include/kernel/interrupt.h	/^   uint32_t ds, es, fs, gs;                  \/\/ Data segment selectors$/;"	m	struct:registers
 hash_entry_finit	include/kernel/hash_table.h	/^static inline void hash_entry_finit(struct hash_entry *e)$/;"	f
-hash_entry_finit	include/kernel/hashtable/trunk/hash_table.h	/^static inline void hash_entry_finit(struct hash_entry *e)$/;"	f
 hash_entry_init	include/kernel/hash_table.h	/^static inline int hash_entry_init(struct hash_entry *e,$/;"	f
-hash_entry_init	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_entry_init(struct hash_entry *e,$/;"	f
 hash_entry	include/kernel/hash_table.h	337;"	d
-hash_entry	include/kernel/hashtable/trunk/hash_table.h	337;"	d
 hash_entry	include/kernel/hash_table.h	/^struct hash_entry {$/;"	s
-hash_entry	include/kernel/hashtable/trunk/hash_table.h	/^struct hash_entry {$/;"	s
 hash_table_bucket_locked	include/kernel/hash_table.h	/^static inline int hash_table_bucket_locked(struct hash_table *t, unsigned int n)$/;"	f
-hash_table_bucket_locked	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_bucket_locked(struct hash_table *t, unsigned int n)$/;"	f
 hash_table_bucket_lock	include/kernel/hash_table.h	/^static inline int hash_table_bucket_lock(struct hash_table *t, unsigned int n)$/;"	f
-hash_table_bucket_lock	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_bucket_lock(struct hash_table *t, unsigned int n)$/;"	f
 hash_table_bucket_unlock	include/kernel/hash_table.h	/^static inline int hash_table_bucket_unlock(struct hash_table *t, unsigned int n)$/;"	f
-hash_table_bucket_unlock	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_bucket_unlock(struct hash_table *t, unsigned int n)$/;"	f
 hash_table_del_hash_entry_safe	include/kernel/hash_table.h	/^static inline struct hash_entry *hash_table_del_hash_entry_safe(struct$/;"	f
-hash_table_del_hash_entry_safe	include/kernel/hashtable/trunk/hash_table.h	/^static inline struct hash_entry *hash_table_del_hash_entry_safe(struct$/;"	f
 hash_table_del_hash_entry	include/kernel/hash_table.h	/^static inline struct hash_entry *hash_table_del_hash_entry(struct hash_table *h,$/;"	f
-hash_table_del_hash_entry	include/kernel/hashtable/trunk/hash_table.h	/^static inline struct hash_entry *hash_table_del_hash_entry(struct hash_table *h,$/;"	f
 hash_table_del_key_safe	include/kernel/hash_table.h	/^struct hash_entry *hash_table_del_key_safe(struct hash_table *h,$/;"	f
-hash_table_del_key_safe	include/kernel/hashtable/trunk/hash_table.h	/^struct hash_entry *hash_table_del_key_safe(struct hash_table *h,$/;"	f
 hash_table_del_key	include/kernel/hash_table.h	/^struct hash_entry *hash_table_del_key(struct hash_table *h, const char *str,$/;"	f
-hash_table_del_key	include/kernel/hashtable/trunk/hash_table.h	/^struct hash_entry *hash_table_del_key(struct hash_table *h, const char *str,$/;"	f
 hash_table_finit	include/kernel/hash_table.h	/^static inline void hash_table_finit(struct hash_table *h)$/;"	f
-hash_table_finit	include/kernel/hashtable/trunk/hash_table.h	/^static inline void hash_table_finit(struct hash_table *h)$/;"	f
 hash_table_for_each_safe	include/kernel/hash_table.h	357;"	d
-hash_table_for_each_safe	include/kernel/hashtable/trunk/hash_table.h	357;"	d
 hash_table_for_each	include/kernel/hash_table.h	344;"	d
-hash_table_for_each	include/kernel/hashtable/trunk/hash_table.h	344;"	d
 hash_table_hash_code_safe	include/kernel/hash_table.h	/^static inline int hash_table_hash_code_safe(struct hash_table *t,$/;"	f
-hash_table_hash_code_safe	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_hash_code_safe(struct hash_table *t,$/;"	f
 hash_table_hash_code	include/kernel/hash_table.h	/^static inline int hash_table_hash_code(const struct hash_table *t,$/;"	f
-hash_table_hash_code	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_hash_code(const struct hash_table *t,$/;"	f
 hash_table_init	include/kernel/hash_table.h	/^static inline int hash_table_init(struct hash_table *h, unsigned int b,$/;"	f
-hash_table_init	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_init(struct hash_table *h, unsigned int b,$/;"	f
 hash_table_insert_safe	include/kernel/hash_table.h	/^void hash_table_insert_safe(struct hash_table *h,$/;"	f
-hash_table_insert_safe	include/kernel/hashtable/trunk/hash_table.h	/^void hash_table_insert_safe(struct hash_table *h,$/;"	f
 hash_table_insert	include/kernel/hash_table.h	/^void hash_table_insert(struct hash_table *h,$/;"	f
-hash_table_insert	include/kernel/hashtable/trunk/hash_table.h	/^void hash_table_insert(struct hash_table *h,$/;"	f
 hash_table_locked	include/kernel/hash_table.h	/^static inline int hash_table_locked(struct hash_table *t)$/;"	f
-hash_table_locked	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_locked(struct hash_table *t)$/;"	f
 hash_table_lock	include/kernel/hash_table.h	/^static inline int hash_table_lock(struct hash_table *t)$/;"	f
-hash_table_lock	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_lock(struct hash_table *t)$/;"	f
 hash_table_lookup_hash_entry_safe	include/kernel/hash_table.h	/^static inline struct hash_entry *hash_table_lookup_hash_entry_safe(struct hash_table$/;"	f
-hash_table_lookup_hash_entry_safe	include/kernel/hashtable/trunk/hash_table.h	/^static inline struct hash_entry *hash_table_lookup_hash_entry_safe(struct hash_table$/;"	f
 hash_table_lookup_hash_entry	include/kernel/hash_table.h	/^static inline struct hash_entry *hash_table_lookup_hash_entry(const struct$/;"	f
-hash_table_lookup_hash_entry	include/kernel/hashtable/trunk/hash_table.h	/^static inline struct hash_entry *hash_table_lookup_hash_entry(const struct$/;"	f
 hash_table_lookup_key_safe	include/kernel/hash_table.h	/^struct hash_entry *hash_table_lookup_key_safe(struct hash_table *h,$/;"	f
-hash_table_lookup_key_safe	include/kernel/hashtable/trunk/hash_table.h	/^struct hash_entry *hash_table_lookup_key_safe(struct hash_table *h,$/;"	f
 hash_table_lookup_key	include/kernel/hash_table.h	/^struct hash_entry *hash_table_lookup_key(const struct hash_table *h,$/;"	f
-hash_table_lookup_key	include/kernel/hashtable/trunk/hash_table.h	/^struct hash_entry *hash_table_lookup_key(const struct hash_table *h,$/;"	f
 hash_table_unlock	include/kernel/hash_table.h	/^static inline int hash_table_unlock(struct hash_table *t)$/;"	f
-hash_table_unlock	include/kernel/hashtable/trunk/hash_table.h	/^static inline int hash_table_unlock(struct hash_table *t)$/;"	f
 hash_table	include/kernel/hash_table.h	/^struct hash_table {$/;"	s
-hash_table	include/kernel/hashtable/trunk/hash_table.h	/^struct hash_table {$/;"	s
 header_addr	include/multiboot.h	/^       unsigned long header_addr;$/;"	m	struct:multiboot_header
 heads	fs/fat.c	/^	uint16_t heads;$/;"	m	struct:fat_bootblock	file:
 heap_init	vm.c	/^void heap_init()$/;"	f
@@ -560,17 +520,14 @@ kbd_init	kbd.c	/^void kbd_init()$/;"	f
 kbd_intr	kbd.c	/^void kbd_intr()\/\/;\/\/struct registers * regs)$/;"	f
 kbd_map_shifted	kbd.c	/^char kbd_map_shifted[256] = {$/;"	v
 kbd_map_unshifted	kbd.c	/^char kbd_map_unshifted[256] = {$/;"	v
+kernel_pd	vm.c	/^pagedir_t kernel_pd;$/;"	v
 kernel_stack_bottom	thread.c	/^void *kernel_stack_bottom;$/;"	v
 kernel_thread	thread.c	/^thread_t *kernel_thread;$/;"	v
 kernelpagedir	vm.c	/^unsigned long kernelpagedir[1024] __attribute__ ((aligned (4096)));$/;"	v
 keycmp_ptr	include/kernel/hash_table.h	/^typedef int (*keycmp_ptr) (const void *, const void *, size_t);$/;"	t
-keycmp_ptr	include/kernel/hashtable/trunk/hash_table.h	/^typedef int (*keycmp_ptr) (const void *, const void *, size_t);$/;"	t
 keycmp	include/kernel/hash_table.h	/^	keycmp_ptr keycmp;$/;"	m	struct:hash_table
-keycmp	include/kernel/hashtable/trunk/hash_table.h	/^	keycmp_ptr keycmp;$/;"	m	struct:hash_table
 keylen	include/kernel/hash_table.h	/^	unsigned int keylen;$/;"	m	struct:hash_entry
-keylen	include/kernel/hashtable/trunk/hash_table.h	/^	unsigned int keylen;$/;"	m	struct:hash_entry
 key	include/kernel/hash_table.h	/^	unsigned char *key;$/;"	m	struct:hash_entry
-key	include/kernel/hashtable/trunk/hash_table.h	/^	unsigned char *key;$/;"	m	struct:hash_entry
 kmain	kmain.c	/^void kmain(uint32_t mbd, uint32_t magic)$/;"	f
 kmemcpy	lib/kernel/memory.c	/^uint8_t *kmemcpy(uint8_t *dest, uint8_t *src, size_t count)$/;"	f
 kmemcpyw	lib/kernel/memory.c	/^uint16_t *kmemcpyw(uint16_t *dest, uint16_t *src, size_t count)$/;"	f
@@ -585,62 +542,44 @@ limit	i386-defs.h	/^   uint16_t limit;$/;"	m	struct:idt_ptr_struct
 limit	include/kernel/vm_defs.h	/^   uint16_t limit;               \/\/ The upper 16 bits of all selector limits.$/;"	m	struct:gdt_ptr_struct
 limit	vm.c	/^	unsigned short limit;$/;"	m	struct:gdt_ptr	file:
 list_add_tail	fs/list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
-list_add_tail	include/kernel/hashtable/trunk/list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
 list_add_tail	include/kernel/list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
 list_add	fs/list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
-list_add	include/kernel/hashtable/trunk/list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
 list_add	include/kernel/list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
 list_del_init	fs/list.h	/^static inline void list_del_init(struct list_head *entry)$/;"	f
-list_del_init	include/kernel/hashtable/trunk/list.h	/^static inline void list_del_init(struct list_head *entry)$/;"	f
 list_del_init	include/kernel/list.h	/^static inline void list_del_init(struct list_head *entry)$/;"	f
 list_del	fs/list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
-list_del	include/kernel/hashtable/trunk/list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
 list_del	include/kernel/list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
 list_empty	fs/list.h	/^static inline int list_empty(struct list_head *head)$/;"	f
-list_empty	include/kernel/hashtable/trunk/list.h	/^static inline int list_empty(struct list_head *head)$/;"	f
 list_empty	include/kernel/list.h	/^static inline int list_empty(struct list_head *head)$/;"	f
 list_entry	fs/list.h	192;"	d
-list_entry	include/kernel/hashtable/trunk/list.h	188;"	d
 list_entry	include/kernel/list.h	188;"	d
 list_files	fs/ext2fs.c	/^void list_files(ext2_directory_t *dir, uint32_t len)$/;"	f
 list_files	fs/fs.c	/^void list_files(ext2_directory_t *dir, uint32_t len)$/;"	f
 list_for_each_entry_safe	fs/list.h	240;"	d
-list_for_each_entry_safe	include/kernel/hashtable/trunk/list.h	236;"	d
 list_for_each_entry_safe	include/kernel/list.h	236;"	d
 list_for_each_entry	fs/list.h	228;"	d
-list_for_each_entry	include/kernel/hashtable/trunk/list.h	224;"	d
 list_for_each_entry	include/kernel/list.h	224;"	d
 list_for_each_prev	fs/list.h	208;"	d
-list_for_each_prev	include/kernel/hashtable/trunk/list.h	204;"	d
 list_for_each_prev	include/kernel/list.h	204;"	d
 list_for_each_safe	fs/list.h	218;"	d
-list_for_each_safe	include/kernel/hashtable/trunk/list.h	214;"	d
 list_for_each_safe	include/kernel/list.h	214;"	d
 list_for_each	fs/list.h	200;"	d
-list_for_each	include/kernel/hashtable/trunk/list.h	196;"	d
 list_for_each	include/kernel/list.h	196;"	d
 list_head	fs/list.h	/^struct list_head {$/;"	s
-list_head	include/kernel/hashtable/trunk/list.h	/^struct list_head {$/;"	s
 list_head	include/kernel/list.h	/^struct list_head {$/;"	s
 list_move_tail	fs/list.h	/^static inline void list_move_tail(struct list_head *list,$/;"	f
-list_move_tail	include/kernel/hashtable/trunk/list.h	/^static inline void list_move_tail(struct list_head *list,$/;"	f
 list_move_tail	include/kernel/list.h	/^static inline void list_move_tail(struct list_head *list,$/;"	f
 list_move	fs/list.h	/^static inline void list_move(struct list_head *list, struct list_head *head)$/;"	f
-list_move	include/kernel/hashtable/trunk/list.h	/^static inline void list_move(struct list_head *list, struct list_head *head)$/;"	f
 list_move	include/kernel/list.h	/^static inline void list_move(struct list_head *list, struct list_head *head)$/;"	f
 list_splice_init	fs/list.h	/^static inline void list_splice_init(struct list_head *list,$/;"	f
-list_splice_init	include/kernel/hashtable/trunk/list.h	/^static inline void list_splice_init(struct list_head *list,$/;"	f
 list_splice_init	include/kernel/list.h	/^static inline void list_splice_init(struct list_head *list,$/;"	f
 list_splice	fs/list.h	/^static inline void list_splice(struct list_head *list, struct list_head *head)$/;"	f
-list_splice	include/kernel/hashtable/trunk/list.h	/^static inline void list_splice(struct list_head *list, struct list_head *head)$/;"	f
 list_splice	include/kernel/list.h	/^static inline void list_splice(struct list_head *list, struct list_head *head)$/;"	f
 list	include/kernel/hash_table.h	/^	struct list_head list;$/;"	m	struct:hash_entry	typeref:struct:hash_entry::list_head
-list	include/kernel/hashtable/trunk/hash_table.h	/^	struct list_head list;$/;"	m	struct:hash_entry	typeref:struct:hash_entry::list_head
 list	include/kernel/thread.h	/^	struct list_head list;$/;"	m	struct:thread	typeref:struct:thread::list_head
 load_addr	include/multiboot.h	/^       unsigned long load_addr;$/;"	m	struct:multiboot_header
 load_end_addr	include/multiboot.h	/^       unsigned long load_end_addr;$/;"	m	struct:multiboot_header
 lock	include/kernel/hash_table.h	/^	pthread_mutex_t lock;$/;"	m	struct:hash_table
-lock	include/kernel/hashtable/trunk/hash_table.h	/^	pthread_mutex_t lock;$/;"	m	struct:hash_table
 lookup_file	fs/ext2fs.c	/^int lookup_file(ext2_directory_t *dir, uint32_t len, char *filename)$/;"	f
 lookup_file	fs/fs.c	/^int lookup_file(ext2_directory_t *dir, uint32_t len, char *filename)$/;"	f
 lookup	fs/ext2fs.c	/^void lookup(ext2_filesystem_t *ext2, char *name)$/;"	f
@@ -649,7 +588,6 @@ lseek	fs/vfs.c	/^off_t lseek(int fildes, off_t offset, int whence)$/;"	f
 magic	include/multiboot.h	/^       unsigned long magic;$/;"	m	struct:multiboot_header
 main	fs/fs.c	/^int main(int argc, char **argv)$/;"	f
 main	fs/vfs.c	/^int main(int argc, char **argv)$/;"	f
-main	include/kernel/hashtable/trunk/test_hashtable.c	/^int main(int argc, char **argv)$/;"	f
 main	include/kernel/test.c	/^int main(int argc, char **argv)$/;"	f
 media_desc	fs/fat.c	/^	uint8_t  media_desc;$/;"	m	struct:fat_bootblock	file:
 mem_lower	include/multiboot.h	/^       unsigned long mem_lower;$/;"	m	struct:multiboot_info
@@ -672,7 +610,6 @@ multiboot_info_t	include/multiboot.h	/^     } multiboot_info_t;$/;"	t	typeref:st
 multiboot_info	include/multiboot.h	/^     typedef struct multiboot_info$/;"	s
 multiboot_memory_map_t	include/multiboot.h	/^     } multiboot_memory_map_t;$/;"	t	typeref:struct:memory_map
 multiboot_module_t	include/multiboot.h	/^     } multiboot_module_t;$/;"	t	typeref:struct:module
-myitem	include/kernel/hashtable/trunk/test_hashtable.c	/^struct myitem {$/;"	s	file:
 name_len	fs/ext2fs_defs.h	/^	uint8_t name_len;$/;"	m	struct:ext2_directory
 name_len	fs/fs.c	/^	uint8_t name_len;$/;"	m	struct:ext2_directory	file:
 name	fs/ext2fs_defs.h	/^	uint8_t name[255];$/;"	m	struct:ext2_directory
@@ -680,7 +617,6 @@ name	fs/fs.c	/^	char *name;\/\/perhaps use name[255\/256] instead?NO! what about
 name	fs/fs.c	/^	uint8_t name[255];$/;"	m	struct:ext2_directory	file:
 name	fs/vfs.c	/^	char *name;\/\/perhaps use name[255\/256] instead?NO! what about other fses?$/;"	m	struct:vfs_file	file:
 next	fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
-next	include/kernel/hashtable/trunk/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
 next	include/kernel/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
 num_fats	fs/fat.c	/^	uint8_t	 num_fats;$/;"	m	struct:fat_bootblock	file:
 num	include/multiboot.h	/^       unsigned long num;$/;"	m	struct:elf_section_header_table
@@ -693,6 +629,8 @@ open	fs/vfs.c	/^int open(const char *path, int oflag)$/;"	f
 outb	hw.c	/^void outb(uint16_t port, uint8_t value)$/;"	f
 page_bitmap	vm.c	/^bitmap_t page_bitmap;$/;"	v
 page_fault	vm.c	/^void page_fault(struct registers * regs)$/;"	f
+pagedir_clone	vm.c	/^pagedir_t pagedir_clone()$/;"	f
+pagedir_t	include/kernel/vm.h	/^typedef uint32_t * pagedir_t;$/;"	t
 paging_init	vm.c	/^void paging_init()$/;"	f
 palloc_bitmap_storage	vm.c	/^uint32_t palloc_bitmap_storage[1024] __attribute__ ((aligned (4096)));$/;"	v
 palloc_bitmap	vm.c	/^uint32_t *palloc_bitmap = palloc_bitmap_storage;$/;"	v
@@ -706,19 +644,20 @@ pallocn_free	vm.c	/^void pallocn_free(void *addr, int pages)$/;"	f
 pallocn	vm.c	/^void *pallocn(uint32_t count)$/;"	f
 panic	debug.h	/^static inline void panic(char *file, int line,char* msg)$/;"	f
 parent	fs/vfs.c	/^	struct file *parent;$/;"	m	struct:file	typeref:struct:file::file	file:
+parent	include/kernel/thread.h	/^	pid_t parent;$/;"	m	struct:thread
 pathsearch	fs/vfs.c	/^int pathsearch(char *path)$/;"	f
-phys_addr_t	vm.c	/^typedef uint32_t phys_addr_t;$/;"	t	file:
+pd	include/kernel/thread.h	/^	pagedir_t pd;	$/;"	m	struct:thread
+phys_addr_t	include/kernel/vm.h	/^typedef uint32_t phys_addr_t;$/;"	t
 pic_init	interrupt.c	/^void pic_init()$/;"	f
 pic_mask	interrupt.c	/^void pic_mask(int irq)$/;"	f
 pic_send_end	interrupt.c	/^void pic_send_end(int irq)$/;"	f
 pic_unmask	interrupt.c	/^void pic_unmask(int irq)$/;"	f
+pid_allocate	thread.c	/^pid_t pid_allocate()$/;"	f
 pid_t	include/kernel/thread.h	/^typedef unsigned short pid_t;$/;"	t
 pid	include/kernel/thread.h	/^	pid_t pid;$/;"	m	struct:thread
 placement	vm.c	/^unsigned int placement = 0;$/;"	v
 pos	include/kernel/hash_table.h	/^	struct list_head *pos;$/;"	m	struct:hash_table	typeref:struct:hash_table::list_head
-pos	include/kernel/hashtable/trunk/hash_table.h	/^	struct list_head *pos;$/;"	m	struct:hash_table	typeref:struct:hash_table::list_head
 prev	fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
-prev	include/kernel/hashtable/trunk/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
 prev	include/kernel/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
 print_dir_entry	fs/ext2fs.c	/^void print_dir_entry(ext2_directory_t *dir)$/;"	f
 print_dir_entry	fs/fs.c	/^void print_dir_entry(ext2_directory_t *dir)$/;"	f
@@ -802,6 +741,7 @@ size	fs/ext2fs.c	/^	uint32_t size;$/;"	m	struct:ext2_filesystem	file:
 size	include/kernel/bitmap.h	/^	uint32_t size;$/;"	m	struct:bitmap
 size	include/multiboot.h	/^       unsigned long size;$/;"	m	struct:elf_section_header_table
 size	include/multiboot.h	/^       unsigned long size;$/;"	m	struct:memory_map
+sp	include/kernel/thread.h	/^	uint8_t *sp;$/;"	m	struct:thread
 ssize_t	include/kernel/types.h	/^typedef unsigned long	ssize_t;$/;"	t
 ss	include/kernel/interrupt.h	/^   uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
 strip_zeros	lib/stdio.c	/^static char *strip_zeros(char *str)$/;"	f	file:
@@ -814,12 +754,12 @@ sys_dummy	syscall.c	/^void sys_dummy()$/;"	f
 syscall_handler	syscall.c	/^int syscall_handler (int test)$/;"	f
 syscall_init	syscall.c	/^void syscall_init()$/;"	f
 table	include/kernel/hash_table.h	/^	struct hash_entry *table;$/;"	m	struct:hash_table	typeref:struct:hash_table::hash_entry
-table	include/kernel/hashtable/trunk/hash_table.h	/^	struct hash_entry *table;$/;"	m	struct:hash_table	typeref:struct:hash_table::hash_entry
 tabsize	include/multiboot.h	/^       unsigned long tabsize;$/;"	m	struct:aout_symbol_table
 test	interrupt.c	/^void test()$/;"	f
+thread_create	thread.c	/^thread_t * thread_create()$/;"	f
 thread_current	thread.c	/^thread_t * thread_current()$/;"	f
 thread_init	thread.c	/^void thread_init()$/;"	f
-thread_scheduler	thread.c	/^void thread_scheduler()$/;"	f
+thread_scheduler	thread.c	/^void thread_scheduler()\/\/struct registers *regs)$/;"	f
 thread_t	include/kernel/thread.h	/^} thread_t;$/;"	t	typeref:struct:thread
 thread	include/kernel/thread.h	/^typedef struct thread {$/;"	s
 time_init	timer.c	/^void time_init()$/;"	f
@@ -861,7 +801,7 @@ vfs_write_inode_t	fs/vfs.h	/^typedef uint32_t (*vfs_write_inode_t) (void *fs, ui
 vfs	fs/vfs.c	/^	struct vfs_file *vfs;	$/;"	m	struct:file	typeref:struct:file::vfs_file	file:
 videoram	console.c	/^	uint16_t *videoram;$/;"	m	struct:__anon1	file:
 videoram	console.c	/^static  uint16_t * videoram = (uint16_t *) 0xb8000;$/;"	v	file:
-virt_addr_t	vm.c	/^typedef uint32_t virt_addr_t;$/;"	t	file:
+virt_addr_t	include/kernel/vm.h	/^typedef uint32_t virt_addr_t;$/;"	t
 vm_init	vm.c	/^void vm_init(uint32_t size)$/;"	f
 void_handler	interrupt.c	/^void void_handler(struct registers *regs)$/;"	f
 volume_label	fs/fat.c	/^	uint32_t volume_label;$/;"	m	struct:fat_bootblock	file:
