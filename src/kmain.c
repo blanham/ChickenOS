@@ -14,6 +14,13 @@
 extern void context_switch();
 void print_mb(unsigned long addr, unsigned long magic);
 //#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
+
+void idle()
+{
+
+	while(1);
+
+}
 void kmain(uint32_t mbd, uint32_t magic)
 {
 	struct multiboot_info *mb;
