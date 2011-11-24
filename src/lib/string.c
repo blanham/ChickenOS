@@ -7,3 +7,14 @@ int strlen(char *str)
 	return tmp - str;
 }
 
+void *memcpy(void *dst, const void *src, size_t size)
+{
+	char *_dst = dst;
+	char *_src = (char *)src;
+	char *end = (char *)(src + size);
+
+	while(_src != end)
+		*_dst = *_src;
+
+	return dst;
+}
