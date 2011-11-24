@@ -94,7 +94,7 @@ thread_t * thread_create(void (*func)(void), void *aux)
 	uint8_t *new_sp = (uint8_t *)(new + STACK_SIZE);
 	new_sp = new_sp;
 	
-	new->pid= pid_allocate()
+	new->pid= pid_allocate();
 
 	void *new_eip = func;
 	new_eip = new_eip;
