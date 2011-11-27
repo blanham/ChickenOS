@@ -14,6 +14,7 @@ typedef struct thread {
 void thread_init();
 thread_t * thread_current();
 
+thread_t * thread_create(void (*func)(void*), void *aux);
 void thread_scheduler();
 pid_t fork();
 #endif
