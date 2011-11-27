@@ -54,7 +54,6 @@ void interrupt_init()
 	idt_build_entry(&idt_table[0x80], (uint32_t)syscall_isr, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
 	idt_flush((uint32_t)&idt_ptr);
 
-	asm volatile("sti");
 }
 
 void interrupt_register(int irq, intr_handler *handler)
@@ -68,13 +67,17 @@ void interrupt_register(int irq, intr_handler *handler)
 void interrupt_handler(struct registers *regs)
 {
 	intr_handler *handler = intr_handlers[regs->int_no];
+	uint32_t _esp;
+	asm ("mov %%esp, %0": "=m"(_esp) );
+//	printf("esp intr %X\n",_esp);
+	if(regs->int_no >= NUM_ISRS)
+		pic_send_end(regs->int_no - NUM_ISRS);
+
 	if(handler){
 		handler(regs); 
 	} else {
 		printf("something wrong in interrupt.c\n");
 	}
-	if(regs->int_no >= NUM_ISRS)
-		pic_send_end(regs->int_no - NUM_ISRS);
 }
 void dump_regs(struct registers *regs)
 {
@@ -160,7 +163,7 @@ static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uin
 } 
 
 
-void test()
+void ishutdown()
 {
 const char s[] = "Shutdown";
 	const char *p;
