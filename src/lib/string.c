@@ -14,7 +14,7 @@ void *memcpy(void *dst, const void *src, size_t size)
 	char *end = (char *)(src + size);
 
 	while(_src != end)
-		*_dst = *_src;
+		*_dst++ = *_src++;
 
 	return dst;
 }
