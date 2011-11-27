@@ -76,7 +76,7 @@ IRQ 12
 IRQ 13
 IRQ 14
 IRQ 15
-
+[GLOBAL intr_return]
 [extern interrupt_handler]
 _isr_handler:
 	push gs
@@ -96,7 +96,8 @@ _isr_handler:
 	call interrupt_handler 
 	
 	;pop eax
-	add esp,4	
+intr_return:	
+	add esp,4
 	popa
 	pop ds
 	pop es
