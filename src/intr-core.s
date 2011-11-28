@@ -92,11 +92,26 @@ _isr_handler:
 	mov ds, eax
 	mov es, eax
 	lea ebp, [esp+52]	
+
+
+	mov eax, esp
+	push eax
+	push format
+	call printf
+	add esp, 8
+	
+
+
+
+
 	push esp
+	
+
+
+
 	call interrupt_handler 
 	
 	;pop eax
-intr_return:	
 	add esp,4
 	popa
 	pop ds
@@ -106,6 +121,33 @@ intr_return:
 	add esp,8;jump ahead of error code/interrupt number
 	sti
 	iret	
+[extern dump_regs]
+
+format db "out %X",10,0
+[extern printf]
+intr_return:
+	;pop esp
+	;call dump_regs
+	
+	
+
+	add esp,4
+
+	mov eax, esp
+	push eax
+	push format
+	call printf
+	add esp, 8
+	
+	popa
+	pop ds
+	pop es
+	pop fs
+	pop gs
+	add esp,8;jump ahead of error code/interrupt number
+;	sti
+	iret	
+
 
 [GLOBAL idt_flush]    ; Allows the C code to call idt_flush().
 

@@ -17,9 +17,10 @@ void print_mb(unsigned long addr, unsigned long magic);
 void idle(void *aux)
 {
 	aux = aux;
+//	while(1)
 	printf("awesome\n");
+//	asm volatile("sti");
 	while(1);
-
 }
 void kmain(uint32_t mbd, uint32_t magic)
 {
@@ -71,7 +72,10 @@ void kmain(uint32_t mbd, uint32_t magic)
 	printf("IDLE %X %X\n",idle, &idle);
 	thread_create(idle,NULL);
 	//idle(NULL);
+	printf("TEST\n");
+	printf("DERP\n");
 	while(1);
+	//	printf("kmain\n");
 	PANIC("kmain returned");
 }
 void print_mb(unsigned long addr, unsigned long magic)
