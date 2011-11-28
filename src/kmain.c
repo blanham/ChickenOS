@@ -16,10 +16,9 @@ void print_mb(unsigned long addr, unsigned long magic);
 
 void idle(void *aux)
 {
+	asm volatile("sti");
 	aux = aux;
-//	while(1)
 	printf("awesome\n");
-//	asm volatile("sti");
 	while(1);
 }
 void kmain(uint32_t mbd, uint32_t magic)
@@ -73,8 +72,8 @@ void kmain(uint32_t mbd, uint32_t magic)
 	thread_create(idle,NULL);
 	//idle(NULL);
 	printf("TEST\n");
-	printf("DERP\n");
 	while(1);
+	printf("DERP\n");
 	//	printf("kmain\n");
 	PANIC("kmain returned");
 }

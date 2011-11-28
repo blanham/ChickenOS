@@ -147,6 +147,31 @@ intr_return:
 	add esp,8;jump ahead of error code/interrupt number
 ;	sti
 	iret	
+[global intr_return2]
+intr_return2:
+	;pop esp
+	
+	call dump_regs
+	
+	
+
+	add esp,4
+
+	mov eax, esp
+	push eax
+	push format
+	call printf
+	add esp, 8
+	
+	popa
+	pop ds
+	pop es
+	pop fs
+	pop gs
+	add esp,8;jump ahead of error code/interrupt number
+;	sti
+	;hlt
+	iret	
 
 
 [GLOBAL idt_flush]    ; Allows the C code to call idt_flush().
