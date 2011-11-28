@@ -67,9 +67,9 @@ void interrupt_register(int irq, intr_handler *handler)
 void interrupt_handler(struct registers *regs)
 {
 	intr_handler *handler = intr_handlers[regs->int_no];
-	uint32_t _esp;
-	asm ("mov %%esp, %0": "=m"(_esp) );
-//	printf("esp intr %X\n",_esp);
+//	uint32_t _esp;
+//	asm ("mov %%esp, %0": "=m"(_esp) );
+//	printf("esp intr %X num %i other %x %x\n",_esp,regs->int_no, regs->esp, regs->useresp);
 	if(regs->int_no >= NUM_ISRS)
 		pic_send_end(regs->int_no - NUM_ISRS);
 
@@ -81,9 +81,9 @@ void interrupt_handler(struct registers *regs)
 }
 void dump_regs(struct registers *regs)
 {
-	printf("edi %x esi %x ebp %x esp %x ebx %x edx %x ecx %x eax %x\n",
+	printf("edi %X esi %X ebp %X esp %X\nebx %X edx %X ecx %X eax %X\n",
 		regs->edi,regs->esi,regs->ebp,regs->esp,regs->ebx,regs->edx,regs->ecx,regs->eax);
-	printf("eip %x cs %x eflags %x useresp %x ss %x\n",
+	printf("eip %X cs %X eflags %X useresp %X ss %X\n",
 		regs->eip, regs->cs, regs->eflags, regs->useresp, regs->ss);
 
 
