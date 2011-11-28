@@ -53,7 +53,7 @@ static char *strip_zeros(char *str)
 static char *int_to_string(int num, int base, int size)
 {
 	int i;
-	char *tmp = alloc(size);
+	char *tmp = allocp;//alloc(size);
 	for(i = 0; i < size; i++)
 		tmp[i] = 0;
 	char * ascii = {"0123456789ABCDEF"};
@@ -131,7 +131,7 @@ void printf(char *fmt, ...)
 				s_val = int_to_string(i_val, 2, 32);
 				strip = strip_zeros(s_val);
 				puts(strip);
-				afree(s_val);
+			//	afree(s_val);
 				break;
 
 			case 'c':
@@ -144,7 +144,7 @@ void printf(char *fmt, ...)
 				s_val = int_to_string(i_val, 10, 10);
 				strip = strip_zeros(s_val);
 				puts(strip);
-				afree(s_val);
+			//	afree(s_val);
 				break;
 			case 'f':
 				d_val = va_arg(ap,double);
@@ -153,7 +153,7 @@ void printf(char *fmt, ...)
 			case 's':
 				s_val = va_arg(ap, char *);
 				puts(s_val);
-				afree(s_val);
+			//	afree(s_val);
 				break;
 			case 'X':
 				puts("0x");	
@@ -162,13 +162,15 @@ void printf(char *fmt, ...)
 				s_val = int_to_string(i_val, 16, 8);
 				strip = strip_zeros(s_val);
 				puts(strip);
-				afree(s_val);
+			//	afree(s_val);
 				break;
-
+			
 			default:
 				putc(*p);
 				break;
 		}
+		for(int i= 0; i < 100; i++)
+			allocp[i] = 0;
 	}
 	
 	va_end(ap);
