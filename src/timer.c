@@ -102,12 +102,14 @@ void rtc_init()
 void timer_intr(struct registers * regs)
 {
 	regs = regs;
-	thread_scheduler();
+//	dump_regs(regs);
+//	while(1);
+	thread_scheduler(regs);
 //	printf("lulz\n");
 }
 void timer_init(uint32_t frequency)
 {
-	frequency = frequency;
+	frequency = 2;
 	int div = 1193180 / frequency;
 	outb(PIT_CMD, 0x36);
 	outb(PIT0_DATA, div & 0xFF);
