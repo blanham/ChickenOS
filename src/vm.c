@@ -27,11 +27,11 @@ pagedir_t kernel_pd;
 
 void gpf(struct registers *regs)
 {
-	regs = regs;
-
 	uint32_t error_code = regs->err_code;
 	printf("Error %x\n",error_code);
 	dump_regs(regs);
+	//triggers debugger in BOCHS
+	asm volatile("xchg %bx, %bx");
 	PANIC("GENERAL PROTECTION FAULT!");
 }
 void page_fault(struct registers * regs)
@@ -59,8 +59,6 @@ void page_fault(struct registers * regs)
 	else
 		printf("protection violation\n");
 
-
-
 	asm volatile ("mov %%cr2, %0"
 				  : "=r" (faulting_addr)
 
@@ -76,21 +74,22 @@ void page_fault(struct registers * regs)
 
 	}
 }
+
 void palloc_internal_free(void *addr, int pages)
 {
 	uint32_t index = ((virt_addr_t)addr - palloc_start) / PAGE_SIZE;
 	bitmap_clear_multiple(&page_bitmap, index, pages);
 	//might copy pintos here and set entire page(s) to some magic number	
 }
+
 void palloc_free(void *addr)
 {
 	palloc_internal_free(addr,1);
-
 }
+
 void pallocn_free(void *addr, int pages)
 {
 	palloc_internal_free(addr,pages);
-
 }
 
 
@@ -116,26 +115,24 @@ void *palloc()
 
 void *pallocn(uint32_t count)
 {
-
-
 	return palloc_internal(0, count);
-
 }
+
 void palloc_init(uint32_t page_count, uint32_t placement)
 {
 	void *start = 0;
 	uint32_t bitmap_ptr = placement;
- 	page_count = page_count;
 	uint32_t bitmap_length = (page_count/32);
 	start = (void *)(placement + bitmap_length);
+
 	if(((uint32_t)start & PAGE_MASK) != 0)
 		start = (void *)(((uint32_t)start & PAGE_MASK) + PAGE_SIZE);
-//	printf("b_t %x start %x\n", bitmap_ptr, (uint32_t)start);
+	
 	bitmap_init_phys(&page_bitmap, page_count, (uint32_t *)bitmap_ptr);
-//	uint32_t first = bitmap_find_first(&page_bitmap);
-/*	printf("first %i\n",first);*/
+	
 	palloc_start = (phys_addr_t)start;
 }
+
 void heap_init()
 {
 /*	void *test = pallocn(9);
@@ -147,26 +144,26 @@ void heap_init()
 
 	printf("test %x test2 %x test3 %x\n", test, test2, test3);*/
 }
+
 void vm_init(uint32_t size)
 {
 	if(placement == 0)
 		placement = (unsigned)&end;
 	placement = (placement & PAGE_MASK)  + PAGE_SIZE;
-	uint32_t temp = (placement - PHYS_BASE)/PAGE_SIZE; 
+	uint32_t temp = (placement - PHYS_BASE)/PAGE_SIZE;
+	//size = 1024 * 1024; //needed for machines with large amounts of memory at the moemnt
+						//becuase we only have 4MB, and the bitmap overflows it 
 	uint32_t page_count = (size/4) - temp;
+	
 	printf("%iMB installed %i\n", (size)/1024 + 2);
-//	printf("Kernel end %X\n", placement);
 		
-//	printf("stack %x\n", &size);
-
 	interrupt_register(13, &gpf);
 	interrupt_register(14, &page_fault);
 
 	palloc_init(page_count, placement);
 	heap_init();
-	uint8_t *asdf = (uint8_t*) PHYS_BASE + 1024*1024*4 - 1;
-	*asdf = 0;
 }
+
 pagedir_t pagedir_new()
 {
 	pagedir_t new = palloc();
@@ -183,7 +180,6 @@ void install_pagedir(uint32_t *pd)
 				"mov %%cr0, %%eax\n"
 				"orl $0x80000000, %%eax\n"
 				"mov %%eax, %%cr0\n" :: "m" (pd));
-
 }
 
 
@@ -213,15 +209,11 @@ void paging_init()
 	// Copies the address of the page directory into the CR3 register and, finally, enables paging!
 
 	install_pagedir(kernel_pd);
-/* 
-	asm volatile (	"mov %0, %%eax\n"
-			"mov %%eax, %%cr3\n"
-			"mov %%cr0, %%eax\n"
-			"orl $0x80000000, %%eax\n"
-			"mov %%eax, %%cr0\n" :: "m" (kernelpagedirPtr));*/
-gdt_install();
+
+	gdt_install();
 
 }
+
 struct gdt_entry
 {
 	unsigned short limit_low;
@@ -263,7 +255,7 @@ void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned cha
 // Sets our 3 gates and installs the real GDT through the assembler function
 void gdt_install()
 {
-	gp.limit = (sizeof(struct gdt_entry) * 6) - 1;
+	gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
 	gp.base = (unsigned int)&gdt;
  
 	gdt_set_gate(0, 0, 0, 0, 0);
