@@ -4,7 +4,7 @@
 %macro ISR_NO_ARGS 1
 	[GLOBAL isr%1]
 	isr%1:
-		cli
+		;cli
 		push byte 0
 		push byte %1
 		jmp _isr_handler
@@ -13,7 +13,7 @@
 %macro ISR_ARGS 1
 	[GLOBAL isr%1]
 	isr%1:
-		cli
+		;cli
 		push byte %1
 		jmp _isr_handler
 %endmacro
@@ -21,7 +21,7 @@
 %macro IRQ 1
 	[GLOBAL irq%1]
 	irq%1:
-		cli
+		;cli
 		push byte 0
 		push byte (%1+32)
 		jmp _isr_handler
@@ -93,25 +93,23 @@ _isr_handler:
 	mov es, eax
 	lea ebp, [esp+52]	
 
-
 	mov eax, esp
+	sub eax, 8
 	push eax
-	push format
-	call printf
-	add esp, 8
+
+;	mov eax, esp
+;	push eax
+;	push format
+;	call printf
+;	add esp, 8
 	
-
-
-
 
 	push esp
 	
 
-
-
 	call interrupt_handler 
+	pop eax
 	
-	;pop eax
 	add esp,4
 	popa
 	pop ds
@@ -119,25 +117,23 @@ _isr_handler:
 	pop fs
 	pop gs
 	add esp,8;jump ahead of error code/interrupt number
-	sti
+	;sti
 	iret	
 [extern dump_regs]
 
 format db "out %X",10,0
 [extern printf]
 intr_return:
-	;pop esp
-	;call dump_regs
 	
-	
+	add esp,4	
 
 	add esp,4
 
-	mov eax, esp
-	push eax
-	push format
-	call printf
-	add esp, 8
+;	mov eax, esp
+;	push eax
+;	push format
+;	call printf
+;	add esp, 8
 	
 	popa
 	pop ds
@@ -145,49 +141,32 @@ intr_return:
 	pop fs
 	pop gs
 	add esp,8;jump ahead of error code/interrupt number
-;	sti
 	iret	
-[global intr_return2]
-intr_return2:
-	;pop esp
-	
-	call dump_regs
-	
-	
 
-	add esp,4
 
-	mov eax, esp
-	push eax
-	push format
-	call printf
-	add esp, 8
-	
-	popa
-	pop ds
-	pop es
-	pop fs
-	pop gs
-	add esp,8;jump ahead of error code/interrupt number
-;	sti
-	;hlt
-	iret	
+[GLOBAL get_eip]
+get_eip:
+	;pop eax
+
+	;jmp eax
+	mov eax, dword[esp]
+	ret
 
 
 [GLOBAL idt_flush]    ; Allows the C code to call idt_flush().
-
 idt_flush:
    mov eax, [esp+4]  ; Get the pointer to the IDT, passed as a parameter.
    lidt [eax]        ; Load the IDT pointer.
    ret
 
-[GLOBAL syscall_isr]
+
 [extern syscall_handler]
+[GLOBAL syscall_isr]
 syscall_isr:
 	cli
 	push eax
 	call syscall_handler
-	add esp,4	
+	pop eax	
 	sti
 	iret	
 

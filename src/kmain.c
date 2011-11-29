@@ -13,13 +13,39 @@
 extern void context_switch();
 void print_mb(unsigned long addr, unsigned long magic);
 //#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
-
+char *msg = "TEST";
 void idle(void *aux)
 {
-	asm volatile("sti");
 	aux = aux;
-	printf("awesome\n");
-	while(1);
+	while(1)
+		asm volatile("hlt");
+}
+void dummy(void *aux)
+{
+	aux = aux;
+	while(1)
+		printf("%s\n",(uint8_t *)aux);
+}
+
+
+void modules_init(struct multiboot_info *mb)
+{
+	mb = mb;
+/*	if(mb->mods_count > 0 )
+	{
+		printf("Modules %i\n", mb->mods_count);
+		void *ptr = *(void **)mb->mods_addr; 
+		puts((char *)ptr);
+		puts("\n");
+		printf("addr %x\n", *(void **)(mb->mods_addr + 4));
+		printf("addr %x\n", *(void **)(mb->mods_addr));
+	//	initrd_init(*(void**)mb->mods_addr);
+		placement = (unsigned)*(void **)(mb->mods_addr + 4);	
+	}
+*/
+
+
+
 }
 void kmain(uint32_t mbd, uint32_t magic)
 {
@@ -39,42 +65,23 @@ void kmain(uint32_t mbd, uint32_t magic)
 	interrupt_init();
 	console_init();
 	console_set_color(BLUE,WHITE);
-	time_init();
-/*	if(mb->mods_count > 0 )
-	{
-		printf("Modules %i\n", mb->mods_count);
-		void *ptr = *(void **)mb->mods_addr; 
-		puts((char *)ptr);
-		puts("\n");
-		printf("addr %x\n", *(void **)(mb->mods_addr + 4));
-		printf("addr %x\n", *(void **)(mb->mods_addr));
-	//	initrd_init(*(void**)mb->mods_addr);
-		placement = (unsigned)*(void **)(mb->mods_addr + 4);	
-	}
-*/
-
 	console_puts("ChickenOS v0.01 booting\n");
+	time_init();
+
 	vm_init(mb->mem_upper);
 	syscall_init();//registers interrupt handler
 	console_set_color(BLACK,WHITE);
 	
 	thread_init();
 	asm volatile("sti");	
-	printf("hello, world \n");
-	//sys_dummy();
-//	char *p = (char *)0x8000000;
-//	*p = *p;
-	//asm volatile ( "mov $0,%%eip");	
-//	context_switch();
-//	thread_t *cur = thread_current();
-//	printf("pid %i\n",cur->pid);
-	printf("IDLE %X %X\n",idle, &idle);
+	
+	
 	thread_create(idle,NULL);
-	//idle(NULL);
-	printf("TEST\n");
-	while(1);
-	printf("DERP\n");
-	//	printf("kmain\n");
+	thread_create(dummy,msg);
+	thread_create(dummy,"TEST2");
+	
+	thread_exit();
+	
 	PANIC("kmain returned");
 }
 void print_mb(unsigned long addr, unsigned long magic)
