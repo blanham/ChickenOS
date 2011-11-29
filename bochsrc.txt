@@ -3,6 +3,7 @@ megs: 64
 #vgaromimage: file=$BXSHARE/VGABIOS-lgpl-latest
 floppya: 1_44=/dev/loop0, status=inserted
 boot: a
+magic_break: enabled=1
 #display_library: x, options="gui_debug"
 log: bochsout.txt
 mouse: enabled=0
