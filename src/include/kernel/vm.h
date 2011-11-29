@@ -14,8 +14,12 @@ extern unsigned int placement;
 void paging_init();
 void gdt_install();
 void vm_init(uint32_t);
+
 void *pallocn(uint32_t count);
 void *palloc();
+void palloc_free(void *addr);
+void pallocn_free(void *addr, int pages);
 
 pagedir_t pagedir_new();
+
 #endif
