@@ -37,7 +37,6 @@ void void_handler(struct registers *regs)
 
 void interrupt_init()
 {
-	
 	idt_ptr.base = (uint32_t)&idt_table;
 	idt_ptr.limit = sizeof(idt_entry_t)*256 - 1;
 	
@@ -53,13 +52,12 @@ void interrupt_init()
 	
 	idt_build_entry(&idt_table[0x80], (uint32_t)syscall_isr, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
 	idt_flush((uint32_t)&idt_ptr);
-
 }
 
 void interrupt_register(int irq, intr_handler *handler)
 {
 	intr_handlers[irq] = handler;
-//	printf("irg %x pointer %x\n",irq,handler);
+	
 	if(irq > NUM_ISRS && irq > NUM_ISRS + NUM_IRQS)
 		pic_unmask(irq-20);
 }
@@ -67,9 +65,7 @@ void interrupt_register(int irq, intr_handler *handler)
 void interrupt_handler(struct registers *regs)
 {
 	intr_handler *handler = intr_handlers[regs->int_no];
-	uint32_t _esp;
-	asm ("mov %%esp, %0": "=m"(_esp) );
-	printf("esp intr %X num %i other %x %x\n",_esp,regs->int_no, regs->esp, regs->useresp);
+	
 	if(regs->int_no >= NUM_ISRS)
 		pic_send_end(regs->int_no - NUM_ISRS);
 
@@ -79,15 +75,13 @@ void interrupt_handler(struct registers *regs)
 		printf("something wrong in interrupt.c\n");
 	}
 }
+
 void dump_regs(struct registers *regs)
 {
 	printf("edi %X esi %X ebp %X esp %X\nebx %X edx %X ecx %X eax %X\n",
 		regs->edi,regs->esi,regs->ebp,regs->esp,regs->ebx,regs->edx,regs->ecx,regs->eax);
 	printf("eip %X cs %X eflags %X useresp %X ss %X\n",
 		regs->eip, regs->cs, regs->eflags, regs->useresp, regs->ss);
-
-
-
 }
 
 void pic_init()
@@ -111,14 +105,15 @@ void pic_init()
 	outb(PIC1_DATA, 0x0);//disables system timer for now
 	outb(PIC2_DATA, 0x0);
 }
+
 void pic_send_end(int irq)
 {
 	if( irq >= 8)
 		outb(PIC2_CMD, PIC_EOI);
 
 	outb(PIC1_CMD, PIC_EOI);
-
 }
+
 void pic_mask(int irq)
 {
 	uint8_t val;
@@ -133,9 +128,8 @@ void pic_mask(int irq)
 
 	val = inb(port) | (1 << irq);
 	outb(port, val);
-
-
 }
+
 void pic_unmask(int irq)
 {
 	uint8_t val;
@@ -153,6 +147,7 @@ void pic_unmask(int irq)
 
 
 }
+
 static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags)
 {
 	entry->sel = sel;
@@ -162,13 +157,12 @@ static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uin
 	entry->base_hi = (((uint32_t)func) >> 16) & 0xFFFF;
 } 
 
-
 void ishutdown()
 {
-const char s[] = "Shutdown";
+	const char s[] = "Shutdown";
 	const char *p;
-for (p = s; *p != '\0'; p++)
-    outb (0x8900, *p);
+	for (p = s; *p != '\0'; p++)
+    	outb (0x8900, *p);
 	asm volatile ("hlt");
 
 

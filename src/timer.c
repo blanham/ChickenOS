@@ -66,10 +66,10 @@ void rtc_data_print(uint8_t *data)
 //	uint32_t timestamp = (data[7]+30)*31556926;
 //	timestamp +=
  
-uint32_t m,d,y;
-m = data[5];
-d = data[4];
-y = data[6] + 2000;
+	uint32_t m,d,y;
+	m = data[5];
+	d = data[4];
+	y = data[6] + 2000;
 	//uint32_t test = jdt(11,22,2011);
 	uint32_t test2 = (jdt(m,d,y) - jdt(1,1,1970));
 	uint32_t test3 = data[2]*60*60 + data[1]*60 + data[0]; 
@@ -101,12 +101,9 @@ void rtc_init()
 
 void timer_intr(struct registers * regs)
 {
-	regs = regs;
-//	dump_regs(regs);
-//	while(1);
 	thread_scheduler(regs);
-//	printf("lulz\n");
 }
+
 void timer_init(uint32_t frequency)
 {
 	frequency = 2;
@@ -120,10 +117,6 @@ void timer_init(uint32_t frequency)
 
 void time_init()
 {
-
 	rtc_init();
-
 	timer_init(2);
-
-
 }
