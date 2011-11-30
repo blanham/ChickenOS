@@ -1,14 +1,15 @@
-#include <kernel/types.h>
-#include <kernel/interrupt.h>
-#include "syscall.h"
-#include <stdio.h>
 #include <kernel/console.h>
-#include <kernel/timer.h>
-#include <kernel/vm.h>
 #include <kernel/hw.h>
+#include <kernel/interrupt.h>
 #include <kernel/thread.h>
+#include <kernel/timer.h>
+#include <kernel/types.h>
+#include <kernel/vm.h>
 #include <multiboot.h>
+#include <stdio.h>
+#include <string.h>
 #include "debug.h"
+#include "syscall.h"
 
 extern void context_switch();
 void print_mb(unsigned long addr, unsigned long magic);
@@ -23,8 +24,28 @@ void idle(void *aux)
 void dummy(void *aux)
 {
 	aux = aux;
+
+	char test[256];
 	while(1)
+	{
+		printf("TEST %i\n",thread_current()->pid);
+		thread_yield();
+
+	}
+	gets(test);
+//	puts(test);
+	printf("%s\n",test);
+	int t = strcmp(test, "test");
+	printf("%s\n",test);
+//	t =t;
+	if(t == 0)
+		printf("YES\n");
+	else
+		printf("NO\n");
+//	while(1);
 		printf("%s\n",(uint8_t *)aux);
+	thread_exit();
+//	while(1);
 }
 
 
@@ -78,7 +99,8 @@ void kmain(uint32_t mbd, uint32_t magic)
 	
 	thread_create(idle,NULL);
 	thread_create(dummy,msg);
-	thread_create(dummy,"TEST2");
+	thread_create(dummy,msg);
+//	thread_create(dummy,"TEST2");
 	
 	thread_exit();
 	
