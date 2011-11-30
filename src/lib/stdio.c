@@ -6,6 +6,7 @@
 static char allocbuf[ALLOCSIZE];
 static char *allocp = allocbuf;
 /* temporary memory functions taken from K&R*/
+
 char *alloc(int n)
 {
 	if(allocbuf + ALLOCSIZE - allocp >= n) {
@@ -15,15 +16,34 @@ char *alloc(int n)
 		return NULL;
 	}
 }
+
 void afree(char *p)
 {
 	if (p >= allocbuf && p < allocbuf + ALLOCSIZE)
 		allocp = p;
-
 }
+
 void putc(char c)
 {
 	console_putc(c);
+}
+
+char getchar()
+{
+	return kbd_getc();
+}
+
+char *gets(char *str)
+{
+	char c;
+	char *tmp = str;
+	while((c = getchar()) != '\n')
+	{
+		*tmp++ = c;
+	}
+
+	*tmp++ = '\0';
+	return str;
 }
 
 int puts(char *string)
