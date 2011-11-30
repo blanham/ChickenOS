@@ -1,3 +1,8 @@
+/*	ChickenOS - vm.c
+ *	Handles paging, gdt, page allocation and (will support) heap allocation
+ *  Uses code borrowed from JamesM's kernel tutorial
+ *
+ */
 #include <kernel/vm.h>
 #include <kernel/interrupt.h>
 #include <kernel/bitmap.h>
@@ -182,7 +187,8 @@ void install_pagedir(uint32_t *pd)
 				"mov %%eax, %%cr0\n" :: "m" (pd));
 }
 
-
+//need to rewrite this, fix it so that all 
+//memory is mapped starting at PHYS_BASE
 void paging_init()
 {
 // Pointers to the page directory and the page table
