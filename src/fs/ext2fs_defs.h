@@ -1,4 +1,9 @@
 #include <stdint.h>
+#include "vfs.h"
+/* inodes are indexed starting at 1 */
+#define INODE(x) (x-1)
+#define BLOCK(x) (1024*(x))
+#define UNUSED(X) X = X
 
 typedef struct ext2_superblock {
 	uint32_t s_inodes_count; //Count of inodes in fs
@@ -100,3 +105,18 @@ typedef struct ext2_directory {
 #define EXT2_ACL_DATA_INO		4
 #define EXT2_BOOT_LOADER_INO	5
 #define EXT2_UNDEL_DIR_INO		6
+
+typedef struct ext2_aux {
+	uint32_t size;
+	ext2_group_descriptor_t *gd_table; 
+	uint32_t *block_bitmap;
+	uint32_t *inode_bitmap;
+} ext2_aux_t;
+
+typedef struct ext2_fs {
+	ext2_superblock_t *superblock;
+	uint16_t type;
+	ext2_aux_t *aux;
+	vfs_ops_t *ops;
+} ext2_fs_t;
+
