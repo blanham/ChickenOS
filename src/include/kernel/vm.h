@@ -1,6 +1,7 @@
 #ifndef C_OS_VM_H
 #define C_OS_VM_H
 #include <kernel/types.h>
+#include <multiboot.h>
 #define PHYS_BASE 0xC0000000
 #define V2P(p) (p - PHYS_BASE)
 #define P2V(p) (p + PHYS_BASE)
@@ -13,7 +14,7 @@ extern unsigned int placement;
 
 void paging_init();
 void gdt_install();
-void vm_init(uint32_t);
+void vm_init(struct multiboot_info *mb);
 
 void *pallocn(uint32_t count);
 void *palloc();
