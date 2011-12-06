@@ -1,6 +1,7 @@
 #include <kernel/vm.h>
 #include <kernel/interrupt.h>
 #include <kernel/bitmap.h>
+#include <kernel/memory.h>
 #include <string.h>
 #include <stdio.h>
 #include "debug.h"
@@ -13,18 +14,21 @@ unsigned int placement = 0;
 phys_addr_t palloc_start = 0;
 virt_addr_t heap_start;
 bitmap_t page_bitmap;
+
 //uint32_t placement;
 // Declare the page directory and a page table, both 4kb-aligned
-unsigned long kernelpagedir[1024] __attribute__ ((aligned (4096)));
-unsigned long lowpagetable[1024] __attribute__ ((aligned (4096)));
-uint32_t palloc_bitmap_storage[1024] __attribute__ ((aligned (4096)));
-uint32_t *palloc_bitmap = palloc_bitmap_storage;
-pagedir_t kernel_pd;
+
+uint32_t kernelpagedir[1024] __attribute__ ((aligned (4096)));
+uint32_t lowpagetable[1024] __attribute__ ((aligned (4096)));
+uint32_t * kernel_pd;
+
 #define PAGE_VIOLATION 0x01
 #define PAGE_WRITE	   0x02
 #define PAGE_USER	   0x04
 
-
+uint32_t palloc_bitmap_storage[1024] __attribute__ ((aligned (4096)));
+uint32_t *palloc_bitmap = palloc_bitmap_storage;
+uint32_t *PD;
 void gpf(struct registers *regs)
 {
 	uint32_t error_code = regs->err_code;
@@ -145,22 +149,33 @@ void heap_init()
 	printf("test %x test2 %x test3 %x\n", test, test2, test3);*/
 }
 
-void vm_init(uint32_t size)
+void vm_init(struct multiboot_info *mb)
 {
+	
+	//return;
+	uint32_t size = mb->mem_upper;
+	
+	if(mb->mods_count > 0 )
+	{
+		placement =(uint32_t) P2V(*(void **)P2V(mb->mods_addr + 4));	
+	}
 	if(placement == 0)
 		placement = (unsigned)&end;
-	placement = (placement & PAGE_MASK)  + PAGE_SIZE;
+	placement = (placement & PAGE_MASK) + PAGE_SIZE;
 	uint32_t temp = (placement - PHYS_BASE)/PAGE_SIZE;
 	//size = 1024 * 1024; //needed for machines with large amounts of memory at the moemnt
 						//becuase we only have 4MB, and the bitmap overflows it 
 	uint32_t page_count = (size/4) - temp;
 	
-	printf("%iMB installed %i\n", (size)/1024 + 2);
-		
+//	printf("%iMB installed %i\n", (size)/1024 + 2);
+//	printf("PC %i PL %X %x\n",page_count, placement, temp);	
+	palloc_init(page_count, placement);
+	PD = pallocn(4);
+	paging_init();	
 	interrupt_register(13, &gpf);
 	interrupt_register(14, &page_fault);
 
-	palloc_init(page_count, placement);
+
 	heap_init();
 }
 
@@ -168,48 +183,42 @@ pagedir_t pagedir_new()
 {
 	pagedir_t new = palloc();
 
-	memcpy(new, kernel_pd, PD_SIZE);	
+//	memcpy(new, kernel_pd, PD_SIZE);	
 
 	return new;
 }
 
 void install_pagedir(uint32_t *pd)
 {
+	uint32_t pdn = V2P((uint32_t)pd);
 	asm volatile (	"mov %0, %%eax\n"
 				"mov %%eax, %%cr3\n"
 				"mov %%cr0, %%eax\n"
 				"orl $0x80000000, %%eax\n"
-				"mov %%eax, %%cr0\n" :: "m" (pd));
+				"mov %%eax, %%cr0\n" :: "m" (pdn));
 }
+
+
+
+
 
 
 void paging_init()
 {
-// Pointers to the page directory and the page table
-	void *lowpagetablePtr = 0;
-	int k = 0;
- 
-	kernel_pd = (pagedir_t)((char*)kernelpagedir + 0x40000000);	// Translate the page directory from
-								// virtual address to physical address
-	lowpagetablePtr = (char *)lowpagetable + 0x40000000;	// Same for the page table
- 
+	void *lowpagetablePtr = (char *)lowpagetable - PHYS_BASE;	
 
-	// Counts from 0 to 1023 to...
-	for (k = 0; k < 1024; k++)
+	kernel_pd = palloc();
+	kmemsetl(kernel_pd, 0, 4*1024); 
+	
+	for (int k = 0; k < 1024; k++)
 	{
 		lowpagetable[k] = (k * 4096) | 0x3;	// ...map the first 4MB of memory into the page table...
-		kernelpagedir[k] = 0;			// ...and clear the page directory entries
 	}
  
-	// Fills the addresses 0...4MB and 3072MB...3076MB of the page directory
-	// with the same page table
  
-	kernelpagedir[0] = (unsigned long)lowpagetablePtr | 0x3;
-	kernelpagedir[768] = (unsigned long)lowpagetablePtr | 0x3;
-	// Copies the address of the page directory into the CR3 register and, finally, enables paging!
+	kernel_pd[768] = (unsigned long)lowpagetablePtr | 0x3;
 
 	install_pagedir(kernel_pd);
-
 	gdt_install();
 
 }
