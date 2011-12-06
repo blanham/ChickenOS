@@ -3,19 +3,13 @@
 #include <stdio.h>
 #include "ext2fs_defs.h"
 //#include "ext2fs.h"
-/* inodes are indexed starting at 1 */
-#define INODE(x) (x-1)
-#define BLOCK(x) (1024*(x))
-#define UNUSED(X) X = X
 typedef struct ext2_filesystem {
 	ext2_superblock_t *superblock;
 	char *fs;
 	uint32_t size;
-//	ext2_group_descriptor_t *gd_table; 
-//	uint32_t *block_bitmap;
-//	uint32_t *inode_bitmap;
-	
-
+	ext2_group_descriptor_t *gd_table; 
+	uint32_t *block_bitmap;
+	uint32_t *inode_bitmap;
 } ext2_filesystem_t;
 
 //char *fs; //just have a pointer to global buffer for now, will also work for ram disk
@@ -176,6 +170,15 @@ void list_files(ext2_directory_t *dir, uint32_t len)
 	}
 
 }
+
+
+
+
+
+
+
+
+
 ext2_directory_t *open_root(uint8_t *fs, ext2_inode_t *inode_table)
 {
 	ext2_directory_t *root;
@@ -244,6 +247,7 @@ void lookup(ext2_filesystem_t *ext2, char *name)
 	char *directory;
 	char *a;
 	char *b;
+	UNUSED(ext2);
 	a = b = calloc(256, 1);
 	strcpy(b, name);
 	while((directory = strtok_r(b, "/", &save_ptr)) != NULL)
@@ -253,7 +257,6 @@ void lookup(ext2_filesystem_t *ext2, char *name)
 		
 
 	}
-
 	free(a);
 
 
@@ -262,27 +265,34 @@ void lookup(ext2_filesystem_t *ext2, char *name)
 int ext2(char *filename)
 {
 	ext2_filesystem_t *ext2 = ext2_load(filename);
+	if(ext2 == NULL)
+	{
+		printf("failed to open fs\n");
+		return -1;
 
+	}
 	ext2_inode_t *inode_test = malloc(sizeof(ext2_inode_t));
-	ext2_read_inode(ext2, 16, inode_test);
 
+		ext2_read_inode(ext2, 16, inode_test);
 
+	return 0;
 	uint32_t groups = (1024/sizeof(ext2_group_descriptor_t));//superblock->s_blocks_count/superblock->s_blocks_per_group + 1; 
 
-
+	return 0;
 	ext2_group_descriptor_t *gd_table = malloc(sizeof(ext2_group_descriptor_t)*groups);
+	return 0;
 	ext2_read_raw(ext2, gd_table, 2048,sizeof(ext2_group_descriptor_t)*groups);
 	ext2_read_block(ext2, 3, gd_table);
 
 
 
-	lookup(ext2, "/boot/map");
+//	lookup(ext2, "/boot/map");
 
 //	int i;
 //	for(i = 0; i < groups; i++)
 	gd_print(gd_table[0]);
 	
-	
+	return 0;
 	int inode_start = BLOCK(gd_table[0].bg_inode_table);
 	printf("inode_start %i\n", gd_table[0].bg_inode_table);
 	printf("inode_start %x\n",inode_start);
@@ -291,7 +301,6 @@ int ext2(char *filename)
 //	for(i = 0; i < 16; i++)
 		inode_print(inode_table[15]);
 	
-	printf("sdafasdfasdsdaffas");
 //	return 0;
 	ext2_directory_t *root = open_root((uint8_t *)ext2->fs, inode_table);
 	list_files(root, inode_table[1].i_size);
@@ -303,11 +312,6 @@ int test =	lookup_file(dir, inode_table[11].i_size, "map");
 	if(test)
 		printf("awesome\n");
 
-//	*/
-/*
-//		printf("\nsize %i\n",sizeof(ext2_inode_t));
-	printf("groups %i\n",groups);
-	printf("magic %x\n",superblock->s_magic);*/
 //	fclose(fp);
 
 	return 0;
