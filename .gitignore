@@ -2,4 +2,5 @@
 bochsout.txt
 tmp/
 utils/
-
+util/
+compile/
