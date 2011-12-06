@@ -9,10 +9,12 @@ enum console_color {
 
 };
 void console_init();
+void console_fs_init();
 void console_clear();
 void console_set_color(uint8_t bg_color, uint8_t fg_color);
 void console_putc(uint8_t c);
 int console_puts(char *string);
+void console_switch(int num);
 char kbd_getc();
 void kbd_init();
 #endif
