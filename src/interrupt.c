@@ -49,8 +49,8 @@ void interrupt_init()
 	
 	for(int i = 0; i < NUM_INTRS; i++)
 		interrupt_register(i, void_handler);
-	
-	idt_build_entry(&idt_table[0x80], (uint32_t)syscall_isr, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
+	extern void sysc();	
+	idt_build_entry(&idt_table[0x80], (uint32_t)sysc, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
 	idt_flush((uint32_t)&idt_ptr);
 }
 
