@@ -253,7 +253,7 @@ thread_t * thread_create(void (*func)(void *), void *aux)
 	
 	new->pid = pid_allocate();
 	new->parent = thread_current()->pid;
-	
+	new->cur_dir = thread_current()->cur_dir;	
 	new_sp -= sizeof(struct registers);	
 	reg_frame= (struct registers *)new_sp;
 	new->regs = (struct registers *)new_sp;
