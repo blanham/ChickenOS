@@ -2,10 +2,12 @@
 #include <kernel/hw.h>
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
+#include <kernel/memory.h>
 #include <kernel/timer.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <multiboot.h>
+#include <../fs/vfs.h>
+#include <../fs/initrd.h>
 #include <stdio.h>
 #include <string.h>
 #include "debug.h"
@@ -14,63 +16,96 @@
 extern void context_switch();
 void print_mb(unsigned long addr, unsigned long magic);
 //#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
-char *msg = "TEST";
+char *msg = "HERPDERP";
 void idle(void *aux)
 {
 	aux = aux;
 	while(1)
 		asm volatile("hlt");
 }
+
+//void console_clear()
 void dummy(void *aux)
 {
 	aux = aux;
 
-	char test[256];
+	char buf[256];
+	char out[256];
+
+	kmemset((uint8_t *)out, 0, 255);
+	//for(int i = 0; i < 24; i++)
+	//	console_puts("p\n");
+	char c;
+	int fd = open((char*)aux, 0);
+//	printf("fd = %i\n",fd);
+	kmemset((uint8_t *)buf, 0 , 255);
+	size_t ret;// = read(fd, buf, 10);
+	//printf("read %x\n",ret);
+//	sprintf(out, "TEST %s\n",buf);
+	//sprintf(out, "read %x\n", ret);
+
+//	write(fd, "DERPppppTT", ret);
+	
+	int fd2 = open("/dev/initrd",0);
+	printf("FD %i\n", fd2);
+	kmemset((uint8_t *)buf, 0, 256);
+
+	ret = read(fd2, buf, 32);
+	ret= ret;
+	printf("RET %s\n",buf);
+	write(fd, buf, ret);
+	printf("done\n");
+	while(1);
 	while(1)
 	{
-		printf("TEST %i\n",thread_current()->pid);
+		c = getchar();
+		putc(c);
+
+	}
+	while(1)
+	{
+		printf("TEST %i %s\n",thread_current()->pid, (char *)aux);
 		thread_yield();
 
 	}
-	gets(test);
+	//gets(test);
 //	puts(test);
-	printf("%s\n",test);
-	int t = strcmp(test, "test");
-	printf("%s\n",test);
+//	printf("%s\n",test);
+//	int t = strcmp(test, "test");
+//	printf("%s\n",test);
 //	t =t;
-	if(t == 0)
-		printf("YES\n");
-	else
-		printf("NO\n");
+//	if(t == -1)
+//		printf("YES\n");
+//	else
+//		printf("NO\n");
 //	while(1);
 		printf("%s\n",(uint8_t *)aux);
 	thread_exit();
 //	while(1);
 }
 
+extern int sh_main(void *aux);
+
+void init(void *aux)
+{
+	int ret = sh_main(aux);
+	printf("return %i\n",ret);
+	thread_exit();
+}
 
 void modules_init(struct multiboot_info *mb)
 {
-	mb = mb;
-/*	if(mb->mods_count > 0 )
+	if(mb->mods_count > 0 )
 	{
-		printf("Modules %i\n", mb->mods_count);
-		void *ptr = *(void **)mb->mods_addr; 
-		puts((char *)ptr);
-		puts("\n");
-		printf("addr %x\n", *(void **)(mb->mods_addr + 4));
-		printf("addr %x\n", *(void **)(mb->mods_addr));
-	//	initrd_init(*(void**)mb->mods_addr);
-		placement = (unsigned)*(void **)(mb->mods_addr + 4);	
+		uintptr_t start = (uintptr_t)*((void**)P2V(mb->mods_addr));
+		uintptr_t end  = (uintptr_t)*((void **)P2V(mb->mods_addr + 4));
+		initrd_init(P2V(start),P2V(end));
 	}
-*/
-
-
-
 }
+
 void kmain(uint32_t mbd, uint32_t magic)
 {
-	struct multiboot_info *mb;
+	struct multiboot_info *mb = 0;
    	if ( magic != 0x2BADB002 )
    	{
       /* Something went not according to specs. Print an error */
@@ -79,29 +114,32 @@ void kmain(uint32_t mbd, uint32_t magic)
 		puts("Bad magic number, halting\r");
 		return;
    	}
- 	mb = (struct multiboot_info *)mbd;
-	
+ 	mb = (struct multiboot_info *)P2V(mbd);
 	/* begin initializations */
-	paging_init();	
 	interrupt_init();
+	vm_init(mb);
 	console_init();
+	paging_init();
 	console_set_color(BLUE,WHITE);
 	console_puts("ChickenOS v0.01 booting\n");
-	time_init();
-
-	vm_init(mb->mem_upper);
-	syscall_init();//registers interrupt handler
-	console_set_color(BLACK,WHITE);
 	
+	time_init();
+	syscall_init();
 	thread_init();
 	asm volatile("sti");	
 	
-	
+	vfs_init();
+	modules_init(mb);	
+	console_fs_init();
+	console_set_color(BLACK,WHITE);
 	thread_create(idle,NULL);
-	thread_create(dummy,msg);
-	thread_create(dummy,msg);
+//	thread_create(dummy,"/dev/tty");
+//	thread_create(dummy,"/dev/tty0");
+	thread_create(init,NULL);
 //	thread_create(dummy,"TEST2");
-	
+	//uint8_t*g = NULL;
+	//*g = 9;
+	printf("d %i\n",-1);	
 	thread_exit();
 	
 	PANIC("kmain returned");
@@ -109,7 +147,7 @@ void kmain(uint32_t mbd, uint32_t magic)
 void print_mb(unsigned long addr, unsigned long magic)
 {
      #define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
-
+	addr = P2V(addr);
  /* Am I booted by a Multiboot-compliant boot loader? */
        if (magic != MULTIBOOT_BOOTLOADER_MAGIC)
          {
@@ -126,7 +164,7 @@ void print_mb(unsigned long addr, unsigned long magic)
      
        /* Are mem_* valid? */
        if (CHECK_FLAG (mbi->flags, 0))
-         printf ("mem_lower = %xKB, mem_upper = %xKB\n",
+         printf ("mem_lower = %iKB, mem_upper = %iKB\n",
                  (unsigned) mbi->mem_lower, (unsigned) mbi->mem_upper);
      
        /* Is boot_device valid? */
@@ -135,7 +173,7 @@ void print_mb(unsigned long addr, unsigned long magic)
      
        /* Is the command line passed? */
        if (CHECK_FLAG (mbi->flags, 2))
-         printf ("cmdline = %s\n", (char *) mbi->cmdline);
+         printf ("cmdline = %s\n", (char *) P2V(mbi->cmdline));
      
        /* Are mods_* valid? */
        if (CHECK_FLAG (mbi->flags, 3))
@@ -145,13 +183,13 @@ void print_mb(unsigned long addr, unsigned long magic)
      
            printf ("mods_count = %d, mods_addr = 0x%x\n",
                    (int) mbi->mods_count, (int) mbi->mods_addr);
-           for (i = 0, mod = (multiboot_module_t *) mbi->mods_addr;
+           for (i = 0, mod = (multiboot_module_t *) P2V(mbi->mods_addr);
                 i < mbi->mods_count;
                 i++, mod++)
              printf (" mod_start = 0x%x, mod_end = 0x%x, cmdline = %s\n",
-                     (unsigned) mod->mod_start,
-                     (unsigned) mod->mod_end,
-                     (char *) mod->cmdline);
+                     (unsigned) P2V(mod->mod_start),
+                     (unsigned) P2V(mod->mod_end),
+                     (char *) P2V(mod->cmdline));
          }
      
        /* Bits 4 and 5 are mutually exclusive! */
@@ -160,7 +198,7 @@ void print_mb(unsigned long addr, unsigned long magic)
            printf ("Both bits 4 and 5 are set.\n");
            return;
          }
-     
+     return;
        /* Is the symbol table of a.out valid? */
        if (CHECK_FLAG (mbi->flags, 4))
          {
@@ -172,7 +210,7 @@ void print_mb(unsigned long addr, unsigned long magic)
                    (unsigned) multiboot_aout_sym->strsize,
                    (unsigned) multiboot_aout_sym->addr);
          }
-     
+    	 
        /* Is the section header table of ELF valid? */
        if (CHECK_FLAG (mbi->flags, 5))
          {
