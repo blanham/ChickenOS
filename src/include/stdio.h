@@ -6,5 +6,6 @@ int puts(char *string);
 char *gets(char *str);
 char getchar();
 int vsprintf(char *buf, const char *fmt, __gnuc_va_list args);
-void printf(char *fmt, ...);
+int printf(const char *fmt, ...);
+int sprintf(char *buf, const char *fmt, ...);
 #endif
