@@ -245,9 +245,9 @@ thread_t * thread_create(void (*func)(void *), void *aux)
 
 	if(new == NULL)
 		return NULL;
-
-	new->pd = pagedir_new();	
-	
+	//printf("ASDFASDFASDFASDFAFSD\n");
+//	new->pd = pagedir_new();	
+	//printf("DERP\n");
 	new_sp = (uint32_t)((uint32_t)new + STACK_SIZE);
 	args = (uint32_t *)(new_sp - 4);
 	
