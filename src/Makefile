@@ -4,10 +4,10 @@ IDIR=./include
 
 LIB_SRCS=./lib/stdio.o ./lib/string.o ./lib/sys.o ./lib/kernel/memory.o 
 SOURCES2=  interrupt.o intr-core.o 
-SOURCES=kmain.o console.o hw.o kbd.o loader.o syscall.o thread.o timer.o vm.o $(LIB_SRCS) $(SOURCES2)
+SOURCES=kmain.o console.o hw.o kbd.o loader.o fs/initrd.o fs/device.o fs/vfs.o sh.o syscall.o thread.o timer.o vm.o $(LIB_SRCS) $(SOURCES2)
 LINKER=$(CROSS)/i586-elf-ld
 #LINKER=ld
-CFLAGS=-g -Wall -Wextra -Werror -I./include --std=gnu99\
+CFLAGS=-g -Wall -Wextra -Werror -I./include -I./fs --std=gnu99\
     -nostdlib -nostdinc -fno-builtin -nostartfiles -nodefaultlibs
 LDFLAGS=-Tlinker.ld
 ASFLAGS=-felf
