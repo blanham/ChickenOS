@@ -76,6 +76,16 @@ IRQ 12
 IRQ 13
 IRQ 14
 IRQ 15
+
+
+[GLOBAL sysc]
+sysc:
+	;cli
+	push 0
+	push 0x80
+	jmp _isr_handler
+
+
 [GLOBAL intr_return]
 [extern interrupt_handler]
 _isr_handler:
@@ -159,14 +169,12 @@ idt_flush:
    lidt [eax]        ; Load the IDT pointer.
    ret
 
-
+;this stuff is old
 [extern syscall_handler]
 [GLOBAL syscall_isr]
 syscall_isr:
-	cli
 	push eax
 	call syscall_handler
 	pop eax	
-	sti
 	iret	
 

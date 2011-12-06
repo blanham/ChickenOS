@@ -1,20 +1,32 @@
 #include <kernel/interrupt.h>
 #include <kernel/console.h>
+#include <kernel/thread.h>
 #include "syscall.h"
 #include <stdio.h>
 //#include <kernel/vfs.h>
 int return_value = 0;
-int syscall_handler (int);
-void syscall_init()
-{
-	//interrupt_register(0x80, &syscall_handler);
 
-}
-int syscall_handler (int test)
+void syscall_handler (struct registers *regs)
 {
-	printf("hadnerl %x\n", test);
-	console_puts("syscall!\n");
-	return 0xdeadbeef;
+	printf("derp %x\n", regs->eax);
+	uint32_t *num = (uint32_t*)((uint32_t)regs->useresp);
+//	uint32_t res = 0;//*(num);
+	
+	printf("Res %x\n",regs->useresp);
+	printf("Res %x\n",num);
+	regs = regs;
+	printf("ESP %X\n",regs->esp);	
+	int call = (int)((int *)regs->useresp);
+	printf("Call %i\n",call);
+	regs->eax = 0xfeed;
+}
+
+
+int syscall_haiindler (int num)
+{
+	num = num;
+	printf("derp %X\n",num);	
+	return 0xcafebabe;
 }
 
 void sys_dummy()
@@ -30,3 +42,9 @@ void sys_dummy()
 	printf("test %x\n",test);
 
 }
+void syscall_init()
+{
+	interrupt_register(0x80, &syscall_handler);
+
+}
+
