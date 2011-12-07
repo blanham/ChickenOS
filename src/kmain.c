@@ -39,20 +39,20 @@ void dummy(void *aux)
 	int fd = open((char*)aux, 0);
 //	printf("fd = %i\n",fd);
 	kmemset((uint8_t *)buf, 0 , 255);
-	size_t ret;// = read(fd, buf, 10);
+	size_t ret = read(fd, buf, 10);
 	//printf("read %x\n",ret);
 //	sprintf(out, "TEST %s\n",buf);
 	//sprintf(out, "read %x\n", ret);
 
 //	write(fd, "DERPppppTT", ret);
 	
-	int fd2 = open("/dev/initrd",0);
-	printf("FD %i\n", fd2);
-	kmemset((uint8_t *)buf, 0, 256);
+//	int fd2 = open("/dev/initrd",0);
+//	printf("FD %i\n", fd2);
+//	kmemset((uint8_t *)buf, 0, 256);
 
-	ret = read(fd2, buf, 32);
-	ret= ret;
-	printf("RET %s\n",buf);
+//	ret = read(fd2, buf, 32);
+//	ret= ret;
+//	printf("RET %s\n",buf);
 	write(fd, buf, ret);
 	printf("done\n");
 	while(1);
@@ -129,17 +129,16 @@ void kmain(uint32_t mbd, uint32_t magic)
 	asm volatile("sti");	
 	
 	vfs_init();
-	modules_init(mb);	
+//	modules_init(mb);	
 	console_fs_init();
 	console_set_color(BLACK,WHITE);
 	thread_create(idle,NULL);
-//	thread_create(dummy,"/dev/tty");
-//	thread_create(dummy,"/dev/tty0");
+	//thread_create(dummy,"/dev/tty");
+	thread_create(dummy,"/dev/tty0");
 	thread_create(init,NULL);
 //	thread_create(dummy,"TEST2");
 	//uint8_t*g = NULL;
 	//*g = 9;
-	printf("d %i\n",-1);	
 	thread_exit();
 	
 	PANIC("kmain returned");
