@@ -52,7 +52,7 @@ static void console_scroll(console_t *con)
 
 void tty_putc(console_t *con, uint8_t c)
 {
-	con->videoram = videoram;
+//	con->videoram = videoram;
 	switch(c)
 	{
 		case 0x08:
@@ -116,9 +116,9 @@ void console_init()
 	console->x = console->y = 0;
 	console->attribute = BLANK;
 	console->videoram = videoram;
-//	console->buffer = palloc();
+	console->buffer = palloc();
 	console->num = 0;
-//	console1.buffer = palloc();
+	console1.buffer = palloc();
 	console1.attribute = BLANK;
 	console1.x=console1.y = 0;
 	console1.num = 1;
@@ -142,18 +142,16 @@ char tty_getc(console_t *con)
 	return kbd_getc();
 
 }
-
+#include <stdio.h>
 void console_switch(int num)
 {
 	//copy curent vram to buffer
 	kmemcpyw(console->buffer,console->videoram, 80*25*2);
-	console->videoram = console->buffer;	
+	console->videoram = console->buffer;
 	//copy new consoles buffer to vram
 	console = consoles[num];
 	console->videoram = videoram;
 	kmemcpyw(console->videoram, console->buffer, 80*25*2);	
-	num = num;	
-//	console = consoled[num];
 
 	//put cursor at correct postion
 	console_cursor_move(CURSOR_POS);
