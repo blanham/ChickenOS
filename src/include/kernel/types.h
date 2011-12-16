@@ -13,6 +13,9 @@ typedef uint32_t		uintptr_t;
 //typedef signed long		int64_t;
 //typedef unsigned long	uint64_t;
 typedef uint32_t	    bool;
+#ifndef NULL
+#define NULL 0
+#endif
 #define FALSE 0
 #define TRUE 1
 #endif
