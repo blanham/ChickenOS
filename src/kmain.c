@@ -1,4 +1,5 @@
 #include <kernel/console.h>
+#include <kernel/common.h>
 #include <kernel/hw.h>
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
@@ -6,91 +7,34 @@
 #include <kernel/timer.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <../fs/vfs.h>
-#include <../fs/initrd.h>
+#include <kernel/fs/vfs.h>
+#include <kernel/fs/initrd.h>
 #include <stdio.h>
 #include <string.h>
-#include "debug.h"
 #include "syscall.h"
 
-extern void context_switch();
 void print_mb(unsigned long addr, unsigned long magic);
-//#define CHECK_FLAG(flags,bit)   ((flags) & (1 << (bit)))
-char *msg = "HERPDERP";
-void idle(void *aux)
+void idle(void *aux UNUSED)
 {
-	aux = aux;
 	while(1)
 		asm volatile("hlt");
 }
 
-//void console_clear()
-void dummy(void *aux)
+void dummy(void *aux UNUSED)
 {
-	aux = aux;
-
-	char buf[256];
-	char out[256];
-
-	kmemset((uint8_t *)out, 0, 255);
-	//for(int i = 0; i < 24; i++)
-	//	console_puts("p\n");
-	char c;
-	int fd = open((char*)aux, 0);
-//	printf("fd = %i\n",fd);
-	kmemset((uint8_t *)buf, 0 , 255);
-	size_t ret = read(fd, buf, 10);
-	//printf("read %x\n",ret);
-//	sprintf(out, "TEST %s\n",buf);
-	//sprintf(out, "read %x\n", ret);
-
-//	write(fd, "DERPppppTT", ret);
-	
-//	int fd2 = open("/dev/initrd",0);
-//	printf("FD %i\n", fd2);
-//	kmemset((uint8_t *)buf, 0, 256);
-
-//	ret = read(fd2, buf, 32);
-//	ret= ret;
-//	printf("RET %s\n",buf);
-	write(fd, buf, ret);
-	printf("done\n");
+	printf("dummy\n");
 	while(1);
-	while(1)
-	{
-		c = getchar();
-		putc(c);
-
-	}
-	while(1)
-	{
-		printf("TEST %i %s\n",thread_current()->pid, (char *)aux);
-		thread_yield();
-
-	}
-	//gets(test);
-//	puts(test);
-//	printf("%s\n",test);
-//	int t = strcmp(test, "test");
-//	printf("%s\n",test);
-//	t =t;
-//	if(t == -1)
-//		printf("YES\n");
-//	else
-//		printf("NO\n");
-//	while(1);
-		printf("%s\n",(uint8_t *)aux);
 	thread_exit();
-//	while(1);
 }
 
 extern int sh_main(void *aux);
 
-void init(void *aux)
+void init(void *aux UNUSED)
 {
-	int ret = sh_main(aux);
-	printf("return %i\n",ret);
-	thread_exit();
+//	int ret = 0;//sh_main(aux);
+//	printf("return %i\n",ret);
+//	thread_exit();
+	while(1);
 }
 
 void modules_init(struct multiboot_info *mb)
@@ -108,13 +52,12 @@ void kmain(uint32_t mbd, uint32_t magic)
 	struct multiboot_info *mb = 0;
    	if ( magic != 0x2BADB002 )
    	{
-      /* Something went not according to specs. Print an error */
-      /* message and halt, but do *not* rely on the multiboot */
-      /* data structure. */
-		puts("Bad magic number, halting\r");
+		console_puts("Bad magic number, halting\r");
 		return;
    	}
- 	mb = (struct multiboot_info *)P2V(mbd);
+ 	
+	mb = (struct multiboot_info *)P2V(mbd);
+	
 	/* begin initializations */
 	interrupt_init();
 	vm_init(mb);
@@ -126,19 +69,18 @@ void kmain(uint32_t mbd, uint32_t magic)
 	time_init();
 	syscall_init();
 	thread_init();
-	asm volatile("sti");	
+
+	interrupt_enable();
 	
+	modules_init(mb);	
 	vfs_init();
-//	modules_init(mb);	
+	
 	console_fs_init();
 	console_set_color(BLACK,WHITE);
+	
 	thread_create(idle,NULL);
-	//thread_create(dummy,"/dev/tty");
-	thread_create(dummy,"/dev/tty0");
-	thread_create(init,NULL);
-//	thread_create(dummy,"TEST2");
-	//uint8_t*g = NULL;
-	//*g = 9;
+	thread_create(init,"test");
+//
 	thread_exit();
 	
 	PANIC("kmain returned");
