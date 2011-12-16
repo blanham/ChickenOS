@@ -1,7 +1,7 @@
 #include <stdio.h>
 //#include <stdlib.h>
 #include <stdio.h>
-#include <vfs.h>
+//#include <vfs.h>
 #include <string.h>
 #include <kernel/list.h>
 
