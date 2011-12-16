@@ -2,9 +2,11 @@
 #define C_OS_THREAD_H
 #include <kernel/list.h>
 #include <kernel/vm.h>
-#include <../fs/vfs.h>
+#include <kernel/fs/vfs.h>
 enum thread_stat {DEAD, RUNNING};
+
 typedef unsigned short pid_t;
+
 typedef struct thread {
 	pid_t pid;
 	pid_t parent;
@@ -19,7 +21,6 @@ typedef struct thread {
 
 void thread_init();
 thread_t * thread_current();
-
 thread_t * thread_create(void (*func)(void*), void *aux);
 void thread_scheduler();
 void thread_yield();
