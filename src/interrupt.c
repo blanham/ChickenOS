@@ -2,7 +2,6 @@
  *  Borrows from Bran and JamesM's tutorials and
  *  the pintos teaching os
  */
-
 #include <kernel/interrupt.h>
 #include <stdio.h>
 #include <kernel/console.h>
@@ -17,17 +16,17 @@
 idt_entry_t idt_table[NUM_INTRS];
 idt_ptr_t	idt_ptr;
 intr_handler *intr_handlers[NUM_INTRS];
+static enum intr_status interrupt_status;
 
 extern void syscall_isr();
-extern void idt_flush(uint32_t);
+//extern void idt_flush(uint32_t);
 static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags);
 
 void pic_init();
-
 void pic_unmask(int irq);
 void pic_send_end(int irq);
 
-void void_handler(struct registers *regs)
+static void void_handler(struct registers *regs)
 {
 	if(regs->int_no < NUM_ISRS)
 		printf("unhandled interrupt %i\n", regs->int_no);
@@ -35,13 +34,19 @@ void void_handler(struct registers *regs)
 		printf("unhandled irq %i\n",regs->int_no - NUM_ISRS);
 }
 
-void interrupt_init()
+void idt_init()
 {
 	idt_ptr.base = (uint32_t)&idt_table;
 	idt_ptr.limit = sizeof(idt_entry_t)*256 - 1;
-	
 	kmemset((uint8_t *)idt_table, 0, sizeof(idt_entry_t) * NUM_INTRS);
+}
 
+
+void interrupt_init()
+{
+	interrupt_disable();
+	
+	idt_init();
 	pic_init();
 
 	for(int i = 0; i < NUM_ISRS + NUM_IRQS; i++)
@@ -49,16 +54,19 @@ void interrupt_init()
 	
 	for(int i = 0; i < NUM_INTRS; i++)
 		interrupt_register(i, void_handler);
+
+	/* needs to be in a seperate function or something */
 	extern void sysc();	
 	idt_build_entry(&idt_table[0x80], (uint32_t)sysc, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
-	idt_flush((uint32_t)&idt_ptr);
+
+	asm volatile ("lidt (%0)" :: "p"((uint32_t)&idt_ptr) );
 }
 
 void interrupt_register(int irq, intr_handler *handler)
 {
 	intr_handlers[irq] = handler;
 	
-	if(irq > NUM_ISRS && irq > NUM_ISRS + NUM_IRQS)
+	if(irq > NUM_ISRS && irq < NUM_ISRS + NUM_IRQS)
 		pic_unmask(irq-20);
 }
 
@@ -144,8 +152,6 @@ void pic_unmask(int irq)
 
 	val = inb(port) & ~(1 << irq);
 	outb(port, val);
-
-
 }
 
 static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags)
@@ -157,17 +163,35 @@ static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uin
 	entry->base_hi = (((uint32_t)func) >> 16) & 0xFFFF;
 } 
 
-void ishutdown()
+enum intr_status interrupt_get()
 {
-	const char s[] = "Shutdown";
-	const char *p;
-	for (p = s; *p != '\0'; p++)
-    	outb (0x8900, *p);
-	asm volatile ("hlt");
-
-
-
+	return interrupt_status;
 }
 
+enum intr_status interrupt_disable()
+{
+	enum intr_status old = interrupt_get();
+	asm volatile ("cli"); 
+	interrupt_status = INTR_DISABLED;
+	
+	return old;
+}
+
+enum intr_status interrupt_enable()
+{
+	enum intr_status old = interrupt_get();
+	asm volatile ("sti"); 
+	interrupt_status = INTR_ENABLED;
+	
+	return old;
+}
+
+enum intr_status interrupt_set(enum intr_status status)
+{
+	if(status == INTR_ENABLED)
+		return interrupt_enable();
+	else
+		return interrupt_disable();
+}
 
 
