@@ -1,8 +1,8 @@
+#include <kernel/common.h>
 #include <kernel/types.h>
 #include <kernel/thread.h>
 #include <kernel/memory.h>
 #include <kernel/interrupt.h>
-#include "debug.h"
 
 void *kernel_stack_bottom;
 extern uint32_t stack;
@@ -108,9 +108,11 @@ void thread_exit()
 	//if we aren't the original kernel thread, free the stack
 	if(cur->pid == 0)
 	{
-		pallocn_free(cur, STACK_PAGES);	
+		//FIXME: This needs to be done differently
+//		pallocn_free(cur, STACK_PAGES);	
 
 	}
+	printf("teasfst\n");
 	asm volatile("sti");
 	thread_yield();
 
@@ -253,7 +255,7 @@ thread_t * thread_create(void (*func)(void *), void *aux)
 	
 	new->pid = pid_allocate();
 	new->parent = thread_current()->pid;
-	new->cur_dir = thread_current()->cur_dir;	
+//	new->cur_dir = thread_current()->cur_dir;	
 	new_sp -= sizeof(struct registers);	
 	reg_frame= (struct registers *)new_sp;
 	new->regs = (struct registers *)new_sp;
