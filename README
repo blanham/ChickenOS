@@ -1,0 +1,7 @@
+ChickenOS v 0.01
+
+
+
+==LIBRARIES==
+Currently uses a linked list library derived from the Linux kernel
+and Durand's liballoc
