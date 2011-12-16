@@ -1,39 +1,41 @@
 /*	ChickenOS - vm.c
- *	Handles paging, gdt, page allocation and (will support) heap allocation
+ *	Handles paging, gdt, and page allocation
+ *  Heap allocation is implemented with liballoc
+ *  which uses pages from the page allocator
  *  Uses code borrowed from JamesM's kernel tutorial
  *
  */
+#include <kernel/common.h>
 #include <kernel/vm.h>
 #include <kernel/interrupt.h>
 #include <kernel/bitmap.h>
 #include <kernel/memory.h>
 #include <string.h>
 #include <stdio.h>
-#include "debug.h"
+
 #define PAGE_SIZE 4096
 #define PAGE_MASK 0xFFFFF000
 #define PD_SIZE 4096
-extern unsigned int end;
-
-unsigned int placement = 0;
-phys_addr_t palloc_start = 0;
-virt_addr_t heap_start;
-bitmap_t page_bitmap;
-
-//uint32_t placement;
-// Declare the page directory and a page table, both 4kb-aligned
-
-uint32_t kernelpagedir[1024] __attribute__ ((aligned (4096)));
-uint32_t lowpagetable[1024] __attribute__ ((aligned (4096)));
-uint32_t * kernel_pd;
+#define HEAP_PAGES (1024*1024)/PAGE_SIZE
 
 #define PAGE_VIOLATION 0x01
 #define PAGE_WRITE	   0x02
 #define PAGE_USER	   0x04
 
+//allocation related variables
+extern uint32_t end;
+uint32_t placement = 0;
+phys_addr_t palloc_start = 0;
+bitmap_t page_bitmap;
+
+//should allocate this at the placement address
 uint32_t palloc_bitmap_storage[1024] __attribute__ ((aligned (4096)));
 uint32_t *palloc_bitmap = palloc_bitmap_storage;
-uint32_t *PD;
+
+// Declare the page directory and a page table, both 4kb-aligned
+//uint32_t lowpagetable[1024] __attribute__ ((aligned (4096)));
+uint32_t * kernel_pd;
+
 void gpf(struct registers *regs)
 {
 	uint32_t error_code = regs->err_code;
@@ -80,7 +82,6 @@ void page_fault(struct registers * regs)
 		PANIC("Page fault in kernel space");
 	}else {
 		//kill process
-
 	}
 }
 
@@ -96,9 +97,10 @@ void palloc_free(void *addr)
 	palloc_internal_free(addr,1);
 }
 
-void pallocn_free(void *addr, int pages)
+int pallocn_free(void *addr, int pages)
 {
 	palloc_internal_free(addr,pages);
+	return 0;
 }
 
 
@@ -134,7 +136,7 @@ void palloc_init(uint32_t page_count, uint32_t placement)
 	uint32_t bitmap_length = (page_count/32);
 	start = (void *)(placement + bitmap_length);
 
-	if(((uint32_t)start & PAGE_MASK) != 0)
+	if(((uint32_t)start & ~PAGE_MASK) != 0)
 		start = (void *)(((uint32_t)start & PAGE_MASK) + PAGE_SIZE);
 	
 	bitmap_init_phys(&page_bitmap, page_count, (uint32_t *)bitmap_ptr);
@@ -142,22 +144,8 @@ void palloc_init(uint32_t page_count, uint32_t placement)
 	palloc_start = (phys_addr_t)start;
 }
 
-void heap_init()
-{
-/*	void *test = pallocn(9);
-	void *test2 = palloc();
-	printf("test %x test2 %x\n", test, test2);
-	pallocn_free(test, 9);
-	test = pallocn(21);
-	void *test3 = palloc(); 
-
-	printf("test %x test2 %x test3 %x\n", test, test2, test3);*/
-}
-
 void vm_init(struct multiboot_info *mb)
 {
-	
-	//return;
 	uint32_t size = mb->mem_upper;
 	
 	if(mb->mods_count > 0 )
@@ -168,20 +156,19 @@ void vm_init(struct multiboot_info *mb)
 		placement = (unsigned)&end;
 	placement = (placement & PAGE_MASK) + PAGE_SIZE;
 	uint32_t temp = (placement - PHYS_BASE)/PAGE_SIZE;
-	//size = 1024 * 1024; //needed for machines with large amounts of memory at the moemnt
+	//size = 1024 * 1024; //needed for machines with large amounts of memory at the moment
 						//becuase we only have 4MB, and the bitmap overflows it 
 	uint32_t page_count = (size/4) - temp;
 	
 //	printf("%iMB installed %i\n", (size)/1024 + 2);
 //	printf("PC %i PL %X %x\n",page_count, placement, temp);	
 	palloc_init(page_count, placement);
-	PD = pallocn(4);
+	
 	paging_init();	
+	
 	interrupt_register(13, &gpf);
 	interrupt_register(14, &page_fault);
 
-
-	heap_init();
 }
 
 pagedir_t pagedir_new()
@@ -193,7 +180,7 @@ pagedir_t pagedir_new()
 	return new;
 }
 
-void install_pagedir(uint32_t *pd)
+void pagedir_install(uint32_t *pd)
 {
 	uint32_t pdn = V2P((uint32_t)pd);
 	asm volatile (	"mov %0, %%eax\n"
@@ -203,23 +190,22 @@ void install_pagedir(uint32_t *pd)
 				"mov %%eax, %%cr0\n" :: "m" (pdn));
 }
 
-
 void paging_init()
 {
-	void *lowpagetablePtr = (char *)lowpagetable - PHYS_BASE;	
+	uint32_t *first = palloc();
 
 	kernel_pd = palloc();
 	kmemsetl(kernel_pd, 0, 4*1024); 
 	
 	for (int k = 0; k < 1024; k++)
 	{
-		lowpagetable[k] = (k * 4096) | 0x3;	// ...map the first 4MB of memory into the page table...
+		first[k] = (k * 4096) | 0x3;	// ...map the first 4MB of memory into the page table...
 	}
  
  
-	kernel_pd[768] = (unsigned long)lowpagetablePtr | 0x3;
+	kernel_pd[768] = (uint32_t)V2P((uint32_t)first) | 0x3;
 
-	install_pagedir(kernel_pd);
+	pagedir_install(kernel_pd);
 	gdt_install();
 
 }

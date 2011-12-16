@@ -8,7 +8,6 @@
 typedef uint32_t phys_addr_t;
 typedef uint32_t virt_addr_t;
 typedef uint32_t * pagedir_t;
-#define NULL (void *)0
 
 extern unsigned int placement;
 
@@ -19,7 +18,7 @@ void vm_init(struct multiboot_info *mb);
 void *pallocn(uint32_t count);
 void *palloc();
 void palloc_free(void *addr);
-void pallocn_free(void *addr, int pages);
+int pallocn_free(void *addr, int pages);
 
 pagedir_t pagedir_new();
 
