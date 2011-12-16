@@ -1,10 +1,11 @@
+#include <kernel/common.h>
 #include <kernel/memory.h>
 #include <kernel/console.h>
 #include <kernel/hw.h>
-#include <../fs/vfs.h>
-static  uint16_t * videoram = (uint16_t *) 0xc00b8000;
+#include <kernel/serial.h>
+#include <kernel/vm.h>
+#include <kernel/fs/vfs.h>
 #define BLANK 0x0700
-/* some stuff that will later be used to setup mutliple consoles */
 #define NUM_CONSOLES 3
 #define CURRENT_CONSOLE consoles[current_console]
 typedef struct {
@@ -14,12 +15,12 @@ typedef struct {
 	uint16_t attribute;
 	int num;
 } console_t;
-console_t console0;
-console_t console1;
-console_t console2;
+
+console_t console0, console1, console2;
 console_t *consoles[NUM_CONSOLES] = {&console0, &console1, &console2};
 console_t *console = &console0;
 
+static  uint16_t * videoram = (uint16_t *) 0xc00b8000;
 #define CURSOR_POS (console->x + console->y*80)
 
 static void console_cursor_move(uint16_t pos)
@@ -72,7 +73,7 @@ void tty_putc(console_t *con, uint8_t c)
 			con->videoram[CURSOR_POS] = con->attribute | c;
 			con->x++;
 	}
-	if(console->x >= 80) 
+	if(con->x >= 80) 
 	{
 		con->x = 0;
 		con->y++;
@@ -82,8 +83,9 @@ void tty_putc(console_t *con, uint8_t c)
 		console_scroll(con);
 	//	console.y = 0;
 	}
+	
 	if(con == console)
-	console_cursor_move(CURSOR_POS);
+		console_cursor_move(CURSOR_POS);
 }
 
 void console_putc(uint8_t c)
@@ -110,29 +112,30 @@ void console_clear()
 	console->y=console->x = 0;
 	console_cursor_move(0);
 }
-#include <kernel/vm.h>
+
+void console_init_one(console_t *con, int num)
+{
+	con->x = con->y = 0;
+	con->attribute = BLANK;
+	con->videoram = videoram;
+	//allocates a page for now, works fine
+	//for 80x25 screens
+	con->buffer = palloc();
+	con->num = num;
+}
+
 void console_init()
 {
-	console->x = console->y = 0;
-	console->attribute = BLANK;
-	console->videoram = videoram;
-	console->buffer = palloc();
-	console->num = 0;
-	console1.buffer = palloc();
-	console1.attribute = BLANK;
-	console1.x=console1.y = 0;
-	console1.num = 1;
+	for(int i = 0; i < NUM_CONSOLES; i++)
+		console_init_one(consoles[i],i);
 	console_clear();
+	
 	kbd_init();
 }
 
 char console_getc()
 {
-	
-	return '\n';
 	return kbd_getc();
-
-
 }
 
 char tty_getc(console_t *con)
@@ -140,14 +143,14 @@ char tty_getc(console_t *con)
 	while(console != con);
 			
 	return kbd_getc();
-
 }
-#include <stdio.h>
+
 void console_switch(int num)
 {
 	//copy curent vram to buffer
 	kmemcpyw(console->buffer,console->videoram, 80*25*2);
 	console->videoram = console->buffer;
+
 	//copy new consoles buffer to vram
 	console = consoles[num];
 	console->videoram = videoram;
@@ -157,14 +160,10 @@ void console_switch(int num)
 	console_cursor_move(CURSOR_POS);
 }
 
-char *derp = "DERPDERPDERPDERP";
-
-size_t console_read(uint16_t dev, void *_buf, off_t off, size_t count)
+size_t console_read(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)
 {
 	char *buf = _buf;
-	off = off;
 	size_t read = count;
-	dev = dev;
 	int tty = MINOR(dev);
 	while(count--)
 	{
@@ -173,11 +172,9 @@ size_t console_read(uint16_t dev, void *_buf, off_t off, size_t count)
 	return read;
 }
 
-size_t console_write(uint16_t dev, void *_buf, off_t off, size_t count)
+size_t console_write(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)
 {
 	char *buf = _buf;
-	dev = dev;
-	off = off;
 	size_t written = count;
 	int tty = MINOR(dev);
 	while(count--)
@@ -190,15 +187,8 @@ size_t console_write(uint16_t dev, void *_buf, off_t off, size_t count)
 
 void console_fs_init()
 {
-	struct file * dir = pathsearch(root, "/dev");
-	struct file *new = file_new3("tty", FILE_CHAR, 0x800);
-	insert_file(dir, new);
-
-	device_file_register(0x800, console_read, console_write);
-	new = file_new3("tty0", FILE_CHAR, 0x801);
-	insert_file(dir, new);
-
-	device_file_register(0x800, console_read, console_write);
-
+	device_register(FILE_CHAR, 0x800, console_read, console_write);
+	//FIXME: needs to be:
+//	device_file_register(0x800, FILE_CHAR, console_ops);
 }
 
