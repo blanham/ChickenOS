@@ -1,7 +1,7 @@
 #include <kernel/interrupt.h>
 #include <kernel/console.h>
 #include <kernel/thread.h>
-#include "syscall.h"
+#include <kernel/syscall.h>
 #include <stdio.h>
 //#include <kernel/vfs.h>
 int return_value = 0;

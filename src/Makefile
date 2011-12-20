@@ -3,10 +3,15 @@ CROSS=/usr/local/cross/bin
 IDIR=./include
 
 LIB_SRCS=./lib/stdio.o ./lib/string.o ./lib/sys.o ./lib/kernel/memory.o 
-SOURCES2=  interrupt.o intr-core.o
-FSSOURCES= fs/vfs.o fs/ext2/ext2.o fs/initrd.o fs/device.o 
-MEMSRCS = mm/liballoc.o mm/liballoc_funcs.o
-SOURCES=kmain.o console.o hw.o kbd.o loader.o  serial.o sh.o syscall.o thread.o timer.o vm.o $(MEMSRCS) $(FSSOURCES) $(LIB_SRCS) $(SOURCES2)
+SOURCES2= 		interrupt.o intr-core.o
+EXT2= 			fs/ext2/ext2.o fs/ext2/ops.o
+VFS= 			fs/vfs.o fs/ops.o fs/initrd.o fs/device.o
+FSSOURCES=		$(VFS) $(EXT2)
+MEMSRCS = 		mm/liballoc.o mm/liballoc_funcs.o
+SOURCES=		kmain.o console.o hw.o kbd.o loader.o    \
+				serial.o sh.o thread/syscall.o thread.o timer.o \
+				vm.o $(MEMSRCS) $(FSSOURCES) $(LIB_SRCS) \
+				$(SOURCES2)
 #LINKER=$(CROSS)/i586-elf-ld
 LINKER=ld
 CFLAGS=-g -Wall -Wextra -Werror -I./include -I./fs --std=gnu99\
