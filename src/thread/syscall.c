@@ -4,47 +4,49 @@
 #include <kernel/syscall.h>
 #include <stdio.h>
 //#include <kernel/vfs.h>
-int return_value = 0;
+
+#define SYSCALL_0(num) ({				\
+					int ret;			\
+	asm volatile ( 	"pushl %1\n"		\
+					"int $0x80\n"		\
+				    "mov %%eax,%0\n"	\
+					"addl $4, %%esp\n"	\
+				   	: "=a"(ret) 		\
+				   	: "i" (num)			\
+					: "memory"			\
+				   	);					\
+					ret;})
+int sys_dummy()
+{
+	return 0xcafebabe;	
+}
+
+int dummy()
+{
+	int test = SYSCALL_0(SYS_DUMMY);
+	return test;
+}
+
 
 void syscall_handler (struct registers *regs)
 {
-	printf("derp %x\n", regs->eax);
-	uint32_t *num = (uint32_t*)((uint32_t)regs->useresp);
-//	uint32_t res = 0;//*(num);
-	
-	printf("Res %x\n",regs->useresp);
-	printf("Res %x\n",num);
-	regs = regs;
-	printf("ESP %X\n",regs->esp);	
 	int call = (int)((int *)regs->useresp);
-	printf("Call %i\n",call);
-	regs->eax = 0xfeed;
+	switch (call)
+	{
+		case SYS_DUMMY:
+			regs->eax = sys_dummy();
+			return;
+		default:
+			printf("undefined system call!\n");
+			return;
+	}
 }
 
-
-int syscall_haiindler (int num)
-{
-	num = num;
-	printf("derp %X\n",num);	
-	return 0xcafebabe;
-}
-
-void sys_dummy()
-{
-	int test = 0;
-	int in = 0xcafebabe;
-	asm volatile ( "mov %1, %%eax\n"
-					"int $0x80\n"
-				   "mov %%eax,%0\n"
-				   : "=m"(test) 
-				   : "m" (in)
-				   );
-	printf("test %x\n",test);
-
-}
 void syscall_init()
 {
 	interrupt_register(0x80, &syscall_handler);
-
+	int test  = ({ int dog = 9; dog;});
+	printf("TESET %i\n",test);
 }
+
 
