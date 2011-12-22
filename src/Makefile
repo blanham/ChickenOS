@@ -7,10 +7,10 @@ SOURCES2= 		interrupt.o intr-core.o
 EXT2= 			fs/ext2/ext2.o fs/ext2/ops.o
 VFS= 			fs/vfs.o fs/ops.o fs/initrd.o fs/device.o
 FSSOURCES=		$(VFS) $(EXT2)
-MEMSRCS = 		mm/liballoc.o mm/liballoc_funcs.o
+MEMSRCS = 		mm/vm.o mm/liballoc.o mm/liballoc_funcs.o
 SOURCES=		kmain.o console.o hw.o kbd.o loader.o    \
 				serial.o sh.o thread/syscall.o thread.o timer.o \
-				vm.o $(MEMSRCS) $(FSSOURCES) $(LIB_SRCS) \
+				$(MEMSRCS) $(FSSOURCES) $(LIB_SRCS) \
 				$(SOURCES2)
 #LINKER=$(CROSS)/i586-elf-ld
 LINKER=ld
@@ -22,7 +22,7 @@ ASFLAGS=-felf
 all: $(SOURCES) link
 
 test: all
-	cd .. && ./update_image.sh && qemu -m 512 -fda ./floppy.img && cd src
+	cd .. && ./update_image.sh && qemu -rtc base=localtime -m 512 -fda ./floppy.img && cd src
 
 test2: all
 	cd .. && ./update_image.sh && qemu -s -S -m 512 -fda ./floppy.img && cd src
