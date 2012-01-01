@@ -1,40 +1,59 @@
-CROSS=/usr/local/cross/bin
-#CC=$(CROSS)/i586-elf-gcc
-IDIR=./include
+CROSS	=		/usr/local/cross/bin
+#CC		=		$(CROSS)/i586-elf-gcc
+CC		=		gcc#clang
+#LINKER	=		$(CROSS)/i586-elf-ld
+CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
+				-std=gnu99	\
+				-fno-stack-protector -nostartfiles \
+				-fomit-frame-pointer\
+				-nodefaultlibs -ffreestanding
+				#-nostdlib -nostdinc -fno-builtin\
 
-LIB_SRCS=./lib/stdio.o ./lib/string.o ./lib/sys.o ./lib/kernel/memory.o 
-SOURCES2= 		interrupt.o intr-core.o
-EXT2= 			fs/ext2/ext2.o fs/ext2/ops.o
-VFS= 			fs/vfs.o fs/ops.o fs/initrd.o fs/device.o
-FSSOURCES=		$(VFS) $(EXT2)
-MEMSRCS = 		mm/vm.o mm/liballoc.o mm/liballoc_funcs.o
-SOURCES=		kmain.o console.o hw.o kbd.o loader.o    \
-				serial.o sh.o thread/syscall.o thread.o timer.o \
-				$(MEMSRCS) $(FSSOURCES) $(LIB_SRCS) \
-				$(SOURCES2)
-#LINKER=$(CROSS)/i586-elf-ld
-LINKER=ld
-CFLAGS=-g -Wall -Wextra -Werror -I./include -I./fs --std=gnu99\
-    -nostdlib -nostdinc -fno-builtin -nostartfiles -nodefaultlibs
-LDFLAGS=-Tlinker.ld
-ASFLAGS=-felf
+LINKER	=		ld
+LDFLAGS	=		-Tlinker.ld
+
+AS		=		nasm
+ASFLAGS	=		-felf
+
+INCLUDES=		-I./include -I./fs -I./include/kernel
+
+KLIBSRCS=		./lib/stdio.o ./lib/string.o ./lib/ctype.o\
+				./lib/kernel/memory.o ./lib/vsprintf.o 
+
+EXT2	= 		fs/ext2/ext2.o fs/ext2/ops.o
+VFS		= 		fs/vfs.o fs/ops.o fs/initrd.o fs/device.o
+FSSRCS	=		$(VFS) $(EXT2)
+
+MEMSRCS = 		mm/gdt.o mm/liballoc.o mm/liballoc_funcs.o\
+				mm/paging.o mm/palloc.o mm/vm.o
+DEVSRCS	=		console.o hw.o kbd.o timer.o serial.o
+THREAD	=		thread.o thread/syscall.o thread/scheduler.o\
+				thread/tss.o thread/fork.o sh.o
+CORE	=		kmain.o loader.o interrupt.o intr-core.o
+SOURCES	=		$(CORE) $(THREAD) $(DEVSRCS) $(MEMSRCS) \
+				$(FSSRCS) $(KLIBSRCS)
 
 all: $(SOURCES) link
 
-test: all
-	cd .. && ./update_image.sh && qemu -rtc base=localtime -m 512 -fda ./floppy.img && cd src
+lib: $(LIBSRCS)
 
-test2: all
-	cd .. && ./update_image.sh && qemu -s -S -m 512 -fda ./floppy.img && cd src
+test: all
+	cd .. && ./update_image.sh && qemu -rtc base=localtime \
+	-m 512 -fda ./floppy.img && cd src
+
+debug: all
+	cd .. && ./update_image.sh && qemu -rtc=localtime -s -S -m 512 -fda \
+	./floppy.img && cd src
 
 clean:
-	rm *.o fs/*.o ./lib/*.o kernel.bin
+	rm *.o mm/*.o fs/*.o thread/*.o ./lib/*.o kernel.bin
 
 link:
 	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES)
+
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 .s.o:
-	nasm $(ASFLAGS) $<
+	$(AS) $(ASFLAGS) $<

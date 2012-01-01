@@ -21,7 +21,7 @@ console_t *consoles[NUM_CONSOLES] = {&console0, &console1, &console2};
 console_t *console = &console0;
 
 static  uint16_t * videoram = (uint16_t *) 0xc00b8000;
-#define CURSOR_POS (console->x + console->y*80)
+#define CURSOR_POS (con->x + con->y*80)
 
 static void console_cursor_move(uint16_t pos)
 {
@@ -117,10 +117,13 @@ void console_init_one(console_t *con, int num)
 {
 	con->x = con->y = 0;
 	con->attribute = BLANK;
-	con->videoram = videoram;
 	//allocates a page for now, works fine
 	//for 80x25 screens
 	con->buffer = palloc();
+//	if(num)
+		con->videoram = con->buffer;
+//	else
+	//	con->videoram = videoram;
 	con->num = num;
 }
 
@@ -128,6 +131,7 @@ void console_init()
 {
 	for(int i = 0; i < NUM_CONSOLES; i++)
 		console_init_one(consoles[i],i);
+	console->videoram = videoram;
 	console_clear();
 	
 	kbd_init();
@@ -148,14 +152,15 @@ char tty_getc(console_t *con)
 void console_switch(int num)
 {
 	//copy curent vram to buffer
-	kmemcpyw(console->buffer,console->videoram, 80*25*2);
+	kmemcpyw(console->buffer,videoram, 80*25);
 	console->videoram = console->buffer;
 
 	//copy new consoles buffer to vram
 	console = consoles[num];
 	console->videoram = videoram;
-	kmemcpyw(console->videoram, console->buffer, 80*25*2);	
-
+	kmemcpyw(videoram, console->buffer, 80*25);
+		
+	console_t *con= console;
 	//put cursor at correct postion
 	console_cursor_move(CURSOR_POS);
 }
@@ -183,6 +188,12 @@ size_t console_write(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)
 	}
 
 	return written;
+}
+
+int console_ioctl(uint16_t dev UNUSED, uint32_t c UNUSED, void * aux UNUSED)
+{
+
+	return -1;
 }
 
 void console_fs_init()
