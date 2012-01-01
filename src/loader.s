@@ -62,7 +62,7 @@ _loader:
     ; Start fetching instructions in kernel space.
     lea ecx, [StartInHigherHalf]
     jmp ecx                                                     ; NOTE: Must be absolute jump!
- 
+[global StartInHigherHalf] 
 StartInHigherHalf:
     ; Unmap the identity-mapped first 4MB of physical address space. It should not be needed
     ; anymore.
@@ -87,18 +87,18 @@ StartInHigherHalf:
  
 ; this function does the same thing of the 'start' one, this time with
 ; the real GDT
-gdt_flush:
-	lgdt [gp]
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov ss, ax
-	jmp 0x08:flush2
+;gdt_flush:
+;	lgdt [gp]
+;	mov ax, 0x10
+;	mov ds, ax
+;	mov es, ax
+;	mov fs, ax
+;	mov gs, ax
+;	mov ss, ax
+;	jmp 0x08:flush2
  
-flush2:
-	ret 
+;flush2:
+;	ret 
  
 section .bss
 align 4096
