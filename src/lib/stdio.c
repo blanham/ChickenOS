@@ -50,7 +50,10 @@ char *gets(char *str)
 int puts(char *string)
 {
 	int cnt = 0;
-
+	if(string == NULL)
+	{
+		return puts("(null)");
+	}
 	while(*string != NULL)
 	{
 		putc(*string++);
@@ -228,19 +231,13 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	char c_val;
 	int i_val;
 	double d_val;
-	//char *buf = _buf;
 	char cbuf[2] = {0,0};
-//	strcpy(buf, "herp");
 	
-//	strcat(buf,"derp");
-//	return 0;
 	for(p = (char *)fmt; *p; p++)
 	{
 		if(*p != '%'){
 			cbuf[0]  = *p;
 			strcat(buf, cbuf);
-			//*buf++ = *p;
-		//	putc(*p);
 			continue;
 		}
 
@@ -263,6 +260,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				strcat(buf, cbuf);
 
 				break;
+			case 'u':
 			case 'd':
 			case 'i':
 				i_val = va_arg(ap, int);
@@ -279,7 +277,10 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			case 's':
 				s_val = va_arg(ap, char *);
 				//puts(s_val);
-				strcat(buf,s_val);
+				if(s_val != NULL)
+					strcat(buf,s_val);
+				else
+					strcat(buf,"(null)");
 			//	afree(s_val);
 				break;
 			case 'X':
@@ -304,7 +305,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	strip = strip;	
 	return 0;//buf - _buf;
 }
-
+extern int linux_vsprintf(char *buf, const char *fmt, va_list args);
 int printf(const char *fmt, ...)
 {
 	va_list ap;
@@ -325,7 +326,7 @@ int sprintf(char *buf, const char *fmt, ...)
 	int ret;
 	va_start(ap, fmt);
 	ret = vsprintf(buf, fmt, ap);
-	puts(buf);
+//	puts(buf);
 	va_end(ap);
 	return ret;
 }
