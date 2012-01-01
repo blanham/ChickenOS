@@ -26,10 +26,14 @@ FSSRCS	=		$(VFS) $(EXT2)
 
 MEMSRCS = 		mm/gdt.o mm/liballoc.o mm/liballoc_funcs.o\
 				mm/paging.o mm/palloc.o mm/vm.o
-DEVSRCS	=		console.o hw.o kbd.o timer.o serial.o
-THREAD	=		thread.o thread/syscall.o thread/scheduler.o\
+DEVSRCS	=		device/intr-core.o\
+				device/console.o device/hw.o device/kbd.o\
+				device/timer.o device/serial.o
+THREAD	=		thread/thread.o thread/syscall.o thread/scheduler.o\
 				thread/tss.o thread/fork.o sh.o
-CORE	=		kmain.o loader.o interrupt.o intr-core.o
+				#have to have interrupt.o here at the moment 
+CORE	=		init/kmain.o init/loader.o device/interrupt.o
+				
 SOURCES	=		$(CORE) $(THREAD) $(DEVSRCS) $(MEMSRCS) \
 				$(FSSRCS) $(KLIBSRCS)
 
