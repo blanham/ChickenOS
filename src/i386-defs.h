@@ -1,5 +1,5 @@
-
-
+#ifndef C_OS_I386
+#define C_OS_I386
 
 
 extern void 
@@ -45,8 +45,8 @@ typedef struct idt_entry_struct idt_entry_t;
 // This is in a format suitable for giving to 'lidt'.
 struct idt_ptr_struct
 {
-   uint16_t limit;
-   uint32_t base;                // The address of the first element in our idt_entry_t array.
+   uint16_t limit : 16;
+   uint32_t base : 32;                // The address of the first element in our idt_entry_t array.
 } __attribute__((packed));
 typedef struct idt_ptr_struct idt_ptr_t;
 
@@ -64,4 +64,4 @@ irq8 , irq9 , irq10, irq11,
 irq12, irq13, irq14, irq15
 };
 
-
+#endif
