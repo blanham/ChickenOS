@@ -1,8 +1,0 @@
-This is the most elegant doubly linked list implementation
-I have ever seen in C. For those who fret about C not having
-a good list data structure, fret no more. The list is stolen
-from Linux kernel. I just removed hardware prefetching from
-the source code so that we can use it for user-space apps.
-
-For sample code, see the hash table that I implemented using
-this list.
