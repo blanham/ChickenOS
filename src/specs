@@ -1,5 +1,0 @@
-FS:
-VFS
-EXT2 vfs driver
-ramdisk vfs driver
-?FAT support?
