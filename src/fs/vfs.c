@@ -1,3 +1,7 @@
+/*	ChickenOS - fs/vfs.c - virtual file system main
+ *	Patterned after the Linux 2.4 vfs
+ *	
+ */
 #include <kernel/common.h>
 #include <kernel/types.h>
 #include <kernel/memory.h>
@@ -8,68 +12,39 @@
 #include <mm/liballoc.h>
 #include <stdio.h>
 #include <string.h>
-vfs_fs_t *main_fs;
+vfs_fs_t *root_fs;
 vfs_fs_t * filesystems[10];
-//FIXME: temporary storage vars
-
-
-
-struct file files[100];
-uint8_t file_count = 0;
 
 struct inode *open_inodes[100];
 struct file *root;
-vfs_fs_t *root_fs;
-/*
-//wrap malloc(), so we can later call c_os's kernel allocator
-void *vfs_malloc(size_t size UNUSED)
-{
-	//return malloc(size);
-	return NULL;
-}
-
-
-
-struct file *file_alloc()
-{
-	struct file *ret = &files[file_count];
-	file_count++;
-	if(file_count > 127)
-		return NULL;
-	else
-		return ret;
-}
-
-
-*/
-
 
 struct inode * vfs_namei(struct inode *dir, char *file)
 {
 	if(dir->flags & I_MOUNT && dir != root->inode)
 	{
 		PANIC("traversing mounts not yet implemented");
-
 	} 
 
 	if((dir->mode & S_IFDIR) == 0)
 	{
+		//TODO: return is not directory error
 		PANIC("calling vfs_namei on a non-directory inode");
 	}
 	//need to lookup things in a cache
 	return dir->fs->ops->namei(dir, file);
 }
 
-struct inode * vfs_pathsearch(struct inode *dir, char *_path)
+struct inode * vfs_pathsearch(struct file *dir, char *_path)
 {
-	char * saveptr;
-	char * tok;
-	struct inode *res = dir;
-	char path[500];
-	strcpy(path, _path);
-
+	char *saveptr, *tok, *filename, *path;
+	struct inode *res = dir->inode;
+	path = strdup(_path);
+	filename = kcalloc(255, 1);;
+	
 	if(path[0] == '/')
 		res = root->inode;
+	else
+		res = thread_current()->cur_dir->inode;	
 	
 	if((tok = (char *)strtok_r(path, "/", &saveptr)) == NULL)
 		return NULL;
@@ -80,19 +55,23 @@ struct inode * vfs_pathsearch(struct inode *dir, char *_path)
 		return NULL;
 	}
 
+	strcpy(filename, tok);
 	while((tok = (char *)strtok_r(NULL, "/", &saveptr)) != NULL)
 	{
+		strcpy(filename, tok);
 		if((res = vfs_namei(res, tok)) == NULL)
 		{
 			printf("file not found?\n");
 			return NULL;
 		}
 	}
-
+	//FIXME: needs to use strcpy or strncpy
+	kmemcpy((uint8_t *)_path, (uint8_t *)filename, 10);
+//	strcpy(_path, filename);
+	kfree(path);
 	return res;
 }
-//void vfs_mount(uint16_t dev, char *path, char * type)
-
+//FIXME: use linked list or hash
 vfs_fs_t * vfs_find_fs(char *type)
 {
 	vfs_fs_t *find = NULL;
@@ -125,20 +104,40 @@ void vfs_mount_root(uint16_t dev, char *type)
 	if(fs->ops->read_sb == NULL)
 		goto error;	
 	ret++;
+	
 	if(fs->ops->read_sb(fs, dev) < 0)
 		goto error;
+	
 	//needs to be a list	
 	open_inodes[0] = fs->superblock->root;
+	
 	root->inode = fs->superblock->root;
+
+	//FIXME: use vfs_new_file instead:
+	//root = vfs_new_file(fs->superblock->root, "/");
 	strcpy(root->name, "/");
 	root->dev = dev;
 	root->offset = 0;
 	root->fs = fs;
 	thread_current()->cur_dir = root;
-//	vfs_file_print(thread_current()->cur_dir);
 	root_fs = fs;
+
 	printf("Mounted %s fs @ dev %i:%i as root\n",type, MAJOR(dev),MINOR(dev));
 
+	char *path = strdup("/lorem"); 
+	struct file *fp = vfs_open(path);
+	char *msg = kcalloc(65536,2);
+	//printf("%s\n", msg);
+		
+	char *out = strdup("herpderp");
+	ret = vfs_write(fp, out,8);
+	vfs_seek(fp, 0, SEEK_SET);
+	printf("Writing returned %i\n",ret);
+	ret = vfs_read(fp, msg, 30);
+	console_puts(msg);
+	console_puts("\n");
+
+	printf("Reading returned %i\n", ret);
 	return;	
 
 error:	
@@ -148,8 +147,8 @@ error:
 
 vfs_fs_t *vfs_alloc()
 {
-	vfs_fs_t *new = kmalloc(sizeof(*new));
-	new->superblock = kmalloc(sizeof(vfs_sb_t));
+	vfs_fs_t *new = kcalloc(sizeof(*new),1);
+	new->superblock = kcalloc(sizeof(vfs_sb_t),1);
 	return new;
 }
 
@@ -172,115 +171,175 @@ int vfs_register_fs(vfs_fs_t *fs)
 }
 void vfs_init()
 {
-	root = kmalloc(sizeof(struct inode));
+	root = kcalloc(sizeof(struct inode),1);
 
 	printf("Initialzing VFS\n");
 	if(ext2_init() < 0)
 		PANIC("failed to init ext2 fs\n");
 
-	vfs_mount_root(0x0400, "ext2");
-	thread_current()->cur_dir = root; 
 }
 /*
 
-void vfs_mount(vfs_fs_t *fs UNUSED, struct file *dir UNUSED)
+int vfs_mount(const char *device, struct file *dir, char *type)
 {
-	
-
-
-}
-*/
-/*int open(const char *path, int oflag, ...)*/
-/*
-int fd_new()
-{
-	static int fd = 3;
-	
-
-	return fd++;
-
-
-}
-
-int open(const char *path, int oflag UNUSED)
-{
-	struct file *dir = thread_current()->cur_dir;
-	struct file * fp = vfs_pathsearch(dir, (char *)path);
-	if(fp == NULL)
+	dev_t dev;
+	vfs_fs_t *fs;
+	struct file *block = vfs_open(device);
+	if(file->mode & S_IFBLK)
+	{
+		dev = block->rdev	
+	}else{
+		//not a block device
+		vfs_close(block);
 		return -1;
-	int fd = fd_new();
-	open_files[fd] = fp;
+	}
+	//would be nice to be able to autodetect the fs
+	if((fs = vfs_find_fs(type)) == NULL)
+		goto error;
+	ret++;
+	
+	if(fs->ops->read_sb == NULL)
+	{
+		printf("Invalid fs! No read_sb defined!\n");
+		return -1;
+	}
+	
+	if(fs->ops->read_sb(fs, dev) < 0)
+		goto error;
+	
+	//needs to be a list
+	//insert root inode	
+//	open_inodes[0] = fs->superblock->root;
+	
+	strcpy(root->name, "/");
+	root->dev = dev;
+	root->offset = 0;
+	root->fs = fs;
+	thread_current()->cur_dir = root;
+	root_fs = fs;
+	printf("Mounted %s fs @ dev %i:%i as root\n",type, MAJOR(dev),MINOR(dev));
 
-	return fd;
+
 }
 */
-size_t vfs_read(struct file *file UNUSED, void *buf UNUSED, size_t nbyte UNUSED)
+struct file *vfs_file_new(struct inode *inode, char *name)
+{
+	struct file *new = kcalloc(sizeof(*new),1);
+	new->inode = inode;
+	new->fs = inode->fs;
+	strcpy(new->name, name);
+	return new;
+}
+
+int vfs_file_free(struct file *file)
+{
+	struct inode *inode = file->inode;
+	kfree(file);
+	//decrement reference count
+	//if 0 take out of cache
+	inode = inode;
+
+	return 0;
+}
+
+struct file *vfs_open(char *path)
+{
+	struct file *cur = thread_current()->cur_dir;
+	struct inode *lookup = vfs_pathsearch(cur, path);
+	if(lookup == NULL)
+		return NULL;
+	struct file *new = vfs_file_new(lookup, path);
+	return new;
+}
+
+int vfs_close(struct file *file)
+{
+	if(file == NULL)
+		return -1;
+	
+	vfs_file_free(file);
+
+	return 0;
+}
+
+size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 {
 	int ret = 0;
-/*
+
 	if(file == NULL || buf == NULL)
 		return -1;
-	if((file->type & (FILE_CHAR | FILE_BLOCK)) != 0){
-//		ret = device_read(*file->type*//*file, buf, file->offset,nbyte);
-	}else{
+	if((file->inode->mode & S_IFCHR) != 0){
+		ret = char_device_read(file->inode->rdev, 
+			buf, file->offset, nbyte);
+	}else if((file->inode->mode & S_IFBLK) != 0){
+		ret = block_device_readn(file->inode->rdev, 
+			buf, 0, file->offset, nbyte);
+	}else if((file->inode->mode & S_IFREG) != 0){
 		if(file->fs == NULL || file->fs->ops->read == NULL)
 			return -1;
-
-	//	ret = file->fs->ops->read(file->fs, file->inode, nbyte, file->offset, buf);
+		ret = file->fs->ops->read(file->inode, buf,
+			nbyte, file->offset);
 	}
-	file->offset += ret; */
+	file->offset += ret; 
 	return ret;
 
 }
 
-size_t vfs_write(struct file *file UNUSED, void *buf UNUSED, size_t nbyte UNUSED)
+off_t vfs_write(struct file *file, 
+	void *buf, size_t nbyte)
 {
 	int ret = 0;
-/*
 	if(file == NULL || buf == NULL)
 		return -1;
-
-	if((file->type & (FILE_CHAR | FILE_BLOCK)) != 0){
-//		ret = device_write(file, buf, file->offset,nbyte);
-	}else{
+	if((file->inode->mode & S_IFCHR) != 0){
+		ret = char_device_write(file->inode->rdev, 
+			buf, file->offset, nbyte);
+	}else if((file->inode->mode & S_IFBLK) != 0){
+	//	ret = block_device_readn(file->inode->rdev, 
+	//		buf, 0, file->offset, nbyte);
+		return -1;
+	}else if((file->inode->mode & S_IFREG) != 0){
 		if(file->fs == NULL || file->fs->ops->write == NULL)
 			return -1;
-
-	//	ret = file->fs->ops->write(file->fs, file->inode, nbyte, file->offset, buf);
+		ret = file->fs->ops->write(file->inode, buf,
+			nbyte, file->offset);
 	}
-	file->offset += ret; */
+	file->offset += ret; 
 	return ret;
 }
 
+off_t vfs_seek(struct file *file, off_t offset, int whence)
+{
+	switch(whence)
+	{
+		case SEEK_SET:
+			file->offset = offset;
+			break;
+		case SEEK_CUR:
+			file->offset += offset;
+			break;
+		case SEEK_END:
+			//file->offset = file->end + offset;
+			//break;
+		default:
+			return 0;
 
-//off_t vfs_seek(struct file *i
-/*
-ssize_t read(int fildes, void *buf, size_t nbyte)
-{
-	struct file *fp = open_files[fildes];
-	if(fp == NULL)
-		return -1;
-	return vfs_read(fp, buf, nbyte);
-}
-ssize_t write(int fildes, void *buf, size_t nbyte)
-{
-	struct file *fp = open_files[fildes];
-	if(fp == NULL)
-		return -1;
-	return vfs_write(fp, buf, nbyte);
-}*/
-/*int creat(const char *path, mode_t mode)*/
-/*int creat(const char *path UNUSED, uint32_t mode UNUSED)
-{
-	return -1;
-}
-off_t lseek(int fildes UNUSED, off_t offset UNUSED, int whence UNUSED)
-{
-	return -1;
+	}
+
+	return file->offset;
 }
 
-int sys_chdir(const char *path)
+int vfs_chdir(const char *_path)
 {
-	path = path;
-	return -1;
-}*/
+	struct file *file;
+	int ret = 0;
+	char *path = strdup(_path);
+	file  = vfs_open(path);
+	if(file != NULL)
+	{
+		thread_current()->cur_dir = file;
+		ret = 1;
+	}
+	kfree(path);
+	return ret;
+}

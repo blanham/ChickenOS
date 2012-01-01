@@ -42,14 +42,16 @@ enum file_type { FILE_CHAR  = 0x2000,
 typedef struct vfs_fs vfs_fs_t;
 struct inode;
 
-typedef int (*vfs_read_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);
-typedef uint32_t (*vfs_write_inode_t) (struct inode *, size_t length, size_t offset, uint8_t *buffer);
+typedef size_t (*vfs_read_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);
+typedef size_t (*vfs_write_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);
 typedef struct inode * (*vfs_namei_t) (struct inode *dir, char *path);
 typedef int (*vfs_read_sb_t) (vfs_fs_t *fs, uint16_t dev);
 typedef int (*vfs_mount_t) (uint16_t dev);
 typedef struct vfs_superblock_ops {
 	vfs_read_inode_t read;
 	vfs_write_inode_t write;
+	//vfs_creat_t creat;
+	//vfs_mkdir_t mkdir;
 	vfs_read_sb_t read_sb;
 	vfs_namei_t namei;
 } vfs_ops_t;
@@ -72,6 +74,7 @@ struct inode {
 	uint16_t pad;
 	uint32_t size;
 	uint32_t time;
+	uint16_t rdev;
 	//if part of mount point,keep in cache
 	uint32_t flags;
 	void *storage;
@@ -98,14 +101,23 @@ int vfs_register_fs(vfs_fs_t *fs);
 
 struct inode * pathsearch(struct inode *dir, char *_path);
 void vfs_init();
+void vfs_mount_root(uint16_t dev, char *type);
+
+struct file *vfs_open(char *path);
+size_t vfs_read(struct file *file, void *buf, size_t nbyte);
+off_t vfs_write(struct file *file, void *buf, size_t nbyte);
+off_t vfs_seek(struct file *file, off_t offset, int whence);
+int vfs_chdir(const char *path);
+
+/* ops.c - standard file ops */
 /*int open(const char *path, int oflag, ...);*/
-int sys_open(const char *path, int oflag);
+int sys_open(const char *path, int oflag, ...);
 
 ssize_t sys_read(int fildes, void *buf, size_t nbyte);
 ssize_t sys_write(int filedes, void *buf, size_t nbyte);
 
 /*int creat(const char *path, mode_t mode);*/
-//int creat(const char *path, uint32_t mode);
+//int sys_creat(const char *path, mode_t mode);
 
 off_t sys_lseek(int fildes, off_t offset, int whence);
 
@@ -113,6 +125,7 @@ off_t sys_lseek(int fildes, off_t offset, int whence);
 
 
 //device.c
+#define INITRD_DEV 0x400
 typedef uint16_t dev_t;
 #define MAJOR(x) ((x & 0xFF00) >> 8)
 #define MINOR(x) (x & 0xFF)
@@ -127,7 +140,20 @@ void  device_register(uint16_t type, dev_t dev, void *read, void *write);
 typedef int(*block_access_fn)(void *aux, void *buf, int block);
 
 
+size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte);
+size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte);
 size_t block_device_read(uint16_t dev, void *buf, uint32_t block);
-int read_block_generic(void * _buf, int size, int offset, int block_size, void *aux, block_access_fn f);
 size_t block_device_readn(uint16_t dev, void *buf, uint32_t block, off_t offset, size_t nbyte);
+
+int read_block_at(uint16_t dev, void * _buf, int block,int block_size, off_t offset, size_t nbytes);
+
+int read_block(uint16_t dev, void * _buf, int block, int block_size);
+
+int write_block_at(uint16_t dev, void * _buf, int block,int block_size, off_t offset, size_t nbytes);
+
+int write_block(uint16_t dev, void * _buf, int block, int block_size);
+
+
+
+
 #endif

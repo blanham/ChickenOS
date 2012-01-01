@@ -1,4 +1,5 @@
 /* inodes are indexed starting at 1 */
+#include <kernel/fs/vfs.h>
 #define INODE(x) (x-1)
 #define BLOCK(x) (1024*(x))
 #define EXT2_MAGIC 0xef53
@@ -39,6 +40,7 @@ typedef struct ext2_group_descriptor {
 	uint16_t bg_pad;
 	uint32_t bg_reserved[3];
 } ext2_group_descriptor_t;
+
 
 struct ext2_inode {
 	uint16_t i_mode;//File mode
@@ -103,4 +105,14 @@ typedef struct ext2_fs {
 	uint16_t dev;
 	vfs_ops_t *ops;
 } ext2_fs_t;
+int ext2_read_superblock(vfs_fs_t *fs, uint16_t dev);
+struct inode * ext2_load_inode(ext2_fs_t *fs, int ino);
+
+struct inode * ext2_namei(struct inode *dir, char *file);
+size_t ext2_read_inode(struct inode *inode,
+	void *_buf, size_t length, 
+	off_t offset);
+size_t ext2_write_inode(struct inode *inode,
+	void *_buf, size_t length, 
+	off_t offset);
 

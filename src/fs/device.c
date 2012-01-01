@@ -1,3 +1,12 @@
+/*	ChickenOS - fs/deivce.c - generic block/char device layer
+ *	Needs a bit of work
+ */
+//Ideally we'll have 2 classes of functions
+//[block|char]_[read|write]_at -> takes offset/size
+//block_[read|write] -> takes block only, used for lowlevel
+//access
+//then we can have a common struct device again
+
 #include <kernel/common.h>
 #include <kernel/memory.h>
 #include <kernel/fs/vfs.h>
@@ -7,6 +16,12 @@
 
 #define MAX_DEVICES 20
 #define NULL 0
+struct char_device_ops {
+	char_read_fn read;
+	char_write_fn write;
+//	char_ioctl_fn ioctl;
+};
+
 struct char_device {
 	uint16_t dev;
 	char_read_fn read;
@@ -40,7 +55,7 @@ void device_register(uint16_t device_type, uint16_t dev, void *read, void *write
 
 	}
 	
-	printf("REGISTER %x\n", dev);
+	printf("Registered device %x:%x\n", MAJOR(dev),MINOR(dev));
 
 }
 
@@ -61,35 +76,225 @@ size_t block_device_read(uint16_t dev, void *buf, uint32_t block)
 	return device->read(dev, buf, block);
 
 }
+size_t block_device_write(uint16_t dev, void *buf, uint32_t block)
+{
+	struct block_device *device = &block_devices[MAJOR(dev)];
+	if(device == NULL)
+	{
+		printf("invalid dev passed to block_device_write\n");
+		return 0;
+	}
+	if(device->write == NULL)
+	{
+		printf("device has no write function\n");
+		return 0;
+	}
+	
+	return device->write(dev, buf, block);
+
+}
 
 size_t block_device_readn(uint16_t dev, void *buf, uint32_t block, off_t offset, size_t nbyte)
 {
-	return read_block_generic(buf, nbyte, block*offset, 
-		SECTOR_SIZE, (void *)(uint32_t)dev, 
-		(block_access_fn)block_device_read);
-
+	return read_block_at(dev, buf, block,SECTOR_SIZE,
+		offset, nbyte);
 }
-/*
-size_t device_read(struct file *file, void *buf, off_t offset, size_t nbyte)
+size_t block_device_writen(uint16_t dev, void *buf, uint32_t block, off_t offset, size_t nbyte)
+{
+	return write_block_at(dev, buf, block,SECTOR_SIZE,
+		offset, nbyte);
+}
+
+
+size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte)
 {
 	size_t ret = 0;
-	struct device *dev = &devices[MAJOR(file->device)];
+	struct char_device *device = &char_devices[MAJOR(dev)];
 	
-	printf("READ %x %X %s\n", file->device, dev->read, file->name);
-	ret = dev->read(file->device, buf, offset, nbyte);
+	printf("READ %x %X\n", dev, device->read);
+	ret = device->read(dev, buf, offset, nbyte);
 
 	return ret;
 }
-size_t device_write(struct file *file, void *buf, off_t offset, size_t nbyte)
+size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte)
 {
 	size_t ret = 0;
-	struct device *dev = &devices[MAJOR(file->device)];
-	ret = dev->write(file->device, buf, offset, nbyte);
+	struct char_device *device = &char_devices[MAJOR(dev)];
+	ret = device->write(dev, buf, offset, nbyte);
 
 	return ret;
 }
-*/
 
+
+
+int read_block(uint16_t dev, void * _buf, int block, int block_size)
+{
+	uint8_t *buf = _buf;
+	uint32_t dblock = 0;
+	off_t count = 0;
+	
+	if(block_size <= 0)
+		return -1;
+	
+	dblock = (block * block_size) / SECTOR_SIZE;
+
+	while(block_size > 0)
+	{
+		if(block_device_read(dev, (void *)(buf + count), dblock) != SECTOR_SIZE)
+		{
+			return -1;
+		}
+
+		count  		+= SECTOR_SIZE;
+		block_size  -= SECTOR_SIZE;
+		dblock++;
+	}
+
+	return count;
+}
+
+
+int read_block_at(uint16_t dev, void * _buf, int block, 
+	int block_size, off_t offset, size_t nbytes)
+{
+	uint8_t *buf = _buf;
+	uint8_t *bounce = kmalloc(block_size);
+
+	int remaining = nbytes;
+	size_t count = 0;
+	int block_ofs, cur_block_size, 
+		till_end;
+	int cur_size = offset;
+	while(remaining > 0)
+	{
+		block = (block*block_size + cur_size) / block_size; 
+		block_ofs = offset % block_size;
+		cur_block_size = block_size - block_ofs;
+	//	to_end = 1000000000;
+	//	till_end = (to_end < cur_block_size) ? to_end: cur_block_size;
+		till_end = cur_block_size;
+		cur_size = remaining < till_end ? remaining : till_end;
+		if(cur_size <= 0)
+			break;
+		
+		if(block_ofs == 0 && cur_size == block_size)
+		{
+			if(read_block(dev, buf + count, block,block_size)  == 0)
+			{
+				count = -1;
+				goto done;
+			}
+		}
+		else
+		{
+			if(read_block(dev, buf + count, block,block_size)  == 0)
+			{
+				count = -1;
+				goto done;
+			}
+
+			kmemcpy(buf + count, bounce + block_ofs,cur_size);
+		} 
+
+		count  += cur_size;
+		offset += cur_size;
+		remaining   -= cur_size;
+	}
+
+done:
+	if(bounce != NULL)
+		kfree(bounce);
+	
+	return count;
+}
+
+
+int write_block(uint16_t dev, void * _buf, int block, int block_size)
+{
+	uint8_t *buf = _buf;
+	uint32_t dblock = 0;
+	off_t count = 0;
+	
+	if(block_size <= 0)
+		return -1;
+	
+	dblock = (block * block_size) / SECTOR_SIZE;
+
+	while(block_size > 0)
+	{
+		if(block_device_write(dev, buf + count, dblock) != SECTOR_SIZE)
+		{
+			return -1;
+		}
+
+		count  		+= SECTOR_SIZE;
+		block_size  -= SECTOR_SIZE;
+		dblock++;
+	}
+
+	return count;
+}
+
+
+int write_block_at(uint16_t dev, void * _buf, int block, 
+	int block_size, off_t offset, size_t nbytes)
+{
+	uint8_t *buf = _buf;
+	uint8_t *bounce = kmalloc(block_size);
+
+	int remaining = nbytes;
+	size_t count = 0;
+	int block_ofs, cur_block_size, 
+		till_end;
+	int cur_size = offset;
+	while(remaining > 0)
+	{
+		block = (block*block_size + cur_size) / block_size; 
+		block_ofs = offset % block_size;
+		cur_block_size = block_size - block_ofs;
+	//	to_end = 1000000000;
+	//	till_end = (to_end < cur_block_size) ? to_end: cur_block_size;
+		till_end = cur_block_size;
+		cur_size = remaining < till_end ? remaining : till_end;
+		if(cur_size <= 0)
+			break;
+		
+		if(block_ofs == 0 && cur_size == block_size)
+		{
+			if(write_block(dev, buf + count, block,block_size)  == 0)
+			{
+				count = -1;
+				goto done;
+			}
+		}
+		else
+		{
+			//have to read the block in first
+			if(block_ofs > 0 || cur_size < cur_block_size)
+			{
+
+				read_block(dev, bounce, block, block_size);
+			}
+			kmemcpy(bounce + block_ofs,buf + count,cur_size);
+			if(write_block(dev, buf + count, block,block_size)  == 0)
+			{
+				count = -1;
+				goto done;
+			}
+
+		} 
+
+		count  += cur_size;
+		offset += cur_size;
+		remaining   -= cur_size;
+	}
+
+done:
+	if(bounce != NULL)
+		kfree(bounce);
+	
+	return count;
+}
 
 int read_block_generic(void * _buf, int size, int offset, int block_size, void *aux, block_access_fn f UNUSED)
 {
@@ -141,33 +346,10 @@ int read_block_generic(void * _buf, int size, int offset, int block_size, void *
 
 end:
 	//FIXME
-	//free(bounce);
+	//kfree(bounce);
 	return count;
 }
 
 
-int read_block(uint16_t dev, void * _buf, int block, int block_size)
-{
-	uint8_t *buf = _buf;
-	off_t count = 0;
-	if(block_size <= 0)
-		return -1;
-	int dblock = block*block_size / SECTOR_SIZE;
-	printf("dev %x %x %x %x %i\n",dev, _buf, block,block_size, dblock);	
-	while(block_size > 0)
-	{
 
-		if(block_device_read(dev, (void *)(buf + count), dblock) != SECTOR_SIZE)
-		{
-				count = -1;
-				goto end;
-		}
 
-		count  += SECTOR_SIZE;
-		block_size   -= SECTOR_SIZE;
-		dblock++;
-	}
-
-end:
-	return count;
-}
