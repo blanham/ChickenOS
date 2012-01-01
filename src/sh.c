@@ -28,34 +28,11 @@ void sh_gets(char *str)
 		*str++ = c;
 	}
 }
-int test;
-int call(int derp)
-{
-	test = 0xcafebabe;
-	int in = derp;
-	uint32_t _esp;
-	asm volatile ("mov %%esp, %0"
-					:"=m"(_esp)
-					);
-	printf("ESP %X\n",_esp);
-
-	asm volatile ( "pushl %1\n"
-					"int $0x80\n"
-				   "mov %%eax,%0\n"
-					"addl $4, %%esp\n"
-				   : "=m"(test) 
-				   : "m" (in)
-					: "memory"
-				   );
-	printf("test %x\n",test);
-
-	return test;
-}
-
+extern int dummy();
 //int sh_main(int argc, char **argv)
 int sh_main(void *aux)
 {
-	printf("ChickenOS Shell\n");
+	printf("ChickenOS Shell %s\n",aux);
 	char cmd[32];
 	aux = aux;
 	int tmp;
@@ -69,7 +46,7 @@ int sh_main(void *aux)
 			return 1;
 		if(strcmp(cmd, "call") == 0)
 		{
-			tmp=call(0xdeabeef);
+			tmp = dummy();
 			printf("returned %x\n",tmp);
 			continue;
 		}	
