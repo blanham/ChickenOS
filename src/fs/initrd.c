@@ -22,46 +22,16 @@ int initrd_read_block(void *_disk UNUSED, void *dst, uint32_t blocknum)
 
 }
 
-uint8_t bounce[SECTOR_SIZE];
-
-size_t initrd_read(uint16_t dev UNUSED, void *buf, off_t offset, size_t nbytes)
+int initrd_write_block(void *_disk UNUSED, void *src, uint32_t blocknum)
 {
-	uint32_t index = offset/SECTOR_SIZE;
-	uint32_t off = offset % SECTOR_SIZE;
-	off = off;
-	printf("READ\n");
-	size_t count = 0;
-	while(nbytes > 0)
-	{ 
-		if(nbytes % SECTOR_SIZE)
-		{	
-			if(initrd_read_block(NULL, bounce, index) < -1)
-				return -1;
-		
-			kmemcpy((uint8_t *)buf, (uint8_t *)bounce,  nbytes);
-		}else{
+	if((blocknum * SECTOR_SIZE) > initrd0->size)
+		return -1;
+	memcpy((uint8_t *)(initrd0->ramdisk + (SECTOR_SIZE * blocknum)), src, SECTOR_SIZE);
 
+	return SECTOR_SIZE;
 
-
-			buf += SECTOR_SIZE;
-		}
-		nbytes -= SECTOR_SIZE;
-		index++;
-		count += SECTOR_SIZE;	
-	}
-	return count;
 }
-size_t initrd_write(uint16_t dev, void *buf, off_t offset, size_t nbytes)
-{
-	dev = dev;
-	uint32_t index = offset;
-	index = index; 
-//	if(initrd_read_block(bounce, index ) < -1)
-//		return -1;
-	
-	kmemcpy((uint8_t *)buf, (uint8_t *)bounce,  nbytes);
-	return nbytes;
-}
+
 
 void initrd_init(uintptr_t start, uintptr_t end)
 {
@@ -69,7 +39,7 @@ void initrd_init(uintptr_t start, uintptr_t end)
 	initrd0->size = end - start;
 	printf("Initializing initrd @ %x - %i bytes \n",start, initrd0->size);
 
-	device_register(FILE_BLOCK,0x400, initrd_read_block, initrd_write);
+	device_register(FILE_BLOCK,0x400, initrd_read_block, initrd_write_block);
 
 }
 
