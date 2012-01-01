@@ -1,12 +1,25 @@
 #include <string.h>
+#include <mm/liballoc.h>
 #define NULL 0
-int strlen(char *str)
+#include <stdio.h>
+#include <kernel/console.h>
+size_t strlen(const char *str)
 {
-	char *tmp = str;
-	while(*tmp != '\0');
-		tmp++;
+	const char *tmp = str;
+
+	while(*++tmp != '\0');
+	//	tmp++;
 	return tmp - str;
 }
+
+char * strdup(const char *str)
+{
+	char *new = kcalloc(strlen(str) + 1,1);
+	if(new != NULL)
+		strcpy(new,str);
+	return new;	
+}
+
 int strcmp ( const char * str1, const char * str2 )
 {
 	int i = 0;	
@@ -85,7 +98,7 @@ char * strtok_r ( char * str, const char * delimiters, char **save )
 }
 char *strcpy(char *dst, const char *src)
 {
-	char *_src = (char *)src;
+	const char *_src = src;
 	char *_dst = dst;
 	while(*_src != '\0')
 		*_dst++ = *_src++;
@@ -110,7 +123,7 @@ void *memcpy(void *dst, const void *src, size_t size)
 {
 	char *_dst = dst;
 	char *_src = (char *)src;
-	char *end = (char *)(src + size);
+	char *end = (char *)((char *)src + size);
 
 	while(_src != end)
 		*_dst++ = *_src++;
@@ -119,11 +132,11 @@ void *memcpy(void *dst, const void *src, size_t size)
 }
 void *memset(void *dest, uint8_t val, size_t count)
 {
-	uint8_t *tmp = dest;
-	while(count-- != 0)
+	char *tmp = dest;
+	char *end = (char *)(tmp + count);
+	while(tmp != end)
 		*tmp++ = val;
 
 	return dest;
 }
-
 
