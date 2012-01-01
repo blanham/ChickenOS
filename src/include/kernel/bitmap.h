@@ -20,6 +20,7 @@ static inline void bitmap_init_phys(bitmap_t *bitmap, uint32_t size, uint32_t *p
 {
 	bitmap->size = size;
 	bitmap->data = ptr;
+	size = size/32;
 	while(size--)
 	{
 		*ptr++ = 0;

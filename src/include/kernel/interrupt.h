@@ -15,9 +15,12 @@ enum intr_status {INTR_ENABLED, INTR_DISABLED};
 
 typedef struct registers
 {
-  	uint32_t ESP;
+  	uint32_t ESP; //try to get rid of this
 	uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
-	uint32_t ds, es, fs, gs;                  // Data segment selectors
+	uint16_t ds,:16;
+	uint16_t es, :16;
+	uint16_t fs, :16;
+	uint16_t gs, :16;                  // Data segment selectors
 	uint32_t int_no, err_code;    // Interrupt number and error code (if applicable)
 	uint32_t eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
 } __attribute__((packed)) registers_t;
