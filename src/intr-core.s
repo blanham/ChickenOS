@@ -6,7 +6,7 @@
 	isr%1:
 		;cli
 		push byte 0
-		push byte %1
+		push %1
 		jmp _isr_handler
 %endmacro
 
@@ -14,7 +14,7 @@
 	[GLOBAL isr%1]
 	isr%1:
 		;cli
-		push byte %1
+		push %1
 		jmp _isr_handler
 %endmacro
 
@@ -23,7 +23,7 @@
 	irq%1:
 		;cli
 		push byte 0
-		push byte (%1+32)
+		push (%1+32)
 		jmp _isr_handler
 %endmacro
 
@@ -81,7 +81,7 @@ IRQ 15
 [GLOBAL sysc]
 sysc:
 	;cli
-	push 0
+	push byte 0
 	push 0x80
 	jmp _isr_handler
 
@@ -133,17 +133,13 @@ _isr_handler:
 
 format db "out %X",10,0
 [extern printf]
+
 intr_return:
 	
 	add esp,4	
 
 	add esp,4
 
-;	mov eax, esp
-;	push eax
-;	push format
-;	call printf
-;	add esp, 8
 	
 	popa
 	pop ds
@@ -151,7 +147,16 @@ intr_return:
 	pop fs
 	pop gs
 	add esp,8;jump ahead of error code/interrupt number
-	iret	
+	;
+;	mov eax, esp
+;	push eax
+;	push format
+;	call printf
+;	add esp, 8
+	;
+
+
+	iretd	
 
 
 [GLOBAL get_eip]

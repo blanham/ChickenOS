@@ -59,7 +59,7 @@ void interrupt_init()
 	extern void sysc();	
 	idt_build_entry(&idt_table[0x80], (uint32_t)sysc, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
 
-	asm volatile ("lidt (%0)" :: "p"((uint32_t)&idt_ptr) );
+	asm volatile ("lidt (%0)" :: "r"((uintptr_t)&idt_ptr) );
 }
 
 void interrupt_register(int irq, intr_handler *handler)
@@ -88,6 +88,7 @@ void dump_regs(struct registers *regs)
 {
 	printf("edi %X esi %X ebp %X esp %X\nebx %X edx %X ecx %X eax %X\n",
 		regs->edi,regs->esi,regs->ebp,regs->esp,regs->ebx,regs->edx,regs->ecx,regs->eax);
+	printf("ds %X es %X fs %X gs %X int_no %i err_code %i\n",regs->ds,regs->es,regs->fs,regs->gs,regs->int_no,regs->err_code);
 	printf("eip %X cs %X eflags %X useresp %X ss %X\n",
 		regs->eip, regs->cs, regs->eflags, regs->useresp, regs->ss);
 }
@@ -110,7 +111,7 @@ void pic_init()
 	outb(PIC1_DATA, 0x01);
 	outb(PIC2_DATA, 0x01);
 	/* finish init */
-	outb(PIC1_DATA, 0x0);//disables system timer for now
+	outb(PIC1_DATA, 0x0);
 	outb(PIC2_DATA, 0x0);
 }
 
@@ -157,7 +158,7 @@ void pic_unmask(int irq)
 static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags)
 {
 	entry->sel = sel;
-	entry->flags = flags;//needs to be ORed with 0x60 once we get to user mode
+	entry->flags = flags|0x60;//needs to be ORed with 0x60 once we get to user mode
 	entry->always0 = 0;
 	entry->base_lo = ((uint32_t)func) & 0xFFFF;
 	entry->base_hi = (((uint32_t)func) >> 16) & 0xFFFF;
