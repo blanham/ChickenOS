@@ -44,6 +44,7 @@ void kmain(uint32_t mbd, uint32_t magic)
 	vm_init(mb);
 	console_init();
 	paging_init();
+
 	//we start out with one color scheme
 	//but this will be changed if i ever get a framebuffer
 	//console working
@@ -55,7 +56,6 @@ void kmain(uint32_t mbd, uint32_t magic)
 	thread_init();
 //	print_mb((uint32_t)mbd, magic);
 
-//	disable fs for now	
 	if(1)
 	{
 		modules_init(mb);	
@@ -64,20 +64,22 @@ void kmain(uint32_t mbd, uint32_t magic)
 		console_fs_init();
 	
 		vfs_mount_root(INITRD_DEV, "ext2");
-
 	}
 
 	thread_usermode();
+	
 	extern pid_t fork();	
-	if(fork() == 0)
+	char *argv[] = {"-test-arg", NULL};	
+	if(!fork() )
 	{
-		sh_main("child");
-		while(1);
+		execv("/test", argv);
+		PANIC("execv(init) failed!");	
 	}
+	
 	while(1)
 		;
 
-	//not likely to be hit, unless things get really fucked
+	//should never return, unless things get really fucked
 	PANIC("kmain returned");
 }
 

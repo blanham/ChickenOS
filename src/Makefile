@@ -5,12 +5,11 @@ CC		=		gcc#clang
 CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
 				-std=gnu99	\
 				-fno-stack-protector -nostartfiles \
-				-fomit-frame-pointer\
 				-nodefaultlibs -ffreestanding
 				#-nostdlib -nostdinc -fno-builtin\
 
 LINKER	=		ld
-LDFLAGS	=		-Tlinker.ld
+LDFLAGS	=		-Tinit/linker.ld
 
 AS		=		nasm
 ASFLAGS	=		-felf
@@ -30,7 +29,7 @@ DEVSRCS	=		device/intr-core.o\
 				device/console.o device/hw.o device/kbd.o\
 				device/timer.o device/serial.o
 THREAD	=		thread/thread.o thread/syscall.o thread/scheduler.o\
-				thread/tss.o thread/fork.o sh.o
+				thread/tss.o thread/fork.o thread/exec.o sh.o
 				#have to have interrupt.o here at the moment 
 CORE	=		init/kmain.o init/loader.o device/interrupt.o
 				
@@ -46,11 +45,12 @@ test: all
 	-m 512 -fda ./floppy.img && cd src
 
 debug: all
-	cd .. && ./update_image.sh && qemu -rtc=localtime -s -S -m 512 -fda \
+	cd .. && ./update_image.sh && qemu -rtc base=localtime -s -S -m 512 -fda \
 	./floppy.img && cd src
 
 clean:
-	rm *.o mm/*.o fs/*.o thread/*.o ./lib/*.o kernel.bin
+	rm kernel.bin\
+		$(SOURCES)
 
 link:
 	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES)
