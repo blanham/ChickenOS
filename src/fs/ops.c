@@ -36,7 +36,7 @@ int sys_open(const char *_path, int oflag UNUSED, ...)
 	return fd;
 }
 //off_t vfs_seek(struct file *i
-/*
+
 ssize_t sys_read(int fildes, void *buf, size_t nbyte)
 {
 	struct file *fp = open_files[fildes];
@@ -50,15 +50,18 @@ ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 	if(fp == NULL)
 		return -1;
 	return vfs_write(fp, buf, nbyte);
-}*/
+}
 /*int creat(const char *path, mode_t mode)*/
 /*int creat(const char *path UNUSED, uint32_t mode UNUSED)
 {
 	return -1;
 }*/
-off_t lseek(int fildes UNUSED, off_t offset UNUSED, int whence UNUSED)
+off_t sys_lseek(int fildes, off_t offset, int whence)
 {
-	return -1;
+	struct file *fp = open_files[fildes];
+	if(fp == NULL)
+		return -1;
+	return vfs_seek(fp, offset, whence);
 }
 
 int sys_chdir(const char *path)
