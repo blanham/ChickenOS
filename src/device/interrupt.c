@@ -30,7 +30,7 @@ static void void_handler(struct registers *regs)
 {
 	if(regs->int_no < NUM_ISRS)
 		printf("unhandled interrupt %i\n", regs->int_no);
-	else
+	else if(regs->int_no - NUM_ISRS != 7)//ignore bochs spurrious interrupt
 		printf("unhandled irq %i\n",regs->int_no - NUM_ISRS);
 }
 
