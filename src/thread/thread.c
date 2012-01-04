@@ -90,36 +90,36 @@ extern void pagedir_insert_page(pagedir_t pd,
 void thread_usermode(void)
 {
 	uint32_t cur_esp,new_esp;
-	thread_t *cur = thread_current();
+	thread_t *cur, *new;
 
 	asm volatile("cli");
 
-	void *new = palloc();
+	cur = thread_current();
+	new = palloc();
 
 	kernel_thread = new;
 
-	void* esp=(void *)( (uintptr_t)new + 4096);//thread_get_sp();
-
-	kmemcpy(new, thread_current(),PAGE_SIZE);
-
+	kmemcpy(new, cur,PAGE_SIZE);
+	
 	//puts new kernel stack in tss
-	tss_update((uintptr_t)esp);
+	tss_update((uintptr_t)new + PAGE_SIZE);
 
 	printf("Entering user mode\n");
 
 	console_set_color(BLACK,WHITE);
 	
-	cur->sp = esp - sizeof(registers_t) -4;
-
-	thread_t *newt = new;
-
-	pagedir_insert_page(newt->pd, (uintptr_t)cur, 
+	pagedir_insert_page(new->pd, (uintptr_t)cur, 
 			(uintptr_t)PHYS_BASE - 0x1000, 0x7);
+	
+	//triple faults in BOCHS, and pagefaults at 0x1000 below
+	//PHYS_BASE without this pagedir_install
+	pagedir_install(new->pd);
+	
+	INIT_LIST_HEAD(&new->list);
 
-	INIT_LIST_HEAD(&newt->list);
-
-	asm volatile("mov %%esp, %0":"=m"(cur_esp));	
-
+	asm volatile("mov %%esp, %0":"=m"(cur_esp));
+	
+	//need a macro for this offset calculation?
 	new_esp = (cur_esp & 0xfff) + (PHYS_BASE - 0x1000);
 
 	asm volatile(
@@ -175,7 +175,9 @@ thread_create(uint32_t eip, uint32_t esp)
 	kmemsetl((uint32_t*)kernel_stack,0, 1024);	
 
 	new->pd = pagedir_new();
+	
 	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
+	
 	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
 		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
 		
@@ -190,9 +192,9 @@ thread_create(uint32_t eip, uint32_t esp)
 	new->regs = (struct registers *)reg_frame;
 	reg_frame->eip = eip;
 	
-//	uint32_t ebp;			
-//	asm volatile ("mov %%ebp, %0\n" :"=m"(ebp));
-//	reg_frame->ebp = ebp;	
+	uint32_t ebp;			
+	asm volatile ("mov %%ebp, %0\n" :"=m"(ebp));
+	reg_frame->ebp = ebp;	
 
 	reg_frame->cs = 0x1b;
 	reg_frame->ds = reg_frame->es = reg_frame->fs = 
