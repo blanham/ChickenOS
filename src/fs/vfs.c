@@ -123,21 +123,6 @@ void vfs_mount_root(uint16_t dev, char *type)
 	root_fs = fs;
 
 	printf("Mounted %s fs @ dev %i:%i as root\n",type, MAJOR(dev),MINOR(dev));
-
-	char *path = strdup("/lorem"); 
-	struct file *fp = vfs_open(path);
-	char *msg = kcalloc(65536,2);
-	//printf("%s\n", msg);
-		
-	char *out = strdup("herpderp");
-	ret = vfs_write(fp, out,8);
-	vfs_seek(fp, 0, SEEK_SET);
-	printf("Writing returned %i\n",ret);
-	ret = vfs_read(fp, msg, 30);
-	console_puts(msg);
-	console_puts("\n");
-
-	printf("Reading returned %i\n", ret);
 	return;	
 
 error:	
