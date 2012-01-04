@@ -44,24 +44,26 @@ typedef struct elf_section {
 int sys_execv(const char *path, char *const argv[])
 {
 	int fd;
-	elf_header_t *header = palloc();
-	void *test = palloc();
-	
+	elf_header_t *header;
+	void *test;
 	thread_t *cur;
-	fd = sys_open(path, 0);
 	registers_t *regs;
-	thread_t *tmp = palloc();
+//	thread_t *tmp = palloc();
+	header = palloc();
+	test = palloc();
+
 
 	cur = thread_current();
 
-	kmemcpy(tmp, cur, 4096);
+	fd = sys_open(path, 0);
+//	kmemcpy(tmp, cur, 4096);
 	
 	printf("Path %s argv[0] %s\n", path, argv[0]);
 	
 	sys_read(fd, header, 4096);
 	sys_read(fd, test, 4096);
-
-	pagedir_t pd = tmp->pd;
+	
+	pagedir_t pd = cur->pd;
 
 	pagedir_insert_page(pd, (uintptr_t)test, header->entry-0x40, 0x7);
 
