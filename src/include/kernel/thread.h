@@ -30,6 +30,8 @@ void thread_yield();
 void thread_exit();
 void thread_usermode(void);
 
+int sys_execv(const char *path, char *const argv[]);
+int execv(const char *path, char *const argv[]);
 /* thread/scheduler.c */
 void thread_scheduler();
 

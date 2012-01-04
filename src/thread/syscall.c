@@ -31,7 +31,21 @@
 					: "memory"			\
 				   	);					\
 					ret;})
-
+#define SYSCALL_2(num, arg0,arg1) ({	\
+					int ret;			\
+	asm volatile ( 	"xchg %%bx, %%bx\n"					\
+					"pushl %3\n"		\
+					"pushl %2\n"		\
+					"pushl %1\n"		\
+					"int $0x80\n"		\
+					"addl $0xC, %%esp\n"	\
+				   	: "=a"(ret) 		\
+				   	: "i" (num),		\
+					 "m" (arg0), 		\
+						"m"(arg1)		\
+					: "memory"			\
+				   	);					\
+					ret;})
 int dummy()
 {
 	int test = SYSCALL_0(SYS_DUMMY);
@@ -53,6 +67,14 @@ int uputs(char *str)
 	int test = SYSCALL_1(SYS_PUTS,str);
 	return test;
 }
+#include <string.h>
+int execv(const char *path, char * const argv[])
+{
+	path = path;
+	//printf("path %X argv %x\n",path, argv);
+	return SYSCALL_2(SYS_EXECV, path, argv);
+//	return test;
+}
 
 int sys_dummy()
 {
@@ -65,14 +87,15 @@ int sys_dummy()
 void syscall_handler (struct registers *regs)
 {
 	int call = *((int *)((uint32_t)regs->useresp));
-	char *str; 
+	char *str;
+	char **dob; 
 	
 	switch (call)
 	{
 		
 		case SYS_PUTS:
 			str = *((char **)((uint32_t)regs->useresp + 4));
-			printf("from user: %s\n",str);
+			printf("%s", str);
 			regs->eax = 0;
 			break;
 		case SYS_GETPID:
@@ -83,6 +106,13 @@ void syscall_handler (struct registers *regs)
 			return;
 		case SYS_DUMMY:
 			regs->eax = sys_dummy();
+			while(1)
+				asm volatile("hlt");
+			return;
+		case SYS_EXECV:
+			str = (char *)*((int *)(regs->useresp + 4));
+			dob = (char **)*((int *)(regs->useresp + 8));
+			regs->eax = sys_execv(str, dob);
 			return;
 		default:
 			printf("undefined system call %x!\n",call);

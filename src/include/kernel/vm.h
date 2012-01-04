@@ -31,6 +31,8 @@ void vm_init(struct multiboot_info *mb);
 void paging_init();
 pagedir_t pagedir_new();
 void pagedir_install(uint32_t *pd);
+void pagedir_insert_page(pagedir_t pd, 
+	virt_addr_t phys, virt_addr_t virt,uint8_t flags);
 
 /* mm.gdt.c */
 void gdt_install();

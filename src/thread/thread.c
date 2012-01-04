@@ -153,71 +153,66 @@ in_kernel(void)
 	return false;
 }
 
-/*
-typedef void (*thread_func)(void *);
+
 thread_t * 
-thread_create(thread_func func, void *aux)
+thread_create(uint32_t eip, uint32_t esp)
 {
-	thread_t *new,*cur;
-	uint32_t *stack_top;
+	thread_t *new, *cur;
+//	interrupt_disable();
 	registers_t *reg_frame;
-	//need a function to return aligned palloc requests 
-	new = pallocn(STACK_PAGES);
+	uint8_t *kernel_stack, *user_stack;
+	uintptr_t new_sp;
+	
+	kernel_stack = pallocn(STACK_PAGES);
+	user_stack = palloc();
+
 	cur = thread_current();
 	
-	interrupt_disable();
+	new = (thread_t *)kernel_stack;	
+	new_sp = (uintptr_t)kernel_stack + 4096;;
 
-	kmemset((uint8_t *)new, 0, STACK_SIZE);
-	if(new == NULL)
-		return NULL;
+	kmemsetl((uint32_t*)user_stack, 0, 1024);
+	kmemsetl((uint32_t*)kernel_stack,0, 1024);	
+
+	new->pd = pagedir_new();
+	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
+	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
+		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
 		
-		stack_top = (uint32_t *)((uint32_t)new + STACK_SIZE);
-	
-		*--stack_top = (uint32_t)func;
-		*--stack_top = (uint32_t)aux;
-		*--stack_top = (uint32_t)thread_dead;
-	
-	pagedir_t new_pd = pagedir_new();
-	//iret dosen't get rid of ss/useresp if
-	//we are not changing ring levels
-	if(in_kernel())
-	{
-		stack_top += 2;
-	}
 	new->parent = cur->pid;
 	new->cur_dir = cur->cur_dir;	
-	new->pd = new_pd;//pagedir_new();
+	new->magic = 0xcafedeed;
 	new->pid = pid_allocate();
-
-
-	reg_frame= (struct registers *)stack_top;
+			
+	reg_frame = (void *)(kernel_stack + 4096);
 	reg_frame--;
 
 	new->regs = (struct registers *)reg_frame;
+	reg_frame->eip = eip;
+	
+//	uint32_t ebp;			
+//	asm volatile ("mov %%ebp, %0\n" :"=m"(ebp));
+//	reg_frame->ebp = ebp;	
 
-	reg_frame->eip = (uint32_t)func;
-	uint32_t _cs, _ss, _ds;
-	asm volatile ("mov %%cs, %0\n" : "=r"(_cs));
-	asm volatile ("mov %%ds, %0\n" : "=r"(_ds));
-	reg_frame->cs = _cs;
- 	reg_frame->ds = _ds;
+	reg_frame->cs = 0x1b;
+	reg_frame->ds = reg_frame->es = reg_frame->fs = 
+		reg_frame->gs = reg_frame->ss = 0x23;
+	reg_frame->eax = 0;	
 	reg_frame->eflags = 0x200;
-	
-	if(!in_kernel())
-	{
-		asm volatile ("mov %%ss, %0\n" : "=r"(_ss));
- 		reg_frame->ss = _ss;
 
-		//reg_frame->useresp = (uint32_t)PHYS_BASE;
-	}
-	new->sp = (uint8_t *)reg_frame - 4;
-//	list_add_tail(&new->all_list,&all_list);
-	list_add_tail(&new->list,&kernel_thread->list);
-	asm volatile("sti");
+	reg_frame->useresp = esp;
+	reg_frame->esp = new_sp - 14*4;	
+		
+	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4));
+		
+	list_add_tail(&new->all_list,&all_list);
+	list_add_tail(&new->list,&cur->list);
 	
-	return new;
+//	interrupt_set(old_level);	
+	return new;//new->pid;	
+
 }
-*/
+
 pid_t sys_getpid()
 {
 	thread_t *cur = thread_current();
@@ -236,72 +231,62 @@ pid_t pid_allocate()
 }
 pid_t sys_fork(registers_t *regs)
 {
-	pid_t old = 0;
-	thread_t *new,*cur;
-	interrupt_disable();
-	regs = regs;
-	uint8_t *kernel_stack = pallocn(STACK_PAGES);
-	uint8_t *user_stack = palloc();
 
+	thread_t *new;
+	uintptr_t new_useresp = (PHYS_BASE - 4096) + (regs->useresp & 0xfff);
+	new = thread_create(regs->eip, new_useresp);
+	
+/*	thread_t *new, *cur;
+//	interrupt_disable();
+	registers_t *reg_frame;
+	uint8_t *kernel_stack, *user_stack;
+	uintptr_t new_sp;
+	
+	kernel_stack = pallocn(STACK_PAGES);
+	user_stack = palloc();
 
 	cur = thread_current();
-	old = cur->pid;
-	uint32_t eip;	
-	uint32_t cur_sp;
-	asm volatile ("mov %%esp, %0\n" :"=m"(cur_sp));	
-	eip = get_eip();
-	printf("cur_sp %X eip %X\n",cur_sp,eip);	
-	printf("cur %X \n",cur);	
-
-	printf("PID = %X\n", thread_current()->pid);
-	printf("PID = %X\n", thread_current()->magic);
-//	{
 	
-		uintptr_t new_sp;
-	//	uintptr_t offset = (uintptr_t)cur->sp & 0xfff;
-		new = (thread_t *)kernel_stack;	
-		new_sp = (uintptr_t)kernel_stack + 4096;;
-		registers_t *reg_frame;
-	printf("new %x\n",new);	
-//		printf("EIP %X\n",regs->eip);	
-		kmemsetl((uint32_t*)user_stack, 0, 1024);
-	//	kmemcpy(kernel_stack, cur, 4096);	
-		pagedir_t pd = pagedir_new();
-		kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
-		pagedir_insert_page(pd, (uintptr_t)user_stack, 
-			(uintptr_t)PHYS_BASE - 0x1000, 0x7);
+	new = (thread_t *)kernel_stack;	
+	new_sp = (uintptr_t)kernel_stack + 4096;;
+
+	kmemsetl((uint32_t*)user_stack, 0, 1024);
+	kmemsetl((uint32_t*)kernel_stack,0, 1024);	
+
+	new->pd = pagedir_new();
+	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
+	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
+		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
 		
-		new->parent = cur->pid;
-		new->cur_dir = cur->cur_dir;	
-		new->pd = pd;
-		new->magic = 0xcafedeed;
-		new->pid = pid_allocate();
-//		new->sp = (uint8_t *)new_sp;	
+	new->parent = cur->pid;
+	new->cur_dir = cur->cur_dir;	
+	new->magic = 0xcafedeed;
+	new->pid = pid_allocate();
 			
-		reg_frame = (void *)(kernel_stack + 4096);
-		reg_frame--;
+	reg_frame = (void *)new_sp - sizeof(*reg_frame);//(kernel_stack + 4096);
+//	reg_frame--;
 
-		new->regs = (struct registers *)reg_frame;
-		reg_frame->eip = regs->eip;
+	new->regs = (struct registers *)reg_frame;
+	reg_frame->eip = regs->eip;
 	
-		//uint32_t ebp;			
-		//asm volatile ("mov %%ebp, %0\n" :"=m"(ebp));
-		//reg_frame->ebp = ebp + 0x2000;	
+//	uint32_t ebp;			
+//	asm volatile ("mov %%ebp, %0\n" :"=m"(ebp));
+//	reg_frame->ebp = ebp;	
 
-		reg_frame->cs = 0x1b;
- 		reg_frame->ds = reg_frame->es = reg_frame->fs = 
-			reg_frame->gs = reg_frame->ss = 0x23;
-		reg_frame->eax = 0;	
-		reg_frame->eflags = 0x200;
-
-		reg_frame->useresp = regs->useresp;
-		reg_frame->esp = new_sp - 14*4;	
+	reg_frame->cs = 0x1b;
+	reg_frame->ds = reg_frame->es = reg_frame->fs = 
+		reg_frame->gs = reg_frame->ss = 0x23;
+	reg_frame->eax = 0;	
+	reg_frame->eflags = 0x200;
+	reg_frame->useresp = PHYS_BASE - 4096 + (regs->useresp & 0xfff);
+	printf("useresp %x newesp %x\n", regs->useresp, reg_frame->useresp);
+	reg_frame->esp = new_sp - 14*4;	
 		
-		new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4));
+	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4));
 		
-		list_add_tail(&new->all_list,&all_list);
-		list_add_tail(&new->list,&cur->list);
-	
+	list_add_tail(&new->all_list,&all_list);
+	list_add_tail(&new->list,&cur->list);
+*/	
 	return new->pid;	
 }
 
