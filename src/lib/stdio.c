@@ -313,7 +313,7 @@ int printf(const char *fmt, ...)
 	int ret;
 	memset(buf, 0, 512);
 	va_start(ap, fmt);
-	ret = vsprintf(buf, fmt, ap);
+	ret = linux_vsprintf(buf, fmt, ap);
 	puts(buf);
 	//console_puts("\n");
 	va_end(ap);
