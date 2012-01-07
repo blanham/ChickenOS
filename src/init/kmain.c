@@ -69,13 +69,14 @@ void kmain(uint32_t mbd, uint32_t magic)
 	thread_usermode();
 	
 	extern pid_t fork();	
-	char *argv[] = {"-test-arg", NULL};	
+	char *argv[] = {"-l", "foo", "bar", NULL};	
 	if(!fork() )
 	{
 		execv("/test", argv);
 		PANIC("execv(init) failed!");	
 	}
-	
+	//only works because initial threads name is "main"
+	strcpy(thread_current()->name, "idle");
 	while(1)
 		;
 
