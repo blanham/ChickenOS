@@ -27,11 +27,11 @@ BOOT_MSG	init/kmain.c	/^char *BOOT_MSG = "ChickenOS v0.01 booting\\n";$/;"	v
 BROWN	include/kernel/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
 BUCKET_BITLEN	include/kernel/hash_table.h	16;"	d
 BUF_SIZE	device/kbd.c	17;"	d	file:
-CASC_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon5
+CASC_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon3
 CHECK_FLAG	init/util.c	5;"	d	file:
-COM1_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon5
+COM1_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon3
 COM1	device/serial.c	6;"	d	file:
-COM2_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon5
+COM2_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon3
 COM2	device/serial.c	7;"	d	file:
 COM3	device/serial.c	8;"	d	file:
 COM4	device/serial.c	9;"	d	file:
@@ -60,8 +60,11 @@ C_OS_VFS_EXT2_H	include/kernel/fs/ext2/ext2.h	2;"	d
 C_OS_VFS_H	include/kernel/fs/vfs.h	2;"	d
 C_OS_VM_H	include/kernel/vm.h	2;"	d
 DK_GREY	include/kernel/console.h	/^	DK_GREY,LT_BLUE,LT_GREEN, LT_CYAN,$/;"	e	enum:console_color
+ELF_MAGIC	thread/exec.c	9;"	d	file:
 ESC	device/kbd.c	14;"	d	file:
 ESP	include/kernel/interrupt.h	/^  	uint32_t ESP; \/\/try to get rid of this$/;"	m	struct:registers
+EXE_ELF	thread/exec.c	/^enum exe_type {EXE_INVALID, EXE_ELF};$/;"	e	enum:exe_type	file:
+EXE_INVALID	thread/exec.c	/^enum exe_type {EXE_INVALID, EXE_ELF};$/;"	e	enum:exe_type	file:
 EXT2_ACL_DATA_INO	fs/ext2/ext2fs_defs.h	80;"	d
 EXT2_ACL_DATA_INO	fs/fs.c	112;"	d	file:
 EXT2_ACL_IDX_INO	fs/ext2/ext2fs_defs.h	79;"	d
@@ -85,7 +88,7 @@ EXT2_UNDEL_DIR_INO	fs/fs.c	114;"	d	file:
 EXT_C	include/multiboot.h	38;"	d
 EXT_C	include/multiboot.h	40;"	d
 FALSE	include/kernel/types.h	21;"	d
-FD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon5
+FD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon3
 FILE_BLOCK	include/kernel/fs/vfs.h	/^				 FILE_BLOCK = 0x6000}; $/;"	e	enum:file_type
 FILE_CHAR	include/kernel/fs/vfs.h	/^enum file_type { FILE_CHAR  = 0x2000, $/;"	e	enum:file_type
 FILE_DIR	include/kernel/fs/vfs.h	/^				 FILE_DIR   = 0x4000,$/;"	e	enum:file_type
@@ -114,7 +117,7 @@ IDT_FLAG_RING0	include/i386-defs.h	23;"	d
 IDT_FLAG_RING1	include/i386-defs.h	24;"	d
 IDT_FLAG_RING2	include/i386-defs.h	25;"	d
 IDT_FLAG_RING3	include/i386-defs.h	26;"	d
-INITRD_DEV	include/kernel/fs/vfs.h	128;"	d
+INITRD_DEV	include/kernel/fs/vfs.h	129;"	d
 INIT_LIST_HEAD	include/kernel/fs/list.h	32;"	d
 INIT_LIST_HEAD	include/kernel/list.h	30;"	d
 INODE2GROUP	fs/ext2/old/ext2fs2.c	40;"	d	file:
@@ -122,24 +125,24 @@ INODE	fs/ext2/ext2fs_defs.h	3;"	d
 INODE	fs/fs.c	106;"	d	file:
 INTR_DISABLED	include/kernel/interrupt.h	/^enum intr_status {INTR_ENABLED, INTR_DISABLED};$/;"	e	enum:intr_status
 INTR_ENABLED	include/kernel/interrupt.h	/^enum intr_status {INTR_ENABLED, INTR_DISABLED};$/;"	e	enum:intr_status
-IRQ0	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon4
-IRQ10	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon4
-IRQ11	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon4
-IRQ12	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon4
-IRQ13	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon4
-IRQ14	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon4
-IRQ15	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon4
-IRQ1	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon4
-IRQ2	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon4
-IRQ3	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon4
-IRQ4	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon4
-IRQ5	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon4
-IRQ6	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon4
-IRQ7	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon4
-IRQ8	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon4
-IRQ9	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon4
+IRQ0	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon2
+IRQ10	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon2
+IRQ11	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon2
+IRQ12	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon2
+IRQ13	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon2
+IRQ14	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon2
+IRQ15	include/kernel/interrupt.h	/^	IRQ12, IRQ13, IRQ14, IRQ15$/;"	e	enum:__anon2
+IRQ1	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon2
+IRQ2	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon2
+IRQ3	include/kernel/interrupt.h	/^	IRQ0 = 32, IRQ1, IRQ2, IRQ3,$/;"	e	enum:__anon2
+IRQ4	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon2
+IRQ5	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon2
+IRQ6	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon2
+IRQ7	include/kernel/interrupt.h	/^	IRQ4, IRQ5, IRQ6, IRQ7,$/;"	e	enum:__anon2
+IRQ8	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon2
+IRQ9	include/kernel/interrupt.h	/^	IRQ8, IRQ9, IRQ10, IRQ11,$/;"	e	enum:__anon2
 I_MOUNT	include/kernel/fs/vfs.h	84;"	d
-KBD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon5
+KBD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon3
 KERNEL_SEG	include/kernel/vm.h	17;"	d
 LEFT	lib/vsprintf.c	58;"	d	file:
 LIBALLOC_DEAD	mm/liballoc.c	49;"	d	file:
@@ -159,10 +162,10 @@ L_ALT	device/kbd.c	10;"	d	file:
 L_CTRL	device/kbd.c	6;"	d	file:
 L_SHIFT	device/kbd.c	8;"	d	file:
 MAGENTA	include/kernel/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
-MAJOR	include/kernel/fs/vfs.h	130;"	d
+MAJOR	include/kernel/fs/vfs.h	131;"	d
 MAX_DEVICES	fs/device.c	17;"	d	file:
 MBR	fs/fat/fat.c	/^mbr_t MBR;$/;"	v
-MINOR	include/kernel/fs/vfs.h	131;"	d
+MINOR	include/kernel/fs/vfs.h	132;"	d
 MULTIBOOT_BOOTLOADER_MAGIC	include/multiboot.h	31;"	d
 MULTIBOOT_HEADER_FLAGS	include/multiboot.h	25;"	d
 MULTIBOOT_HEADER_FLAGS	include/multiboot.h	27;"	d
@@ -196,7 +199,7 @@ PIT0_DATA	device/timer.c	9;"	d	file:
 PIT1_DATA	device/timer.c	10;"	d	file:
 PIT2_DATA	device/timer.c	11;"	d	file:
 PIT_CMD	device/timer.c	12;"	d	file:
-PIT_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon5
+PIT_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};$/;"	e	enum:__anon3
 PLUS	lib/vsprintf.c	56;"	d	file:
 PREFIX	include/mm/liballoc.h	21;"	d
 PTE_MASK	mm/paging.c	15;"	d	file:
@@ -223,11 +226,11 @@ STACK_SIZE	thread/thread.c	11;"	d	file:
 SYSCALL_0	thread/syscall.c	9;"	d	file:
 SYSCALL_1	thread/syscall.c	20;"	d	file:
 SYSCALL_2	thread/syscall.c	34;"	d	file:
-SYS_DUMMY	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon2
-SYS_EXECV	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon2
-SYS_FORK	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon2
-SYS_GETPID	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon2
-SYS_PUTS	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon2
+SYS_DUMMY	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon4
+SYS_EXECV	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon4
+SYS_FORK	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon4
+SYS_GETPID	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon4
+SYS_PUTS	include/thread/syscall.h	/^enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};$/;"	e	enum:__anon4
 S_IFBLK	fs/fs.c	86;"	d	file:
 S_IFBLK	include/kernel/fs/vfs.h	18;"	d
 S_IFCHR	fs/fs.c	88;"	d	file:
@@ -335,9 +338,8 @@ alloc	lib/stdio.c	/^char *alloc(int n)$/;"	f
 allocp	lib/stdio.c	/^static char *allocp = allocbuf;$/;"	v	file:
 always0	include/i386-defs.h	/^   uint8_t  always0;             \/\/ This must always be zero.$/;"	m	struct:idt_entry_struct
 aout_symbol_table	include/multiboot.h	/^     typedef struct aout_symbol_table$/;"	s
-aout_sym	include/multiboot.h	/^         multiboot_aout_symbol_table_t aout_sym;$/;"	m	union:multiboot_info::__anon3
+aout_sym	include/multiboot.h	/^         multiboot_aout_symbol_table_t aout_sym;$/;"	m	union:multiboot_info::__anon5
 archtype	thread/exec.c	/^	uint16_t archtype;$/;"	m	struct:elf_header	file:
-array	include/kernel/test.c	/^uint32_t array[1024];$/;"	v
 assert	include/kernel/common.h	/^assert(char *file, int line, bool condition, char *msg)$/;"	f
 attrib	fs/fat/fat.c	/^	uint8_t attrib;$/;"	m	struct:fat_directory_entry	file:
 attribute	device/console.c	/^	uint16_t attribute;$/;"	m	struct:__anon1	file:
@@ -384,7 +386,6 @@ bitmap_set	include/kernel/bitmap.h	/^static inline int bitmap_set(bitmap_t *bitm
 bitmap_test	include/kernel/bitmap.h	/^static inline int bitmap_test(bitmap_t *bitmap, uint32_t index)$/;"	f
 bitmap_t	include/kernel/bitmap.h	/^} bitmap_t;$/;"	t	typeref:struct:bitmap
 bitmap	include/kernel/bitmap.h	/^typedef struct bitmap {$/;"	s
-bitmap	include/kernel/test.c	/^bitmap_t bitmap = array;$/;"	v
 block_access_fn	fs/ext2/old/ext2-3.c	/^typedef int(*block_access_fn)(void *aux, void *buf, int block);$/;"	t	file:
 block_access_fn	fs/ext2/temp.c	/^typedef int(*block_access_fn)(void *aux, void *buf, int block);$/;"	t	file:
 block_access_fn	include/kernel/fs/vfs.h	/^typedef int(*block_access_fn)(void *aux, void *buf, int block);$/;"	t
@@ -416,6 +417,7 @@ bootcode	fs/fat/fat.c	/^	uint8_t bootcode[446];$/;"	m	struct:mbr_struct	file:
 bootflag	fs/fat/fat.c	/^	uint8_t bootflag;$/;"	m	struct:partition_entry	file:
 boot	fs/fat/fat.c	/^	uint8_t  boot[420];$/;"	m	struct:fat32_bootblock	file:
 boot	fs/fat/fat.c	/^	uint8_t  boot[448];$/;"	m	struct:fat16_bootblock	file:
+brk	include/kernel/thread.h	/^	void * brk;$/;"	m	struct:thread
 bss_end_addr	include/multiboot.h	/^       unsigned long bss_end_addr;$/;"	m	struct:multiboot_header
 bucket_locks	include/kernel/hash_table.h	/^	pthread_mutex_t *bucket_locks;$/;"	m	struct:hash_table
 buckets	include/kernel/hash_table.h	/^	unsigned int buckets;$/;"	m	struct:hash_table
@@ -516,7 +518,7 @@ eip	include/kernel/interrupt.h	/^	uint32_t eip, cs, eflags, useresp, ss; \/\/ Pu
 eip	include/thread/tss.h	/^    unsigned int	eip;$/;"	m	struct:tss
 elf_header_t	thread/exec.c	/^} __attribute__((packed)) elf_header_t;$/;"	t	typeref:struct:elf_header	file:
 elf_header	thread/exec.c	/^typedef struct elf_header {$/;"	s	file:
-elf_sec	include/multiboot.h	/^         multiboot_elf_section_header_table_t elf_sec;$/;"	m	union:multiboot_info::__anon3
+elf_sec	include/multiboot.h	/^         multiboot_elf_section_header_table_t elf_sec;$/;"	m	union:multiboot_info::__anon5
 elf_section_header_table	include/multiboot.h	/^     typedef struct elf_section_header_table$/;"	s
 elf_section	thread/exec.c	/^typedef struct elf_section {$/;"	s	file:
 elf_section	thread/exec.c	/^} elf_section;$/;"	t	typeref:struct:elf_section	file:
@@ -532,6 +534,8 @@ esp1	include/thread/tss.h	/^    unsigned int	esp1;$/;"	m	struct:tss
 esp2	include/thread/tss.h	/^    unsigned int	esp2;$/;"	m	struct:tss
 esp	include/kernel/interrupt.h	/^	uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; \/\/ Pushed by pusha.$/;"	m	struct:registers
 esp	include/thread/tss.h	/^    unsigned int	esp;$/;"	m	struct:tss
+exe_type	thread/exec.c	/^enum exe_type {EXE_INVALID, EXE_ELF};$/;"	g	file:
+exec_type	thread/exec.c	/^enum exe_type exec_type(const char *path UNUSED)$/;"	f
 execv	thread/syscall.c	/^int execv(const char *path, char * const argv[])$/;"	f
 ext2_aux_t	fs/ext2/ext2fs_defs.h	/^} ext2_aux_t;$/;"	t	typeref:struct:ext2_aux
 ext2_aux	fs/ext2/ext2fs_defs.h	/^typedef struct ext2_aux {$/;"	s
@@ -695,6 +699,7 @@ hdrsize	thread/exec.c	/^	uint16_t hdrsize;$/;"	m	struct:elf_header	file:
 header_addr	include/multiboot.h	/^       unsigned long header_addr;$/;"	m	struct:multiboot_header
 heads	fs/fat/fat.c	/^	uint16_t heads;$/;"	m	struct:fat16_bootblock	file:
 heads	fs/fat/fat.c	/^	uint16_t heads;$/;"	m	struct:fat32_bootblock	file:
+hex_dump	thread/exec.c	/^void hex_dump(void *ptr)$/;"	f
 hidden_blocks	fs/fat/fat.c	/^	uint32_t hidden_blocks;$/;"	m	struct:fat16_bootblock	file:
 hidden_blocks	fs/fat/fat.c	/^	uint32_t hidden_blocks;$/;"	m	struct:fat32_bootblock	file:
 hour	device/timer.c	/^	uint8_t hour;$/;"	m	struct:c_os_time	file:
@@ -799,6 +804,7 @@ io_bmap	include/thread/tss.h	/^			io_bmap	:16;$/;"	m	struct:tss
 is_digit	lib/vsprintf.c	43;"	d	file:
 isdigit	lib/ctype.c	/^int isdigit(int c)$/;"	f
 islower	lib/ctype.c	/^int islower(int c)$/;"	f
+isprint	thread/exec.c	/^int isprint(char c)$/;"	f
 isrs	include/i386-defs.h	/^void (*isrs[])(void) = {$/;"	v
 isxdigit	lib/ctype.c	/^int isxdigit(int c)$/;"	f
 jdt	device/timer.c	/^int32_t jdt(int8_t m, int8_t d, int16_t y)$/;"	f
@@ -890,6 +896,7 @@ list	include/kernel/hash_table.h	/^	struct list_head list;$/;"	m	struct:hash_ent
 list	include/kernel/thread.h	/^	struct list_head list;$/;"	m	struct:thread	typeref:struct:thread::list_head
 list	sh.c	/^	struct list_head list;$/;"	m	struct:command	typeref:struct:command::list_head	file:
 load_addr	include/multiboot.h	/^       unsigned long load_addr;$/;"	m	struct:multiboot_header
+load_elf	thread/exec.c	/^static int load_elf(const char *path)$/;"	f	file:
 load_end_addr	include/multiboot.h	/^       unsigned long load_end_addr;$/;"	m	struct:multiboot_header
 location	mm/gdt.c	/^	uint32_t location;$/;"	m	struct:gdt_descriptor	file:
 lock	include/kernel/hash_table.h	/^	pthread_mutex_t lock;$/;"	m	struct:hash_table
@@ -909,7 +916,6 @@ main2	fs/fat/fat.c	/^int main2(int argc, char **argv)$/;"	f
 main	fs/ext2/old/ext2-3.c	/^int main(int argc,char**argv)$/;"	f
 main	fs/ext2/old/ext2fs2.c	/^int main(int argc, char **argv)$/;"	f
 main	fs/fs.c	/^int main(int argc, char **argv)$/;"	f
-main	include/kernel/test.c	/^int main(int argc, char **argv)$/;"	f
 malloc	mm/liballoc.c	/^void *PREFIX(malloc)(size_t req_size)$/;"	f
 mbr_struct	fs/fat/fat.c	/^struct mbr_struct {$/;"	s	file:
 mbr_t	fs/fat/fat.c	/^typedef struct mbr_struct mbr_t;$/;"	t	typeref:struct:mbr_struct	file:
@@ -917,6 +923,7 @@ media_desc	fs/fat/fat.c	/^	uint8_t  media_desc;$/;"	m	struct:fat16_bootblock	fil
 media_desc	fs/fat/fat.c	/^	uint8_t  media_desc;$/;"	m	struct:fat32_bootblock	file:
 mem_lower	include/multiboot.h	/^       unsigned long mem_lower;$/;"	m	struct:multiboot_info
 mem_upper	include/multiboot.h	/^       unsigned long mem_upper;$/;"	m	struct:multiboot_info
+memcmp	lib/string.c	/^int memcmp (const void *s1, const void *s2, size_t n)$/;"	f
 memcpy	lib/string.c	/^void *memcpy(void *dst, const void *src, size_t size)$/;"	f
 memory_map	include/multiboot.h	/^     typedef struct memory_map$/;"	s
 memset	lib/string.c	/^void *memset(void *dest, uint8_t val, size_t count)$/;"	f
@@ -1032,6 +1039,7 @@ print_mb	init/util.c	/^void print_mb(unsigned long addr, unsigned long magic)$/;
 print_mbr	fs/fat/fat.c	/^void print_mbr(mbr_t *mbr)$/;"	f
 print_stack_trace	include/kernel/common.h	/^static inline void print_stack_trace ()$/;"	f
 printf	lib/stdio.c	/^int printf(const char *fmt, ...)$/;"	f
+push_arg	thread/exec.c	/^static void *push_arg(char *arg, void *sp)$/;"	f	file:
 putc	lib/stdio.c	/^void putc(char c)$/;"	f
 puts	lib/stdio.c	/^int puts(char *string)$/;"	f
 ramdisk	fs/initrd.c	/^	uint8_t *ramdisk;$/;"	m	struct:initrd_struct	file:
@@ -1164,6 +1172,7 @@ ss	include/kernel/interrupt.h	/^	uint32_t eip, cs, eflags, useresp, ss; \/\/ Pus
 ss	include/thread/tss.h	/^    sel_t		ss;$/;"	m	struct:tss
 ssys_fork	thread/fork.c	/^pid_t ssys_fork()$/;"	f
 stack_fault	mm/vm.c	/^static void stack_fault(struct registers * regs)$/;"	f	file:
+stack_prepare	thread/exec.c	/^static uintptr_t stack_prepare(char *path, char *const argv[])$/;"	f	file:
 status	include/kernel/thread.h	/^	enum thread_stat status;$/;"	m	struct:thread	typeref:enum:thread::thread_stat
 storage	include/kernel/fs/vfs.h	/^	void *storage;$/;"	m	struct:inode
 strcat	lib/string.c	/^char * strcat(char *dst, const char * src)$/;"	f
@@ -1183,6 +1192,7 @@ superblock	fs/ext2/old/ext2fs.c	/^	ext2_superblock_t *superblock;$/;"	m	struct:e
 superblock	fs/fs.c	/^	ext2_superblock_t *superblock;$/;"	m	struct:ext2_filesystem	file:
 superblock	include/kernel/fs/vfs.h	/^	vfs_sb_t *superblock;$/;"	m	struct:vfs_fs
 sys_chdir	fs/ops.c	/^int sys_chdir(const char *path)$/;"	f
+sys_close	fs/ops.c	/^int sys_close(int fd)$/;"	f
 sys_dummy	thread/syscall.c	/^int sys_dummy()$/;"	f
 sys_execv	thread/exec.c	/^int sys_execv(const char *path, char *const argv[])$/;"	f
 sys_fork	thread/thread.c	/^pid_t sys_fork(registers_t *regs)$/;"	f
@@ -1231,7 +1241,7 @@ uint32_t	include/stdint.h	/^typedef unsigned int 	uint32_t;$/;"	t
 uint8_t	include/kernel/types.h	/^typedef unsigned char 	uint8_t;$/;"	t
 uint8_t	include/stdint.h	/^typedef unsigned char 	uint8_t;$/;"	t
 uintptr_t	include/kernel/types.h	/^typedef uint32_t		uintptr_t;$/;"	t
-u	include/multiboot.h	/^       } u;$/;"	m	struct:multiboot_info	typeref:union:multiboot_info::__anon3
+u	include/multiboot.h	/^       } u;$/;"	m	struct:multiboot_info	typeref:union:multiboot_info::__anon5
 unused	fs/fat/fat.c	/^	uint8_t unused;$/;"	m	struct:fat16_bootblock	file:
 unused	fs/fat/fat.c	/^	uint8_t unused;$/;"	m	struct:fat32_bootblock	file:
 uputs	thread/syscall.c	/^int uputs(char *str)$/;"	f
