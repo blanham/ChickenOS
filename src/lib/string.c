@@ -98,10 +98,9 @@ char * strtok_r ( char * str, const char * delimiters, char **save )
 }
 char *strcpy(char *dst, const char *src)
 {
-	const char *_src = src;
 	char *_dst = dst;
-	while(*_src != '\0')
-		*_dst++ = *_src++;
+	
+	while((*_dst++ = *src++) != 0);
 
 	return dst;
 }
@@ -138,5 +137,14 @@ void *memset(void *dest, uint8_t val, size_t count)
 		*tmp++ = val;
 
 	return dest;
+}
+int memcmp (const void *s1, const void *s2, size_t n)
+{
+	uint32_t i = 0;
+	uint8_t *_s1 = (uint8_t *)s1;
+	uint8_t *_s2 = (uint8_t *)s2;	
+	while(*_s1++ == *_s2++ && i < n)
+		i++;
+	return *_s1 - *_s2; 
 }
 
