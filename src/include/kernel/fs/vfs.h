@@ -104,6 +104,7 @@ void vfs_init();
 void vfs_mount_root(uint16_t dev, char *type);
 
 struct file *vfs_open(char *path);
+int vfs_close(struct file *file);
 size_t vfs_read(struct file *file, void *buf, size_t nbyte);
 off_t vfs_write(struct file *file, void *buf, size_t nbyte);
 off_t vfs_seek(struct file *file, off_t offset, int whence);
@@ -112,7 +113,7 @@ int vfs_chdir(const char *path);
 /* ops.c - standard file ops */
 /*int open(const char *path, int oflag, ...);*/
 int sys_open(const char *path, int oflag, ...);
-
+int sys_close(int fd);
 ssize_t sys_read(int fildes, void *buf, size_t nbyte);
 ssize_t sys_write(int filedes, void *buf, size_t nbyte);
 

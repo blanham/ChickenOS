@@ -35,7 +35,14 @@ int sys_open(const char *_path, int oflag UNUSED, ...)
 	kfree(path);
 	return fd;
 }
-//off_t vfs_seek(struct file *i
+int sys_close(int fd)
+{
+	struct file *fp = open_files[fd];
+	if(fp == NULL)
+		return -1;
+	return vfs_close(fp);
+}
+
 
 ssize_t sys_read(int fildes, void *buf, size_t nbyte)
 {
