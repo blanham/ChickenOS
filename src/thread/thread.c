@@ -173,7 +173,8 @@ thread_create(uint32_t eip, uint32_t esp)
 
 	kmemsetl((uint32_t*)user_stack, 0, 1024);
 	kmemsetl((uint32_t*)kernel_stack,0, 1024);	
-
+	//FIXME:pagedir_new should copy all entries from
+	//cur's pd
 	new->pd = pagedir_new();
 	
 	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
@@ -234,62 +235,11 @@ pid_t pid_allocate()
 pid_t sys_fork(registers_t *regs)
 {
 
-	thread_t *new;
-	uintptr_t new_useresp = (PHYS_BASE - 4096) + (regs->useresp & 0xfff);
-	new = thread_create(regs->eip, new_useresp);
-	
-/*	thread_t *new, *cur;
-//	interrupt_disable();
-	registers_t *reg_frame;
-	uint8_t *kernel_stack, *user_stack;
-	uintptr_t new_sp;
-	
-	kernel_stack = pallocn(STACK_PAGES);
-	user_stack = palloc();
-
-	cur = thread_current();
-	
-	new = (thread_t *)kernel_stack;	
-	new_sp = (uintptr_t)kernel_stack + 4096;;
-
-	kmemsetl((uint32_t*)user_stack, 0, 1024);
-	kmemsetl((uint32_t*)kernel_stack,0, 1024);	
-
-	new->pd = pagedir_new();
-	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
-	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
-		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
-		
-	new->parent = cur->pid;
-	new->cur_dir = cur->cur_dir;	
-	new->magic = 0xcafedeed;
-	new->pid = pid_allocate();
-			
-	reg_frame = (void *)new_sp - sizeof(*reg_frame);//(kernel_stack + 4096);
-//	reg_frame--;
-
-	new->regs = (struct registers *)reg_frame;
-	reg_frame->eip = regs->eip;
-	
-//	uint32_t ebp;			
-//	asm volatile ("mov %%ebp, %0\n" :"=m"(ebp));
-//	reg_frame->ebp = ebp;	
-
-	reg_frame->cs = 0x1b;
-	reg_frame->ds = reg_frame->es = reg_frame->fs = 
-		reg_frame->gs = reg_frame->ss = 0x23;
-	reg_frame->eax = 0;	
-	reg_frame->eflags = 0x200;
-	reg_frame->useresp = PHYS_BASE - 4096 + (regs->useresp & 0xfff);
-	printf("useresp %x newesp %x\n", regs->useresp, reg_frame->useresp);
-	reg_frame->esp = new_sp - 14*4;	
-		
-	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4));
-		
-	list_add_tail(&new->all_list,&all_list);
-	list_add_tail(&new->list,&cur->list);
-*/	
-	return new->pid;	
+	return thread_create(regs->eip, (PHYS_BASE - 4096) + (regs->useresp & 0xfff))->pid;
+	//thread_t *new;
+	//uintptr_t new_useresp = (PHYS_BASE - 4096) + (regs->useresp & 0xfff);
+	//new = thread_create(regs->eip, new_useresp);
+	//return new->pid;	
 }
 
 
