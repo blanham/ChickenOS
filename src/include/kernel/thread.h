@@ -16,6 +16,7 @@ typedef struct thread {
 	struct list_head all_list;
 	struct file *cur_dir;
 	uint8_t *sp;
+	void * brk;
 	struct registers *regs;
 	pagedir_t pd;
 	enum thread_stat status;
