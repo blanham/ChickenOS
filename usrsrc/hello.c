@@ -1,5 +1,5 @@
 //#include "user.h"
-
+#include "stdio.h"
 enum { SYS_FORK,SYS_GETPID, SYS_EXECV, SYS_PUTS, SYS_DUMMY = 256};
 
 #define SYSCALL_0(num) ({				\
@@ -38,30 +38,41 @@ pid_t get_pid()
 {
 	int test = SYSCALL_0(SYS_GETPID);
 	return test;
-}
-pid_t fork()
+}*/
+int fork()
 {
 	int test = SYSCALL_0(SYS_FORK);
 	return test;
 }
-*/
-int uputs(char *str)
+
+/*int uputs(char *str)
 {
 	int test = SYSCALL_1(SYS_PUTS,str);
 	return test;
-}
+}*/
 
-int main()//int argc, char **argv)
+int main(int argc, char **argv)
 {
-	uputs("hello, world\n");
-
-
+//	uputs("hello, world\n");
+	printf("hello,world\n");
+	printf("argc %x argv %X:%s\n",argc, argv,argv[0]);
+	for(int i = 0; i < argc; i++)
+		printf("%s\n",argv[i]);
+//while(*argv++ != 0)
+//	printf("%s\n",*argv);
+	
+/*	if(fork())
+	{
+		printf("forked!\n");
+		while(1);
+	}
+	printf("main!\n");	*/
 	return 0;
 }
 
-void _start()//int argc, char **argv)
+void _start(int argc, char **argv)
 {
 
-	main();//argc, argv);
+	main(argc, argv);
 	while(1);
 }

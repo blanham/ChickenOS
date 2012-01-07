@@ -1,0 +1,65 @@
+CROSS	=		/usr/local/cross/bin
+CC		=		$(CROSS)/i586-elf-gcc
+CC		=		gcc#clang
+LINKER	=		$(CROSS)/i586-elf-ld
+CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
+				-std=gnu99	\
+				-fno-stack-protector -nostartfiles \
+				-nodefaultlibs -ffreestanding
+				#-nostdlib -nostdinc -fno-builtin\
+
+LINKER	=		ld
+LDFLAGS	=		-Tuser.ld
+
+AS		=		nasm
+ASFLAGS	=		-felf
+
+INCLUDES=		#-I./include -I./fs -I./include/kernel
+
+KLIBSRCS=		stdio.o string.o# ./lib/ctype.o\
+				./lib/kernel/memory.o ./lib/vsprintf.o 
+
+EXT2	= 	#	fs/ext2/ext2.o fs/ext2/ops.o
+VFS		= 	#	fs/vfs.o fs/ops.o fs/initrd.o fs/device.o
+FSSRCS	=	#	$(VFS) $(EXT2)
+
+MEMSRCS = 	#	mm/gdt.o mm/liballoc.o mm/liballoc_funcs.o\
+				mm/paging.o mm/palloc.o mm/vm.o
+DEVSRCS	=	#	device/intr-core.o\
+				device/console.o device/hw.o device/kbd.o\
+				device/timer.o device/serial.o
+THREAD	=	#	thread/thread.o thread/syscall.o thread/scheduler.o\
+				thread/tss.o thread/fork.o thread/exec.o sh.o
+				#have to have interrupt.o here at the moment 
+CORE	=	#	init/kmain.o init/loader.o device/interrupt.o
+HELLO1	=		hello.o			
+SOURCES	= $(HELLO1)	 $(KLIBSRCS)
+
+
+	#	$(CORE) $(THREAD) $(DEVSRCS) $(MEMSRCS) \
+				$(FSSRCS) $(KLIBSRCS)
+
+all: $(SOURCES) link
+
+lib: $(LIBSRCS)
+
+test: all
+	cd .. && ./update_image.sh && qemu -rtc base=localtime \
+	-m 512 -fda ./floppy.img && cd src
+
+debug: all
+	cd .. && ./update_image.sh && qemu -rtc base=localtime -s -S -m 512 -fda \
+	./floppy.img && cd src
+
+clean:
+	rm $(SOURCES)
+
+link:
+	$(LINKER) $(LDFLAGS) -o test $(SOURCES)
+
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+.s.o:
+	$(AS) $(ASFLAGS) $<

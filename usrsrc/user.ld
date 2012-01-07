@@ -2,7 +2,7 @@ ENTRY(_start)
 OUTPUT_FORMAT(elf32-i386)
 
 SECTIONS {
-   . = 0x80000000;
+   . = 0x8048000;
 
    .text  :{
        *(.text)
