@@ -27,12 +27,29 @@ typedef struct elf_header {
 	uint16_t shdrcnt;
 	uint16_t strsec;
 } __attribute__((packed)) elf_header_t;
-
 typedef struct elf_section {
-
-
-
-} elf_section;
+	uint32_t sh_name;
+	uint32_t sh_type;
+	uint32_t sh_flags;
+	uint32_t sh_addr;
+	uint32_t sh_offset;
+	uint32_t sh_size;
+	uint32_t sh_link;
+	uint32_t sh_info;
+	uint32_t sh_align;
+	uint32_t sh_entsize;
+}  __attribute__((packed)) elf_section_t;
+typedef struct elf_program_header {
+	uint32_t type;
+	uint32_t offset;
+	uint32_t virtaddr;
+	uint32_t physaddr;
+	uint32_t filesize;
+	uint32_t memsize;
+	uint32_t flags;
+	uint32_t align;
+} __attribute__((packed)) elf_program_header_t;
+static uintptr_t stack_prepare(char *path, char *const argv[]);
 int isprint(char c)
 {
 	if(('a' <= c) && (c <= 'z'))
@@ -63,6 +80,90 @@ void hex_dump(void *ptr)
 			printf("\n");
 		p+=16;
 	}
+}
+
+/*int load_page(int fd, virtaddr_t )
+{
+} */
+static int load_elf(const char *path)
+{
+	int fd;
+	elf_header_t *header;
+	void *test, *test2;
+	thread_t * cur;
+	cur = thread_current();
+	header = palloc();
+	test = palloc();
+	test2 = palloc();
+
+	fd = sys_open(path, 0);
+	path = strdup("/bin/ls");
+	
+	sys_read(fd, header, 4096);
+	if(memcmp(header->magic, ELF_MAGIC, 4))
+		printf("ELF GOOD\n");
+	sys_read(fd, test, 4096);
+	sys_read(fd, test2, 4096);
+	
+	sys_close(fd);
+
+	pagedir_t pd = cur->pd;
+
+	pagedir_insert_page(pd, (uintptr_t)test, header->entry & ~0xFFF, 0x7);
+	pagedir_insert_page(pd, (uintptr_t)test2, (header->entry & ~0xFFF) + 0x1000, 0x7);
+
+	pagedir_install(pd);
+	
+	printf("phdrpos %X shdrpos %X\n",header->phdrpos, header->shdrpos);
+	printf("phdrent %X phdrcnt %i shdrent %X shdrcnt %i\n",	
+		header->phdrent, header->phdrcnt, header->shdrent, header->shdrcnt);
+
+	return header->entry;
+
+}
+enum exe_type {EXE_INVALID, EXE_ELF};
+enum exe_type exec_type(const char *path UNUSED)
+{
+	int fd;
+	void *magic;
+	enum exe_type ret = EXE_INVALID;
+	magic = palloc();
+	
+	fd = sys_open(path, 0);
+	sys_read(fd, magic, 4096);
+	if(memcmp(magic, ELF_MAGIC, 4))
+		ret = EXE_ELF;
+		
+	sys_close(fd);
+	palloc_free(magic);
+	return ret;
+}
+int sys_execv(const char *path, char *const argv[])
+{
+	char *name;
+	registers_t *regs;
+	thread_t *cur = thread_current();
+	
+
+	//backtrack from end of string to get name
+	name = (char *)path + strlen(path);
+	while((*(--name - 1) != '/') && (name != path));
+	
+	cur->name = krealloc(cur->name, strlen(name) + 1);
+	strcpy(cur->name, name);
+
+	if(exec_type(path) == EXE_ELF)
+	{	
+		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
+	
+		if((int)(regs->eip = (uintptr_t)load_elf(path)) == -1)
+			goto failure;
+	
+		regs->useresp = stack_prepare((char *)path, argv);
+	}
+	//if we return, then something is wrong		
+failure:
+	return -1;
 }
 static void *push_arg(char *arg, void *sp)
 {
@@ -126,86 +227,3 @@ static uintptr_t stack_prepare(char *path, char *const argv[])
 	return (uintptr_t)stackw;
 }
 
-/*int load_page(int fd, virtaddr_t )
-{
-} */
-static int load_elf(const char *path)
-{
-	int fd;
-	elf_header_t *header;
-	void *test, *test2;
-	thread_t * cur;
-	cur = thread_current();
-	header = palloc();
-	test = palloc();
-	test2 = palloc();
-
-	fd = sys_open(path, 0);
-	path = strdup("/bin/ls");
-	
-	sys_read(fd, header, 4096);
-	if(memcmp(header->magic, ELF_MAGIC, 4))
-		printf("ELF GOOD\n");
-	sys_read(fd, test, 4096);
-	sys_read(fd, test2, 4096);
-	
-	sys_close(fd);
-
-	pagedir_t pd = cur->pd;
-
-	pagedir_insert_page(pd, (uintptr_t)test, header->entry & ~0xFFF, 0x7);
-	pagedir_insert_page(pd, (uintptr_t)test2, (header->entry & ~0xFFF) + 0x1000, 0x7);
-
-	pagedir_install(pd);
-	
-//	printf("phdrpos %X shdrpos %X\n",header->phdrpos, header->shdrpos);
-//	printf("phdrent %X phdrcnt %i shdrent %X shdrcnt %i\n",	
-//		header->phdrent, header->phdrcnt, header->shdrent, header->shdrcnt);
-
-	return header->entry;
-
-}
-enum exe_type {EXE_INVALID, EXE_ELF};
-enum exe_type exec_type(const char *path UNUSED)
-{
-	int fd;
-	void *magic;
-	
-	magic = palloc();
-	
-	fd = sys_open(path, 0);
-	sys_read(fd, magic, 4096);
-	if(memcmp(magic, ELF_MAGIC, 4))
-		return EXE_ELF;
-		
-	sys_close(fd);
-	palloc_free(magic);
-	return EXE_INVALID;
-}
-int sys_execv(const char *path, char *const argv[])
-{
-	char *name;
-	registers_t *regs;
-	thread_t *cur = thread_current();
-	
-
-	//backtrack from end of string to get name
-	name = (char *)path + strlen(path);
-	while((*(--name - 1) != '/') && (name != path));
-	
-	cur->name = krealloc(cur->name, strlen(name) + 1);
-	strcpy(cur->name, name);
-
-	if(exec_type(path) == EXE_ELF)
-	{	
-		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
-	
-		if((int)(regs->eip = (uintptr_t)load_elf(path)) == -1)
-			goto failure;
-	
-		regs->useresp = stack_prepare((char *)path, argv);
-	}
-	//if we return, then something is wrong		
-failure:
-	return -1;
-}
