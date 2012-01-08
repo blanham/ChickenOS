@@ -50,6 +50,24 @@ typedef struct elf_program_header {
 	uint32_t align;
 } __attribute__((packed)) elf_program_header_t;
 static uintptr_t stack_prepare(char *path, char *const argv[]);
+
+static void elf_print_sections(elf_section_t *sections)
+{
+//	uint32_t sh_name;
+//	uint32_t sh_type;
+//	uint32_t sh_flags;
+	printf("type %i addr %X offset %i size %X link %X info %X align %X entsize %x\n",
+ 		sections->sh_type, sections->sh_addr, sections->sh_offset, sections->sh_size,
+		sections->sh_link, sections->sh_info, sections->sh_align, sections->sh_entsize);
+
+}
+
+static void elf_print_programs(elf_program_header_t *program)
+{
+	printf("type %i offset %X virtaddt %X filesize %X memsize %X align %X\n",
+		program->type, program->offset, program->virtaddr,
+ 		program->filesize, program->memsize, program->align);
+}
 int isprint(char c)
 {
 	if(('a' <= c) && (c <= 'z'))
@@ -89,21 +107,44 @@ static int load_elf(const char *path)
 {
 	int fd;
 	elf_header_t *header;
+	elf_section_t *sections;
+	elf_program_header_t *program;
 	void *test, *test2;
 	thread_t * cur;
+	uintptr_t entry;
 	cur = thread_current();
-	header = palloc();
+	header = kmalloc(sizeof(*header));
 	test = palloc();
 	test2 = palloc();
 
 	fd = sys_open(path, 0);
 	path = strdup("/bin/ls");
 	
-	sys_read(fd, header, 4096);
-	if(memcmp(header->magic, ELF_MAGIC, 4))
-		printf("ELF GOOD\n");
+	sys_read(fd, header, sizeof(*header));
+	program = kmalloc(sizeof(*program)*header->phdrcnt);
+	sys_lseek(fd, header->phdrpos, SEEK_SET);
+	sys_read(fd, program, sizeof(*program)*header->phdrcnt);
+
+	for(int i = 0; i < header->phdrcnt; i++)
+	{
+		elf_print_programs(program + i);
+
+	}
+	sys_lseek(fd, header->shdrpos, SEEK_SET);
+	sections = kmalloc(sizeof(*sections)*header->shdrcnt);
+	sys_read(fd, sections, sizeof(*sections)*header->shdrcnt);
+	for(int i = 0; i < header->shdrcnt -10; i++)
+	{
+		elf_print_sections(sections + i);
+
+	}
+//	if(memcmp(header->magic, ELF_MAGIC, 4))
+	//	printf("ELF GOOD\n");
+	sys_lseek(fd, 4096, SEEK_SET);
 	sys_read(fd, test, 4096);
 	sys_read(fd, test2, 4096);
+	void *test3 = palloc();
+	sys_read(fd, test3, 4096);
 	
 	sys_close(fd);
 
@@ -111,15 +152,18 @@ static int load_elf(const char *path)
 
 	pagedir_insert_page(pd, (uintptr_t)test, header->entry & ~0xFFF, 0x7);
 	pagedir_insert_page(pd, (uintptr_t)test2, (header->entry & ~0xFFF) + 0x1000, 0x7);
+	pagedir_insert_page(pd, (uintptr_t)test3, (header->entry & ~0xFFF) + 0x2000, 0x7);
 
 	pagedir_install(pd);
 	
-	printf("phdrpos %X shdrpos %X\n",header->phdrpos, header->shdrpos);
-	printf("phdrent %X phdrcnt %i shdrent %X shdrcnt %i\n",	
-		header->phdrent, header->phdrcnt, header->shdrent, header->shdrcnt);
-
-	return header->entry;
-
+//	PRIntf("phdrpos %X shdrpos %X\n",header->phdrpos, header->shdrpos);
+//	printf("phdrent %X phdrcnt %i shdrent %X shdrcnt %i\n",	
+//		header->phdrent, header->phdrcnt, header->shdrent, header->shdrcnt);
+	
+	entry = header->entry;
+	kfree(header);
+	kfree(sections);
+	return entry;
 }
 enum exe_type {EXE_INVALID, EXE_ELF};
 enum exe_type exec_type(const char *path UNUSED)
@@ -148,18 +192,20 @@ int sys_execv(const char *path, char *const argv[])
 	//backtrack from end of string to get name
 	name = (char *)path + strlen(path);
 	while((*(--name - 1) != '/') && (name != path));
-	
-	cur->name = krealloc(cur->name, strlen(name) + 1);
-	strcpy(cur->name, name);
-
 	if(exec_type(path) == EXE_ELF)
 	{	
+		uintptr_t eip;
 		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
 	
-		if((int)(regs->eip = (uintptr_t)load_elf(path)) == -1)
+		if((int)(eip = (uintptr_t)load_elf(path)) == -1)
 			goto failure;
 	
+		regs->eip = eip;
 		regs->useresp = stack_prepare((char *)path, argv);
+
+		
+		cur->name = krealloc(cur->name, strlen(name) + 1);
+		strcpy(cur->name, name);
 	}
 	//if we return, then something is wrong		
 failure:
