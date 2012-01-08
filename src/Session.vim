@@ -34,12 +34,12 @@ badd +1 lib/stdio.c
 badd +72 init/kmain.c
 badd +1 ./thread/thread.c
 badd +37 lib/string.c
-badd +0 fs/vfs.c
-badd +0 ./fs/ops.c
-badd +0 include/kernel/fs/vfs.h
-badd +0 include/mm/liballoc.h
-badd +0 include/kernel/thread.h
-badd +0 ./mm/liballoc.c
+badd +1 fs/vfs.c
+badd +1 ./fs/ops.c
+badd +1 include/kernel/fs/vfs.h
+badd +1 include/mm/liballoc.h
+badd +1 include/kernel/thread.h
+badd +1 ./mm/liballoc.c
 badd +1 string.new
 silent! argdel *
 edit thread/exec.c
@@ -149,11 +149,11 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 207 - ((30 * winheight(0) + 17) / 35)
+let s:l = 136 - ((10 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-207
+136
 normal! 01l
 tabedit fs/vfs.c
 set splitbelow splitright
@@ -262,7 +262,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 81 - ((17 * winheight(0) + 17) / 35)
+let s:l = 81 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -375,7 +375,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 99 - ((2 * winheight(0) + 17) / 35)
+let s:l = 99 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -488,7 +488,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 14 - ((13 * winheight(0) + 17) / 35)
+let s:l = 14 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -601,7 +601,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 95 - ((10 * winheight(0) + 17) / 35)
+let s:l = 95 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -940,7 +940,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 69 - ((15 * winheight(0) + 17) / 35)
+let s:l = 69 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -1053,11 +1053,11 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 188 - ((44 * winheight(0) + 17) / 35)
+let s:l = 234 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-188
+234
 normal! 02l
 tabedit fs/vfs.c
 set splitbelow splitright
@@ -1166,7 +1166,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 240 - ((17 * winheight(0) + 17) / 35)
+let s:l = 240 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -1279,7 +1279,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 107 - ((8 * winheight(0) + 17) / 35)
+let s:l = 107 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -1392,7 +1392,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 40 - ((17 * winheight(0) + 17) / 35)
+let s:l = 40 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -1505,7 +1505,7 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 20 - ((19 * winheight(0) + 17) / 35)
+let s:l = 20 - ((0 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
@@ -1618,11 +1618,11 @@ setlocal nowinfixwidth
 setlocal wrap
 setlocal wrapmargin=0
 silent! normal! zE
-let s:l = 78 - ((21 * winheight(0) + 17) / 35)
+let s:l = 60 - ((6 * winheight(0) + 17) / 35)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-78
+60
 normal! 01l
 tabedit lib/stdio.c
 set splitbelow splitright

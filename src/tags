@@ -330,6 +330,7 @@ access	mm/gdt.c	/^	uint8_t access;$/;"	m	struct:segment_descriptor	file:
 addr	include/multiboot.h	/^       unsigned long addr;$/;"	m	struct:aout_symbol_table
 addr	include/multiboot.h	/^       unsigned long addr;$/;"	m	struct:elf_section_header_table
 afree	lib/stdio.c	/^void afree(char *p)$/;"	f
+align	thread/exec.c	/^	uint32_t align;$/;"	m	struct:elf_program_header	file:
 all_list	include/kernel/thread.h	/^	struct list_head all_list;$/;"	m	struct:thread	typeref:struct:thread::list_head
 all_list	thread/thread.c	/^LIST_HEAD(all_list);$/;"	v
 allocate_new_page	mm/liballoc.c	/^static struct liballoc_major *allocate_new_page( unsigned int size )$/;"	f	file:
@@ -518,10 +519,14 @@ eip	include/kernel/interrupt.h	/^	uint32_t eip, cs, eflags, useresp, ss; \/\/ Pu
 eip	include/thread/tss.h	/^    unsigned int	eip;$/;"	m	struct:tss
 elf_header_t	thread/exec.c	/^} __attribute__((packed)) elf_header_t;$/;"	t	typeref:struct:elf_header	file:
 elf_header	thread/exec.c	/^typedef struct elf_header {$/;"	s	file:
+elf_print_programs	thread/exec.c	/^static void elf_print_programs(elf_program_header_t *program)$/;"	f	file:
+elf_print_sections	thread/exec.c	/^static void elf_print_sections(elf_section_t *sections)$/;"	f	file:
+elf_program_header_t	thread/exec.c	/^} __attribute__((packed)) elf_program_header_t;$/;"	t	typeref:struct:elf_program_header	file:
+elf_program_header	thread/exec.c	/^typedef struct elf_program_header {$/;"	s	file:
 elf_sec	include/multiboot.h	/^         multiboot_elf_section_header_table_t elf_sec;$/;"	m	union:multiboot_info::__anon5
 elf_section_header_table	include/multiboot.h	/^     typedef struct elf_section_header_table$/;"	s
+elf_section_t	thread/exec.c	/^}  __attribute__((packed)) elf_section_t;$/;"	t	typeref:struct:elf_section	file:
 elf_section	thread/exec.c	/^typedef struct elf_section {$/;"	s	file:
-elf_section	thread/exec.c	/^} elf_section;$/;"	t	typeref:struct:elf_section	file:
 entry_addr	include/multiboot.h	/^       unsigned long entry_addr;$/;"	m	struct:multiboot_header
 entry	thread/exec.c	/^	uint32_t entry;$/;"	m	struct:elf_header	file:
 err_code	include/kernel/interrupt.h	/^	uint32_t int_no, err_code;    \/\/ Interrupt number and error code (if applicable)$/;"	m	struct:registers
@@ -617,6 +622,7 @@ file_type	fs/fs.c	/^	uint8_t file_type;$/;"	m	struct:ext2_directory	file:
 filename	fs/fat/fat.c	/^	uint8_t filename[11];$/;"	m	struct:fat_directory_entry	file:
 file	fs/ext2/old/ext2-3.c	/^struct file {$/;"	s	file:
 file	include/kernel/fs/vfs.h	/^struct file {$/;"	s
+filesize	thread/exec.c	/^	uint32_t filesize;$/;"	m	struct:elf_program_header	file:
 filesystem	fs/fs.c	/^	void *filesystem;$/;"	m	struct:vfs_file	file:
 filesystems	fs/vfs.c	/^vfs_fs_t * filesystems[10];$/;"	v
 filetype	thread/exec.c	/^	uint16_t filetype;$/;"	m	struct:elf_header	file:
@@ -628,6 +634,7 @@ flags	include/multiboot.h	/^       unsigned long flags;$/;"	m	struct:multiboot_h
 flags	include/multiboot.h	/^       unsigned long flags;$/;"	m	struct:multiboot_info
 flags	mm/gdt.c	/^	uint8_t flags;$/;"	m	struct:segment_descriptor	file:
 flags	thread/exec.c	/^	uint32_t flags;$/;"	m	struct:elf_header	file:
+flags	thread/exec.c	/^	uint32_t flags;$/;"	m	struct:elf_program_header	file:
 fork	thread/syscall.c	/^pid_t fork()$/;"	f
 free	mm/liballoc.c	/^void PREFIX(free)(void *ptr)$/;"	f
 fs_info_sector	fs/fat/fat.c	/^	uint16_t fs_info_sector;$/;"	m	struct:fat32_bootblock	file:
@@ -927,6 +934,7 @@ memcmp	lib/string.c	/^int memcmp (const void *s1, const void *s2, size_t n)$/;"	
 memcpy	lib/string.c	/^void *memcpy(void *dst, const void *src, size_t size)$/;"	f
 memory_map	include/multiboot.h	/^     typedef struct memory_map$/;"	s
 memset	lib/string.c	/^void *memset(void *dest, uint8_t val, size_t count)$/;"	f
+memsize	thread/exec.c	/^	uint32_t memsize;$/;"	m	struct:elf_program_header	file:
 minute	device/timer.c	/^	uint8_t minute;$/;"	m	struct:c_os_time	file:
 mmap_addr	include/multiboot.h	/^       unsigned long mmap_addr;$/;"	m	struct:multiboot_info
 mmap_length	include/multiboot.h	/^       unsigned long mmap_length;$/;"	m	struct:multiboot_info
@@ -974,6 +982,7 @@ num	device/console.c	/^	int num;$/;"	m	struct:__anon1	file:
 num	include/multiboot.h	/^       unsigned long num;$/;"	m	struct:elf_section_header_table
 off_t	include/kernel/types.h	/^typedef signed long int	off_t;$/;"	t
 offset	include/kernel/fs/vfs.h	/^	uint32_t offset;$/;"	m	struct:file
+offset	thread/exec.c	/^	uint32_t offset;$/;"	m	struct:elf_program_header	file:
 oldtss	include/thread/tss.h	/^    sel_t		oldtss;$/;"	m	struct:tss
 open_dir	fs/ext2/old/ext2fs.c	/^ext2_directory_t *open_dir(uint8_t *fs, ext2_inode_t *inode_table, uint32_t inode)$/;"	f
 open_dir	fs/fs.c	/^ext2_directory_t *open_dir(uint8_t *fs, ext2_inode_t *inode_table, uint32_t inode)$/;"	f
@@ -1016,6 +1025,7 @@ phdrcnt	thread/exec.c	/^	uint16_t phdrcnt;$/;"	m	struct:elf_header	file:
 phdrent	thread/exec.c	/^	uint16_t phdrent;$/;"	m	struct:elf_header	file:
 phdrpos	thread/exec.c	/^	uint32_t phdrpos;$/;"	m	struct:elf_header	file:
 phys_addr_t	include/kernel/vm.h	/^typedef uintptr_t phys_addr_t;$/;"	t
+physaddr	thread/exec.c	/^	uint32_t physaddr;$/;"	m	struct:elf_program_header	file:
 pic_init	device/interrupt.c	/^void pic_init()$/;"	f
 pic_mask	device/interrupt.c	/^void pic_mask(int irq)$/;"	f
 pic_send_end	device/interrupt.c	/^void pic_send_end(int irq)$/;"	f
@@ -1137,8 +1147,18 @@ sel_t	include/thread/tss.h	/^typedef uint32_t sel_t;$/;"	t
 sel	include/i386-defs.h	/^   uint16_t sel;                 \/\/ Kernel segment selector.$/;"	m	struct:idt_entry_struct
 serial_init	device/serial.c	/^void serial_init()$/;"	f
 serial_interrupt	device/serial.c	/^void serial_interrupt(registers_t *regs UNUSED)$/;"	f
+sh_addr	thread/exec.c	/^	uint32_t sh_addr;$/;"	m	struct:elf_section	file:
+sh_align	thread/exec.c	/^	uint32_t sh_align;$/;"	m	struct:elf_section	file:
+sh_entsize	thread/exec.c	/^	uint32_t sh_entsize;$/;"	m	struct:elf_section	file:
+sh_flags	thread/exec.c	/^	uint32_t sh_flags;$/;"	m	struct:elf_section	file:
 sh_gets	sh.c	/^void sh_gets(char *str)$/;"	f
+sh_info	thread/exec.c	/^	uint32_t sh_info;$/;"	m	struct:elf_section	file:
+sh_link	thread/exec.c	/^	uint32_t sh_link;$/;"	m	struct:elf_section	file:
 sh_main	sh.c	/^int sh_main(void *aux)$/;"	f
+sh_name	thread/exec.c	/^	uint32_t sh_name;$/;"	m	struct:elf_section	file:
+sh_offset	thread/exec.c	/^	uint32_t sh_offset;$/;"	m	struct:elf_section	file:
+sh_size	thread/exec.c	/^	uint32_t sh_size;$/;"	m	struct:elf_section	file:
+sh_type	thread/exec.c	/^	uint32_t sh_type;$/;"	m	struct:elf_section	file:
 shdrcnt	thread/exec.c	/^	uint16_t shdrcnt;$/;"	m	struct:elf_header	file:
 shdrent	thread/exec.c	/^	uint16_t shdrent;$/;"	m	struct:elf_header	file:
 shdrpos	thread/exec.c	/^	uint32_t shdrpos;$/;"	m	struct:elf_header	file:
@@ -1234,6 +1254,7 @@ tty_putc	device/console.c	/^void tty_putc(console_t *con, uint8_t c)$/;"	f
 typecode	fs/fat/fat.c	/^	uint8_t typecode;$/;"	m	struct:partition_entry	file:
 type	fs/fat/fat.c	/^	int type;$/;"	m	struct:fat_filesystem	file:
 type	include/multiboot.h	/^       unsigned long type;$/;"	m	struct:memory_map
+type	thread/exec.c	/^	uint32_t type;$/;"	m	struct:elf_program_header	file:
 uint16_t	include/kernel/types.h	/^typedef unsigned short 	uint16_t;$/;"	t
 uint16_t	include/stdint.h	/^typedef unsigned short 	uint16_t;$/;"	t
 uint32_t	include/kernel/types.h	/^typedef unsigned int 	uint32_t;$/;"	t
@@ -1290,6 +1311,7 @@ vfs_write	fs/vfs.c	/^off_t vfs_write(struct file *file, $/;"	f
 videoram	device/console.c	/^	uint16_t *videoram;$/;"	m	struct:__anon1	file:
 videoram	device/console.c	/^static  uint16_t * videoram = (uint16_t *) 0xc00b8000;$/;"	v	file:
 virt_addr_t	include/kernel/vm.h	/^typedef uintptr_t virt_addr_t;$/;"	t
+virtaddr	thread/exec.c	/^	uint32_t virtaddr;$/;"	m	struct:elf_program_header	file:
 vm_init	mm/vm.c	/^void vm_init(struct multiboot_info *mb)$/;"	f
 void_handler	device/interrupt.c	/^static void void_handler(struct registers *regs)$/;"	f	file:
 volume_label	fs/fat/fat.c	/^	uint8_t volume_label[11];$/;"	m	struct:fat16_bootblock	file:
