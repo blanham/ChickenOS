@@ -12,6 +12,7 @@
 #include <mm/liballoc.h>
 #include <stdio.h>
 #include <string.h>
+#include <thread/syscall.h>
 //file stuff should be seperated out
 struct file *open_files[100];
 uint8_t file_count = 0;
@@ -28,16 +29,19 @@ int sys_open(const char *_path, int oflag UNUSED, ...)
 {
 	char *path = strdup(_path);
 	struct file * fp = vfs_open(path);
+	int td = thread_current()->fd++;
 	if(fp == NULL)
 		return -1;
-	int fd = fd_new();
-	open_files[fd] = fp;
+//	int fd = fd_new();
+//	open_files[fd] = fp;
+	thread_current()->files[td] = fp;
 	kfree(path);
-	return fd;
+	return td;
 }
 int sys_close(int fd)
 {
-	struct file *fp = open_files[fd];
+	struct file *fp = thread_current()->files[fd];
+	thread_current()->fd--;
 	if(fp == NULL)
 		return -1;
 	return vfs_close(fp);
@@ -46,14 +50,14 @@ int sys_close(int fd)
 
 ssize_t sys_read(int fildes, void *buf, size_t nbyte)
 {
-	struct file *fp = open_files[fildes];
+	struct file *fp = thread_current()->files[fildes];
 	if(fp == NULL)
 		return -1;
 	return vfs_read(fp, buf, nbyte);
 }
 ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 {
-	struct file *fp = open_files[fildes];
+	struct file *fp = thread_current()->files[fildes];
 	if(fp == NULL)
 		return -1;
 	return vfs_write(fp, buf, nbyte);
@@ -65,7 +69,7 @@ ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 }*/
 off_t sys_lseek(int fildes, off_t offset, int whence)
 {
-	struct file *fp = open_files[fildes];
+	struct file *fp = thread_current()->files[fildes];
 	if(fp == NULL)
 		return -1;
 	return vfs_seek(fp, offset, whence);
@@ -74,4 +78,14 @@ off_t sys_lseek(int fildes, off_t offset, int whence)
 int sys_chdir(const char *path)
 {
 	return vfs_chdir(path);
+}
+
+int sys_dup(int oldfd UNUSED)
+{
+	return ENOSYS;
+}
+
+int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
+{
+	return ENOSYS;
 }
