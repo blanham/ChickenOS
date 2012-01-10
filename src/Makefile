@@ -1,6 +1,6 @@
 CROSS	=		/usr/local/cross/bin
-#CC		=		$(CROSS)/i586-elf-gcc
-CC		=		gcc#clang
+CC		=		$(CROSS)/i586-elf-gcc
+CC		=		gcc -m32 #clang -m32
 #LINKER	=		$(CROSS)/i586-elf-ld
 CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
 				-std=gnu99	\
@@ -8,7 +8,7 @@ CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
 				-nodefaultlibs -ffreestanding
 				#-nostdlib -nostdinc -fno-builtin\
 
-LINKER	=		ld
+LINKER	=		ld -melf_i386
 LDFLAGS	=		-Tinit/linker.ld
 
 AS		=		nasm
@@ -29,7 +29,7 @@ DEVSRCS	=		device/intr-core.o\
 				device/console.o device/hw.o device/kbd.o\
 				device/timer.o device/serial.o
 THREAD	=		thread/thread.o thread/syscall.o thread/scheduler.o\
-				thread/tss.o thread/fork.o thread/exec.o sh.o
+				thread/tss.o thread/fork.o thread/exec.o thread/load_elf.o sh.o
 				#have to have interrupt.o here at the moment 
 CORE	=		init/kmain.o init/loader.o device/interrupt.o
 				
