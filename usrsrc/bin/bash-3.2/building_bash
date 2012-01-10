@@ -1,0 +1,6 @@
+export CFLAGS="-nostdinc -Os  -Ttext=100 -nostdlib -static   -fno-builtin "
+export CC="diet -v gcc-3.3"
+export LDFLAGS="-nostdlib"
+./configure --enable-minimal-config --enable-history --enable-readline --enable-static-link  --enable-help-builtin --enable-progcomp --disable-nls --disable-job-control
+make
+objcopy --strip-debug -R .comment -R .note bash bash

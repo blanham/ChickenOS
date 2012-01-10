@@ -1,22 +1,23 @@
-CROSS	=		/usr/local/cross/bin
-CC		=		$(CROSS)/i586-elf-gcc
-CC		=		gcc#clang
-LINKER	=		$(CROSS)/i586-elf-ld
-CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
+CROSS	=		/usr/local/cross2/bin
+CC		=		$(CROSS)/i586-pc-chickenos-gcc
+#CC		=		gcc -m32#clang
+LINKER	=		$(CROSS)/i586-pc-chickenos-ld
+CFLAGS	=		-g -Wall  $(INCLUDES)  \
 				-std=gnu99	\
 				-fno-stack-protector -nostartfiles \
-				-nodefaultlibs -ffreestanding
+				-nodefaultlibs -ffreestanding\
+				-I./include
 				#-nostdlib -nostdinc -fno-builtin\
 
-LINKER	=		ld
-LDFLAGS	=		-Tuser.ld
+#LINKER	=		ld
+LDFLAGS	=		--static #-Tuser.ld
 
 AS		=		nasm
 ASFLAGS	=		-felf
 
 INCLUDES=		#-I./include -I./fs -I./include/kernel
 
-KLIBSRCS=		stdio.o string.o# ./lib/ctype.o\
+KLIBSRCS=		#stdio.o string.o# ./lib/ctype.o\
 				./lib/kernel/memory.o ./lib/vsprintf.o 
 
 EXT2	= 	#	fs/ext2/ext2.o fs/ext2/ops.o
@@ -54,8 +55,8 @@ debug: all
 clean:
 	rm $(SOURCES)
 
-link:
-	$(LINKER) $(LDFLAGS) -o test $(SOURCES)
+link: syscalls.o
+	$(LINKER) $(LDFLAGS) -o test $(SOURCES) libc.a syscalls.o crt0.o 
 
 
 %.o: %.c
