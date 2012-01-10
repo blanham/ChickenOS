@@ -29,7 +29,7 @@ DEVSRCS	=		device/intr-core.o\
 				device/console.o device/hw.o device/kbd.o\
 				device/timer.o device/serial.o
 THREAD	=		thread/thread.o thread/syscall.o thread/scheduler.o\
-				thread/tss.o thread/fork.o thread/exec.o sh.o
+				thread/tss.o thread/fork.o thread/exec.o thread/load_elf.o sh.o
 				#have to have interrupt.o here at the moment 
 CORE	=		init/kmain.o init/loader.o device/interrupt.o
 				
