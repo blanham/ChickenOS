@@ -4,6 +4,7 @@
 #include <kernel/interrupt.h>
 #include <kernel/vm.h>
 #include <fs/vfs.h>
+
 enum thread_stat {THREAD_DEAD, THREAD_READY, THREAD_RUNNING, THREAD_BLOCKED};
 //is this the right place for this?
 typedef unsigned short pid_t;
@@ -15,6 +16,8 @@ typedef struct thread {
 	struct list_head list;
 	struct list_head all_list;
 	struct file *cur_dir;
+	int fd;
+	struct file *files[8];
 	uint8_t *sp;
 	void * brk;
 	struct registers *regs;
@@ -31,11 +34,15 @@ void thread_yield();
 void thread_exit();
 void thread_usermode(void);
 
-int sys_execv(const char *path, char *const argv[]);
+int sys_execve(const char *path, char *const argv[], char *const envp[]); 
 int execv(const char *path, char *const argv[]);
 /* thread/scheduler.c */
 void thread_scheduler();
+/* thread/load_elf.c */
+#define ELF_MAGIC "\177ELF"
+int load_elf(const char *path, uintptr_t *eip);
 
+/* */
 pid_t sys_fork(registers_t *regs);
 pid_t sys_getpid();
 #endif

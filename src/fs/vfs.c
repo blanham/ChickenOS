@@ -322,6 +322,7 @@ int vfs_chdir(const char *_path)
 	file  = vfs_open(path);
 	if(file != NULL)
 	{
+		vfs_close(thread_current()->cur_dir);
 		thread_current()->cur_dir = file;
 		ret = 1;
 	}
