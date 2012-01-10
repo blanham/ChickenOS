@@ -33,6 +33,8 @@ pagedir_t pagedir_new();
 void pagedir_install(uint32_t *pd);
 void pagedir_insert_page(pagedir_t pd, 
 	virt_addr_t phys, virt_addr_t virt,uint8_t flags);
+void pagedir_insert_pagen(pagedir_t pd, virt_addr_t kvirt, 
+	virt_addr_t uvirt,uint8_t flags, int n);
 
 /* mm.gdt.c */
 void gdt_install();

@@ -104,11 +104,22 @@ void pagedir_insert_page(pagedir_t pd, virt_addr_t kvirt,
 	
 	if((*pde_entry & 0x1) == 0)
 	{
-		*pde_entry = (uint32_t)V2P(palloc()) | 0x7;	
+		*pde_entry = (uint32_t)V2P(palloc()) | flags;	
 	}
 
 	pte_entry = (uint32_t *)P2V(((uintptr_t)(*pde_entry) & ~0xfff));
 	pte_entry += pte_index;
 	
-	*pte_entry = V2P(kvirt) | 0x7;
+	*pte_entry = V2P(kvirt) | flags;
+}
+void pagedir_insert_pagen(pagedir_t pd, virt_addr_t kvirt, 
+	virt_addr_t uvirt,uint8_t flags, int n)
+{
+
+	for(int i = 0; i < n; i++)
+		pagedir_insert_page(pd, kvirt + PAGE_SIZE*i, uvirt + PAGE_SIZE*i, flags);
+
+
+
+
 }
