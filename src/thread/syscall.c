@@ -56,7 +56,7 @@ void *sys_brk(uintptr_t ptr)
 		return cur->brk;	
 	}
 }
-
+extern void test_signals();
 void syscall_handler (struct registers *regs)
 {
 	int call = regs->eax;
@@ -121,6 +121,11 @@ void syscall_handler (struct registers *regs)
 		case 174:
 			if(regs->ecx != 0 && regs->edx != 0 && regs->ebx <20)
 			printf("%i %x %x\n", regs->ebx, *(int *)regs->ecx, *(int *)regs->edx);
+			break;
+		case 200:
+			thread_scheduler(regs);
+			//printf("test\n");
+		//	test_signals();
 			break;	
 		default:
 			printf("undefined system call %i!\n",call);
