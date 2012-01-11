@@ -89,3 +89,12 @@ int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
 {
 	return ENOSYS;
 }
+
+int sys_ioctl(int fildes, int request, ...)
+{
+	struct file *fp = thread_current()->files[fildes];
+	if(fp == NULL)
+		return -1;
+	return vfs_ioctl(fp, request, NULL);
+}
+

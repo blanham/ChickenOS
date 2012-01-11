@@ -164,17 +164,24 @@ void console_switch(int num)
 	//put cursor at correct postion
 	console_cursor_move(CURSOR_POS);
 }
-
-size_t console_read(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)
+char *test = "testing\n";
+size_t console_read(uint16_t dev UNUSED, void *_buf, off_t off UNUSED, size_t count)
 {
-	char *buf = _buf;
-	size_t read = count;
-	int tty = MINOR(dev);
+//	char *buf = _buf;
+//	size_t read = count;
+//	int tty = MINOR(dev);
+//	printf("console read\n");
+	static int i = 0;
+	i++;
+//	if(i == 30)
+//		while(1);
+	kmemcpy(_buf, test, 7);
 	while(count--)
 	{
-		*buf++ = tty_getc(consoles[tty]);
+	//	*buf++ = tty_getc(consoles[tty]);
 	}
-	return read;
+	
+	return 0;//read;
 }
 
 size_t console_write(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)
@@ -190,15 +197,25 @@ size_t console_write(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)
 	return written;
 }
 
-int console_ioctl(uint16_t dev UNUSED, uint32_t c UNUSED, void * aux UNUSED)
+int console_ioctl(uint16_t dev, int request, va_list args UNUSED)
 {
-
+	int tty = MINOR(dev);
+	switch(request)
+	{
+		case 0x5401://TCGETS
+			return 0;
+		case 0x540f:
+			return 12;
+		default:
+		printf("request %x @ tty %i\n",request,tty);
+			;
+	}
 	return -1;
 }
 
 void console_fs_init()
 {
-	device_register(FILE_CHAR, 0x800, console_read, console_write);
+	device_register(FILE_CHAR, 0x800, console_read, console_write, console_ioctl);
 	//FIXME: needs to be:
 //	device_file_register(0x800, FILE_CHAR, console_ops);
 }

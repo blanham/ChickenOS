@@ -5,8 +5,8 @@ CC		=		gcc -m32 #clang -m32
 CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
 				-std=gnu99	\
 				-fno-stack-protector -nostartfiles \
-				-nodefaultlibs -ffreestanding
-				#-nostdlib -nostdinc -fno-builtin\
+				-nodefaultlibs -ffreestanding\
+				-nostdlib -nostdinc -fno-builtin
 
 LINKER	=		ld -melf_i386
 LDFLAGS	=		-Tinit/linker.ld
