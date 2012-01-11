@@ -22,7 +22,11 @@ void thread_scheduler(struct registers *regs)
 	{
 		next = list_entry(next->list.next, thread_t, list);
 	}*/
-	
+	if(next->signal_pending != 0 && next->pid != 0)
+	{
+		//	printf("signal %i pending\n",next->signal_pending);	
+	}
+
 	cur->sp = (uint8_t *)regs->ESP;
 	_esp = (uint32_t)next->sp;
 	

@@ -227,10 +227,23 @@ pid_t sys_getpid()
 pid_t pid_allocate()
 {
 	static pid_t pid_count = 0;
-
+	
 	pid_count++;
 
 	return pid_count;
+}
+int sys_kill(int pid, int sig)
+{
+	thread_t * p;
+	list_for_each_entry(p, &all_list, all_list)
+	{
+		if(p->pid == pid)
+		{
+			p->signal_pending = sig;
+		}
+	}
+	thread_yield();
+	return -2;
 }
 pid_t sys_fork(registers_t *regs)
 {

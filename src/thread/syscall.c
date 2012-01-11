@@ -1,4 +1,5 @@
 #include <common.h>
+#include <mm/liballoc.h>
 #include <kernel/interrupt.h>
 #include <kernel/console.h>
 #include <kernel/thread.h>
@@ -42,24 +43,38 @@ int sys_dummy()
 	return 0xcafebabe;	
 }
 
-
+void *sys_brk(uintptr_t ptr)
+{
+	thread_t *cur = thread_current();
+	printf("brk %x incr %x\n", cur->brk, ptr);
+	if(ptr == 0)
+		return cur->brk;
+	else
+	{
+		cur->brk = (void *)ptr;
+		printf("set brk to %x\n", cur->brk);
+		return cur->brk;	
+	}
+}
 
 void syscall_handler (struct registers *regs)
 {
 	int call = regs->eax;
-//	printf("call %i\n",call);
+	char *buf = NULL;
+	buf = buf;
 	switch (call)
 	{
 		
-		case SYS_PUTS:
-			printf("%s", (char *)regs->ebx);
-			regs->eax = 0;
-			break;
+	//	case SYS_PUTS:
+	//		printf("%s", (char *)regs->ebx);
+	//		regs->eax = 0;
+	//		break;
 		case SYS_READ:
 			regs->eax = sys_read((int)regs->ebx, (char *)regs->ecx, (int)regs->edx);
 			break;
 		case SYS_WRITE:
-			regs->eax = sys_write((int)regs->ebx, (char *)regs->ecx, (int)regs->edx);
+			regs->eax = sys_write(0, (char *)regs->ecx, (int)regs->edx);
+			printf("\n");
 			break;
 		case SYS_GETPID:
 			regs->eax = sys_getpid();
@@ -75,8 +90,9 @@ void syscall_handler (struct registers *regs)
 		case SYS_EXECVE:
 			regs->eax = sys_execve((char *)regs->ebx, (char **)regs->ecx, (char **)regs->edx);
 			return;
-		case SYS_SBRK:
-			regs->eax = (uintptr_t)thread_current()->brk;
+		case SYS_BRK:
+			regs->eax = (uintptr_t)sys_brk(regs->ebx);
+			printf("trying to set brk to %X\n",regs->ebx);
 			return;
 		case 146://writev(int fd, struct iovec *vec, int count)
 			//dump_regs(regs);
@@ -84,18 +100,28 @@ void syscall_handler (struct registers *regs)
 			regs->eax = -1;
 			printf("%i\n", regs->edx);
 			sys_write(regs->ebx, (char *)*(int *)regs->ecx, *((int*)regs->ecx + 1));
-			//sys_write(0, (char *)*((int*)regs->ecx + 2), *((int*)regs->ecx + 3));
+			//sys_write(0, (char *()*((int*)regs->ecx + 2), *((int*)regs->ecx + 3));
 			return;
 		case 54:
+			regs->eax = sys_ioctl((int)regs->ebx, (int)regs->ecx, NULL);
+			return;
 		case 65:
+	//		regs->eax = 12;
+			return;
 		case 37:
-			regs->eax = 1;
-			break;
-		case 252:
-		case SYS_EXIT:
-			thread_exit();
-			while(1);
-			break;
+			//printf("kill %i %i\n",regs->ebx, regs->ecx);
+			//printf("eip %X\n",regs->eip);
+			regs->eax = sys_kill((int)regs->ebx, (int)regs->ecx);
+			regs->eax = 0;
+			return;
+//		case 252:
+//		case SYS_EXIT:
+//			thread_exit();
+//			return;
+		case 174:
+			if(regs->ecx != 0 && regs->edx != 0 && regs->ebx <20)
+			printf("%i %x %x\n", regs->ebx, *(int *)regs->ecx, *(int *)regs->edx);
+			break;	
 		default:
 			printf("undefined system call %i!\n",call);
 		//	while(1);

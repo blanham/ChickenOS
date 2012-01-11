@@ -19,30 +19,33 @@
 struct char_device_ops {
 	char_read_fn read;
 	char_write_fn write;
-//	char_ioctl_fn ioctl;
+	char_ioctl_fn ioctl;
 };
 
 struct char_device {
 	uint16_t dev;
 	char_read_fn read;
 	char_write_fn write;
+	char_ioctl_fn ioctl;
 };
 struct block_device {
 	uint16_t dev;
 	block_read_fn read;
 	block_write_fn write;
+	void *pad;
 };
 
 struct block_device block_devices[MAX_DEVICES]; 
 struct char_device char_devices[MAX_DEVICES]; 
 
-void device_register(uint16_t device_type, uint16_t dev, void *read, void *write)
+void device_register(uint16_t device_type, uint16_t dev, void *read, void *write, void *ioctl)
 {
 	if(device_type == FILE_CHAR)
 	{
 		struct char_device *c = &char_devices[MAJOR(dev)];
 		c->read = (char_read_fn)read;
 		c->write = (char_write_fn)write;
+		c->ioctl = (char_ioctl_fn)ioctl;
 		c->dev = MAJOR(dev);
 
 	}
@@ -111,7 +114,7 @@ size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte)
 	size_t ret = 0;
 	struct char_device *device = &char_devices[MAJOR(dev)];
 	
-	printf("READ %x %X\n", dev, device->read);
+//	printf("READ %x %X\n", dev, device->read);
 	ret = device->read(dev, buf, offset, nbyte);
 
 	return ret;
@@ -125,6 +128,14 @@ size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte)
 	return ret;
 }
 
+int char_device_ioctl(uint16_t dev, int request, ...)
+{
+	size_t ret = 0;
+	struct char_device *device = &char_devices[MAJOR(dev)];
+	ret = device->ioctl(dev, request, NULL);
+
+	return ret;
+}
 
 
 int read_block(uint16_t dev, void * _buf, int block, int block_size)

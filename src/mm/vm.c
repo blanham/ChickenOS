@@ -9,6 +9,7 @@
 #include <kernel/vm.h>
 #include <kernel/console.h>
 #include <kernel/interrupt.h>
+#include <kernel/thread.h>
 #include <stdio.h>
 
 extern uint32_t end;
@@ -85,12 +86,11 @@ static void page_fault(struct registers * regs)
 				  : "=r" (faulting_addr)
 
 				 );
-	console_set_color(GREEN, WHITE);
-	printf("\nPAGE FAULT! @ %x\n",faulting_addr);
 
-	if(is_user)
-		printf("user space\n");
-	else
+	if(!is_user)
+	{	
+		console_set_color(GREEN, WHITE);
+		printf("\nPAGE FAULT! @ %x\n",faulting_addr);
 		printf("kernel space\n");
 
 	if(is_write)
@@ -104,7 +104,7 @@ static void page_fault(struct registers * regs)
 		printf("protection violation\n");
 
 	printf("\n");
-	
+	}
 	if(!is_user)
 	{
 		console_set_color(RED, WHITE);
@@ -114,11 +114,13 @@ static void page_fault(struct registers * regs)
 		PANIC("Page fault in kernel space!");
 	}else {
 		//kill process
-		console_set_color(RED, WHITE);
+	//	console_set_color(RED, WHITE);
+		printf("SIGSEGV @ %X\n", faulting_addr);	
 		printf("REGS:\n");
 		dump_regs(regs);
 		printf("\n");
-		PANIC("Page fault in user space!");
+		thread_exit();
+	//	PANIC("Page fault in user space!");
 
 	}
 }

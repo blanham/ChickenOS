@@ -7,7 +7,7 @@
 #include <kernel/interrupt.h>
 #include <fs/vfs.h>
 enum exe_type {EXE_INVALID, EXE_ELF};
-static uintptr_t stack_prepare(char *path, char *const argv[]);
+static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew);
 static inline int _isprint(char c)
 {
 	if(('a' <= c) && (c <= 'z'))
@@ -79,8 +79,11 @@ int sys_execve(const char *path, char *const argv[], char *const envp[])
 		if(envp != NULL)
 			printf("passing environment not yet supported!\n");	
 	//	regs->eip = eip;
-		regs->useresp = stack_prepare((char *)path, argv);
-		
+		int newargv;
+		int newargc;
+		regs->useresp = stack_prepare((char *)path, argv, &newargv, &newargc);
+		regs->esi = newargc;
+		regs->ecx = (uint32_t)newargv;
 		//backtrack from end of string to get name
 		name = (char *)path + strlen(path);
 		while((*(--name - 1) != '/') && (name != path));
@@ -90,7 +93,7 @@ int sys_execve(const char *path, char *const argv[], char *const envp[])
 		
 		//FIXME: probably not the best address for break
 		cur->brk = (void *)0xb0000000;
-		pagedir_insert_page(cur->pd, (uintptr_t)palloc(), (uintptr_t)cur->brk, 0x7);
+		pagedir_insert_pagen(cur->pd, (uintptr_t)pallocn(1000), (uintptr_t)cur->brk, 0x7, 1000);
 		printf("done\n");
 	}
 	//if we return, then something is wrong		
@@ -105,7 +108,7 @@ static void *push_arg(char *arg, void *sp)
 		strcpy((char *)sp, arg);	
 		return sp;
 }
-static uintptr_t stack_prepare(char *path, char *const argv[])
+static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew)
 {
 	int argc = 1;
 	char **table;
@@ -147,8 +150,9 @@ static uintptr_t stack_prepare(char *path, char *const argv[])
 	//gcc will not let this be one line
 	*stackw = (uint32_t)stackw + 4;
 	stackw--;
-
-	*stackw-- = argc;
+	*argvnew = (int)table[0];
+	*stackw-- = (uintptr_t)table[0];
+	*argcnew = argc;
 	//NULL function return value (entry point should not return)
 	*stackw = NULL;
 	

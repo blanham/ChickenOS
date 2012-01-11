@@ -293,6 +293,29 @@ off_t vfs_write(struct file *file,
 	return ret;
 }
 
+int  vfs_ioctl(struct file *file, 
+	int request, ...)
+{
+	int ret = 0;
+	if(file == NULL)
+		return -1;
+	if((file->inode->mode & S_IFCHR) != 0){
+		ret = char_device_ioctl(file->inode->rdev, 
+			request, NULL);
+	}else if((file->inode->mode & S_IFBLK) != 0){
+	//	ret = block_device_readn(file->inode->rdev, 
+	//		buf, 0, file->offset, nbyte);
+		return -1;
+	}else if((file->inode->mode & S_IFREG) != 0){
+	//	if(file->fs == NULL || file->fs->ops->write == NULL)
+	//		return -1;
+	//	ret = file->fs->ops->write(file->inode, buf,
+	//		nbyte, file->offset);
+		return -1;
+	}
+	return ret;
+}
+
 off_t vfs_seek(struct file *file, off_t offset, int whence)
 {
 	switch(whence)

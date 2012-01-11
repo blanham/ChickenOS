@@ -15,11 +15,18 @@ typedef struct thread {
 	char *name;
 	struct list_head list;
 	struct list_head all_list;
+	//fs stuff
 	struct file *cur_dir;
 	int fd;
 	struct file *files[8];
+	//saved kernel stack
 	uint8_t *sp;
+	//location of brk
 	void * brk;
+	//signal stuff
+	int signal_pending;
+	//this pointer to registers on kernel
+	//stack probably not needed	
 	struct registers *regs;
 	pagedir_t pd;
 	enum thread_stat status;
@@ -45,5 +52,6 @@ int load_elf(const char *path, uintptr_t *eip);
 /* */
 pid_t sys_fork(registers_t *regs);
 pid_t sys_getpid();
+int sys_kill(int pid, int sig);
 #endif
 
