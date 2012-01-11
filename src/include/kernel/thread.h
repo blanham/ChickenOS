@@ -21,6 +21,8 @@ typedef struct thread {
 	struct file *files[8];
 	//saved kernel stack
 	uint8_t *sp;
+	//saved user stack
+	uint8_t *usersp;
 	//location of brk
 	void * brk;
 	//signal stuff

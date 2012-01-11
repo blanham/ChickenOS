@@ -243,7 +243,7 @@ int sys_kill(int pid, int sig)
 		}
 	}
 	thread_yield();
-	return -2;
+	return 0;
 }
 pid_t sys_fork(registers_t *regs)
 {
