@@ -95,27 +95,27 @@ int main(int argc, char **argv)
     char c;
     char cmdline[MAXLINE];
     int emit_prompt = 1; /* emit prompt (default) */
-
+//	printf("argc %i argv %x\n",argv);
     /* Redirect stderr to stdout (so that driver will get all output
      * on the pipe connected to stdout) */
     //dup2(1, 2);
 
     /* Parse the command line */
-    while ((c = getopt(argc, argv, "hvp")) != EOF) {
+ /*   while ((c = getopt(argc, argv, "hvp")) != EOF) {
         switch (c) {
         case 'h':             /* print help message */
-            usage();
-	    break;
-        case 'v':             /* emit additional diagnostic info */
-            verbose = 1;
-	    break;
-        case 'p':             /* don't print a prompt */
-            emit_prompt = 0;  /* handy for automatic testing */
-	    break;
-	default:
-            usage();
-	}
-    }
+ //           usage();
+//	    break;
+  //      case 'v':             /* emit additional diagnostic info */
+    //        verbose = 1;
+	  //  break;
+        //case 'p':             /* don't print a prompt */
+         //   emit_prompt = 0;  /* handy for automatic testing */
+	  //  break;
+//	default:
+  //          usage();
+///	/}
+   // }
 
     /* Install the signal handlers */
 
@@ -140,6 +140,7 @@ int main(int argc, char **argv)
 	}
 	if ((fgets(cmdline, MAXLINE, stdin) == NULL) && ferror(stdin))
 	    app_error("fgets error");
+	fputs(cmdline,stdin);
 	if (feof(stdin)) { /* End of file (ctrl-d) */
 	    fflush(stdout);
 	    exit(0);
@@ -172,12 +173,12 @@ void eval(char *cmdline)
     int jobtype; //if equal to 1 (from parseline) then start a bg job
     struct job_t job;
     sigset_t signals;
-
+	
     jobtype = parseline(cmdline, argv); //parse input, and discover jobtype
     
     if(argv[0] == NULL) return; //return on no input
     else if(builtin_cmd(argv)) return; //nothing to be done if builtin cmd
-
+	printf("cmdline %x %s\n",argv, argv[0]);
     /* set job state based on detected jobtype */
     if(jobtype == 1) job.state = BG;
     else job.state = FG;
@@ -188,11 +189,11 @@ void eval(char *cmdline)
     /* block SIGCHLD*/
     //sigprocmask(SIG_BLOCK, &signals, NULL);
 
-    if(!(job.pid = fork())) //child
+  //  if(!(job.pid = fork())) //child
     {
    // 	setpgid(0,0); //workaround from p4shell.pdf
 //	sigprocmask(SIG_UNBLOCK, &signals, NULL);//unblock SIGCHLD
-	
+	printf("argv %s\n", argv[0]);	
 	if(execve(argv[0], argv, environ) < 0)//execute job, check return value
 	{
 		printf("%s: Command not found\n", argv[0]);

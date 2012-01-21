@@ -63,17 +63,28 @@ enum exe_type exec_type(const char *path)
 int sys_execve(const char *path, char *const argv[], char *const envp[]) 
 {
 	char *name;
+	static int tmp = 0;
 	registers_t *regs;
 	thread_t *cur = thread_current();
-	printf("path %s argv0 %s\n",path, argv[0]);	
+	//while(1);
+	if(path == NULL || argv == NULL)
+		return -1;
+//	if((uintptr_t)path < 0x30303040)
+//		return -1;
 	if(exec_type(path) == EXE_ELF)
 	{	
 	//	uintptr_t eip;
 		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
-		
-		sys_open("/dev/tty", 0);
-		sys_open("/dev/tty", 0);
-		
+		if(tmp == 0)
+		{
+			sys_open("/dev/tty0", 0);
+			sys_open("/dev/tty0", 0);
+		}else{
+			sys_open("/dev/tty1", 0);
+			sys_open("/dev/tty1", 0);
+
+		}
+		tmp++;
 		if(load_elf(path, &regs->eip) != 0)
 			goto failure;
 		if(envp != NULL)
@@ -145,17 +156,20 @@ static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int
 
 	//push table (argv) onto stack
 	for(int i = argc; i >= 0; i--)
+	{
 		*stackw-- = (uint32_t)table[i];
-	
+	//	printf("table %x\n", table[i]);
+	}
 	//gcc will not let this be one line
 	*stackw = (uint32_t)stackw + 4;
 	stackw--;
-	*argvnew = (int)table[0];
+	*(uint32_t *)table[0] = (uintptr_t)table[1]; 
+	*argvnew = (uintptr_t)table[0];
 	*stackw-- = (uintptr_t)table[0];
 	*argcnew = argc;
 	//NULL function return value (entry point should not return)
 	*stackw = NULL;
-	
+//	printf("argv = %x\n", *argvnew);	
 //	hex_dump((void *)(PHYS_BASE - 64));
 
 	kfree(table);

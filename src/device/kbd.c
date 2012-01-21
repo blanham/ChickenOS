@@ -1,7 +1,9 @@
+#include <common.h>
 #include <kernel/console.h>
 #include <kernel/hw.h>
 #include <kernel/interrupt.h>
 #include <kernel/memory.h>
+#include <stdio.h>
 uint16_t shifts;
 #define L_CTRL  0x0001
 #define R_CTRL  0x0002
@@ -70,7 +72,7 @@ void kbd_e5(uint8_t c)
 
 
 
-void kbd_intr()//;//struct registers * regs)
+void kbd_intr(struct registers * regs UNUSED)
 {
 	uint8_t c = inb(0x60);
 	switch(c)
@@ -133,7 +135,8 @@ void kbd_intr()//;//struct registers * regs)
 }
 void kbd_init()
 {
-	
+//	for(int i = 0; i < 255; i++)
+//		rbuf[i] = 0;	
 	interrupt_register(0x21, &kbd_intr);
 
 }

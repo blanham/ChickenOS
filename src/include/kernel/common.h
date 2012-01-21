@@ -81,9 +81,9 @@ static inline void panic(char *file, int line,char* msg)
 
 	kernel_halt();
 }
-#define ASSERT(condition, msg) assert(__FILE__, __LINE__,condition, msg)
+#define ASSERT(condition, msg) kassert(__FILE__, __LINE__,condition, msg)
 static inline void
-assert(char *file, int line, bool condition, char *msg)
+kassert(char *file, int line, bool condition, char *msg)
 {
 	console_set_color(RED,WHITE);
 	

@@ -88,6 +88,7 @@ static void elf_load_program(elf_header_t *header, int fd)
 			code = pallocn(pages);
 			sys_read(fd, code, program->ph_filesize);
 			pagedir_insert_pagen(pd, (uintptr_t)code, program->ph_virtaddr, 0x7, pages);
+			printf("insert %i pages\n",pages);
 		}	
 		program++;
 	}

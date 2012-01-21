@@ -14,8 +14,11 @@
 thread_t *kernel_thread;
 
 LIST_HEAD(all_list);
-
+LIST_HEAD(ready_list);
+thread_t *ready = NULL;
+thread_t *all = NULL;
 pid_t pid_allocate();
+//static void thread_set_ready(thread_t *thread);
 
 char *_main_thread_name = "main";
 void thread_init()
@@ -29,12 +32,12 @@ void thread_init()
 //	kernel_thread->sp = (uint8_t *)((uint32_t)kernel_thread + 4096);//0xfeeddEEF;
 	kernel_thread->pd = pagedir_new();
 	kernel_thread->name = _main_thread_name;
-	kernel_thread->status = THREAD_RUNNING;
+	kernel_thread->status = THREAD_READY;
 	kernel_thread->magic = 0xfeedface;
-
-	INIT_LIST_HEAD(&kernel_thread->list);	
-	list_add_tail(&kernel_thread->all_list,&all_list);
-
+	DL_APPEND(all, kernel_thread);
+//	INIT_LIST_HEAD(&kernel_thread->list);	
+	//list_add_tail(&kernel_thread->all_list,&all_list);
+//	thread_set_ready(kernel_thread);
 	tss_init();
 }
 
@@ -52,7 +55,12 @@ void thread_yield()
 	asm volatile("int $32");
 }
 
+/*void thread_set_ready(thread_t *thread UNUSED)
+{
+//	list_add_tail(&thread->ready_list, &ready_list);
 
+
+}*/
 void thread_exit()
 {
 	asm volatile("cli");
@@ -61,9 +69,10 @@ void thread_exit()
 	//which the scheduler uses to get the next process
 	//need to set a value in the thread_t to tell
 	//the scheduler to do this
-	struct list_head *tmp = cur->list.next;
-	list_del(&cur->list);
-	cur->list.next = tmp;
+//	struct list_head *tmp = cur->list.next;
+//	list_del(&cur->list);
+//	cur->list.next = tmp;
+	CDL_DELETE(all, cur);
 	//if we aren't the original kernel thread, free the stack
 	if(cur->pid == 0)
 	{
@@ -115,8 +124,11 @@ void thread_usermode(void)
 	//PHYS_BASE without this pagedir_install
 	pagedir_install(new->pd);
 	
-	INIT_LIST_HEAD(&new->list);
-
+//	INIT_LIST_HEAD(&new->list);
+//	CDL_DELETE(all, cur);
+	all = NULL;
+	new->status = THREAD_READY;
+	CDL_PREPEND(all, new);	
 	asm volatile("mov %%esp, %0":"=m"(cur_esp));
 	
 	//need a macro for this offset calculation?
@@ -176,7 +188,7 @@ thread_create(uint32_t eip, uint32_t esp)
 	//FIXME:pagedir_new should copy all entries from
 	//cur's pd
 	new->pd = pagedir_new();
-	
+	kmemcpy(new->pd, cur->pd, 4096);
 	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
 	
 	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
@@ -186,7 +198,7 @@ thread_create(uint32_t eip, uint32_t esp)
 	new->cur_dir = cur->cur_dir;	
 	new->magic = 0xcafedeed;
 	new->pid = pid_allocate();
-			
+	new->user = (uint8_t *)(PHYS_BASE - 0x1000);	
 	reg_frame = (void *)(kernel_stack + 4096);
 	reg_frame--;
 
@@ -208,9 +220,11 @@ thread_create(uint32_t eip, uint32_t esp)
 		
 	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4));
 		
-	list_add_tail(&new->all_list,&all_list);
-	list_add_tail(&new->list,&cur->list);
-	
+//	list_add_tail(&new->all_list,&all_list);
+//	list_add_tail(&new->list,&cur->list);
+	CDL_PREPEND(all, new);
+	new->status = THREAD_READY;
+//	thread_set_ready(new);	
 //	interrupt_set(old_level);	
 	return new;//new->pid;	
 
@@ -234,8 +248,8 @@ pid_t pid_allocate()
 }
 int sys_kill(int pid, int sig)
 {
-	thread_t * p;
-	list_for_each_entry(p, &all_list, all_list)
+	thread_t * p = NULL;
+	//list_for_each_entry(p, &all_list, all_list)
 	{
 		if(p->pid == pid)
 		{

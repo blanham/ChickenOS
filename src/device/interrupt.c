@@ -28,6 +28,7 @@ void pic_send_end(int irq);
 
 static void void_handler(struct registers *regs)
 {
+	printf("void\n");
 	if(regs->int_no < NUM_ISRS)
 		printf("unhandled interrupt %i\n", regs->int_no);
 	else if(regs->int_no - NUM_ISRS != 7)//ignore bochs spurrious interrupt
@@ -67,7 +68,7 @@ void interrupt_register(int irq, intr_handler *handler)
 	intr_handlers[irq] = handler;
 	
 	if(irq > NUM_ISRS && irq < NUM_ISRS + NUM_IRQS)
-		pic_unmask(irq-20);
+		pic_unmask(irq-0x20);
 }
 
 void interrupt_handler(struct registers *regs)
@@ -78,7 +79,7 @@ void interrupt_handler(struct registers *regs)
 		pic_send_end(regs->int_no - NUM_ISRS);
 
 	if(handler){
-		handler(regs); 
+		handler(regs);
 	} else {
 		printf("something wrong in interrupt.c\n");
 	}

@@ -27,7 +27,7 @@ MEMSRCS = 		mm/gdt.o mm/liballoc.o mm/liballoc_funcs.o\
 				mm/paging.o mm/palloc.o mm/vm.o
 DEVSRCS	=		device/intr-core.o\
 				device/console.o device/hw.o device/kbd.o\
-				device/timer.o device/serial.o
+				device/timer.o device/serial.o device/ata.o
 THREAD	=		thread/thread.o thread/syscall.o thread/scheduler.o\
 				thread/tss.o thread/fork.o thread/exec.o thread/load_elf.o sh.o
 				#have to have interrupt.o here at the moment 
@@ -42,7 +42,7 @@ lib: $(LIBSRCS)
 
 test: all
 	cd .. && ./update_image.sh && qemu -rtc base=localtime \
-	-m 512 -fda ./floppy.img && cd src
+	-m 512 -fda ./floppy.img -hda hd.img -boot a && cd src
 
 debug: all
 	cd .. && ./update_image.sh && qemu -rtc base=localtime -s -S -m 512 -fda \

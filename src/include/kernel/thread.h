@@ -4,7 +4,7 @@
 #include <kernel/interrupt.h>
 #include <kernel/vm.h>
 #include <fs/vfs.h>
-
+#include <util/utlist.h>
 enum thread_stat {THREAD_DEAD, THREAD_READY, THREAD_RUNNING, THREAD_BLOCKED};
 //is this the right place for this?
 typedef unsigned short pid_t;
@@ -13,8 +13,11 @@ typedef struct thread {
 	pid_t pid;
 	pid_t parent;
 	char *name;
-	struct list_head list;
-	struct list_head all_list;
+//	struct list_head list;
+//	struct list_head ready_list;
+//	struct list_head all_list;
+	struct thread *ready_prev, *ready_next;
+	struct thread *prev, *next;
 	//fs stuff
 	struct file *cur_dir;
 	int fd;
@@ -23,6 +26,7 @@ typedef struct thread {
 	uint8_t *sp;
 	//saved user stack
 	uint8_t *usersp;
+	uint8_t *user;
 	//location of brk
 	void * brk;
 	//signal stuff

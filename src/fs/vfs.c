@@ -48,10 +48,12 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	
 	if((tok = (char *)strtok_r(path, "/", &saveptr)) == NULL)
 		return NULL;
-	
+		
 	if((res = vfs_namei(res, tok)) == NULL)
 	{
 		printf("dir search or insert broken\n");
+		printf("path %s\n",path);
+		while(1);
 		return NULL;
 	}
 
