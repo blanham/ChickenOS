@@ -73,9 +73,9 @@ static void stack_fault(struct registers * regs)
 }
 static void page_fault(struct registers * regs)
 {
-	void *faulting_addr;
+	uintptr_t faulting_addr, new_page;
 	uint32_t error_code = regs->err_code;
-
+	thread_t *cur = thread_current();
 	bool is_user, is_write, not_present;	
 		
 	is_user = ((PAGE_USER & error_code) ? TRUE : FALSE);
@@ -113,8 +113,16 @@ static void page_fault(struct registers * regs)
 		printf("\n");
 		PANIC("Page fault in kernel space!");
 	}else {
+		//
+		if(faulting_addr + 0x1000 > (uintptr_t)cur->user)
+		{
+			cur->user -=0x1000;
+			new_page = (uintptr_t)palloc();
+			pagedir_insert_page(cur->pd, new_page, (uintptr_t)cur->user, 0x7);
+			return;
+
+		} 
 		//kill process
-	//	console_set_color(RED, WHITE);
 		printf("SIGSEGV @ %X\n", faulting_addr);	
 		printf("REGS:\n");
 		dump_regs(regs);

@@ -21,7 +21,7 @@ void tss_init(void)
 void
 tss_update(uint32_t esp)
 {
-	if(esp == 0)
-		esp = (uintptr_t)((uintptr_t)thread_current() + 4096);
+	//if(esp == 0)
+	//	esp = (uintptr_t)((uintptr_t)thread_current() + 4096);
 	tss.esp0 = esp;
 }

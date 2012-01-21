@@ -89,6 +89,7 @@ sysc:
 [GLOBAL intr_return]
 [extern interrupt_handler]
 _isr_handler:
+	sti	;reenable interrupts
 	push gs
 	push fs
 	push es

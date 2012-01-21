@@ -51,6 +51,7 @@ void kmain(uint32_t mbd, uint32_t magic)
 	console_set_color(BLUE,WHITE);
 	console_puts(BOOT_MSG);
 	
+	kbd_init();
 	time_init();
 	syscall_init();
 	thread_init();
@@ -62,8 +63,9 @@ void kmain(uint32_t mbd, uint32_t magic)
 		vfs_init();
 		//need to move this back to console.c	
 		console_fs_init();
-	
-		vfs_mount_root(INITRD_DEV, "ext2");
+		extern void ata_init();
+		ata_init();	
+		vfs_mount_root(ATA0_0_DEV, "ext2");
 	}
 
 	thread_usermode();
@@ -74,6 +76,7 @@ void kmain(uint32_t mbd, uint32_t magic)
 		execv("/init", argv);
 		PANIC("execv(init) failed!");	
 	}
+
 	//only works because initial threads name is "main"
 	strcpy(thread_current()->name, "idle");
 	while(1)

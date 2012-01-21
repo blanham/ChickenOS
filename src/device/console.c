@@ -142,7 +142,7 @@ char console_getc()
 	return kbd_getc();
 }
 
-char tty_getc(console_t *con)
+char tty_getc(console_t *con UNUSED)
 {
 	while(console != con);
 			
@@ -167,21 +167,19 @@ void console_switch(int num)
 char *test = "testing\n";
 size_t console_read(uint16_t dev UNUSED, void *_buf, off_t off UNUSED, size_t count)
 {
-//	char *buf = _buf;
-//	size_t read = count;
-//	int tty = MINOR(dev);
-//	printf("console read\n");
-	static int i = 0;
-	i++;
-//	if(i == 30)
-//		while(1);
-	kmemcpy(_buf, test, 7);
+	char *buf = _buf;
+	size_t read = 0;
+	int tty = MINOR(dev);
 	while(count--)
 	{
-	//	*buf++ = tty_getc(consoles[tty]);
+		read++;
+		*buf++ = tty_getc(consoles[tty]);
+		tty_putc(consoles[tty],*(buf-1));
+		if(*(buf - 1) == '\n')
+			break;
 	}
 	
-	return 0;//read;
+	return read;
 }
 
 size_t console_write(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)

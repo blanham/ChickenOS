@@ -26,7 +26,7 @@ pagedir_t pagedir_new()
 	uint8_t *new_pt;
 	uint32_t cur;
 	
-	for(int i = 768; i < 1024; i++)
+	for(int i = 0; i < 1024; i++)
 	{
 		if((kernel_pd[i] & PTE_PRESENT) != 0)
 		{

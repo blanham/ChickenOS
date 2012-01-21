@@ -82,12 +82,12 @@ int sys_chdir(const char *path)
 
 int sys_dup(int oldfd UNUSED)
 {
-	return ENOSYS;
+	return -1;//ENOSYS;
 }
 
 int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
 {
-	return ENOSYS;
+	return -1;//ENOSYS;
 }
 
 int sys_ioctl(int fildes, int request, ...)

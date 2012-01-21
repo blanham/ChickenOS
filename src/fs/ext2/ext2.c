@@ -160,9 +160,9 @@ struct inode * ext2_namei(struct inode *dir, char *file)
 //	ext2_read(&test, dir, 4096, 0);
 	while(count)
 	{
-	//	print_dir_entry(ext2_dir);
+		//print_dir_entry(ext2_dir);
 
-		if(!strcmp(ext2_dir->name,file))//,strlen(file)))
+		if(!strncmp(ext2_dir->name,file,strlen(file)-1))
 		{
 			kfree(fdir);
 			return ext2_load_inode(fs,ext2_dir->inode); 
