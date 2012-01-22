@@ -65,15 +65,14 @@ struct partition_entry {
 } __attribute__((packed));
 void print_partition_entry(struct partition_entry *entry)
 {
-	printf("bootable %i start head %i start sector %i\n",
-		entry->bootable, entry->start_head, entry->start_sector);
+	printf("bootable %i start head %i start sector %x total sectors %i type %X\n",
+		entry->bootable, entry->start_head, entry->rel_sector, entry->total_sectors*512,entry->system_id);
 
 }
 
 struct mbr {
 	uint8_t code[436];
 	uint8_t disk[10];
-//	uint8_t parttable[64];
 	struct partition_entry partitions[4];
 	uint8_t signature[2];
 
@@ -98,12 +97,16 @@ size_t ata_sector_read(void *buf, unsigned long long lba, uint32_t count UNUSED)
 
 	return 0;
 }
-size_t ata_read(uint16_t dev, void *_buf UNUSED, off_t off UNUSED, size_t count UNUSED)
+size_t ata_read_block(uint16_t dev, void *_buf, uint32_t block_num)
 {
-	uint8_t part = MINOR(dev);
-	printf("trying to read from device %i partiton %i\n",part/64, part);
+	uint8_t part = MINOR(dev) - 1;
+	uint8_t drive_num = part/64;
+	struct ata_drive *drive = &drives[drive_num];
+	struct partition_entry *parti = &drive->mbr->partitions[part];
+	//printf("read block %i\n",block_num);
+	ata_sector_read(_buf,parti->rel_sector + block_num, 0);
 	
-	return -1;
+	return 512;
 }
 size_t ata_write(uint16_t dev UNUSED, void *_buf UNUSED, off_t off UNUSED, size_t count UNUSED)
 {
@@ -114,9 +117,10 @@ int ata_ioctl(uint16_t dev UNUSED, int request UNUSED, va_list args UNUSED)
 {
 	return -1;
 }
-/*void ata_intr(struct registers * regs UNUSED)
+void ata_intr(struct registers * regs UNUSED)
 {
-}*/
+	printf("ata interrupt\n");
+}
 void ata_detect()
 {
 	inb(ATA_CTRL);
@@ -124,7 +128,7 @@ void ata_detect()
 	inb(ATA_CTRL);
 	inb(ATA_CTRL);
 }
-void ata_identify()
+void ata_identify(int drive)
 {
 	uint16_t *data = kcalloc(256, 2);
 	outb(0x1f6, 0xA0);
@@ -164,16 +168,19 @@ void ata_identify()
 	uint32_t logical = *(uint32_t *)&data[117];	
 	uint32_t log = *(uint32_t *)&data[60];	
 	printf("size %i\n",logical*log);
+	drives[drive].io_base = 0x1f0;
+	struct mbr *mbr = kcalloc(sizeof(struct mbr),1);
+	ata_sector_read(mbr, 0, 1);
+	printf("SIG %X %X\n",mbr->signature[0], mbr->signature[1]);
+	drives[drive].mbr = mbr;
+	print_partition_entry(&mbr->partitions[0]);
+	
 }
 void ata_init()
 {
-	device_register(FILE_BLOCK, 0x300, ata_read, ata_write, ata_ioctl);
-	struct mbr *mbr = kcalloc(sizeof(struct mbr),1);
-	ata_identify();
-	ata_sector_read(mbr, 0, 1);
-	printf("SIG %X %X\n",mbr->signature[0], mbr->signature[1]);
+	device_register(FILE_BLOCK, 0x300, ata_read_block, ata_write, ata_ioctl);
+	ata_identify(0);
 	printf("test %i\n",sizeof(struct partition_entry));
-	print_partition_entry(&mbr->partitions[0]);
 
-//interrupt_register(0x21, &ata_intr);
+	interrupt_register(0x2E, &ata_intr);
 }
