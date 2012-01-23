@@ -15,6 +15,7 @@ void console_set_color(uint8_t bg_color, uint8_t fg_color);
 void console_putc(uint8_t c);
 int console_puts(char *string);
 void console_switch(int num);
+void serial_putc(char c);
 char kbd_getc();
 void kbd_init();
 #endif
