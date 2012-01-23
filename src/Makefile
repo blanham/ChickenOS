@@ -41,8 +41,8 @@ all: $(SOURCES) link
 lib: $(LIBSRCS)
 
 test: all
-	cd .. && ./update_image.sh && qemu -rtc base=localtime \
-	-m 512 -fda ./floppy.img -hda hd.img -boot a && cd src
+	cd .. && ./new_update.sh && qemu -rtc base=localtime \
+	-m 512 -hda disk.img -serial file:log && cd src
 
 debug: all
 	cd .. && ./update_image.sh && qemu -rtc base=localtime -s -S -m 512 -fda \
