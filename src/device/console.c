@@ -91,6 +91,7 @@ void tty_putc(console_t *con, uint8_t c)
 void console_putc(uint8_t c)
 {
 	tty_putc(console, c);
+	serial_putc(c);
 }
 
 int console_puts(char *string)

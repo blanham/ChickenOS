@@ -27,7 +27,22 @@ void modules_init(struct multiboot_info *mb)
 		initrd_init(P2V(start),P2V(end));
 	}
 }
+struct vbe_controller_info{
+	uint8_t signature[4];
+	uint16_t version;
+	uintptr_t oem_string;
+	uint8_t capabilities[4];
+	uintptr_t videomodes;
+	uint16_t memory;
+};
+void vga_init(struct multiboot_info *mb)
+{
+	struct vbe_controller_info *info = (void *)P2V(mb->vbe_control_info);
+	printf("location3: %X\n",info);
+	printf("%s\n",(info->signature));	
+	printf("Modes %s\n",P2V(info->videomodes));
 
+}
 void kmain(uint32_t mbd, uint32_t magic)
 {
 	struct multiboot_info *mb = 0;
@@ -43,6 +58,7 @@ void kmain(uint32_t mbd, uint32_t magic)
 	interrupt_init();
 	vm_init(mb);
 	console_init();
+	vga_init(mb);
 	paging_init();
 
 	//we start out with one color scheme
@@ -50,16 +66,20 @@ void kmain(uint32_t mbd, uint32_t magic)
 	//console working
 	console_set_color(BLUE,WHITE);
 	console_puts(BOOT_MSG);
-	
+	printf("TEST %x\n",(mb->vbe_mode));
+//	while(1);
 	kbd_init();
+	extern void serial_init();
+	serial_init();
 	time_init();
 	syscall_init();
 	thread_init();
+//	printf("test %x\n",*(uint16_t *)P2V(0x404));
 //	print_mb((uint32_t)mbd, magic);
 
 	if(1)
 	{
-		modules_init(mb);	
+	//	modules_init(mb);	
 		vfs_init();
 		//need to move this back to console.c	
 		console_fs_init();

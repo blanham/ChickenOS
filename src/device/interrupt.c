@@ -28,11 +28,10 @@ void pic_send_end(int irq);
 
 static void void_handler(struct registers *regs)
 {
-	printf("void\n");
 	if(regs->int_no < NUM_ISRS)
 		printf("unhandled interrupt %i\n", regs->int_no);
 	else if(regs->int_no - NUM_ISRS != 7)//ignore bochs spurrious interrupt
-		printf("unhandled irq %i\n",regs->int_no - NUM_ISRS);
+		{}//printf("unhandled irq %i\n",regs->int_no - NUM_ISRS);
 }
 
 void idt_init()
