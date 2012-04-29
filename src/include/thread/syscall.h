@@ -41,6 +41,7 @@ enum { SYS_EXIT = 1, SYS_FORK, SYS_READ, SYS_WRITE, SYS_OPEN, SYS_CLOSE, SYS_WAI
 
 void syscall_init();
 int fork();
+int dummy();
 int get_pid();
 int uputs(char *str);
 #endif
