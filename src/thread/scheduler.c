@@ -51,15 +51,26 @@ void signal(registers_t *regs, thread_t *next)
 		next->regs->useresp = (uintptr_t)next->usersp; 
 	}
 }
+	extern uint32_t GUARD;
 void thread_scheduler(registers_t *regs)
 {
 	uint32_t _esp = 0xfeedface;
 	thread_t *cur, *next;
-
+	//printf("asfasdf\n");
+	return;
+	next = NULL;
 	cur = thread_current();
 	CDL_SEARCH_SCALAR(cur, next, status, THREAD_READY);
+
 	next = cur->next;
+	if((uintptr_t)next < (uintptr_t)PHYS_BASE)
+		next = cur;
+	//i believe that signals go here:
+	//if(next->signal_pending != 0)
+	//signal(regs, next);
 	//printf("next pid %i\n",next->pid);
+//	dump_regs(regs);
+//	printf("%X %X %X %X %X\n", cur->next, cur->sp, regs->ESP, regs, next->sp);
 	cur->sp = (uint8_t *)regs->ESP;
 	cur->regs = regs;
 	_esp = (uint32_t)next->sp;
