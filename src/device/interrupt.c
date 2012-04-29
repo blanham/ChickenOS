@@ -17,7 +17,7 @@ idt_entry_t idt_table[NUM_INTRS];
 idt_ptr_t	idt_ptr;
 intr_handler *intr_handlers[NUM_INTRS];
 static enum intr_status interrupt_status;
-
+void *idt_pointer;
 extern void syscall_isr();
 //extern void idt_flush(uint32_t);
 static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags);
@@ -31,7 +31,7 @@ static void void_handler(struct registers *regs)
 	if(regs->int_no < NUM_ISRS)
 		printf("unhandled interrupt %i\n", regs->int_no);
 	else if(regs->int_no - NUM_ISRS != 7)//ignore bochs spurrious interrupt
-		{}//printf("unhandled irq %i\n",regs->int_no - NUM_ISRS);
+	printf("unhandled irq %i\n",regs->int_no - NUM_ISRS);
 }
 
 void idt_init()
@@ -48,7 +48,7 @@ void interrupt_init()
 	
 	idt_init();
 	pic_init();
-
+	idt_pointer = (void *)&idt_table;
 	for(int i = 0; i < NUM_ISRS + NUM_IRQS; i++)
 		idt_build_entry(&idt_table[i], (uint32_t)isrs[i], 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
 	
@@ -58,7 +58,6 @@ void interrupt_init()
 	/* needs to be in a seperate function or something */
 	extern void sysc();	
 	idt_build_entry(&idt_table[0x80], (uint32_t)sysc, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
-
 	asm volatile ("lidt (%0)" :: "r"((uintptr_t)&idt_ptr) );
 }
 
@@ -72,16 +71,19 @@ void interrupt_register(int irq, intr_handler *handler)
 
 void interrupt_handler(struct registers *regs)
 {
-	intr_handler *handler = intr_handlers[regs->int_no];
-	
-	if(regs->int_no >= NUM_ISRS)
-		pic_send_end(regs->int_no - NUM_ISRS);
+	int irq = regs->int_no;
+	intr_handler *handler = intr_handlers[irq];
+//	if(irq > 32 && irq < 32+32)
+	//	printf("irq %i\n",irq-32);
+
 
 	if(handler){
 		handler(regs);
 	} else {
 		printf("something wrong in interrupt.c\n");
 	}
+	if(regs->int_no >= NUM_ISRS)
+		pic_send_end(regs->int_no - NUM_ISRS);
 }
 
 void dump_regs(struct registers *regs)
