@@ -36,10 +36,12 @@ int execv(const char *path, char * const argv[])
 	return SYSCALL_3N(SYS_EXECVE, path, argv, NULL);
 }
 
+extern void send_packet();
 int sys_dummy()
 {
 //	PANIC("YAY!");
-	printf("dummy syscall\n");
+	send_packet();
+//	printf("dummy syscall\n");
 	return 0xcafebabe;	
 }
 
@@ -138,6 +140,10 @@ void syscall_handler (struct registers *regs)
 			break;
 		case 200:
 			thread_scheduler(regs);
+			break;
+		case SYS_DUMMY:
+
+			regs->eax = sys_dummy();
 			break;	
 		default:
 			printf("undefined system call %i!\n",call);
