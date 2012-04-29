@@ -7,6 +7,7 @@
  */
 #include <common.h>
 #include <kernel/vm.h>
+#include <kernel/hw.h>
 #include <kernel/console.h>
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
@@ -17,6 +18,7 @@ extern uint32_t end;
 static void gpf(struct registers *regs);
 static void page_fault(struct registers * regs);
 static void stack_fault(struct registers * regs);
+static void double_fault(struct registers * regs);
 
 void vm_init(struct multiboot_info *mb)
 {
@@ -43,6 +45,7 @@ void vm_init(struct multiboot_info *mb)
 	
 	paging_init();	
 	
+	interrupt_register(8, &double_fault);
 	interrupt_register(12, &stack_fault);
 	interrupt_register(13, &gpf);
 	interrupt_register(14, &page_fault);
@@ -57,9 +60,20 @@ static void gpf(struct registers *regs)
 	dump_regs(regs);
 	//triggers debugger in BOCHS
 	asm volatile("xchg %bx, %bx");
+	interrupt_disable();
 	PANIC("GENERAL PROTECTION FAULT!");
 }
+static void double_fault(struct registers * regs)
+{
+	uint32_t error_code = regs->err_code;
+	printf("Error %x\n",error_code);
+	dump_regs(regs);
+	//triggers debugger in BOCHS
+	asm volatile("xchg %bx, %bx");
+	PANIC("DOUBLE FAULT!");
 
+
+}
 static void stack_fault(struct registers * regs)
 {
 	uint32_t error_code = regs->err_code;
@@ -76,8 +90,9 @@ static void page_fault(struct registers * regs)
 	uintptr_t faulting_addr, new_page;
 	uint32_t error_code = regs->err_code;
 	thread_t *cur = thread_current();
-	bool is_user, is_write, not_present;	
-		
+	bool is_user, is_write, not_present;
+	interrupt_disable();
+
 	is_user = ((PAGE_USER & error_code) ? TRUE : FALSE);
 	is_write = ((PAGE_WRITE & error_code) ? TRUE : FALSE);
 	not_present = ((PAGE_VIOLATION & error_code) ? FALSE : TRUE);
