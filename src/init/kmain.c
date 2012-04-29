@@ -4,11 +4,13 @@
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
 #include <kernel/memory.h>
+#include <device/pci.h>
 #include <kernel/timer.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 #include <kernel/fs/vfs.h>
 #include <kernel/fs/initrd.h>
+#include <net/net_core.h>
 #include <stdio.h>
 #include <string.h>
 #include <thread/syscall.h>
@@ -58,26 +60,27 @@ void kmain(uint32_t mbd, uint32_t magic)
 	interrupt_init();
 	vm_init(mb);
 	console_init();
-	vga_init(mb);
+//	vga_init(mb);
+	
 	paging_init();
-
 	//we start out with one color scheme
 	//but this will be changed if i ever get a framebuffer
 	//console working
 	console_set_color(BLUE,WHITE);
 	console_puts(BOOT_MSG);
-	printf("TEST %x\n",(mb->vbe_mode));
+	pci_init();
+//	printf("TEST %x\n",(mb->vbe_mode));
 //	while(1);
 	kbd_init();
 	extern void serial_init();
 	serial_init();
 	time_init();
 	syscall_init();
+	network_init();
 	thread_init();
 //	printf("test %x\n",*(uint16_t *)P2V(0x404));
 //	print_mb((uint32_t)mbd, magic);
-
-	if(1)
+	if(0)
 	{
 	//	modules_init(mb);	
 		vfs_init();
@@ -87,20 +90,31 @@ void kmain(uint32_t mbd, uint32_t magic)
 		ata_init();	
 		vfs_mount_root(ATA0_0_DEV, "ext2");
 	}
-
 	thread_usermode();
+	while(1);
+	dummy();
+	dummy();
+	dummy();
+	dummy();
 	
-	char *argv[] = {"-l", "foo", "bar", NULL};	
+	while(1);
+
+//	char *argv[] = {"-l", "foo", "bar", NULL};	
 	if(!fork() )
 	{
-		execv("/init", argv);
+	//	while(1)
+	//	execv("/init", argv);
 		PANIC("execv(init) failed!");	
 	}
 
 	//only works because initial threads name is "main"
 	strcpy(thread_current()->name, "idle");
-	while(1)
-		;
+	while(1) {
+	//	if((inb(0x3037) & 0x1) == 0)	
+		//	printf("packet\n");
+
+
+	}
 
 	//should never return, unless things get really fucked
 	PANIC("kmain returned");
