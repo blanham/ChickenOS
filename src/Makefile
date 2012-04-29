@@ -25,25 +25,30 @@ FSSRCS	=		$(VFS) $(EXT2)
 
 MEMSRCS = 		mm/gdt.o mm/liballoc.o mm/liballoc_funcs.o\
 				mm/paging.o mm/palloc.o mm/vm.o
+
+NETSRCS =		net/net_core.o net/arp.o net/dhcp.o net/ethernet.o net/ip.o\
+				net/udp.o \
+				device/net/pcnet.o device/net/ne2000.o device/net/rtl8139.o
+
 DEVSRCS	=		device/intr-core.o\
 				device/console.o device/hw.o device/kbd.o\
-				device/timer.o device/serial.o device/ata.o
+				device/timer.o device/serial.o device/ata.o\
+				device/pci.o
 THREAD	=		thread/thread.o thread/syscall.o thread/scheduler.o\
 				thread/tss.o thread/fork.o thread/exec.o thread/load_elf.o sh.o
 				#have to have interrupt.o here at the moment 
 CORE	=		init/kmain.o init/loader.o device/interrupt.o
 				
-SOURCES	=		$(CORE) $(THREAD) $(DEVSRCS) $(MEMSRCS) \
+SOURCES	=		$(CORE) $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
 				$(FSSRCS) $(KLIBSRCS)
 
 all: $(SOURCES) link
-
+	cp kernel.bin /tftpboot/chicken
 lib: $(LIBSRCS)
 
 test: all
-	cd .. && ./new_update.sh && qemu -rtc base=localtime \
-	-m 512 -hda disk.img -serial file:log && cd src
-
+	cd .. && ./new_update.sh &&  qemu -rtc base=localtime \
+	-m 64 -hda disk.img -serial file:log -net nic,vlan=0,model=pcnet -net tap,vlan=0,ifname=tap0,script=no  && cd src 
 debug: all
 	cd .. && ./update_image.sh && qemu -rtc base=localtime -s -S -m 512 -fda \
 	./floppy.img && cd src
