@@ -28,6 +28,7 @@ struct pcnet_init {
 struct pcnet {
 	struct pci_device *pci;
 	struct pci_conf_hdr *pci_hdr;
+	struct network_dev *dev;
 	uint16_t io_base;
 	uint8_t *mem_base;
 	uint8_t  mac[6];

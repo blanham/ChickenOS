@@ -1,3 +1,8 @@
+/*	ChickenOS AMD-PCNET Network Card Driver
+ *	Broken in Virtualbox at the moment
+ *
+ */
+
 #include <stdio.h>
 #include <mm/liballoc.h>
 #include <device/net/pcnet.h>
@@ -111,29 +116,32 @@ void pcnet_resetl(struct pcnet *l)
 
 size_t pcnet_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 {
+	dev =dev;
 	struct pcnet *l = dev->device;
-	
+//	interrupt_disable();	
 	kmemcpy(l->tx_buffers[l->cur_tx], _buf, length);
 	l->tx_descs[l->cur_tx].addr = (uintptr_t)V2P(l->tx_buffers[l->cur_tx]);
 	l->tx_descs[l->cur_tx].flags2 = 0;
 	l->tx_descs[l->cur_tx].status |= 0x8300;
 	l->tx_descs[l->cur_tx].len =  -length;
+//	printf("%p, io %x %x\n",l, &l->io_base, l->tx_descs[l->cur_tx].addr);
 	uint16_t csr = pcnet_csr_inl(l, 0);
 	pcnet_csr_outl(l, 0, csr | 8);
 	l->cur_tx++;
 	if(l->cur_tx == 8)
 		l->cur_tx = 0;
 
+//	interrupt_enable();	
 	return length;
 }
 struct network_dev *temp_net;
 void send_packet()//truct rtl8139 *rtl)
 {
-	uint8_t *test = kmalloc(60);
-	kmemcpy(test, packet, 60);
-	kmemcpy(&test[6], global->mac,6);
-	pcnet_send(temp_net, (uint8_t*)test, 60);
-	kfree(test);
+	//uint8_t *test = kmalloc(60);
+//	kmemcpy(test, packet, 60);
+//	kmemcpy(&test[6], global->mac,6);
+//	pcnet_send(temp_net, (uint8_t*)test, 60);
+//	kfree(test);
 }
 
 void pcnet_dumpregs(struct pcnet *l)
@@ -157,23 +165,20 @@ void pcnet_getmac(struct pcnet *l, char *mac)
 
 void pcnet_receive(struct pcnet *l)
 {
+	size_t len;
+	uint8_t *buf;
+	struct sockbuf *sb;
 	while((l->rx_descs[l->cur_rx].status & 0x8000) == 0)
 	{
 		if(!(l->rx_descs[l->cur_rx].status & 0x4000) &&
 			(l->rx_descs[l->cur_rx].status & 0x0300) == 0x0300)
 		{
-			size_t len = l->rx_descs[l->cur_rx].flags2 & 0xFFFF;
-			uint8_t *buf = l->rx_buffers[l->cur_rx];
-			for(unsigned int i = 0; i < len; i++)
-			{
+			len = l->rx_descs[l->cur_rx].flags2 & 0xFFFF;
+			buf = l->rx_buffers[l->cur_rx];
+			sb = sockbuf_alloc(l->dev, len);
+			kmemcpy(sb->data, buf, len);
+			network_received(sb);
 
-				printf("%x:",buf[i]);
-				if(i % 16 == 15)
-					printf("\n");
-
-
-			}
-		while(1);
 
 		}	
 		l->rx_descs[l->cur_rx].addr = V2P(l->rx_buffers[l->cur_rx]);
@@ -202,12 +207,12 @@ void pcnet_handler(void *aux)
 		return;
 	}
 	if(csr & 0x0200){
-		printf("Tx finished \n");
+	//	printf("Tx finished \n");
 
 	}else if(csr & 0x0400){
 		if(csr & 0x8000)
 			printf("error: ");
-		printf("rx packet\n");
+//		printf("rx packet\n");
 
 		pcnet_receive(l);
 
@@ -241,7 +246,7 @@ void pcnet_start2(struct pcnet *l)
 	//4)enable 32bit mode
 	pcnet_outl(l, 20, 0);
 //	pcnet_bcr_outl(l, 20, 0x0102);
-	pcnet_bcr_outl(l, 20, 0x0002);
+	pcnet_bcr_outl(l, 20, 0x0102);
 
 	pcnet_getmac(l, (char *)&mac);
 	kmemcpy(global->mac, mac, 6);
@@ -251,8 +256,8 @@ void pcnet_start2(struct pcnet *l)
 	pcnet_csr_outl(l, 0, 4);
 
 	//6) setup descriptor table
-	l->rx_descs = kcalloc(sizeof(struct pcnet_desc),8);
-	l->tx_descs = kcalloc(sizeof(struct pcnet_desc),8);
+	l->rx_descs = pallocn(4);//(void *)((uintptr_t)kcalloc(sizeof(struct pcnet_desc)+16,8) & ~0xf);
+	l->tx_descs = pallocn(4);//(void *)((uintptr_t)kcalloc(sizeof(struct pcnet_desc)+16,8) & ~0xf);
 	l->cur_rx = 0;
 	l->cur_tx = 0;
 	//7) fill table, flags2 in tx, and flags/2 in rx = 0, taken care of by calloc
@@ -297,8 +302,8 @@ void pcnet_start2(struct pcnet *l)
 			break;
 
 	}
-	pcnet_csr_outl(l, 0, 0x2);
-	pcnet_csr_outl(l, 0, 0x40);
+//	pcnet_csr_outl(l, 0, 0x2);
+	pcnet_csr_outl(l, 0, 0x42);
 	pcnet_dumpregs(l);
 	val = pcnet_csr_inl(l, 4);
 	pcnet_csr_outl(l, 4, val | 0xC00);
@@ -310,6 +315,7 @@ struct network_dev * pcnet_init()
 	global = l;
 	temp_net = device;
 	device->device = l;
+	l->dev = device;
 	l->pci = pci_get_device(AMD_VEND, PCNET_DEV);
 //	l->rcv_buffer = kmalloc((8192*8)+16+1500);
 //	l->tx_buffers = (void *)P2V(0x3380000);//kmalloc((8192+16+1500)*4);
@@ -328,8 +334,8 @@ struct network_dev * pcnet_init()
 //	pci_reg_outw(l->pci, 4, out|4|1);
 		pcnet_start2(l);
 	//	pcnet_dumpregs(l);
-	//	pcnet_getmac(l,(char *)&device->mac);
-	//	print_mac((char *)l->mac);
+		pcnet_getmac(l,(char *)&device->mac);
+		print_mac((char *)l->mac);
 		device->send = pcnet_send;
 		//device->receive = pcnet_receive;
 

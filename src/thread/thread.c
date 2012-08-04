@@ -13,8 +13,8 @@
 
 thread_t *kernel_thread;
 
-LIST_HEAD(all_list);
-LIST_HEAD(ready_list);
+//LIST_HEAD(all_list);
+//LIST_HEAD(ready_list);
 thread_t *ready = NULL;
 thread_t *all = NULL;
 pid_t pid_allocate();

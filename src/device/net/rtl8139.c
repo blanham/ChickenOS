@@ -9,11 +9,53 @@
 #include "rtl8139.h"
 
 struct rtl8139 *global;
-void rtl_handler(struct registers *regs)
+#define RX_BUF_LEN 8192
+#define RX_BUF_PAD 16
+void rtl_receive(struct rtl8139 *rtl)
 {
-	regs = regs;
-	struct rtl8139 *rtl = global;
-	uint16_t irq = rtl_inw(global, ISR);
+	uint16_t status, len;
+	int16_t offset;
+	struct sockbuf *sb;
+	while(!(rtl_inw(rtl, CMD) & 0x1))
+	{
+		//now check the rx_status from the packet
+		status = *(uint16_t *)(rtl->rx_buffer + rtl->rx_offset);
+		len = *(uint16_t *)(rtl->rx_buffer + rtl->rx_offset + 2);
+		if(status & 0x1)
+		{
+		//	printf("received packet! status %X len %X\n", status, len);
+			//need to have function that allocates this for us
+			sb = sockbuf_alloc(rtl->dev,len);
+			if(sb == NULL)
+			{
+				printf("out of memory error in %s\n",__func__);
+				break;
+			}
+			//have to account for wrapping the buffer
+			offset = rtl->rx_offset + 4 + len - RX_BUF_LEN;
+
+			if(offset < 0)
+				offset = 0;
+			kmemcpy(sb->data, rtl->rx_buffer + rtl->rx_offset + 4, len - offset);
+			//uintptr_t off2 = len - offset;
+			kmemcpy(sb->data + (len - offset), rtl->rx_buffer, offset);
+			network_received(sb); 
+			
+		}else{
+
+			printf("receive error\n");
+		}
+		rtl->rx_offset = ((rtl->rx_offset + 3 + 4 + len) & ~3) % RX_BUF_LEN;
+		rtl_outw(rtl, 0x38, rtl->rx_offset -16);//set receive pointer
+	}
+
+
+}
+
+void rtl_handler(void *aux)
+{
+	struct rtl8139 *rtl = aux;
+	uint16_t irq = rtl_inw(rtl, ISR);
 	if(irq & 0x20){
 		rtl_outw(rtl, ISR, 0x20);
 	}
@@ -23,19 +65,14 @@ void rtl_handler(struct registers *regs)
 	}
 	if(irq & 0x4){
 		rtl_outw(rtl, ISR, 0x4);
-		printf("tx\n");
+		//printf("tx\n");
 	}
 
 	if(irq & 0x1)
 	{	
-		for(int i = 0; i < 0x100; i++)
-		{
-	//		printf("%c:",*(char *)(rtl->rcv_buffer + i) & 0xff) ;
-		//	if(i % 32 == 31)
-		//		printf("\n");
-		}
+		
+		rtl_receive(rtl);
 
-	//	printf("received packet!\n");
 		rtl_outw(rtl, ISR, 0x1);
 	}
 }
@@ -56,10 +93,6 @@ char lpacket[] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 0x00, 0x00, 0x00, 0x00 };
 
-void testsend_packet()//truct rtl8139 *rtl)
-{
-
-}
 
 size_t rtl8139_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 {
@@ -69,9 +102,12 @@ size_t rtl8139_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 	length = length;
 	
 	void* tx_buffer = (void *)(rtl->tx_buffers + 8192*rtl->tx_cur);
+	kmemset(tx_buffer, 0, (length <60) ? 60 : length);
 	kmemcpy(tx_buffer, _buf, length);
+		
 	if(length < 60)
 		length = 60;
+	
 	rtl_outl(rtl, 0x20 + rtl->tx_cur*4, V2P(tx_buffer));
 	rtl_outl(rtl, 0x10 + rtl->tx_cur*4, length | (48 << 16)); 
 	rtl->tx_cur++;
@@ -95,8 +131,8 @@ void rtl8139_start(struct rtl8139 *rtl)
 	rtl_outb(rtl, 0x37, 0x10);
 	while((rtl_inb(rtl, 0x37) & 0x10) != 0);
 	
-	kmemset(rtl->rcv_buffer, 0, (8192*8)+16+1500);
-	rtl_outl(rtl, 0x30,(uintptr_t)V2P(rtl->rcv_buffer));
+	kmemset(rtl->rx_buffer, 0, (8192*8)+16+1500);
+	rtl_outl(rtl, 0x30,(uintptr_t)V2P(rtl->rx_buffer));
 	rtl_outb(rtl, 0x37, 0xc);
 	
 	for(int i=0; i < 4; i++)
@@ -104,8 +140,10 @@ void rtl8139_start(struct rtl8139 *rtl)
 		rtl_outl(rtl, 0x20 + i*4, (uintptr_t)V2P(rtl->tx_buffers) + i*(8192 +16+1500));
 	}
 	//TODO: need to register pci IRQs instead of doing it directly
-	interrupt_register(32 + rtl->pci_hdr->int_line, &rtl_handler);
-	rtl_outl(rtl, 0x44, (1 << 7) |  (1 << 1));
+	//interrupt_register(32 + rtl->pci_hdr->int_line, &rtl_handler);
+
+	pci_register_irq(rtl->pci, &rtl_handler, rtl);
+	rtl_outl(rtl, 0x44, (1 << 7) | 8|  (1 << 1));
 	rtl_outw(rtl, 0x3c, 0x5 );
 	for(int i = 0; i < 6; i ++)
 		rtl->mac[i] = rtl_inb(rtl, i);
@@ -140,29 +178,32 @@ struct network_dev * rtl8139_init()
 	struct rtl8139 *rtl = (struct rtl8139 *)kmalloc(sizeof(*rtl));
 	global = rtl;
 	device->device = rtl;
+	rtl->dev = device;
 	rtl->pci = pci_get_device(RTL8139_VEND, RTL8139_DEV);
-	rtl->rcv_buffer = kmalloc((8192*8)+16+1500);
+	rtl->rx_buffer = pallocn(2);//kmalloc(RX_BUF_LEN + RX_BUF_PAD);
 	rtl->tx_buffers = (void *)P2V(0x3380000);//kmalloc((8192+16+1500)*4);
 	if(rtl->pci != NULL)
 	{
 		rtl->pci_hdr = &rtl->pci->header.hdr;
-		printf("Realtek 8139 Ethernet adapter Rev %i found\n", rtl->pci_hdr->rev);
 		
 		rtl->io_base = pci_get_bar(rtl->pci, PCI_BAR_IO) & ~1;
-		printf("io base %x\n",rtl->io_base);
 		
 		rtl->mem_base = (uint8_t *)(pci_get_bar(rtl->pci, PCI_BAR_MEM) & ~3);
-		printf("mem base %x\n",rtl->mem_base);
 		
 		rtl8139_start(rtl);
 		rtl8139_getmac(rtl,(char *)&device->mac);
 		device->send = rtl8139_send;
+		printf("Realtek 8139 Ethernet adapter Rev %i found\t", rtl->pci_hdr->rev);
+		printf("io base %x ",rtl->io_base);
+		printf("mem base %x\n",rtl->mem_base);
 	//	device->receive = rtl8139_receive;
+		print_mac((char *)&device->mac);
+		printf("%X\n",rtl->dev);
 
 	}
 	else
 	{
-		kfree(rtl->rcv_buffer);
+		kfree(rtl->rx_buffer);
 		kfree(rtl);
 
 		rtl = NULL;

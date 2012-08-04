@@ -115,7 +115,18 @@ char * strcat(char *dst, const char * src)
 
 	return dst;
 }
+char * strncat(char *dst, const char * src, size_t len)
+{
+//	char *d = dst;
+//	char *_src = (char *)src;
+	while(*dst++ != '\0' && len-- > 0);
+	dst--;
+	strcpy(dst, (char *)src);
 
+
+
+	return dst;
+}
 
 void *memcpy(void *dst, const void *src, size_t size)
 {

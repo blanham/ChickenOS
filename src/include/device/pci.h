@@ -22,7 +22,7 @@ union pci_membar {
 struct pci_conf_hdr {
 	uint16_t vend_id;
 	uint16_t dev_id;
-	uint16_t instruction;
+	uint16_t command;
 	uint16_t status;
 	uint8_t rev;
 	uint8_t class[3];
@@ -61,6 +61,7 @@ struct pci_device {
 	union cfg_addr2 regs;
 	intr_handler *irq_handler;
 	struct pci_device *next;
+	int device;
 };
 
 struct cfg_addr {

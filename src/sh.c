@@ -8,7 +8,7 @@
 struct command {
 	int (*cmd)(void *aux);
 	char name[32];
-	struct list_head list;
+//	struct list_head list;
 
 };
 

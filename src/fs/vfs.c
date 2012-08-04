@@ -40,6 +40,15 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	struct inode *res = dir->inode;
 	path = strdup(_path);
 	filename = kcalloc(255, 1);;
+
+	if(memcmp(_path, "cfs://",6) == 0)
+	{
+
+
+		return NULL;
+	}
+
+
 	
 	if(path[0] == '/')
 		res = root->inode;

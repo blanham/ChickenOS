@@ -1,6 +1,6 @@
 #ifndef C_OS_SYSCALL_H
 #define C_OS_SYSCALL_H
-enum { SYS_EXIT = 1, SYS_FORK, SYS_READ, SYS_WRITE, SYS_OPEN, SYS_CLOSE, SYS_WAITPID, SYS_CREAT, SYS_LINK, SYS_UNLINK, SYS_EXECVE,SYS_LSEEK = 19,SYS_GETPID = 20, SYS_KILL = 37,SYS_BRK = 45, SYS_PUTS, SYS_SBRK, SYS_DUMMY = 256};
+enum { SYS_EXIT = 1, SYS_FORK, SYS_READ, SYS_WRITE, SYS_OPEN, SYS_CLOSE, SYS_WAITPID, SYS_CREAT, SYS_LINK, SYS_UNLINK, SYS_EXECVE,SYS_LSEEK = 19,SYS_GETPID = 20, SYS_KILL = 37,SYS_BRK = 45, SYS_PUTS, SYS_SBRK, SYS_NETWORK = 255, SYS_DUMMY = 256};
 #define SYSCALL_0N(num) ({	\
 					int ret;			\
 	asm volatile (	"int $0x80"		\
@@ -44,4 +44,5 @@ int fork();
 int dummy();
 int get_pid();
 int uputs(char *str);
+int network_setup();
 #endif
