@@ -70,7 +70,15 @@ void kbd_e5(uint8_t c)
 	}
 }
 
+void reboot()
+{
+	uint8_t test = 0x02;
+	while((test & 0x02) != 0)
+		test = inb(0x64);
+	outb(0x64, 0xFE);
+	asm volatile ("hlt");
 
+}
 
 void kbd_intr(struct registers * regs UNUSED)
 {
@@ -119,6 +127,8 @@ void kbd_intr(struct registers * regs UNUSED)
 			break;
 		/* ESC shutsdown for now */
 		case 1:
+			printf("esc\n");
+			reboot();
 			shutdown();
 			break;
 	

@@ -1,6 +1,7 @@
 #ifndef C_OS_NET_NETCORE_H
 #define C_OS_NET_NETCORE_H
 #include <kernel/types.h>
+#include <queue.h>
 #define ETH_ALEN 6
 #define MY_DEST_MAC0    0x00
 #define MY_DEST_MAC1    0xC0
@@ -19,6 +20,10 @@ struct network_dev {
 	net_receive_packet_t receive;
 	char mac[6];
 	uint32_t ip;
+	uint32_t dns_ip;
+	uint32_t subnet_mask;
+	uint32_t router[2];
+	int resolved;
 	struct network_dev *next;
 };
 struct ether_header
@@ -68,12 +73,28 @@ extern uint8_t our_ip[];
 extern uint8_t their_ip[];
 extern uint8_t dest_mac[];
 uint16_t htons(uint16_t val);
+uint16_t ntohs(uint16_t val);
+uint32_t htonl(uint32_t val);
+uint32_t ntohl(uint32_t val);
+
+enum proto_type {
+	IPPROTO_ICMP = 1,
+	IPPROTO_TCP = 6,
+	IPPROTO_UDP = 17
+};
+
+
+
 struct socket {
 	struct network_dev *dev;
-
+	int pid;
+	//enum sock_type type;
+	enum proto_type proto;
+	uint16_t src_port;
+	uint16_t dst_port;	
 
 };
-struct addrinfo {
+struct addri{
     int     ai_flags;
     int     ai_family;
     int     ai_socktype;
@@ -83,7 +104,47 @@ struct addrinfo {
     char    *ai_canonname;     /* canonical name */
     struct  addrinfo *ai_next; /* this struct can form a linked list */
 };
+enum transport_type {
+	CSOCK_TCP,
+	CSOCK_UDP,
+	CSOCK_RAW,
+	CSOCK_ARP
+};
+enum build_packet {
+	CSOCK_PAYLOAD,
+	CSOCK_PHYSICAL,
+	CSOCK_INTERNET,
+	CSOCK_TRANSPORT
+};
+struct sockbuf {
+	size_t length;
+	void *data;
+	struct ether_header *eth;
+	
+	struct ip *ip;
+	struct ether_arp *arp;
+	uint16_t proto;
+	uint32_t i_len;
+	
+	void *transport;
+	uint16_t t_proto;
+	uint32_t t_len;;
+	
+	void *payload;
+	uint32_t p_len;
+	
+	struct network_dev * dev;
+	struct socket *socket;
+	char dest_mac[6];
+	uint32_t dest_ip;
+	int broadcast;
+	TAILQ_ENTRY(sockbuf) elem;
+};
+struct sockbuf *sockbuf_alloc(struct network_dev *dev, uint32_t len);
+void sockbuf_free(struct sockbuf *sb);
 
+void sockbuf_queue(struct sockbuf *sb);
+void sockbuf_unqueue(struct sockbuf *sb);
 int getaddrinfo(const char *node,
                 const char *service,
                 const struct addrinfo *hints,
@@ -92,16 +153,41 @@ int getaddrinfo(const char *node,
 void freeaddrinfo(struct addrinfo *res);
 int socket(int domain, int type, int protocol); 
 
-void ethernet_send(struct network_dev *dev, uint8_t *payload, size_t len, uint16_t ethertype, char dest_mac[6]);
-void udp_send(struct network_dev *dev, uint16_t src, uint16_t dst, 
-	uint8_t *payload, size_t len);
-size_t ip_send(struct network_dev *dev, uint8_t proto,uint8_t *payload, size_t len);
 
+void udp_send2(struct sockbuf *sb, uint16_t src, uint16_t dst);
+void udp_received(struct sockbuf *sb);
+uint32_t udp_bind(struct network_dev *dev, uint16_t port);
+
+
+size_t ip_send(struct network_dev *dev, uint8_t proto,uint8_t *payload, size_t len);
+void ip_send2(struct sockbuf *sb);
+void ip_received(struct sockbuf *sb);
+
+void ip_address_print(uint32_t ip);
+void ip_route_insert(uint32_t ip, uint32_t gateway, uint32_t mask);
+
+void icmp_received(struct sockbuf *sb);
+
+void tcp_received(struct sockbuf *sb);
+void dhcp_received(struct sockbuf *sb);
+
+	
+void dns_lookup(struct network_dev *dev, char *domain);
+
+void ethernet_received(struct sockbuf *sb);
+void ethernet_send2(struct network_dev *dev, uint8_t *payload, size_t len, uint16_t ethertype, char dest_mac[6]);
+void ethernet_send(struct sockbuf *sb, uint16_t ether_type);
+
+#define ETHERTYPE_IP  0x0800
+#define ETHERTYPE_ARP 0x806
+
+int arp_lookup(struct sockbuf *sb, uint32_t ip);
+void arp_received(struct sockbuf *sb);
 
 void print_mac(char *mac);
 void network_init();
+void network_received(struct sockbuf *sbuf);
+int sys_network_setup();
 
-
-
-	
+uint16_t cksum(uint16_t *buf, size_t nbytes);
 #endif

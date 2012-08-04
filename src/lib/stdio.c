@@ -331,4 +331,15 @@ int sprintf(char *buf, const char *fmt, ...)
 	return ret;
 }
 
+int snprintf(char *buf, size_t size, const char *fmt, ...)
+{
+	va_list ap;
+	int ret;
+	size = size;
+	va_start(ap, fmt);
+	ret = vsprintf(buf, fmt, ap);
+//	puts(buf);
+	va_end(ap);
+	return ret;
+}
 

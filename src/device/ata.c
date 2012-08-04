@@ -161,26 +161,26 @@ void ata_identify(int drive)
 	}
 	kmemcpy(name, p, 40);
 //	name[13] = 0;
-	printf("Detected HD: %.14s ",name);
+	printf("Detected HD:\t%.14s",name);
 	struct ata_identify *st = (void *)data;
-	printf("capacity %iMB\n",
+	printf("Capacity %iMB\t",
 	(st->bytes_per_sector*st->sectors_per_track*st->num_cylinders*st->num_heads)/(1024*1024));
 	uint32_t logical = *(uint32_t *)&data[117];	
 	uint32_t log = *(uint32_t *)&data[60];	
-	printf("size %i\n",logical*log);
+	printf("Size %i\n",logical*log);
 	drives[drive].io_base = 0x1f0;
 	struct mbr *mbr = kcalloc(sizeof(struct mbr),1);
 	ata_sector_read(mbr, 0, 1);
-	printf("SIG %X %X\n",mbr->signature[0], mbr->signature[1]);
+//	printf("SIG %X %X\n",mbr->signature[0], mbr->signature[1]);
 	drives[drive].mbr = mbr;
-	print_partition_entry(&mbr->partitions[0]);
+//	print_partition_entry(&mbr->partitions[0]);
 	
 }
 void ata_init()
 {
 	device_register(FILE_BLOCK, 0x300, ata_read_block, ata_write, ata_ioctl);
 	ata_identify(0);
-	printf("test %i\n",sizeof(struct partition_entry));
+//	printf("test %i\n",sizeof(struct partition_entry));
 
 	interrupt_register(0x2E, &ata_intr);
 }

@@ -37,13 +37,18 @@ struct vbe_controller_info{
 	uintptr_t videomodes;
 	uint16_t memory;
 };
+extern pagedir_t kernel_pd;
 void vga_init(struct multiboot_info *mb)
 {
 	struct vbe_controller_info *info = (void *)P2V(mb->vbe_control_info);
-	printf("location3: %X\n",info);
-	printf("%s\n",(info->signature));	
-	printf("Modes %s\n",P2V(info->videomodes));
-
+	printf("location: %X\n",info);
+	for(int i =0; i < 4; i++)
+		printf("%c", info->signature[i]);
+	printf("\n");
+	//printf("%s\n",(info->signature));	
+	//uintptr_t test = info->oem_string;
+	//pagedir_insert_page(kernel_pd, test, test,0x7);
+	//printf("Modes %s\n",(test));
 }
 void kmain(uint32_t mbd, uint32_t magic)
 {
@@ -76,11 +81,10 @@ void kmain(uint32_t mbd, uint32_t magic)
 	serial_init();
 	time_init();
 	syscall_init();
-	network_init();
 	thread_init();
 //	printf("test %x\n",*(uint16_t *)P2V(0x404));
 //	print_mb((uint32_t)mbd, magic);
-	if(0)
+	if(1)
 	{
 	//	modules_init(mb);	
 		vfs_init();
@@ -90,20 +94,27 @@ void kmain(uint32_t mbd, uint32_t magic)
 		ata_init();	
 		vfs_mount_root(ATA0_0_DEV, "ext2");
 	}
+	network_init();
 	thread_usermode();
-	while(1);
-	dummy();
-	dummy();
-	dummy();
-	dummy();
-	
-	while(1);
+	//we have this special sycall at the moment
+	//to setup networking, later will be able to handle
+	//it in user space	
+//	network_setup();
 
-//	char *argv[] = {"-l", "foo", "bar", NULL};	
+
+//	while(1);
+//	dummy();
+//	dummy();
+//	dummy();
+//	dummy();
+	
+//	while(1);
+
+	char *argv[] = {"-l", "foo", "bar", NULL};	
 	if(!fork() )
 	{
 	//	while(1)
-	//	execv("/init", argv);
+		execv("/init", argv);
 		PANIC("execv(init) failed!");	
 	}
 

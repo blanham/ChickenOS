@@ -3,6 +3,7 @@
 #include <kernel/interrupt.h>
 #include <kernel/console.h>
 #include <kernel/thread.h>
+#include <net/net_core.h>
 #include <thread/syscall.h>
 #include <stdio.h>
 //#include <kernel/vfs.h>
@@ -44,7 +45,10 @@ int sys_dummy()
 //	printf("dummy syscall\n");
 	return 0xcafebabe;	
 }
-
+int network_setup()
+{
+	return SYSCALL_0N(SYS_NETWORK);
+}
 void *sys_brk(uintptr_t ptr)
 {
 	thread_t *cur = thread_current();
@@ -140,6 +144,9 @@ void syscall_handler (struct registers *regs)
 			break;
 		case 200:
 			thread_scheduler(regs);
+			break;
+		case SYS_NETWORK:
+			regs->eax = sys_network_setup();
 			break;
 		case SYS_DUMMY:
 
