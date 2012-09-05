@@ -217,6 +217,8 @@ sbrk(int nbytes){
 
 // --- Other ---
  int gettimeofday(struct timeval *p, void *z){
-	 return -1;
+	 
+	int ret = SYSCALL_2N(SYS_GETTIMEOFDAY, p, z);
+	return ret;
  }
 

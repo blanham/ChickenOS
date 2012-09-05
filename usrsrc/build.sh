@@ -89,7 +89,7 @@ cp ../gcc-files/gcc/config/os.h gcc-${GCC_VER}/gcc/config/${OSNAME}.h
 echo "PATCH NEWLIB"
 patch -p0 -d newlib-${NEWLIB_VER} < ../newlib.patch || exit
 mkdir -p newlib-${NEWLIB_VER}/newlib/libc/sys/${OSNAME}
-cp -r ../newlib-files/* newlib-${NEWLIB_VER}/newlib/libc/sys/${OSNAME}/.
+cp -r -L  ../newlib-files/* newlib-${NEWLIB_VER}/newlib/libc/sys/${OSNAME}/.
 cp ../newlib-files/vanilla-syscalls.c newlib-${NEWLIB_VER}/newlib/libc/sys/${OSNAME}/syscalls.c
 cp ../newlib-files/syscall.h newlib-${NEWLIB_VER}/newlib/libc/sys/${OSNAME}/syscall.h
 
