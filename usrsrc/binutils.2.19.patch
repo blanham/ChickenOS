@@ -1,0 +1,57 @@
+--- ../../binutils-2.20/config.sub	2009-08-17 00:10:29.000000000 -0400
++++ config.sub	2010-04-03 18:01:47.000000000 -0400
+@@ -1275,6 +1275,7 @@ case $os in
+ 	      | -kopensolaris* \
+ 	      | -amigaos* | -amigados* | -msdos* | -newsos* | -unicos* | -aof* \
+ 	      | -aos* \
++		  | -chickenos* \
+ 	      | -nindy* | -vxsim* | -vxworks* | -ebmon* | -hms* | -mvs* \
+ 	      | -clix* | -riscos* | -uniplus* | -iris* | -rtu* | -xenix* \
+ 	      | -hiux* | -386bsd* | -knetbsd* | -mirbsd* | -netbsd* \
+--- ../../binutils-2.20/ld/configure.tgt	2009-08-06 13:38:03.000000000 -0400
++++ ld/configure.tgt	2010-04-03 18:01:16.000000000 -0400
+@@ -201,6 +201,8 @@ i[3-7]86-*-linux-*)	targ_emul=elf_i386
+ 			targ64_extra_emuls="elf_x86_64 elf_l1om"
+ 			targ64_extra_libpath=elf_x86_64
+ 			tdir_i386linux=${targ_alias}aout ;;
++i[3-7]86-*-chickenos*)         targ_emul=chickenos_i386 ;;
++			
+ x86_64-*-linux-*)	targ_emul=elf_x86_64
+ 			targ_extra_emuls="elf_i386 i386linux elf_l1om"
+ 			targ_extra_libpath=elf_i386
+--- ../../binutils-2.20/ld/Makefile.in	2009-09-07 08:10:24.000000000 -0400
++++ ld/Makefile.in	2010-04-03 18:01:16.000000000 -0400
+@@ -2451,6 +2451,9 @@ eelf64ltsmip.c: $(srcdir)/emulparams/elf
+ eelf_i386.c: $(srcdir)/emulparams/elf_i386.sh \
+   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf_i386 "$(tdir_elf_i386)"
++echickenos_i386.c: $(srcdir)/emulparams/chickenos_i386.sh \
++  $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++	${GENSCRIPTS} chickenos_i386 "$(tdir_chickenos_i386)"
+ eelf_x86_64.c: $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 	${GENSCRIPTS} elf_x86_64 "$(tdir_elf_x86_64)"
+--- ../../binutils-2.20/bfd/config.bfd	2009-08-06 13:38:00.000000000 -0400
++++ bfd/config.bfd	2010-04-03 18:01:16.000000000 -0400
+@@ -615,6 +615,11 @@ case "${targ}" in
+     targ_selvecs="bfd_elf32_i386_vec bfd_elf64_l1om_vec"
+     want64=true
+     ;;
++  i[3-7]86-*-chickenos*)
++    targ_defvec=bfd_elf32_i386_vec
++    targ_selvecs=i386coff_vec
++    
++    ;;
+   x86_64-*-elf*)
+     targ_defvec=bfd_elf64_x86_64_vec
+     targ_selvecs="bfd_elf32_i386_vec bfd_elf64_l1om_vec i386coff_vec"
+
+--- ../../../binutils-2.20/gas/configure.tgt	2009-09-09 04:13:28.000000000 -0400
++++ gas/configure.tgt	2010-04-03 19:13:26.000000000 -0400
+@@ -236,5 +236,6 @@ case ${generic_target} in
+   i386-*-chaos)				fmt=elf ;;
+   i386-*-rdos*)				fmt=elf ;;
++  i386-*-chickenos*)				fmt=elf ;;
+ 
+   i860-*-*)				fmt=elf endian=little ;;
+ 

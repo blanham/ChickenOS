@@ -1,0 +1,64 @@
+--- ../../gcc-4.3.3/config.sub	2008-01-22 21:37:40.000000000 -0500
++++ config.sub	2010-04-03 16:36:15.000000000 -0400
+@@ -1240,6 +1240,7 @@ case $os in
+ 	      | -hpux* | -unos* | -osf* | -luna* | -dgux* | -solaris* | -sym* \
+ 	      | -amigaos* | -amigados* | -msdos* | -newsos* | -unicos* | -aof* \
+ 	      | -aos* | -aros* \
++		  | -chickenos* \
+ 	      | -nindy* | -vxsim* | -vxworks* | -ebmon* | -hms* | -mvs* \
+ 	      | -clix* | -riscos* | -uniplus* | -iris* | -rtu* | -xenix* \
+ 	      | -hiux* | -386bsd* | -knetbsd* | -mirbsd* | -netbsd* \
+--- ../../gcc-4.3.3/libstdc++-v3/crossconfig.m4	2008-01-14 19:15:43.000000000 -0500
++++ libstdc++-v3/crossconfig.m4	2010-04-03 16:35:47.000000000 -0400
+@@ -393,6 +393,12 @@ case "${host}" in
+       AC_DEFINE(HAVE_ISNANL)
+     fi
+     ;;
++  *-chickenos*)
++    AC_CHECK_HEADERS([sys/types.h locale.h float.h])
++    GLIBCXX_CHECK_BUILTIN_MATH_SUPPORT
++    GLIBCXX_CHECK_COMPLEX_MATH_SUPPORT
++    GLIBCXX_CHECK_STDLIB_SUPPORT
++    ;;
+   *-vxworks)
+     AC_DEFINE(HAVE_MMAP)
+     AC_DEFINE(HAVE_ACOSF)
+--- ../../gcc-4.3.3/gcc/config.gcc	2008-11-20 12:09:53.000000000 -0500
++++ gcc/config.gcc	2010-04-03 16:35:47.000000000 -0400
+@@ -605,6 +605,13 @@ case ${target} in
+     *) echo 'Unknown thread configuration for VxWorks'; exit 1 ;;
+   esac
+   ;;
++*-*-chickenos*)
++  extra_parts="crtbegin.o crtend.o"
++  gas=yes
++  gnu_ld=yes
++  # Assume that newlib is being used and so __cxa_atexit is provided.
++  default_use_cxa_atexit=yes
++  ;;
+ *-*-elf)
+   # Assume that newlib is being used and so __cxa_atexit is provided.
+   default_use_cxa_atexit=yes
+@@ -1070,6 +1077,11 @@ hppa[12]*-*-hpux11*)
+ 	use_collect2=yes
+ 	gas=yes
+ 	;;
++i[3-7]86-*-chickenos*)
++	tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h i386/i386elf.h   chickenos.h"
++	tmake_file="${tmake_file} i386/t-i386elf t-svr4"
++	use_fixproto=yes
++	;;
+ i[34567]86-*-darwin*)
+ 	need_64bit_hwint=yes
+ 
+--- ../../gcc-4.3.3/libgcc/config.host	2008-11-20 12:09:53.000000000 -0500
++++ libgcc/config.host	2010-04-03 16:35:47.000000000 -0400
+@@ -637,6 +637,8 @@ xscale-*-elf)
+ 	;;
+ xscale-*-coff)
+ 	;;
++i[3-7]86-*-chickenos*)
++	;;
+ xstormy16-*-elf)
+ 	;;
+ xtensa-*-elf*)
