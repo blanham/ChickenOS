@@ -1,0 +1,71 @@
+ChickenOS TODO
+===============================================================================
+
+Core
+===============================================================================
+-Improve quality of comments and commit messages
+-Need to implement synchronization primitives
+
+Console
+===============================================================================
+-Modify the kernel's printf to output info separately from tty0
+-Improve keyboard support (Seem to run into issues with Newlib's getc)
+
+Threads
+===============================================================================
+-Fix fork()
+-Implement passing open files to child threads
+-Implement wait queue
+-May have to change/rewrite the scheduler
+
+Userspace
+===============================================================================
+-Continue adding missing system calls to Newlib port
+-Figure out why C++ binaries crash
+-Get dash working properly
+-Port coreutils or busybox
+-Port binutils/gcc/nasm
+-Port vim
+-Port links/lynx
+-Implement dynamic loading of libraries
+
+Syscalls
+===============================================================================
+-poll()
+-select()
+
+Network
+===============================================================================
+-TCP needs to be implemented properly
+-Socket subsystem could use some work
+-Implement local sockets
+-Try to figure out why we crash Virtualbox (and the host system) using the
+ AM7990 driver
+-Add NE9000 driver
+-Add Intel 2200BG WiFi driver (can probably port iwi from openbsd or linux) 
+ (if I do this, abstract out all system specific calls, so other osdev people
+ can use the driver)
+ and then port wpa_supplicant 
+ (trivial: http://hostap.epitest.fi/wpa_supplicant/devel/porting.html) 
+
+Filesystem
+===============================================================================
+-Implement ext2 write support
+-Implement fat12/16/32 support
+-Need to add support for select()
+-Maybe implement ISO9660 support for reading CDs
+-Add a block cache (can likely use pintos code for reference)
+-Continue work on the network filesystem, and maybe add NFS support
+
+Sound
+===============================================================================
+-Implement Soundblaster 16 support
+-AC97 support may not be that hard to implement
+
+Video
+===============================================================================
+-Somehow get VBE/VESA to work so we can have something better than a simple 80
+ column terminal
+-Get linear framebuffer to work so we can do video
+-get X11 working (EXTREMELY AMBITIOUS)
+-port SDL (has been done by other hobbiest OSes)
