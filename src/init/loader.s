@@ -6,7 +6,8 @@ extern _sbss
 ; setting up the Multiboot header - see GRUB docs for details
 MODULEALIGN equ  1<<0             ; align loaded modules on page boundaries
 MEMINFO     equ  1<<1             ; provide memory map
-FLAGS       equ  MODULEALIGN | MEMINFO  ; this is the Multiboot 'flag' field
+VIDEOINFO	equ  1<<2 ;provide video info
+FLAGS       equ  MODULEALIGN | MEMINFO ;| VIDEOINFO  ; this is the Multiboot 'flag' field
 MAGIC       equ    0x1BADB002     ; 'magic number' lets bootloader find the header
 CHECKSUM    equ -(MAGIC + FLAGS)  ; checksum required
  
@@ -87,18 +88,27 @@ StartInHigherHalf:
  
 ; this function does the same thing of the 'start' one, this time with
 ; the real GDT
-;gdt_flush:
-;	lgdt [gp]
-;	mov ax, 0x10
-;	mov ds, ax
-;	mov es, ax
-;	mov fs, ax
-;	mov gs, ax
-;	mov ss, ax
-;	jmp 0x08:flush2
+gdt_flush:
+	mov eax, [esp+4]
+	lgdt [eax]
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	mov ss, ax
+	mov ax, 0x2b
+	ltr ax
+	jmp 0x08:flush2
  
-;flush2:
-;	ret 
+flush2:
+	ret 
+
+[global tss_flush]
+tss_flush:
+	mov ax, 0x28
+	ltr ax
+	ret
  
 section .bss
 align 4096

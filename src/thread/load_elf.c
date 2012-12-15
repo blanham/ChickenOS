@@ -78,17 +78,27 @@ static void elf_load_program(elf_header_t *header, int fd)
 	int pages = 0;
 	sys_lseek(fd, header->phdrpos, SEEK_SET);
 	sys_read(fd, program, sizeof(*program)*header->phdrcnt);
-
 	for(int i = 0; i < header->phdrcnt; i++)
 	{
 		if(program->ph_type == PT_LOAD)
 		{
+		//	elf_print_programs(program);
 			sys_lseek(fd, program->ph_offset, SEEK_SET);
 			pages = program->ph_memsize/PAGE_SIZE + 1;
 			code = pallocn(pages);
+			
+			if(program->ph_filesize < program->ph_memsize)
+			{
+				memset((void *)(code + program->ph_filesize), 0x0, program->ph_memsize - program->ph_filesize);
+			}
+			if((program->ph_offset & 0xFFF) != 0)
+			{
+				code = code + (program->ph_offset & 0xfff) ;
+			}
 			sys_read(fd, code, program->ph_filesize);
-			pagedir_insert_pagen(pd, (uintptr_t)code, program->ph_virtaddr, 0x7, pages);
-			printf("insert %i pages\n",pages);
+
+			pagedir_insert_pagen(pd, (uintptr_t)((uintptr_t) code & ~0xFFF), program->ph_virtaddr, 0x7, pages);
+		//	printf("insert %i pages\n",pages);
 		}	
 		program++;
 	}
@@ -99,16 +109,25 @@ int load_elf(const char *path, uintptr_t *eip)
 {
 	int fd;
 	elf_header_t *header;
-
 	header = kmalloc(sizeof(*header));
 
-	fd = sys_open(path, 0);
-	
-	sys_read(fd, header, sizeof(*header));
-
-	if(!memcmp(header->magic, ELF_MAGIC, 4))
+	if((fd = sys_open(path, 0)) < 0)
+	{
+		printf("wellp, we're boned\n");
 		return -1;
-
+	}	
+		
+	if(sys_read(fd, header, sizeof(*header)) != sizeof(*header))
+	{
+		printf("Error reading ELF header\n");
+		return -1;
+	}
+	if(memcmp(header->magic, ELF_MAGIC, 4) != 0)
+	{
+		printf("Missing or invalid ELF magic number!\n");
+		return -1;
+	}
+	
 	elf_load_program(header, fd);	
 	
 	*eip = header->entry;

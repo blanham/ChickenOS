@@ -16,11 +16,6 @@
 
 #define MAX_DEVICES 20
 #define NULL 0
-struct char_device_ops {
-	char_read_fn read;
-	char_write_fn write;
-	char_ioctl_fn ioctl;
-};
 
 struct char_device {
 	uint16_t dev;
@@ -146,7 +141,6 @@ int read_block(uint16_t dev, void * _buf, int block, int block_size)
 	
 	if(block_size <= 0)
 		return -1;
-	
 	dblock = (block * block_size) / SECTOR_SIZE;
 
 	while(block_size > 0)

@@ -28,7 +28,7 @@ typedef struct ext2_superblock {
 	uint32_t s_creator_os;//indicator of which OS created 
 	uint32_t s_rev_level;//EXT2 revision level
 	uint32_t s_reserved[236];//padding to 1024 bytesOS
-} ext2_superblock_t;
+} __attribute__((packed)) ext2_superblock_t;
 
 typedef struct ext2_group_descriptor {
 	uint32_t bg_block_bitmap;//address of block containing the block bitmap for this group
@@ -39,7 +39,7 @@ typedef struct ext2_group_descriptor {
 	uint16_t bg_used_dirs_count; //number of inodes in this group that are directories
 	uint16_t bg_pad;
 	uint32_t bg_reserved[3];
-} ext2_group_descriptor_t;
+} __attribute__((packed)) ext2_group_descriptor_t;
 
 
 struct ext2_inode {

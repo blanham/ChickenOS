@@ -5,7 +5,7 @@
 #include <kernel/thread.h>
 #include <thread/tss.h> 
 #include <kernel/memory.h>
-#include <kernel/console.h>
+#include <device/console.h>
 #include <kernel/interrupt.h>
 #include <kernel/vm.h>
 #include <thread/syscall.h>
@@ -24,7 +24,7 @@ void return_from_signal()
 	thread_current()->signal_pending = -1;
 	SYSCALL_0N(200);
 }
-
+extern bool thread_start;
 void signal(registers_t *regs, thread_t *next)
 {
 	if(next->signal_pending > 0 && next->pid != 0)
@@ -52,32 +52,48 @@ void signal(registers_t *regs, thread_t *next)
 	}
 }
 	extern uint32_t GUARD;
+extern void pic_send_end(int irq);
+extern thread_t *kernel_thread;
 void thread_scheduler(registers_t *regs)
 {
+	(void)regs;
 	uint32_t _esp = 0xfeedface;
 	thread_t *cur, *next;
-	//printf("asfasdf\n");
-	return;
 	next = NULL;
 	cur = thread_current();
-	CDL_SEARCH_SCALAR(cur, next, status, THREAD_READY);
-
+//	asm volatile ("mov %%esp, %0":"=m"(_esp));
+//	printf("ESP %X\n",_esp);
+//	cur->status = 0;
+//	CDL_SEARCH_SCALAR(cur, next, status, THREAD_READY);
+//	cur->status = THREAD_READY;
+//	if(thread_start == false) return;
+//	dump_regs(regs);
+//	printf("ESP %X\n",regs->ESP);
+	//return;
 	next = cur->next;
-	if((uintptr_t)next < (uintptr_t)PHYS_BASE)
-		next = cur;
+
+	if(next == NULL)
+		next = kernel_thread;//cur;
+	if(next->status == THREAD_DEAD)
+		next = next->next;
+	if(next == NULL)
+		next = kernel_thread;//cur;
+
+//	if((uintptr_t)next < (uintptr_t)PHYS_BASE)
+		//next = cur;
 	//i believe that signals go here:
 	//if(next->signal_pending != 0)
 	//signal(regs, next);
-	//printf("next pid %i\n",next->pid);
-//	dump_regs(regs);
-//	printf("%X %X %X %X %X\n", cur->next, cur->sp, regs->ESP, regs, next->sp);
+	
 	cur->sp = (uint8_t *)regs->ESP;
 	cur->regs = regs;
 	_esp = (uint32_t)next->sp;
-//	printf("next %i\n",next->pid);
-	//printf("%p\n",next + 4096);
+	//dump_regs((registers_t *)(_esp + 4));
+
 	tss_update((uintptr_t)next + 4096);	
 	pagedir_install(next->pd);
+
+	pic_send_end(0);
 
 	asm volatile(
 					"mov %0,%%esp\n"

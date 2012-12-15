@@ -1,4 +1,5 @@
 #include <common.h>
+#include <memory.h>
 #include <kernel/vm.h>
 #include <thread/tss.h>
 struct segment_descriptor {
@@ -46,7 +47,7 @@ gdt_fill(struct segment_descriptor *sd, uint32_t base,
 	sd->flags 	= (flags & 0xf0) | ((limit >> 16) & 0xF);
 	sd->access 	= access;
 }
-
+extern void gdt_flush(uintptr_t ptr);
 void
 gdt_install(void)
 {
@@ -59,9 +60,19 @@ gdt_install(void)
 	gdt_fill(&gdt_entries[3], 0, 0xFFFFF, GDTF_BOTH, 0xFA);
 	gdt_fill(&gdt_entries[4], 0, 0xFFFFF, GDTF_BOTH, 0xF2);
 
-	gdt_fill(&gdt_entries[5], (uintptr_t)&tss, 0x67, 0xcf, GDTA_TSS);
+kmemset(&tss, 0, 104);
+	tss.ss0  = 0x10;
+	tss.io_bmap = sizeof(tss);	
+//	uint32_t esp;
+//	asm volatile ("mov %0, %%esp"::"m"(esp));
+//	tss.esp0 = esp;	
+	tss.cs = 0xb;
+	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13;
 
-	asm volatile(
+
+	gdt_fill(&gdt_entries[5], (uintptr_t)&tss, 0x67, 0xcf, GDTA_TSS);
+	gdt_flush((uintptr_t)&gdt_desc);
+	/*asm volatile(
 			//	"jmp $0x8, $test\n"
 			//	"test:\n"
 				"lgdt 		(%0)\n"
@@ -71,11 +82,11 @@ gdt_install(void)
 				"mov %%ax, %%fs\n" 
 				"mov %%ax, %%gs\n" 
 			   	"mov %%ax, %%ss\n"
-				"mov $0x28, %%ax\n"
-				"ltr %%ax\n"
+			//	"mov $0x28, %%ax\n"
+			//	"ltr %%ax\n"
 				::
 				"r"(&gdt_desc),
 				"K"(KERNEL_SEG)//,
 			//	"q"(0x28)
-				);
+				);*/
 }
