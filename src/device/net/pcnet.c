@@ -322,7 +322,7 @@ struct network_dev * pcnet_init()
 	if(l->pci != NULL)
 	{
 		l->bit32 = 0;
-		l->pci_hdr = &l->pci->header.hdr;
+		l->pci_hdr = l->pci->header;
 		printf("AMD PCNET Ethernet adapter found Rev %i IRQ %i\n", l->pci_hdr->rev, l->pci_hdr->int_line);
 		
 		l->io_base = pci_get_bar(l->pci, PCI_BAR_IO) & ~1;

@@ -17,7 +17,6 @@
 #include <kernel/memory.h>
 #include <device/net/e1000.h>
 struct e1000 *e1000_global;
-#define INTEL_VEND 0x8086
 #define E1000_DEV 0x100E
 extern pagedir_t kernel_pd;
 void pagedir_insert_page(pagedir_t pd, 
@@ -280,7 +279,7 @@ struct network_dev *e1000_init()
 
 	if(e->pci != NULL)
 	{
-		e->pci_hdr = &e->pci->header.hdr;
+		e->pci_hdr = e->pci->header;
 		printf("Intel Pro/1000 Ethernet adapter Rev %i found at ", e->pci_hdr->rev);
 		
 		e->io_base = pci_get_bar(e->pci, PCI_BAR_IO) & ~1;
