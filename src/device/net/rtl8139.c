@@ -184,7 +184,7 @@ struct network_dev * rtl8139_init()
 	rtl->tx_buffers = (void *)P2V(0x3380000);//kmalloc((8192+16+1500)*4);
 	if(rtl->pci != NULL)
 	{
-		rtl->pci_hdr = &rtl->pci->header.hdr;
+		rtl->pci_hdr = rtl->pci->header;
 		
 		rtl->io_base = pci_get_bar(rtl->pci, PCI_BAR_IO) & ~1;
 		

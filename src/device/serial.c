@@ -1,8 +1,9 @@
-#include <kernel/console.h>
+#include <device/console.h>
 #include <kernel/common.h>
 #include <kernel/hw.h>
 #include <kernel/interrupt.h>
 #include <kernel/fs/vfs.h>
+#include <device/serial.h>
 #define COM1 0x3F8
 #define COM2 0x2F8
 #define COM3 0x3E8
@@ -23,11 +24,11 @@
 
 void serial_interrupt(registers_t *regs UNUSED)
 {
-	console_puts("serial\n");
+//	console_puts("serial\n");
 
 }
 
-void serial_putc(char c UNUSED)
+void serial_putc(char c)
 {
 	if(c == '\n')
 	{

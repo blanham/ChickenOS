@@ -1,8 +1,9 @@
 #include <common.h>
-#include <kernel/console.h>
+#include <device/console.h>
 #include <kernel/hw.h>
 #include <kernel/interrupt.h>
 #include <kernel/memory.h>
+#include <device/input.h>
 #include <stdio.h>
 uint16_t shifts;
 #define L_CTRL  0x0001
@@ -25,15 +26,15 @@ uint8_t gpos = 0;
 char kbd_map_unshifted[256] = {
 ' ',ESC,'1','2','3','4','5','6','7','8','9','0','-','+',BKSPACE,TAB,
 'q','w','e','r','t','y','u','i','o','p',' ',' ',CR, ' ','a','s',
-'d','f','g','h','j','k','l',';','\'',' ',' ', ' ', 'z','x','c',
-'v','b','n','m',',','.','/'
+'d','f','g','h','j','k','l',';','\'',' ',' ', '\\', 'z','x','c',
+'v','b','n','m',',','.','/', ' ', ' ', ' ', ' '
 
 
 };
 char kbd_map_shifted[256] = {
 ' ',ESC,'!','@','#','$','%','^','&','*','(',41,'_','+',BKSPACE,TAB,
 'Q','W','E','R','T','Y','U','I','O','P',' ',' ',CR, ' ','A','S',
-'D','F','G','H','J','K','L',';','|',' ',' ', ' ', 'Z','X','C',
+'D','F','G','H','J','K','L',';','"',' ',' ', '|', 'Z','X','C',
 'V','B','N','M','<','>','?'
 
 
@@ -70,6 +71,7 @@ void kbd_e5(uint8_t c)
 	}
 }
 
+/* FIXME: Maybe move this somewhere else? */
 void reboot()
 {
 	uint8_t test = 0x02;
@@ -141,6 +143,7 @@ void kbd_intr(struct registers * regs UNUSED)
 				c = kbd_map_unshifted[c];
 			//console_putc(c);
 			rbuf[pos++] = c;
+		//	input_queue_putc(c);
 	}
 }
 void kbd_init()

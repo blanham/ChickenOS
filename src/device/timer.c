@@ -1,7 +1,7 @@
 /* PIT and RTC routines */
 #include <kernel/timer.h>
 #include <kernel/interrupt.h>
-#include <kernel/console.h>
+#include <kernel/common.h>
 #include <kernel/thread.h>
 #include <kernel/hw.h>
 #include <stdio.h>
@@ -15,6 +15,9 @@
 #define RTC_DATA   0x71
 #define RTC_UPDATE 0x80
 uint8_t rtc_data[8];
+uint32_t ticks = 0;
+uint32_t unix_time;
+
 struct c_os_time {
 	uint8_t hour;
 	uint8_t minute;
@@ -74,6 +77,7 @@ void rtc_data_print(uint8_t *data)
 	uint32_t test2 = (jdt(m,d,y) - jdt(1,1,1970));
 	uint32_t test3 = data[2]*60*60 + data[1]*60 + data[0]; 
 	printf("timestamp: %i\n",(test2)* 24 * 60 * 60 + test3);
+	unix_time = (test2* 24 * 60 * 60) + test3;
 }
 void rtc_init()
 {
@@ -101,13 +105,22 @@ void rtc_init()
 
 void timer_intr(struct registers * regs)
 {
+	(void)regs;
+//	dump_regs(regs);
+//	dump_regs(regs);
+//	printf("fuck\n");
+	ticks++;
+	if(ticks % 100 == 0)
+	{
+		unix_time++;
+	}
 	thread_scheduler(regs);
 }
 
 void timer_init(uint32_t frequency)
 {
-	frequency = 2;
 	int div = 1193180 / frequency;
+	
 	outb(PIT_CMD, 0x36);
 	outb(PIT0_DATA, div & 0xFF);
 	outb(PIT0_DATA, div >> 8);
@@ -115,8 +128,41 @@ void timer_init(uint32_t frequency)
 	interrupt_register(IRQ0, &timer_intr);
 }
 
+void time_sleep(int seconds)
+{
+	uint32_t wait = seconds + unix_time;
+	while(unix_time <  wait);
+	return;
+}
+
+void time_msleep(int mseconds)
+{
+	uint32_t wait = mseconds + ticks;
+	while(ticks <  wait);
+	return;
+}
+
+void time_usleep(int useconds)
+{
+	uint32_t wait = useconds/10 + ticks;
+	while(ticks <  wait);
+	return;
+}
+
 void time_init()
 {
 	rtc_init();
-	timer_init(2);
+	timer_init(100);
+}
+
+int sys_gettimeofday(struct timeval *tp, void *tzp UNUSED)
+{
+	if(tp != NULL)
+	{
+		tp->tv_sec = unix_time;
+		tp->tv_usec = (ticks % 100) * 100;
+
+	}	
+
+	return 0;
 }
