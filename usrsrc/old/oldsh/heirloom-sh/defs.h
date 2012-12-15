@@ -42,7 +42,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
-
+typedef struct { int dummy} siginfo_t;
 /*
  *	UNIX shell
  */

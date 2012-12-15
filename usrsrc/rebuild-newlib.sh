@@ -32,7 +32,7 @@ cp -r -L  ../newlib-files/* newlib-${NEWLIB_VER}/newlib/libc/sys/${OSNAME}/.
 cp ../newlib-files/syscall.h newlib-${NEWLIB_VER}/newlib/libc/sys/${OSNAME}/syscall.h
 
 cd newlib-obj
-#../newlib-${NEWLIB_VER}/configure --target=$TARGET --prefix=$PREFIX --with-gmp=$PREFIX --with-mpfr=$PREFIX || exit
+../newlib-${NEWLIB_VER}/configure --enable-malloc-debugging --target=$TARGET --prefix=$PREFIX --with-gmp=$PREFIX --with-mpfr=$PREFIX || exit
 make || exit
 make install || exit
 cd ..

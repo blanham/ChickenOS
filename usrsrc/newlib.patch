@@ -20,13 +20,15 @@
  fi
 --- ../../newlib-1.18.0/newlib/configure.host	2009-12-10 12:12:11.000000000 -0500
 +++ newlib/configure.host	2010-04-03 15:57:57.000000000 -0400
-@@ -519,6 +519,9 @@ case "${host}" in
+@@ -519,6 +519,10 @@ case "${host}" in
    w65-*-*)
  	sys_dir=w65
  	;;
 +  i[3-7]86-*-chickenos*)
 +	sys_dir=chickenos
++	newlib_cflags="${newlib_cflags} -DSIGNAL_PROVIDED -D__rtems__ -DPOSIX_REALTIME_SIGNALS"
 +	;;
-   xscale-*-*)
- 	sys_dir=arm
- 	if [ "x${newlib_may_supply_syscalls}" = "xno" ] ; then
+   z8k-*-coff)
+	sys_dir=z8ksim
+	;;
+

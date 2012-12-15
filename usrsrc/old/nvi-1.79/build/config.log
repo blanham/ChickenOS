@@ -1,0 +1,6 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+i386-pc-chickenos-gcc -o conftest conftest.c
+configure: In function 'main':
+configure:889:10: warning: incompatible implicit declaration of built-in function 'exit'

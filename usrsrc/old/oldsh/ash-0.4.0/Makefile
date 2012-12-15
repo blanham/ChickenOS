@@ -3,7 +3,7 @@
 
 WARNS=2
 YHEADER=1
-PROG=	sh
+#PROG=	sh
 SHSRCS=	alias.c cd.c echo.c error.c eval.c exec.c expand.c \
 	histedit.c input.c jobs.c mail.c main.c memalloc.c miscbltin.c \
 	mystring.c options.c parser.c redir.c show.c trap.c output.c var.c \

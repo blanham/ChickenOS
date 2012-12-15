@@ -10,9 +10,13 @@ Console
 ===============================================================================
 -Modify the kernel's printf to output info separately from tty0
 -Improve keyboard support (Seem to run into issues with Newlib's getc)
+-Actually queue keycodes
+-Implement line disciplines (raw and cooked mode)
+-Proper blocking I/O
 
 Threads
 ===============================================================================
+-Fuck it, lets rewrite the whole thing
 -Fix fork()
 -Implement passing open files to child threads
 -Implement wait queue
@@ -33,6 +37,7 @@ Syscalls
 ===============================================================================
 -poll()
 -select()
+-termios stuff
 
 Network
 ===============================================================================
@@ -50,7 +55,8 @@ Network
 
 Filesystem
 ===============================================================================
--Implement ext2 write support
+-Implement ext2 write support - actually done, just needs new/extensible 
+ file/directory support
 -Implement fat12/16/32 support
 -Need to add support for select()
 -Maybe implement ISO9660 support for reading CDs
