@@ -2,7 +2,6 @@
 #include <mm/liballoc.h>
 #define NULL 0
 #include <stdio.h>
-#include <kernel/console.h>
 size_t strlen(const char *str)
 {
 	const char *tmp = str;
@@ -150,11 +149,18 @@ void *memset(void *dest, uint8_t val, size_t count)
 }
 int memcmp (const void *s1, const void *s2, size_t n)
 {
-	uint32_t i = 0;
 	uint8_t *_s1 = (uint8_t *)s1;
 	uint8_t *_s2 = (uint8_t *)s2;	
-	while(*_s1++ == *_s2++ && i < n)
-		i++;
-	return *_s1 - *_s2; 
+	while(n--)
+	{
+ 		if(*_s1 == *_s2)
+		{
+			return *_s1 - *_s2; 
+		}
+		n--;
+		++_s1;
+		++_s2;
+	}
+	return 0;
 }
 

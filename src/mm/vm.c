@@ -8,17 +8,11 @@
 #include <common.h>
 #include <kernel/vm.h>
 #include <kernel/hw.h>
-#include <kernel/console.h>
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
 #include <stdio.h>
 
 extern uint32_t end;
-
-static void gpf(struct registers *regs);
-static void page_fault(struct registers * regs);
-static void stack_fault(struct registers * regs);
-static void double_fault(struct registers * regs);
 
 void vm_init(struct multiboot_info *mb)
 {
@@ -35,7 +29,7 @@ void vm_init(struct multiboot_info *mb)
 
 	//round up placement to nearest page	
 	placement = (placement & PAGE_MASK) + PAGE_SIZE;
-	//size = 1024 * 1024; //needed for machines with large amounts of memory at the moment
+	size = 1024 * 1024; //needed for machines with large amounts of memory at the moment
 						//becuase we only have 4MB, and the bitmap overflows it 
 	uint32_t page_count = (size/4) - (V2P(placement)/PAGE_SIZE);
 	
@@ -44,107 +38,5 @@ void vm_init(struct multiboot_info *mb)
 	palloc_init(page_count, placement);
 	
 	paging_init();	
-	
-	interrupt_register(8, &double_fault);
-	interrupt_register(12, &stack_fault);
-	interrupt_register(13, &gpf);
-	interrupt_register(14, &page_fault);
-
-}
-
-static void gpf(struct registers *regs)
-{
-	uint32_t error_code = regs->err_code;
-	console_set_color(LT_GREY,WHITE);
-	printf("Error %x\n",error_code);
-	dump_regs(regs);
-	//triggers debugger in BOCHS
-	asm volatile("xchg %bx, %bx");
-	interrupt_disable();
-	PANIC("GENERAL PROTECTION FAULT!");
-}
-static void double_fault(struct registers * regs)
-{
-	uint32_t error_code = regs->err_code;
-	printf("Error %x\n",error_code);
-	dump_regs(regs);
-	//triggers debugger in BOCHS
-	asm volatile("xchg %bx, %bx");
-	PANIC("DOUBLE FAULT!");
-
-
-}
-static void stack_fault(struct registers * regs)
-{
-	uint32_t error_code = regs->err_code;
-	printf("Error %x\n",error_code);
-	dump_regs(regs);
-	//triggers debugger in BOCHS
-	asm volatile("xchg %bx, %bx");
-	PANIC("STACK FAULT!");
-
-
-}
-static void page_fault(struct registers * regs)
-{
-	uintptr_t faulting_addr, new_page;
-	uint32_t error_code = regs->err_code;
-	thread_t *cur = thread_current();
-	bool is_user, is_write, not_present;
-	interrupt_disable();
-
-	is_user = ((PAGE_USER & error_code) ? TRUE : FALSE);
-	is_write = ((PAGE_WRITE & error_code) ? TRUE : FALSE);
-	not_present = ((PAGE_VIOLATION & error_code) ? FALSE : TRUE);
-	
-	asm volatile ("mov %%cr2, %0"
-				  : "=r" (faulting_addr)
-
-				 );
-
-	if(!is_user)
-	{	
-		console_set_color(GREEN, WHITE);
-		printf("\nPAGE FAULT! @ %x\n",faulting_addr);
-		printf("kernel space\n");
-
-	if(is_write)
-		printf("write\n");
-	else
-		printf("read\n");
-	
-	if(not_present)
-		printf("page not present\n");
-	else
-		printf("protection violation\n");
-
-	printf("\n");
-	}
-	if(!is_user)
-	{
-		console_set_color(RED, WHITE);
-		printf("REGS:\n");
-		dump_regs(regs);
-		printf("\n");
-		PANIC("Page fault in kernel space!");
-	}else {
-		//
-		if(faulting_addr + 0x1000 > (uintptr_t)cur->user)
-		{
-			cur->user -=0x1000;
-			new_page = (uintptr_t)palloc();
-			pagedir_insert_page(cur->pd, new_page, (uintptr_t)cur->user, 0x7);
-			return;
-
-		} 
-		//kill process
-		printf("SIGSEGV @ %X\n", faulting_addr);	
-		printf("REGS:\n");
-		dump_regs(regs);
-		printf("\n");
-		thread_exit();
-	//	PANIC("Page fault in user space!");
-
-	}
 }
 

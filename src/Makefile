@@ -8,8 +8,8 @@ CFLAGS	=		-g -Wall -Wextra -Werror $(INCLUDES) \
 				-nodefaultlibs -ffreestanding\
 				-nostdlib -nostdinc -fno-builtin
 
-LINKER	=		ld -melf_i386
-LDFLAGS	=		-Tinit/linker.ld
+LINKER	=		ld -melf_i386 
+LDFLAGS	=		-Tinit/linker.ld 
 
 AS		=		nasm
 ASFLAGS	=		-felf
@@ -31,38 +31,53 @@ NETSRCS =		net/net_core.o net/arp.o net/dhcp.o net/ethernet.o net/ip.o\
 				device/net/pcnet.o device/net/ne2000.o device/net/rtl8139.o\
 				device/net/e1000.o
 
-DEVSRCS	=		device/intr-core.o\
+USBSOURCES =	device/usb/usb.o device/usb/uhci.o
+
+AUDIOSRCS=	device/audio.o #device/audio/ac97.o device/audio/intel_ac97.o
+
+VIDEOSOURCES=	device/video.o device/video/vga.o device/video/bochs_vga.o
+
+DEVSRCS	=		device/intr-core.o rme/rme.o device/input.o\
 				device/console.o device/hw.o device/kbd.o\
 				device/timer.o device/serial.o device/ata.o\
-				device/pci.o
+				device/pci.o $(VIDEOSOURCES) $(AUDIOSRCS)\
+				$(USBSOURCES)
+
 THREAD	=		thread/thread.o thread/syscall.o thread/scheduler.o\
 				thread/tss.o thread/fork.o thread/exec.o thread/load_elf.o sh.o
 				#have to have interrupt.o here at the moment 
 CORE	=		init/kmain.o init/loader.o device/interrupt.o
 				
-SOURCES	=		$(CORE) $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
-				$(FSSRCS) $(KLIBSRCS)
-
+SOURCES	=		$(CORE)  $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
+				$(FSSRCS) $(KLIBSRCS) 
+#SOURCES = $(CORE) device/intr-core.o device/kbd.o device/serial.o thread/thread.o mm/palloc.o mm/liballoc.o mm/liballoc_funcs.o thread/syscall.o thread/tss.o device/console.o device/hw.o mm/gdt.o mm/paging.o mm/vm.o $(KLIBSRCS)
+#SOURCES = init/kmain.o init/loader.o 
 all: $(SOURCES) link
 	cp kernel.bin /tftpboot/chicken
 lib: $(LIBSRCS)
 test: all
-	cd .. && ./new_update.sh &&  qemu -rtc base=localtime \
-	-m 64 -hda disk.img -serial file:log&& cd src 
+	cd .. && ./new_update.sh &&  /usr/local/bin/qemu-system-i386  -vga std -soundhw ac97  -rtc base=localtime \
+	-m 64 -usb  -hda disk.img -serial file:log && cd src 
+bochs: all
+	cd .. && ./new_update.sh &&  ./run_bochs.sh && cd src 
+test3: all
+	cd .. &&  qemu -rtc base=localtime \
+	-m 64 -hda disk.img -serial file:log && cd src 
 
 test2: all
 	cd .. && ./new_update.sh &&  qemu -rtc base=localtime \
 	-m 64 -hda disk.img -serial file:log -net nic,vlan=0,model=e1000,macaddr=00:00:00:00:00:00 -net tap,vlan=0,ifname=tap0,script=no  && cd src 
 debug: all
-	cd .. && ./update_image.sh && qemu -rtc base=localtime -s -S -m 512 -fda \
-	./floppy.img && cd src
+	cd .. && ./new_update.sh &&  qemu -rtc base=localtime \
+	-m 64 -usb -hda disk.img -s -S -serial file:log && cd src 
 
 clean:
 	rm kernel.bin\
 		$(SOURCES)
 
 link:
-	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES)
+	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES) ./libgcc.a
+
 
 
 %.o: %.c

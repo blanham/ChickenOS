@@ -58,6 +58,7 @@ ssize_t sys_read(int fildes, void *buf, size_t nbyte)
 ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 {
 	struct file *fp = thread_current()->files[fildes];
+	
 	if(fp == NULL)
 		return -1;
 	return vfs_write(fp, buf, nbyte);
@@ -80,6 +81,15 @@ int sys_chdir(const char *path)
 	return vfs_chdir(path);
 }
 
+char *sys_getcwd(char *buf, size_t size UNUSED)
+{
+	strcpy(buf, "/");
+	
+	return buf;
+}
+
+
+
 int sys_dup(int oldfd UNUSED)
 {
 	return -1;//ENOSYS;
@@ -92,7 +102,11 @@ int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
 
 int sys_ioctl(int fildes, int request, ...)
 {
-	struct file *fp = thread_current()->files[fildes];
+	struct file *fp;
+	if(fildes == -1)
+		return -1;
+	fp = thread_current()->files[fildes];
+	printf("fildes %i file %x\n", fildes, fp);
 	if(fp == NULL)
 		return -1;
 	return vfs_ioctl(fp, request, NULL);

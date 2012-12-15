@@ -51,7 +51,7 @@ enum exe_type exec_type(const char *path)
 	
 	sys_read(fd, magic, 4096);
 	
-	if(memcmp(magic, ELF_MAGIC, 4))
+	if(memcmp(magic, ELF_MAGIC, 4) == 0)
 		ret = EXE_ELF;
 		
 	sys_close(fd);
@@ -75,11 +75,15 @@ int sys_execve(const char *path, char *const argv[], char *const envp[])
 	{	
 	//	uintptr_t eip;
 		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
+	//	dump_regs(regs);
+		//FIXME: this is the wrong place to do this
 		if(tmp == 0)
 		{
 			sys_open("/dev/tty0", 0);
 			sys_open("/dev/tty0", 0);
+			sys_open("/dev/tty0", 0);
 		}else{
+			sys_open("/dev/tty1", 0);
 			sys_open("/dev/tty1", 0);
 			sys_open("/dev/tty1", 0);
 
@@ -87,92 +91,90 @@ int sys_execve(const char *path, char *const argv[], char *const envp[])
 		tmp++;
 		if(load_elf(path, &regs->eip) != 0)
 			goto failure;
+	//	printf("loaded elf\n");
 		if(envp != NULL)
-			printf("passing environment not yet supported!\n");	
+			printf("passing environment not yet supported!\n");
+	//	printf("argv %s\n", argv[0]);	
 	//	regs->eip = eip;
 		int newargv;
 		int newargc;
-		regs->useresp = stack_prepare((char *)path, argv, &newargv, &newargc);
-		regs->esi = newargc;
-		regs->ecx = (uint32_t)newargv;
-		//backtrack from end of string to get name
+				//backtrack from end of string to get name
 		name = (char *)path + strlen(path);
 		while((*(--name - 1) != '/') && (name != path));
 
 		cur->name = krealloc(cur->name, strlen(name) + 1);
-		strcpy(cur->name, name);
-		
+		regs->useresp = stack_prepare((char *)name, argv, &newargv, &newargc);
+		regs->esi = newargc;
+		regs->ecx = (uint32_t)newargv;
+
+	//	strcpy(cur->name, name);
+	//	printf("here?\n");	
 		//FIXME: probably not the best address for break
-		cur->brk = (void *)0xb0000000;
+		cur->brk = (void *)0x80000000;
 		pagedir_insert_pagen(cur->pd, (uintptr_t)pallocn(1000), (uintptr_t)cur->brk, 0x7, 1000);
-		printf("done\n");
+		//thread_yield();
+	//	printf("done\n");
 	}
-	//if we return, then something is wrong		
+	//if we return, then something is wrong	
 failure:
 	return -1;
 }
-static void *push_arg(char *arg, void *sp)
+static void push_arg(char *arg, char **sp)
 {
 		int len;
 		len = strlen(arg) + 1;
-		sp -= len;
-		strcpy((char *)sp, arg);	
-		return sp;
+		*sp -= len;
+		strcpy(*sp, arg);
+		printf("stack %x string %s *sp %s len %i\n", sp, arg, sp, len);
 }
 static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew)
 {
 	int argc = 1;
 	char **table;
-	uint32_t *stackw;
-	char *stackc = (void *)PHYS_BASE;
+	//uint32_t *stackw;
+	char *stack = (void *)PHYS_BASE;
 	char **argvp = (char **)argv;
 	
 	while(*argvp++ != NULL)	
 		argc++;
 
-	table = kcalloc((argc + 1)*sizeof(uint32_t *), 1);
+	table = kcalloc(argc + 1, sizeof(uint32_t *));
+
+
+	(void)path;
 	
 	for(int i = argc-2; i >= 0; i--)
 	{	
-		stackc = push_arg(argv[i], stackc);
-		table[i+1] = stackc;
-	}	
+		push_arg(argv[i], &stack);
+		table[i+1] = stack;
+	}
+	
 	//push path
-	stackc = push_arg(path, stackc);
+	push_arg(path, &stack);
 	//first entry of table is path
-	table[0] = stackc;
+	table[0] = stack;
+	printf("stack %x\n", stack);
 
 	//keep stack aligned
-	if(((uintptr_t)stackc % 4) != 0)
-		for(uint32_t i = 0; i < ((uintptr_t)stackc % 4); i++)
-			*--stackc = 0;
+	stack -= (uintptr_t)stack % 4;
+	
+	stack -= 4;
+	*(uint32_t *)stack = 0;
 
-	stackw = (uint32_t *)stackc;
+	stack = stack - (argc * 4);
+	kmemcpy(stack, table, argc * 4);
+	
+	stack -= 4;
+	*(uint32_t *)stack = (uint32_t)stack + 4;
 
-	//FIXME: should be able to use the NULL on the end of the
-	//supplied argv[]
-	//push null pointer (argv[argc] == NULL)
-	*--stackw = NULL;
 
-	//push table (argv) onto stack
-	for(int i = argc; i >= 0; i--)
-	{
-		*stackw-- = (uint32_t)table[i];
-	//	printf("table %x\n", table[i]);
-	}
-	//gcc will not let this be one line
-	*stackw = (uint32_t)stackw + 4;
-	stackw--;
-	*(uint32_t *)table[0] = (uintptr_t)table[1]; 
-	*argvnew = (uintptr_t)table[0];
-	*stackw-- = (uintptr_t)table[0];
+//	hex_dump((void *)(PHYS_BASE - 16*3), 3);
+	*argvnew = (int)stack;
 	*argcnew = argc;
-	//NULL function return value (entry point should not return)
-	*stackw = NULL;
-//	printf("argv = %x\n", *argvnew);	
-//	hex_dump((void *)(PHYS_BASE - 64));
+//	printf(" stack %x argvnew %x argcnew %i\n", stack, *argvnew, *argcnew);
+	
 
 	kfree(table);
-	return (uintptr_t)stackw;
+	return (uintptr_t)stack;
 }
 

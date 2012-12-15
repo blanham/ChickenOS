@@ -30,6 +30,7 @@ void ext2_inode_to_vfs(ext2_fs_t *fs,struct inode *vfs,ext2_inode_t *ext2,uint32
 	vfs->inode_num = inode;
 	vfs->mode = ext2->i_mode;
 	vfs->size = ext2->i_size;
+	//fix time reading
 	vfs->time = ext2->i_ctime;
 	if(ext2->i_mode & S_IFCHR || ext2->i_mode & S_IFBLK)
 	{
@@ -120,24 +121,24 @@ struct inode * ext2_load_inode(ext2_fs_t *fs, int inode)
 {
 	struct inode *read = kcalloc(sizeof(*read), 1);
 	ext2_inode_t *ext2_ino = kcalloc(sizeof(*ext2_ino),1);
+	ext2_inode_t *inode_block = kcalloc(sizeof(*ext2_ino),8);
 	ext2_superblock_t *sb = fs->superblock->sb;
-	
-	int group = ((inode - 1)/sb->s_inodes_per_group) + 1;
+	int ind;
+	int group = ((inode - 1)/sb->s_inodes_per_group);
 	
 	ext2_group_descriptor_t * gd = 
-		&fs->aux->gd_table[group -1];
-	
-	size_t table_size = 
-			sizeof(*ext2_ino) *sb->s_inodes_per_group;
-	ext2_inode_t *table = kmalloc(table_size);
-	
-	//FIXME: fixed size (1 block)
-	read_block_at(fs->dev, table, gd->bg_inode_table,
-		fs->aux->block_size, 0, table_size);
-
-	//if(this fails) free(read,ext_ino, table) and return NULL;
-	memcpy(ext2_ino, &table[inode-1], sizeof(*ext2_ino));
-	kfree(table);
+		&fs->aux->gd_table[group];
+//	gd_print(*gd);
+	int table_index = ((inode - 1 ) % sb->s_inodes_per_group) ;
+//	printf("inode %i table_index = %i\n",inode, table_index);
+	int block = ((table_index * 128) / 1024 )+ gd->bg_inode_table;
+//	printf("BLOCK %i FUCK %i\n",block,((table_index * 128) % 1024) / 128);
+	read_block(fs->dev, inode_block, block, 1024);
+	ind = table_index % (1024 /128);
+//	printf("IND %i\n",ind);
+	kmemcpy(ext2_ino, &inode_block[ind], sizeof(*ext2_ino));
+//	inode_print(*ext2_ino);
+	kfree(inode_block);
 	ext2_inode_to_vfs(fs, read,ext2_ino,inode);
 	return read;
 }
@@ -160,11 +161,12 @@ struct inode * ext2_namei(struct inode *dir, char *file)
 //	ext2_read(&test, dir, 4096, 0);
 	while(count)
 	{
-		//print_dir_entry(ext2_dir);
-
-		if(!strncmp(ext2_dir->name,file,strlen(file)-1))
+	//	print_dir_entry(ext2_dir);
+	//	printf("%s %s %i\n", file, ext2_dir->name, ext2_dir->name_len);
+		if(ext2_dir->name_len  == strlen(file) && !strncmp(ext2_dir->name,file,strlen(file)-1))
 		{
 			kfree(fdir);
+		//	printf("loading inode %i\n",ext2_dir->inode);
 			return ext2_load_inode(fs,ext2_dir->inode); 
 		}
 		if((len = ext2_dir[0].rec_len) == 0)
@@ -179,17 +181,21 @@ struct inode * ext2_namei(struct inode *dir, char *file)
 #define EXT2_NDIR_BLOCKS 12
 #define EXT2_DIR_BLOCKS 12
 
+//FIXME: There are some magic numbers in here that should be gotten rid of
 int byte_to_block(ext2_fs_t *fs, ext2_inode_t *inode, size_t offset)
 {
 	uint32_t block_size = fs->aux->block_size;
 	off_t block_offset = offset / block_size;
 	uint32_t *indirect = NULL;	
+	uint32_t *dbl_indirect;
 	int block = 0;
+	uint32_t temp = 0;
 	if(offset > inode->i_size)
 		return -1;
 	
 	if(offset < EXT2_NDIR_BLOCKS*block_size)
 	{
+	//	printf("offset %i temp %i\n",offset, block_offset);
 		block = inode->i_block[block_offset];
 
 	}
@@ -199,15 +205,48 @@ int byte_to_block(ext2_fs_t *fs, ext2_inode_t *inode, size_t offset)
 		if(ext2_read_block(fs, indirect, inode->i_block[12]) != block_size)
 			return -1;
 		block_offset = (offset - EXT2_NDIR_BLOCKS*block_size)/block_size;	
+	//	printf("offset %i temp %i\n",offset, block_offset);
 		block = indirect[block_offset];
 
-	}else{
-		PANIC("Double/Triple indirect blocks in ext2.c not implemented yet\n");
-		return -1;
+	}
+	else if((unsigned)offset < ((EXT2_NDIR_BLOCKS + (block_size/4)) + (block_size/4)*(block_size/4)) * block_size)
+	{
+		dbl_indirect = kmalloc(block_size*sizeof(uint32_t));
+		if(ext2_read_block(fs, dbl_indirect, inode->i_block[13]) != block_size)
+			return -1;
+	//	printf("check %u\n", offset - 274432);
+		temp = offset - ((EXT2_NDIR_BLOCKS*block_size) + ((block_size / sizeof(uint32_t)*block_size)));
+		block_offset = temp / (256*block_size);	
+//	block_offset = (offset - (EXT2_NDIR_BLOCKS + (block_size / 4))*block_size)/block_size;	
+		block = dbl_indirect[block_offset];
+	//	printf("offset %i b_offset %i block %u temp %u temp2 %u\n",offset, block_offset, block, temp, temp2);
+		if(block_offset > 256){
+			printf("temp %u\n", temp);
+			printf("value %u\n",((EXT2_NDIR_BLOCKS + (block_size/4))* (block_size)));	
+			PANIC("SHIT'S FUCKED");
+		}
+	//	printf("offset %i b_offset %i block %u temp %u\n",offset, block_offset, block, temp);
+		temp = temp - (block_offset*262144);//(block*((block_size/4) * block_size));
+		indirect = kmalloc(block_size*sizeof(uint32_t));
+		if(ext2_read_block(fs, indirect, block) != block_size)
+			return -1;
+		block_offset = (temp) / block_size;	
+		block = indirect[block_offset];
+
+	//	printf("offset %i b_offset %i block %u temp %u\n",offset, block_offset, block, temp);
+	//	PANIC("Double indirect blocks in ext2.c not implemented yet");
+		//return -1;
+	}
+	else
+	{
+
+		PANIC("Triple indirect blocks in ext2.c not implemented yet");
+
 	}
 	
 	if(indirect != NULL)
 		kfree(indirect);
+
 
 	return block;
 }
@@ -229,6 +268,7 @@ size_t ext2_read_inode(struct inode *inode,void *_buf,
 	while(remaining > 0)
 	{
 		block = byte_to_block(fs, ext2_ino,offset);
+		//printf("reading block %i %i\n",block, offset);
 		block_ofs = offset % block_size;
 		cur_block_size = block_size - block_ofs;
 		to_end = ext2_ino->i_size - offset;

@@ -41,12 +41,12 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	path = strdup(_path);
 	filename = kcalloc(255, 1);;
 
-	if(memcmp(_path, "cfs://",6) == 0)
-	{
+//	if(memcmp(_path, "cfs://",6) == 0)
+//	{
 
 
-		return NULL;
-	}
+	//	return NULL;
+//	}
 
 
 	
@@ -308,11 +308,15 @@ int  vfs_ioctl(struct file *file,
 	int request, ...)
 {
 	int ret = 0;
+	va_list va;
+	va_start(va, request);
 	if(file == NULL)
 		return -1;
+
+	printf("test %x\n", file);
 	if((file->inode->mode & S_IFCHR) != 0){
 		ret = char_device_ioctl(file->inode->rdev, 
-			request, NULL);
+			request, va);
 	}else if((file->inode->mode & S_IFBLK) != 0){
 	//	ret = block_device_readn(file->inode->rdev, 
 	//		buf, 0, file->offset, nbyte);
@@ -324,6 +328,7 @@ int  vfs_ioctl(struct file *file,
 	//		nbyte, file->offset);
 		return -1;
 	}
+	va_end(va);
 	return ret;
 }
 
