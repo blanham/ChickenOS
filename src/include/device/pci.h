@@ -25,7 +25,10 @@ struct pci_conf_hdr {
 	uint16_t command;
 	uint16_t status;
 	uint8_t rev;
-	uint8_t class[3];
+//	uint8_t class[3];
+	uint8_t pci_interface;
+	uint8_t pci_minor;
+	uint8_t pci_major;
 	uint8_t clg;
 	uint8_t latency;
 	uint8_t header;
@@ -54,10 +57,10 @@ union cfg_addr2 {
 	uint32_t val;
 } __attribute__((packed));
 struct pci_device {
-	union pci_dev_storage {
-		struct pci_conf_hdr hdr;
-		uint32_t storage[256/4];
-	} header;
+//	union pci_dev_storage {
+		struct pci_conf_hdr *header;
+	//	uint32_t storage[256/4];
+//	} header;
 	union cfg_addr2 regs;
 	intr_handler *irq_handler;
 	struct pci_device *next;
@@ -78,6 +81,9 @@ struct cfg_addr {
 #define PCI_BAR_MEM  0x0
 #define PCI_BAR_IO 	 0x1
 #define PCI_BAR_NONE 0x3
+
+
+#define INTEL_VEND 0x8086
 
 typedef void pci_intr_handler (void *);
 uint32_t pci_get_bar(struct pci_device *dev, uint8_t type);

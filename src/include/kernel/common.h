@@ -17,7 +17,7 @@ static inline void kernel_halt()
 void kprintf(char *fmt, ...);
 
 //fix this once I have a kernel printf
-#include <kernel/console.h>
+#include <device/console.h>
 #include <stdio.h>
 static inline void print_stack_trace ()
 {
@@ -62,7 +62,7 @@ static inline void backtrace(unsigned int level)
 				return;
 		}	
 		printf("%i [%X] %x\n",i, ret, (StartInHigherHalf));
-		if((uintptr_t)ret == (uintptr_t)(StartInHigherHalf + 0xc0000000))
+		if((uintptr_t)ret == (uintptr_t)((StartInHigherHalf& 0xFFF) + 0xc0000000))
 			return;
 	}
 
@@ -73,25 +73,28 @@ static inline void backtrace(unsigned int level)
 #define PANIC(x) panic(__FILE__, __LINE__, x);
 static inline void panic(char *file, int line,char* msg)
 {
-	console_set_color(RED,WHITE);
-	console_puts("KERNEL PANIC\n");
+	//console_set_color(RED,WHITE);
+//	console_puts("KERNEL PANIC\n");
 	printf("file:%s line:%i [%s]\n",file, line, msg);
 	printf("Backtrace\n");
 	print_stack_trace();
-
 	kernel_halt();
 }
 #define ASSERT(condition, msg) kassert(__FILE__, __LINE__,condition, msg)
 static inline void
 kassert(char *file, int line, bool condition, char *msg)
 {
-	console_set_color(RED,WHITE);
 	
 	if(condition == true)
 		return;
-	console_puts("Conditon failed:\t");
-	console_puts(msg);
+	(void)msg;	
+	//console_set_color(GREEN,WHITE);
 	
+	//console_puts("Conditon failed:\t");
+//	console_puts(msg);
+		uint32_t *ptr = 0;
+	*ptr = 0;
+
 	panic(file, line, "ASSERTION FAILED!");
 }
 #endif

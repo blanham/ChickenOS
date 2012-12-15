@@ -30,12 +30,16 @@ void vm_init(struct multiboot_info *mb);
 /* mm/paging.c */
 void paging_init();
 pagedir_t pagedir_new();
+pagedir_t pagedir_clone(pagedir_t pd);
 void pagedir_install(uint32_t *pd);
 void pagedir_insert_page(pagedir_t pd, 
 	virt_addr_t phys, virt_addr_t virt,uint8_t flags);
 void pagedir_insert_pagen(pagedir_t pd, virt_addr_t kvirt, 
 	virt_addr_t uvirt,uint8_t flags, int n);
-
+void pagedir_insert_page_physical(pagedir_t pd, phys_addr_t kphys, 
+	virt_addr_t uvirt,uint8_t flags);
+void pagedir_insert_pagen_physical(pagedir_t pd, phys_addr_t kphys, 
+	virt_addr_t uvirt,uint8_t flags, int n);
 /* mm.gdt.c */
 void gdt_install();
 

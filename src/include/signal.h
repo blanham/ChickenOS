@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#if defined(_POSIX_SOURCE) || defined(_POSIX_C_SOURCE) \
- || defined(_XOPEN_SOURCE) || defined(_GNU_SOURCE)
+//#if defined(_POSIX_SOURCE) || defined(_POSIX_C_SOURCE) \
+// || defined(_XOPEN_SOURCE) || defined(_GNU_SOURCE)
 
 #ifdef _GNU_SOURCE
 #define __siginfo siginfo
@@ -23,7 +23,7 @@ extern "C" {
 #define __NEED_sigset_t
 #define __NEED_siginfo_t
 
-#include <bits/alltypes.h>
+//#include <bits/alltypes.h>
 
 #define SIG_HOLD ((void (*)(int)) 2)
 
@@ -142,7 +142,8 @@ struct sigevent {
 	int sigev_signo;
 	int sigev_notify;
 	void (*sigev_notify_function)(union sigval);
-	pthread_attr_t *sigev_notify_attributes;
+	//pthread_attr_t *sigev_notify_attributes;
+	uint32_t ___pad;
 	char __pad[56-3*sizeof(long)];
 };
 
@@ -173,11 +174,11 @@ int sigwaitinfo(const sigset_t *, siginfo_t *);
 int sigtimedwait(const sigset_t *, siginfo_t *, const struct timespec *);
 int sigqueue(pid_t, int, const union sigval);
 
-int pthread_sigmask(int, const sigset_t *, sigset_t *);
-int pthread_kill(pthread_t, int);
+//int pthread_sigmask(int, const sigset_t *, sigset_t *);
+//int pthread_kill(pthread_t, int);
 
-void psiginfo(const siginfo_t *, const char *);
-void psignal(int, const char *);
+//void psiginfo(const siginfo_t *, const char *);
+//void psignal(int, const char *);
 
 #endif
 
@@ -212,7 +213,7 @@ int sigisemptyset(const sigset_t *);
 #define SA_ONESHOT SA_RESETHAND
 #endif
 
-#include <bits/signal.h>
+//#include <bits/signal.h>
 
 #define SIG_ERR  ((void (*)(int))-1)
 #define SIG_DFL  ((void (*)(int)) 0)
@@ -227,4 +228,4 @@ int raise(int);
 }
 #endif
 
-#endif
+//#endif

@@ -117,6 +117,7 @@ int sys_open(const char *path, int oflag, ...);
 int sys_close(int fd);
 ssize_t sys_read(int fildes, void *buf, size_t nbyte);
 ssize_t sys_write(int filedes, void *buf, size_t nbyte);
+char* sys_getcwd(char *buf, size_t size);
 
 /*int creat(const char *path, mode_t mode);*/
 //int sys_creat(const char *path, mode_t mode);
@@ -136,6 +137,11 @@ typedef uint16_t dev_t;
 typedef size_t (*char_read_fn)(uint16_t dev, void *buf, off_t offset, size_t count);
 typedef size_t (*char_write_fn)(uint16_t dev, void *buf, off_t offset, size_t count);
 typedef int (*char_ioctl_fn)(uint16_t dev, int request, ...);
+struct char_device_ops {
+	char_read_fn read;
+	char_write_fn write;
+	char_ioctl_fn ioctl;
+};
 
 
 typedef size_t (*block_read_fn) (uint16_t dev, void *buf, int block);
