@@ -1,6 +1,7 @@
 #ifndef C_OS_BITMAP_H
 #define C_OS_BITMAP_H
 #include <kernel/types.h>
+//TODO: needs housekeeping
 //#include <stdint.h>
 //#include "types.h"
 //typedef uint32_t * bitmap_t;
