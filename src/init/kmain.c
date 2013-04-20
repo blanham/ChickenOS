@@ -11,8 +11,8 @@
 #include <kernel/timer.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/fs/vfs.h>
-#include <kernel/fs/initrd.h>
+#include <fs/vfs.h>
+#include <fs/initrd.h>
 #include <net/net_core.h>
 #include <stdio.h>
 #include <string.h>
@@ -22,7 +22,7 @@ char *BOOT_MSG = "ChickenOS v0.02 booting\n";
 
 extern void print_mb(unsigned long addr, unsigned long magic);
 
-
+//FIXME: Move this somewhere else (init/boot.c?)
 void modules_init(struct multiboot_info *mb)
 {
 	extern uint32_t *background_image;
@@ -35,56 +35,68 @@ void modules_init(struct multiboot_info *mb)
 	}
 }
 
-void kmain(uint32_t mbd, uint32_t magic)
+
+//mb is already a virtual address
+void kmain(struct multiboot_info* mb, uint32_t magic)
 {
-	struct multiboot_info *mb = 0;
    	if ( magic != 0x2BADB002 )
    	{
 	//	console_puts("Bad magic number, halting\r");
 		return;
    	}
- 	
-	mb = (struct multiboot_info *)P2V(mbd);
 	
 	/* begin initializations */
 	modules_init(mb);
+
 	vm_init(mb);
+
 	thread_init();
+
 	interrupt_init();
+
 //	console_init();
+
 	pci_init();
+
 	video_init();
+
 	//we start out with one color scheme
 	//but this will be changed if i ever get a framebuffer
 	//console working
 //	console_set_color(BLUE,WHITE);
 	console_puts(BOOT_MSG);
+
 	audio_init();
+
 	extern void pci_list();
-	pci_list();	
+
+//	pci_list();	
 
 	kbd_init();	
+
 	time_init();
+
 	syscall_init();
 	
 	interrupt_enable();
 	
 	usb_init();
+
 	serial_init();
 
-	if(1)
-	{
-		modules_init(mb);	
-		vfs_init();
-		//need to move this back to console.c	
-		console_fs_init();
-		extern void ata_init();
-		ata_init();	
-		vfs_mount_root(ATA0_0_DEV, "ext2");
+	//network_init();
 
-	}
-	
-//	network_init();
+	vfs_init();
+
+	//need to move this back to console.c	
+	console_fs_init();
+
+	extern void ata_init();
+
+	ata_init();	
+
+
+	vfs_mount_root(ATA0_0_DEV, "ext2");
 	
 	thread_usermode();
 	
@@ -94,14 +106,17 @@ void kmain(uint32_t mbd, uint32_t magic)
 //	network_setup();
 
 
-	char *argv[] = {"dash", NULL};
+	char *argv[] = {"/init",NULL};	
+
 	if(!fork() )
 	{
 		execv("/init", argv);
 		PANIC("execv(init) failed!");
 	}
+
 	//only works because initial threads name is "main"
 	strcpy(thread_current()->name, "idle");
+	//needs to be sleep?
 	while(1);
 
 	//should never return, unless things get really fucked

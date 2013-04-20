@@ -29,6 +29,13 @@ execve(char *name, char **argv, char **env) {
 	int ret = SYSCALL_3N(SYS_EXECVE, name, argv, env);
 	return ret;
 }
+int
+execvp(char *name, char **argv, char **env) {
+//	errno = ENOMEM;
+	int ret = SYSCALL_3N(SYS_EXECVE, name, argv, NULL);
+//FIXME:doesn't actually search path
+	return ret;
+}
 
 /*
  * getpid -- only one process, so just return 1.
@@ -67,7 +74,14 @@ kill(int pid, int sig)
 int
 wait(int *status) {
 //	errno = ECHILD;
-	int ret = SYSCALL_1N(SYS_WAITPID, status);
+	int ret = SYSCALL_3N(SYS_WAITPID, -1, status, 0);
+	
+	return ret;
+}
+int
+waitpid(int pid, int *status, int options) {
+//	errno = ECHILD;
+	int ret = SYSCALL_3N(SYS_WAITPID, pid, status, options);
 	
 	return ret;
 }

@@ -1,5 +1,17 @@
 #include <kernel/types.h>
 
+int isprint(char c)
+{
+	if(('a' <= c) && (c <= 'z'))
+	return 1;
+	if(c == '/')
+		return 1;
+	if(c == '-')
+		return 1;
+	return 0;
+
+}
+
 int isdigit(int c)
 {
 	if(('0' <= c) && (c <= '9'))

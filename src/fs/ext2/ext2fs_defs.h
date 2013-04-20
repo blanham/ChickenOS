@@ -1,5 +1,5 @@
 /* inodes are indexed starting at 1 */
-#include <kernel/fs/vfs.h>
+#include <fs/vfs.h>
 #define INODE(x) (x-1)
 #define BLOCK(x) (1024*(x))
 #define EXT2_MAGIC 0xef53
@@ -85,6 +85,7 @@ typedef struct ext2_aux {
 	uint32_t size;
 	uint32_t gd_block;
 	uint32_t block_size;
+//	uint32_t fuckass[0];
 	ext2_group_descriptor_t *gd_table; 
 	//may cache these
 	uint32_t *block_bitmap;

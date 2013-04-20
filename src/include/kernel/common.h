@@ -36,7 +36,6 @@ static inline void print_stack_trace ()
 //horrible, horrible abuse of GCC's builtin return_address 
 //funtion, needs to print to serial so output can be pasted
 //into addr2line -e kernel.bin -a -f [BACKTRACE]
-extern void kmain(uint32_t mbd, uint32_t magic);
 extern int StartInHigherHalf;
 static inline void backtrace(unsigned int level)
 {
@@ -70,11 +69,12 @@ static inline void backtrace(unsigned int level)
 }
 #undef BACK
 
+//FIXME: Get colored coded messages fixed
 #define PANIC(x) panic(__FILE__, __LINE__, x);
 static inline void panic(char *file, int line,char* msg)
 {
 	//console_set_color(RED,WHITE);
-//	console_puts("KERNEL PANIC\n");
+	//console_puts("KERNEL PANIC\n");
 	printf("file:%s line:%i [%s]\n",file, line, msg);
 	printf("Backtrace\n");
 	print_stack_trace();
@@ -91,8 +91,8 @@ kassert(char *file, int line, bool condition, char *msg)
 	//console_set_color(GREEN,WHITE);
 	
 	//console_puts("Conditon failed:\t");
-//	console_puts(msg);
-		uint32_t *ptr = 0;
+	//console_puts(msg);
+	uint32_t *ptr = 0;
 	*ptr = 0;
 
 	panic(file, line, "ASSERTION FAILED!");

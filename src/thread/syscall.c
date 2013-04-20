@@ -7,6 +7,7 @@
 #include <net/net_core.h>
 #include <thread/syscall.h>
 #include <stdio.h>
+#include <errno.h>
 //#include <kernel/vfs.h>
 //needs to be seperated into two files
 
@@ -73,7 +74,7 @@ void syscall_handler (struct registers *regs)
 	int call = regs->eax;
 	char *buf = NULL;
 	buf = buf;
-	//printf("call %i\n",call);
+//	printf("call %i\n",call);
 	switch (call)
 	{
 		case SYS_READ:
@@ -100,6 +101,9 @@ void syscall_handler (struct registers *regs)
 		case SYS_LSEEK:
 			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->ecx, (int) regs->edx);
 			return;
+		case SYS_STAT:
+			regs->eax = sys_stat((char *)regs->ebx, (struct stat *)regs->ecx);
+			return;
 		case SYS_GETPID:
 		//	printf("getpid\n");
 		//	while(1);
@@ -110,6 +114,7 @@ void syscall_handler (struct registers *regs)
 			break;
 		case SYS_FORK:
 			regs->eax = sys_fork(regs);
+			printf("fork @ eip %X\n", regs->eip);
 			//dump_regs(regs);
 			return;
 		case SYS_EXECVE:
@@ -117,6 +122,7 @@ void syscall_handler (struct registers *regs)
 		//	dump_regs(regs);
 			regs->eax = sys_execve((char *)regs->ebx, (char **)regs->ecx, (char **)regs->edx);
 		//	dump_regs(regs);
+			thread_yield();
 			return;
 		case SYS_SBRK:
 			regs->eax = (uintptr_t)sys_brk(regs->ebx);
@@ -188,7 +194,7 @@ void syscall_handler (struct registers *regs)
 		default:
 			printf("undefined system call %i!\n",call);
 		//	while(1);
-			regs->eax = 0;
+			regs->eax = 0;//ENOSYS;
 			return;
 	}
 }

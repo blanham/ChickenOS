@@ -7,12 +7,14 @@
 #include <kernel/memory.h>
 #include <kernel/thread.h>
 #include <kernel/vm.h>
-#include <kernel/fs/vfs.h>
-#include <kernel/fs/ext2/ext2.h>
+#include <fs/vfs.h>
+#include <fs/ext2/ext2.h>
 #include <mm/liballoc.h>
 #include <stdio.h>
 #include <string.h>
 #include <thread/syscall.h>
+#include <sys/stat.h>
+#include <errno.h>
 //file stuff should be seperated out
 struct file *open_files[100];
 uint8_t file_count = 0;
@@ -61,7 +63,10 @@ ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 	
 	if(fp == NULL)
 		return -1;
-	return vfs_write(fp, buf, nbyte);
+	ssize_t ret;
+	ret = vfs_write(fp, buf, nbyte);
+
+	return ret;
 }
 /*int creat(const char *path, mode_t mode)*/
 /*int creat(const char *path UNUSED, uint32_t mode UNUSED)
@@ -75,12 +80,19 @@ off_t sys_lseek(int fildes, off_t offset, int whence)
 		return -1;
 	return vfs_seek(fp, offset, whence);
 }
+int sys_stat(char *filename, struct stat *statbuf)
+{
+	printf("sys_stat: %s %p\n", filename, statbuf);
+	
+	return ENOENT;
+}
 
 int sys_chdir(const char *path)
 {
 	return vfs_chdir(path);
 }
 
+//FIXME: Placeholder
 char *sys_getcwd(char *buf, size_t size UNUSED)
 {
 	strcpy(buf, "/");
@@ -90,16 +102,19 @@ char *sys_getcwd(char *buf, size_t size UNUSED)
 
 
 
+//FIXME: Placeholder
 int sys_dup(int oldfd UNUSED)
 {
 	return -1;//ENOSYS;
 }
 
+//FIXME: Placeholder
 int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
 {
 	return -1;//ENOSYS;
 }
 
+//FIXME: doesn't handle varargs
 int sys_ioctl(int fildes, int request, ...)
 {
 	struct file *fp;

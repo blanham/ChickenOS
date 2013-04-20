@@ -9,7 +9,7 @@ int video_init()
 	console_t *console = NULL;
 
 //	console = bochs_vga_init();
-//	if(console == NULL)
+	if(console == NULL)
 		console = vga_init();
 	(void)console;
 

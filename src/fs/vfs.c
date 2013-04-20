@@ -7,17 +7,45 @@
 #include <kernel/memory.h>
 #include <kernel/thread.h>
 #include <kernel/vm.h>
-#include <kernel/fs/vfs.h>
-#include <kernel/fs/ext2/ext2.h>
+#include <fs/vfs.h>
+#include <fs/ext2/ext2.h>
 #include <mm/liballoc.h>
 #include <stdio.h>
 #include <string.h>
-vfs_fs_t *root_fs;
-vfs_fs_t * filesystems[10];
 
+//FIXME: Probably shouldn't be a table
+vfs_fs_t * filesystems[10];
+vfs_fs_t *root_fs;
+
+//FIXME: This is incorrect, should he hashed or something
 struct inode *open_inodes[100];
 struct file *root;
 
+
+struct file *vfs_file_new(struct inode *inode, char *name)
+{
+	struct file *new = kcalloc(sizeof(*new),1);
+	new->inode = inode;
+	new->fs = inode->fs;
+	strcpy(new->name, name);
+	return new;
+}
+
+int vfs_file_free(struct file *file)
+{
+	struct inode *inode = file->inode;
+	kfree(file);
+	//decrement reference count
+	//if 0 take out of cache
+	inode = inode;
+
+	return 0;
+}
+
+
+
+//FIXME: Traversing mounts, '.' and '..', and non-directory inodes broken
+//		 Some kind of cache would probably be a good idea
 struct inode * vfs_namei(struct inode *dir, char *file)
 {
 	if(dir->flags & I_MOUNT && dir != root->inode)
@@ -30,7 +58,7 @@ struct inode * vfs_namei(struct inode *dir, char *file)
 		//TODO: return is not directory error
 		PANIC("calling vfs_namei on a non-directory inode");
 	}
-	//need to lookup things in a cache
+	
 	return dir->fs->ops->namei(dir, file);
 }
 
@@ -38,18 +66,19 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 {
 	char *saveptr, *tok, *filename, *path;
 	struct inode *res = dir->inode;
+
 	path = strdup(_path);
+
 	filename = kcalloc(255, 1);;
 
+
+//Remnant of idea for network based fs
 //	if(memcmp(_path, "cfs://",6) == 0)
 //	{
-
-
 	//	return NULL;
 //	}
-
-
 	
+
 	if(path[0] == '/')
 		res = root->inode;
 	else
@@ -57,12 +86,14 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	
 	if((tok = (char *)strtok_r(path, "/", &saveptr)) == NULL)
 		return NULL;
-		
+
 	if((res = vfs_namei(res, tok)) == NULL)
 	{
-		printf("dir search or insert broken\n");
-		printf("path %s\n",path);
-		while(1);
+		//FIXME	leaving this here for now
+		//		but i've probably fixed the main bug
+		//		causing this
+		printf("dir search or insert broken. path %s\n",path);
+		
 		return NULL;
 	}
 
@@ -82,6 +113,7 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	kfree(path);
 	return res;
 }
+
 //FIXME: use linked list or hash
 vfs_fs_t * vfs_find_fs(char *type)
 {
@@ -98,12 +130,14 @@ vfs_fs_t * vfs_find_fs(char *type)
 
 	return find;
 }
+
 void vfs_file_print(struct file *file)
 {
 	printf("File: %s\n",file->name);
-	printf("Device %x\n",file->dev);
+	printf("Device %x\n",file->inode->rdev);
 
 }
+
 void vfs_mount_root(uint16_t dev, char *type)
 {
 	vfs_fs_t *fs;
@@ -119,17 +153,18 @@ void vfs_mount_root(uint16_t dev, char *type)
 	if(fs->ops->read_sb(fs, dev) < 0)
 		goto error;
 	
-	//needs to be a list	
+	//FIXME: needs to be a list	
 	open_inodes[0] = fs->superblock->root;
 	
-	root->inode = fs->superblock->root;
+	//root->inode = fs->superblock->root;
 
 	//FIXME: use vfs_new_file instead:
-	//root = vfs_new_file(fs->superblock->root, "/");
-	strcpy(root->name, "/");
-	root->dev = dev;
-	root->offset = 0;
-	root->fs = fs;
+	root = vfs_file_new(fs->superblock->root, "/");
+//	strcpy(root->name, "/");
+//	root->dev = dev;
+//	root->offset = 0;
+//	root->fs = fs;
+
 	thread_current()->cur_dir = root;
 	root_fs = fs;
 
@@ -148,6 +183,10 @@ vfs_fs_t *vfs_alloc()
 	return new;
 }
 
+//TODO: Copy the Linux module setup
+//		Wherein we put everything in a 
+//		null-terminated array of function 
+//		pointers that we iterate over
 int vfs_register_fs(vfs_fs_t *fs)
 {
 	//return error if name blank
@@ -167,7 +206,7 @@ int vfs_register_fs(vfs_fs_t *fs)
 }
 void vfs_init()
 {
-	root = kcalloc(sizeof(struct inode),1);
+	//root = (struct file *)kcalloc(sizeof(struct file),1);
 
 	printf("Initialzing VFS\n");
 	if(ext2_init() < 0)
@@ -218,25 +257,6 @@ int vfs_mount(const char *device, struct file *dir, char *type)
 
 }
 */
-struct file *vfs_file_new(struct inode *inode, char *name)
-{
-	struct file *new = kcalloc(sizeof(*new),1);
-	new->inode = inode;
-	new->fs = inode->fs;
-	strcpy(new->name, name);
-	return new;
-}
-
-int vfs_file_free(struct file *file)
-{
-	struct inode *inode = file->inode;
-	kfree(file);
-	//decrement reference count
-	//if 0 take out of cache
-	inode = inode;
-
-	return 0;
-}
 
 struct file *vfs_open(char *path)
 {
@@ -281,8 +301,7 @@ size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 
 }
 
-off_t vfs_write(struct file *file, 
-	void *buf, size_t nbyte)
+off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 {
 	int ret = 0;
 	if(file == NULL || buf == NULL)
@@ -291,6 +310,7 @@ off_t vfs_write(struct file *file,
 		ret = char_device_write(file->inode->rdev, 
 			buf, file->offset, nbyte);
 	}else if((file->inode->mode & S_IFBLK) != 0){
+//FIXME: This returns -1 so we don't fuxxor our disk image accidentally
 	//	ret = block_device_readn(file->inode->rdev, 
 	//		buf, 0, file->offset, nbyte);
 		return -1;
@@ -304,6 +324,7 @@ off_t vfs_write(struct file *file,
 	return ret;
 }
 
+//FIXME: Might actually take va_list
 int  vfs_ioctl(struct file *file, 
 	int request, ...)
 {
@@ -332,6 +353,13 @@ int  vfs_ioctl(struct file *file,
 	return ret;
 }
 
+
+
+//FIXME: Error catching
+//		check if fd is open and return EBADF
+//		check if file offset is negative and return EINVAL
+//		check if offset overflows off_t and return EOVERFLOW
+//		check if pipe and return ESPIPE
 off_t vfs_seek(struct file *file, off_t offset, int whence)
 {
 	switch(whence)
@@ -346,13 +374,14 @@ off_t vfs_seek(struct file *file, off_t offset, int whence)
 			//file->offset = file->end + offset;
 			//break;
 		default:
+			//EINVAL?
 			return 0;
 
 	}
 
 	return file->offset;
 }
-
+//FIXME: I'm not sure if the logic here checks out
 int vfs_chdir(const char *_path)
 {
 	struct file *file;

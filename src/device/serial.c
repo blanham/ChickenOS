@@ -2,7 +2,7 @@
 #include <kernel/common.h>
 #include <kernel/hw.h>
 #include <kernel/interrupt.h>
-#include <kernel/fs/vfs.h>
+#include <fs/vfs.h>
 #include <device/serial.h>
 #define COM1 0x3F8
 #define COM2 0x2F8

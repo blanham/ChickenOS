@@ -79,7 +79,9 @@ StartInHigherHalf:
  
     ; pass Multiboot info structure -- WARNING: This is a physical address and may not be
     ; in the first 4MB!
-    push ebx
+    ; 4/8/2013 - add KERNEL_VIRTUAL_BASE so it is a virtual address
+	add ebx, KERNEL_VIRTUAL_BASE
+	push ebx
  
     call  kmain                  ; call kernel proper
     hlt                          ; halt machine should kernel return

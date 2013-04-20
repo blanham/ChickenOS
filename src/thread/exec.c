@@ -1,5 +1,6 @@
 #include <common.h>
 #include <stdio.h>
+#include <ctype.h>
 #include <string.h>
 #include <memory.h>
 #include <mm/liballoc.h>
@@ -8,17 +9,7 @@
 #include <fs/vfs.h>
 enum exe_type {EXE_INVALID, EXE_ELF};
 static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew);
-static inline int _isprint(char c)
-{
-	if(('a' <= c) && (c <= 'z'))
-	return 1;
-	if(c == '/')
-		return 1;
-	if(c == '-')
-		return 1;
-	return 0;
 
-}
 void hex_dump(void *ptr, int n)
 {
 	uint8_t *p = ptr;	
@@ -32,7 +23,7 @@ void hex_dump(void *ptr, int n)
 		printf("|");
 		for(int i = 0; i < 16; i++)
 		{
-			printf("%c",_isprint(p[i]) == 0 ? '.' : p[i]);
+			printf("%c",isprint(p[i]) == 0 ? '.' : p[i]);
 		}
 		printf("|");
 		printf("\n");
@@ -66,16 +57,21 @@ int sys_execve(const char *path, char *const argv[], char *const envp[])
 	static int tmp = 0;
 	registers_t *regs;
 	thread_t *cur = thread_current();
+
 	//while(1);
+
 	if(path == NULL || argv == NULL)
 		return -1;
+
 //	if((uintptr_t)path < 0x30303040)
 //		return -1;
-	if(exec_type(path) == EXE_ELF)
+	
+if(exec_type(path) == EXE_ELF)
 	{	
 	//	uintptr_t eip;
 		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
 	//	dump_regs(regs);
+
 		//FIXME: this is the wrong place to do this
 		if(tmp == 0)
 		{
@@ -89,13 +85,18 @@ int sys_execve(const char *path, char *const argv[], char *const envp[])
 
 		}
 		tmp++;
+
 		if(load_elf(path, &regs->eip) != 0)
 			goto failure;
+
 	//	printf("loaded elf\n");
+
 		if(envp != NULL)
 			printf("passing environment not yet supported!\n");
+
 	//	printf("argv %s\n", argv[0]);	
 	//	regs->eip = eip;
+
 		int newargv;
 		int newargc;
 				//backtrack from end of string to get name

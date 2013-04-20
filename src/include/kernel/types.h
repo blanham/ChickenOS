@@ -15,6 +15,8 @@ typedef signed long	long	int64_t;
 typedef unsigned long long	uint64_t;
 typedef uint32_t	    bool;
 typedef uint32_t		uintptr_t;
+typedef uint32_t blksize_t;
+typedef uint32_t blkcnt_t;
 #ifndef NULL
 #define NULL 0
 #endif

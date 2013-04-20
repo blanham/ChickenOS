@@ -38,6 +38,7 @@ Syscalls
 -poll()
 -select()
 -termios stuff
+-various fs calls
 
 Network
 ===============================================================================

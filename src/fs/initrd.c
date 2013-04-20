@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <kernel/common.h>
 #include <kernel/memory.h>
-#include <kernel/fs/vfs.h>
-#include <kernel/fs/initrd.h>
+#include <fs/vfs.h>
+#include <fs/initrd.h>
 typedef struct initrd_struct {
 	uint8_t *ramdisk;
 	uint32_t size;

@@ -142,7 +142,7 @@ void thread_usermode(void)
 	
 	//need a macro for this offset calculation?
 	new_esp = (cur_esp & 0xfff) + (PHYS_BASE - 0x1000);
-//	interrupt_enable();
+	interrupt_enable();
 	thread_start = true;
 	asm volatile(
 				"cli\n"
@@ -175,6 +175,17 @@ in_kernel(void)
 	return false;
 }
 
+
+thread_t *
+		thread_new_struct(thread_t * new)
+{
+
+
+
+
+
+	return new;
+}
 
 //FIXME: doesn't copy open files over to new process in the case of a fork
 thread_t * 

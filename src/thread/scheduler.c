@@ -1,5 +1,5 @@
-//*	ChickenOS - thread/scheduler.c
- /*	Very basic scheduler, called on every timer interrupt  
+/*	ChickenOS - thread/scheduler.c
+ *	Very basic scheduler, called on every timer interrupt  
  */
 #include <common.h>
 #include <kernel/thread.h>
@@ -12,6 +12,13 @@
 #include <stdio.h>
 extern void hex_dump(void *ptr, int n);
 extern struct list_head all_list;
+
+//This should be done differently:
+//push the current eip on the stack
+//push the signal number
+//and then set the eip to the handler
+//when the handler returns, it will return to eip
+//thus resuming control flow 
 void dummy_signal(int test)
 {
 	static int i = 0;
@@ -54,6 +61,8 @@ void signal(registers_t *regs, thread_t *next)
 	extern uint32_t GUARD;
 extern void pic_send_end(int irq);
 extern thread_t *kernel_thread;
+//FIXME: FOR THE LOVE OF GOD FIXME
+
 void thread_scheduler(registers_t *regs)
 {
 	(void)regs;

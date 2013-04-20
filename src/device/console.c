@@ -6,7 +6,7 @@
 #include <device/serial.h>
 #include <device/input.h>
 #include <kernel/vm.h>
-#include <kernel/fs/vfs.h>
+#include <fs/vfs.h>
 #include <device/video/bochs_vga.h>
 #include <sys/ioctls.h>
 #define CURRENT_CONSOLE consoles[current_console]
@@ -22,11 +22,11 @@ char console_getc()
 
 void console_putc(uint8_t c)
 {
-	consoles[0]->putc(consoles[0], c);
+	if(consoles[0] != NULL)
+		consoles[0]->putc(consoles[0], c);
 //	tty_putc(console, c);
 		
-//	serial_putc(c);
-	(void)c;
+	serial_putc(c);
 }
 
 int console_puts(char *string)
@@ -93,7 +93,7 @@ size_t console_write(uint16_t dev, void *_buf, off_t off UNUSED, size_t count)
 	return written;
 }
 //TODO: some of these will probably be taken care of here
-//		ans some will need to be taken care of in the drivers
+//		and some will need to be taken care of in the drivers
 int console_ioctl(uint16_t dev, int request, va_list args UNUSED)
 {
 	int tty = MINOR(dev);
