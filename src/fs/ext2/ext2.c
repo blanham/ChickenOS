@@ -1,6 +1,6 @@
 #include <kernel/common.h>
 #include <kernel/memory.h>
-#include <kernel/fs/vfs.h>
+#include <fs/vfs.h>
 #include <mm/liballoc.h>
 #include "ext2fs_defs.h"
 #include "ext2fs.h"
@@ -22,47 +22,54 @@ vfs_ops_t ext2_ops = {
 	ext2_namei//vfs_namei_t namei;
 };
 
-
-
 void ext2_inode_to_vfs(ext2_fs_t *fs,struct inode *vfs,ext2_inode_t *ext2,uint32_t inode)
 {
-	vfs->size = ext2->i_size;
 	vfs->inode_num = inode;
 	vfs->mode = ext2->i_mode;
 	vfs->size = ext2->i_size;
-	//fix time reading
-	vfs->time = ext2->i_ctime;
+	
+	vfs->atime = ext2->i_atime;
+	vfs->ctime = ext2->i_ctime;
+	vfs->dtime = ext2->i_dtime;
+	vfs->mtime = ext2->i_mtime;
+
+	vfs->uid = ext2->i_uid;
+	vfs->gid = ext2->i_gid;
+
+	vfs->links_count = ext2->i_links_count;
+
 	if(ext2->i_mode & S_IFCHR || ext2->i_mode & S_IFBLK)
 	{
 		vfs->rdev = ext2->i_block[0];
 	}
+	
 	//TODO:if part of mount point,keep in cache
 	vfs->flags = 0;
 	vfs->storage = ext2;
-	vfs->fs = (void *)fs;
-
+	vfs->fs = (vfs_fs_t *)fs;
 }
+
 size_t ext2_read_block(ext2_fs_t *fs, void *buf, int block)
 {
-	int block_size = fs->aux->block_size;
-	return	read_block(fs->dev, buf, block, block_size);
-}
-size_t ext2_write_block(ext2_fs_t *fs, void *buf, int block)
-{
-	int block_size = fs->aux->block_size;
-	return	write_block(fs->dev, buf, block, block_size);
+	return	read_block(fs->dev, buf, block, fs->aux->block_size);
 }
 
+size_t ext2_write_block(ext2_fs_t *fs, void *buf, int block)
+{
+	return	write_block(fs->dev, buf, block, fs->aux->block_size);
+}
+
+//FIXME: fix error handling to catch all memory leaks
 int ext2_read_superblock(vfs_fs_t *fs, uint16_t dev)
 {
 	struct inode *root;
 	int count;
 	ext2_fs_t *ext2 = (ext2_fs_t *)fs;
 	ext2_superblock_t *sb;
-	ext2_aux_t *aux = fs->aux; 
+	
 	fs->dev = dev;
 
-	fs->superblock->sb = kmalloc(sizeof(ext2_superblock_t));
+	fs->superblock->sb = kcalloc(sizeof(ext2_superblock_t), 1);
 	sb = fs->superblock->sb;
 		
 	count = read_block_at(fs->dev, sb, 1,1024, 0, 1024);
@@ -83,18 +90,18 @@ int ext2_read_superblock(vfs_fs_t *fs, uint16_t dev)
 
 	int num_groups = (sb->s_blocks_count - 1)/sb->s_blocks_per_group + 1;
 
-	
-	int size = sizeof(ext2_group_descriptor_t)*num_groups;
+//	int size = sizeof(ext2_group_descriptor_t)*num_groups;
 	
 //	printf("EXT2 groups %i blocks %i gd_size %i\n", 
 //		num_groups,sb->s_blocks_count, size);
 	
 	ext2->aux->gd_table = 
-		(ext2_group_descriptor_t *)kmalloc(size);
-
+		(ext2_group_descriptor_t *)kcalloc(sizeof(ext2_group_descriptor_t),num_groups);
+	
 	ext2->aux->block_size = 1024 << sb->s_log_block_size;
 	
-	ext2_read_block(ext2, aux->gd_table, aux->gd_block - 1);
+	ext2_read_block(ext2, ext2->aux->gd_table, ext2->aux->gd_block - 1);
+	
 	//now that we can read inodes, we cache the root inode(2)
 	//in the vfs superblock struct
 	if((root  = kcalloc(sizeof(*root), 1)) == NULL)
@@ -112,11 +119,6 @@ fail:
 	return -1;
 }
 
-
-
-
-//read_superblock
-//read_inode
 struct inode * ext2_load_inode(ext2_fs_t *fs, int inode)
 {
 	struct inode *read = kcalloc(sizeof(*read), 1);
@@ -124,10 +126,10 @@ struct inode * ext2_load_inode(ext2_fs_t *fs, int inode)
 	ext2_inode_t *inode_block = kcalloc(sizeof(*ext2_ino),8);
 	ext2_superblock_t *sb = fs->superblock->sb;
 	int ind;
+	
 	int group = ((inode - 1)/sb->s_inodes_per_group);
 	
-	ext2_group_descriptor_t * gd = 
-		&fs->aux->gd_table[group];
+	ext2_group_descriptor_t * gd = &fs->aux->gd_table[group];
 //	gd_print(*gd);
 	int table_index = ((inode - 1 ) % sb->s_inodes_per_group) ;
 //	printf("inode %i table_index = %i\n",inode, table_index);
@@ -135,16 +137,14 @@ struct inode * ext2_load_inode(ext2_fs_t *fs, int inode)
 //	printf("BLOCK %i FUCK %i\n",block,((table_index * 128) % 1024) / 128);
 	read_block(fs->dev, inode_block, block, 1024);
 	ind = table_index % (1024 /128);
-//	printf("IND %i\n",ind);
 	kmemcpy(ext2_ino, &inode_block[ind], sizeof(*ext2_ino));
-//	inode_print(*ext2_ino);
+	//inode_print(*ext2_ino);
 	kfree(inode_block);
 	ext2_inode_to_vfs(fs, read,ext2_ino,inode);
 	return read;
 }
 //read_dir
-
-typedef uint32_t ino_t;
+//typedef uint32_t ino_t;
 struct inode * ext2_namei(struct inode *dir, char *file)
 {
 	ext2_fs_t *fs = (ext2_fs_t *)dir->fs;
@@ -379,7 +379,7 @@ int ext2_init()
 {
 	printf("Initializing EXT2 FS\n");
 	ext2_fs_t * new = (ext2_fs_t *)vfs_alloc();
-	new->aux = kmalloc(sizeof(ext2_aux_t));
+	new->aux = kcalloc(sizeof(ext2_aux_t),1);
 	new->ops = &ext2_ops;
 	//FIXME:should use strncpy
 	strcpy(new->name, "ext2");

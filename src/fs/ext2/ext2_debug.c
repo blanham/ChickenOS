@@ -7,6 +7,7 @@ void inode_print(ext2_inode_t inode)
 	printf("inode mode %x\n",inode.i_mode);
 	printf("inode size %i\n",inode.i_size);
 	printf("inode atime %i\n",inode.i_atime);
+	printf("inode mtime %i\n",inode.i_mtime);
 	printf("inode ctime %i\n\n",inode.i_ctime);
 	printf("inode block0 %x\n",inode.i_block[0]);
 	printf("inode block1 %i\n",inode.i_block[1]);

@@ -4,6 +4,7 @@
 #include <kernel/vm.h>
 #include <mm/liballoc.h>
 
+//FIXME: Add locks here
 int liballoc_lock() {
 
         return 0;

@@ -19,13 +19,14 @@ union pci_membar {
 	};
 	uint32_t val;
 } __attribute__((packed));
+
 struct pci_conf_hdr {
 	uint16_t vend_id;
 	uint16_t dev_id;
 	uint16_t command;
 	uint16_t status;
 	uint8_t rev;
-//	uint8_t class[3];
+//	uint8_t class[3];//FIXME: What is this?
 	uint8_t pci_interface;
 	uint8_t pci_minor;
 	uint8_t pci_major;
@@ -43,7 +44,7 @@ struct pci_conf_hdr {
 	uint8_t max_lat;
 	uint8_t data[192];
 } __attribute__((packed));
-//struct pci_device;
+
 union cfg_addr2 {
     struct{
 	unsigned type:2;
@@ -56,11 +57,9 @@ union cfg_addr2 {
 	};
 	uint32_t val;
 } __attribute__((packed));
+
 struct pci_device {
-//	union pci_dev_storage {
-		struct pci_conf_hdr *header;
-	//	uint32_t storage[256/4];
-//	} header;
+	struct pci_conf_hdr *header;
 	union cfg_addr2 regs;
 	intr_handler *irq_handler;
 	struct pci_device *next;

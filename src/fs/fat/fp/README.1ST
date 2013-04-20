@@ -1,0 +1,2 @@
+If cd1.sys doesn't find your cdrom drive then change the 1 to a 2 in
+config.sys and so on to try the other 3 generic cdrom drivers on the disk. 

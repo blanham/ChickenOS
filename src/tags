@@ -37,6 +37,7 @@ AC97_REG_VENDOR_ID2	include/device/audio/ac97.h	36;"	d
 AC97_REG_VENDOR_RESERVED1	include/device/audio/ac97.h	33;"	d
 AC97_REG_VENDOR_RESERVED2	include/device/audio/ac97.h	34;"	d
 AC97_REG_VIDEO_MUTE	include/device/audio/ac97.h	13;"	d
+ACCESSPERMS	include/sys/stat.h	78;"	d
 ADD_AIX	rme/rme.h	/^	ADD_AI = 0x04,	ADD_AIX = 0x05,$/;"	e	enum:opcodes
 ADD_AI	rme/rme.h	/^	ADD_AI = 0x04,	ADD_AIX = 0x05,$/;"	e	enum:opcodes
 ADD_MRX	rme/rme.h	/^	ADD_MR = 0x00,	ADD_MRX = 0x01,$/;"	e	enum:opcodes
@@ -51,7 +52,8 @@ ALIGNMENT	mm/liballoc.c	6;"	d	file:
 ALIGN_INFO	mm/liballoc.c	9;"	d	file:
 ALIGN_TYPE	mm/liballoc.c	8;"	d	file:
 ALIGN	mm/liballoc.c	20;"	d	file:
-ALLOCSIZE	lib/stdio.c	6;"	d	file:
+ALLOCSIZE	lib/stdio.c	7;"	d	file:
+ALLPERMS	include/sys/stat.h	79;"	d
 AL	rme/rme.h	/^	AL, CL, DL, BL,$/;"	e	enum:gpRegs
 AMD_VEND	include/device/net/pcnet.h	77;"	d
 AND_AIX	rme/rme.h	/^	AND_AI = 0x24,	AND_AIX = 0x25,$/;"	e	enum:opcodes
@@ -61,7 +63,7 @@ AND_MR	rme/rme.h	/^	AND_MR = 0x20,	AND_MRX = 0x21,$/;"	e	enum:opcodes
 AND_RMX	rme/rme.h	/^	AND_RM = 0x22,	AND_RMX = 0x23,$/;"	e	enum:opcodes
 AND_RM	rme/rme.h	/^	AND_RM = 0x22,	AND_RMX = 0x23,$/;"	e	enum:opcodes
 ASSERT	include/kernel/common.h	83;"	d
-ATA0_0_DEV	include/kernel/fs/vfs.h	133;"	d
+ATA0_0_DEV	include/fs/vfs.h	136;"	d
 ATA_CMDSTAT	include/device/ata.h	/^enum {ATA_DATA, ATA_FEATURES, ATA_SEC_CNT, ATA_LBALO, ATA_LBAMID, ATA_LBAHI, ATA_DRVHD, ATA_CMDSTAT};$/;"	e	enum:__anon7
 ATA_CMD_CACHE_FLUSH	include/device/ata.h	29;"	d
 ATA_CMD_IDENTIFY	include/device/ata.h	30;"	d
@@ -111,7 +113,7 @@ B600	include/sys/termios.h	88;"	d
 B75	include/sys/termios.h	82;"	d
 B9600	include/sys/termios.h	93;"	d
 BACK	include/kernel/common.h	35;"	d
-BACK	include/kernel/common.h	71;"	d
+BACK	include/kernel/common.h	70;"	d
 BCD_TO	device/timer.c	32;"	d	file:
 BH	rme/rme.h	/^	AH, CH, DH, BH$/;"	e	enum:gpRegs
 BITMAP_ERROR	include/kernel/bitmap.h	14;"	d
@@ -231,6 +233,7 @@ C_OS_DEVICE_VIDEO_H	include/device/video.h	2;"	d
 C_OS_DEV_NET_RTL8139_H	device/net/rtl8139.h	2;"	d
 C_OS_DEV_USB_H	include/device/usb.h	2;"	d
 C_OS_DIRENT_H	include/sys/dirent.h	2;"	d
+C_OS_FS_FAT_FAT_H	fs/fat/fat.h	2;"	d
 C_OS_HW_H	include/kernel/hw.h	2;"	d
 C_OS_I386	include/i386-defs.h	2;"	d
 C_OS_INTERRUPT_H	include/kernel/interrupt.h	2;"	d
@@ -253,8 +256,8 @@ C_OS_THREAD_H	include/kernel/thread.h	2;"	d
 C_OS_TIMER_H	include/kernel/timer.h	2;"	d
 C_OS_TSS	include/thread/tss.h	2;"	d
 C_OS_TYPES_H	include/kernel/types.h	4;"	d
-C_OS_VFS_EXT2_H	include/kernel/fs/ext2/ext2.h	2;"	d
-C_OS_VFS_H	include/kernel/fs/vfs.h	2;"	d
+C_OS_VFS_EXT2_H	include/fs/ext2/ext2.h	2;"	d
+C_OS_VFS_H	include/fs/vfs.h	2;"	d
 C_OS_VM_H	include/kernel/vm.h	2;"	d
 C_SYS_POLL_H	include/sys/poll.h	2;"	d
 Chars	include/device/video/font.h	/^	unsigned short Chars;		\/\/\/< number of characters in font$/;"	m	struct:bitmap_font
@@ -275,6 +278,7 @@ DEC_D	rme/rme.h	/^	DEC_C = 0x48|CL,	DEC_D = 0x48|DL,$/;"	e	enum:opcodes
 DEC_Di	rme/rme.h	/^	DEC_Si = 0x48|DH,	DEC_Di = 0x48|BH,$/;"	e	enum:opcodes
 DEC_Si	rme/rme.h	/^	DEC_Si = 0x48|DH,	DEC_Di = 0x48|BH,$/;"	e	enum:opcodes
 DEC_Sp	rme/rme.h	/^	DEC_Sp = 0x48|AH,	DEC_Bp = 0x48|CH,$/;"	e	enum:opcodes
+DEFFILEMODE	include/sys/stat.h	80;"	d
 DHCP_OP_REPLY	net/dhcp.c	33;"	d	file:
 DHCP_OP_REQUEST	net/dhcp.c	32;"	d	file:
 DHCP_TYPE_ACK	net/dhcp.c	37;"	d	file:
@@ -318,6 +322,7 @@ D	rme/rme.h	/^	uint32_t	D;$/;"	m	union:uGPR
 DoFunc32	rme/rme.c	/^int DoFunc32(tRME_State *State, int mmm, int32_t disp, void *ptr)$/;"	f
 DoFunc	rme/rme.c	/^static int DoFunc(tRME_State *State, int mmm, int16_t disp, void *ptr)$/;"	f	file:
 E1000_DEV	device/net/e1000.c	20;"	d	file:
+EACCES	include/errno.h	5;"	d
 ECHOE	include/sys/termios.h	59;"	d
 ECHOK	include/sys/termios.h	60;"	d
 ECHONL	include/sys/termios.h	61;"	d
@@ -327,6 +332,9 @@ ECTRL_FD	device/net/e1000.c	50;"	d	file:
 ECTRL_SLU	device/net/e1000.c	52;"	d	file:
 ELF_MAGIC	include/kernel/thread.h	94;"	d
 ELMT_FROM_HH	include/util/uthash.h	82;"	d
+ENOENT	include/errno.h	4;"	d
+ENOSYS	include/errno.h	6;"	d
+ERRNO_H	include/errno.h	2;"	d
 ERROR_S	rme/rme.c	85;"	d	file:
 ERROR_S	rme/rme.c	87;"	d	file:
 ERR_OUTPUT	rme/rme.c	24;"	d	file:
@@ -347,9 +355,9 @@ EXT2_BAD_INO	fs/ext2/ext2fs_defs.h	77;"	d
 EXT2_BAD_INO	fs/fs.c	109;"	d	file:
 EXT2_BOOT_LOADER_INO	fs/ext2/ext2fs_defs.h	81;"	d
 EXT2_BOOT_LOADER_INO	fs/fs.c	113;"	d	file:
-EXT2_DIR_BLOCKS	fs/ext2/ext2.c	181;"	d	file:
+EXT2_DIR_BLOCKS	fs/ext2/ext2.c	182;"	d	file:
 EXT2_MAGIC	fs/ext2/ext2fs_defs.h	5;"	d
-EXT2_NDIR_BLOCKS	fs/ext2/ext2.c	180;"	d	file:
+EXT2_NDIR_BLOCKS	fs/ext2/ext2.c	181;"	d	file:
 EXT2_NDIR_BLOCKS	fs/ext2/old/ext2-3.c	302;"	d	file:
 EXT2_ROOT_INO	fs/ext2/ext2fs_defs.h	78;"	d
 EXT2_ROOT_INO	fs/fs.c	110;"	d	file:
@@ -359,7 +367,7 @@ EXT2_SB_SIZE	fs/ext2/ext2.c	11;"	d	file:
 EXT2_SB_SIZE	fs/ext2/old/ext2-3.c	9;"	d	file:
 EXT2_UNDEL_DIR_INO	fs/ext2/ext2fs_defs.h	82;"	d
 EXT2_UNDEL_DIR_INO	fs/fs.c	114;"	d	file:
-FALSE	include/kernel/types.h	21;"	d
+FALSE	include/kernel/types.h	23;"	d
 FCR	device/serial.c	17;"	d	file:
 FD_CLR	include/sys/types.h	240;"	d
 FD_ISSET	include/sys/types.h	241;"	d
@@ -367,9 +375,9 @@ FD_I	include/kernel/interrupt.h	/^enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, CO
 FD_SETSIZE	include/sys/types.h	222;"	d
 FD_SET	include/sys/types.h	239;"	d
 FD_ZERO	include/sys/types.h	242;"	d
-FILE_BLOCK	include/kernel/fs/vfs.h	/^				 FILE_BLOCK = 0x6000}; $/;"	e	enum:file_type
-FILE_CHAR	include/kernel/fs/vfs.h	/^enum file_type { FILE_CHAR  = 0x2000, $/;"	e	enum:file_type
-FILE_DIR	include/kernel/fs/vfs.h	/^				 FILE_DIR   = 0x4000,$/;"	e	enum:file_type
+FILE_BLOCK	include/fs/vfs.h	/^				 FILE_BLOCK = 0x6000}; $/;"	e	enum:file_type
+FILE_CHAR	include/fs/vfs.h	/^enum file_type { FILE_CHAR  = 0x2000, $/;"	e	enum:file_type
+FILE_DIR	include/fs/vfs.h	/^				 FILE_DIR   = 0x4000,$/;"	e	enum:file_type
 FIN_WAIT_1	net/tcp.c	/^enum tcp_states {CLOSED, LISTEN, SYN_RCVD, SYN_SENT, ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2,CLOSE_WAIT, CLOSING, LAST_ACK,TIME_WAIT, BREAK};$/;"	e	enum:tcp_states	file:
 FIN_WAIT_2	net/tcp.c	/^enum tcp_states {CLOSED, LISTEN, SYN_RCVD, SYN_SENT, ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2,CLOSE_WAIT, CLOSING, LAST_ACK,TIME_WAIT, BREAK};$/;"	e	enum:tcp_states	file:
 FLAG_AF	rme/rme.c	44;"	d	file:
@@ -509,8 +517,8 @@ INC_D	rme/rme.h	/^	INC_C = 0x40|CL,	INC_D = 0x40|DL,$/;"	e	enum:opcodes
 INC_Di	rme/rme.h	/^	INC_Si = 0x40|DH,	INC_Di = 0x40|BH,$/;"	e	enum:opcodes
 INC_Si	rme/rme.h	/^	INC_Si = 0x40|DH,	INC_Di = 0x40|BH,$/;"	e	enum:opcodes
 INC_Sp	rme/rme.h	/^	INC_Sp = 0x40|AH,	INC_Bp = 0x40|CH,$/;"	e	enum:opcodes
-INITRD_DEV	include/kernel/fs/vfs.h	132;"	d
-INIT_LIST_HEAD	include/kernel/fs/list.h	32;"	d
+INITRD_DEV	include/fs/vfs.h	135;"	d
+INIT_LIST_HEAD	include/fs/list.h	32;"	d
 INLCR	include/sys/termios.h	34;"	d
 INODE2GROUP	fs/ext2/old/ext2fs2.c	40;"	d	file:
 INODE	fs/ext2/ext2fs_defs.h	3;"	d
@@ -519,7 +527,7 @@ INPCK	include/sys/termios.h	32;"	d
 INSB	rme/rme.h	/^	INSB  = 0x6C,	INSW = 0x6D,$/;"	e	enum:opcodes
 INSW	rme/rme.h	/^	INSB  = 0x6C,	INSW = 0x6D,$/;"	e	enum:opcodes
 INT3	rme/rme.h	/^	INT3 = 0xCC,	INT_I = 0xCD,$/;"	e	enum:opcodes
-INTEL_VEND	include/device/pci.h	86;"	d
+INTEL_VEND	include/device/pci.h	85;"	d
 INTR_DISABLED	include/kernel/interrupt.h	/^enum intr_status {INTR_ENABLED, INTR_DISABLED};$/;"	e	enum:intr_status
 INTR_ENABLED	include/kernel/interrupt.h	/^enum intr_status {INTR_ENABLED, INTR_DISABLED};$/;"	e	enum:intr_status
 INT_I	rme/rme.h	/^	INT3 = 0xCC,	INT_I = 0xCD,$/;"	e	enum:opcodes
@@ -570,7 +578,7 @@ ISR	device/net/rtl8139.h	/^	ISR = 0x3e,$/;"	e	enum:rtl_registers
 ISTRIP	include/sys/termios.h	33;"	d
 IXOFF	include/sys/termios.h	38;"	d
 IXON	include/sys/termios.h	37;"	d
-I_MOUNT	include/kernel/fs/vfs.h	84;"	d
+I_MOUNT	include/fs/vfs.h	96;"	d
 Index	include/device/video/font.h	/^	const unsigned short *Index;	\/\/\/< encoding to character index$/;"	m	struct:bitmap_font
 InstrNum	rme/rme.h	/^	 int	InstrNum;	\/\/!< Total executed instructions$/;"	m	struct:sRME_State
 JMP_F	rme/rme.h	/^	JMP_S = 0xEB,	JMP_F = 0xEA,$/;"	e	enum:opcodes
@@ -597,8 +605,8 @@ LIST_FIRST	include/queue.h	385;"	d
 LIST_FOREACH_SAFE	include/queue.h	392;"	d
 LIST_FOREACH	include/queue.h	387;"	d
 LIST_HEAD_INITIALIZER	include/queue.h	345;"	d
-LIST_HEAD_INIT	include/kernel/fs/list.h	27;"	d
-LIST_HEAD	include/kernel/fs/list.h	29;"	d
+LIST_HEAD_INIT	include/fs/list.h	27;"	d
+LIST_HEAD	include/fs/list.h	29;"	d
 LIST_HEAD	include/queue.h	340;"	d
 LIST_INIT	include/queue.h	397;"	d
 LIST_INSERT_AFTER	include/queue.h	401;"	d
@@ -647,7 +655,7 @@ MAC3	device/net/rtl8139.h	/^	MAC3, MAC4, MAC5,$/;"	e	enum:rtl_registers
 MAC4	device/net/rtl8139.h	/^	MAC3, MAC4, MAC5,$/;"	e	enum:rtl_registers
 MAC5	device/net/rtl8139.h	/^	MAC3, MAC4, MAC5,$/;"	e	enum:rtl_registers
 MAGENTA	include/device/console.h	/^	RED, MAGENTA, BROWN, LT_GREY,$/;"	e	enum:console_color
-MAJOR	include/kernel/fs/vfs.h	135;"	d
+MAJOR	include/fs/vfs.h	138;"	d
 MALLOC_ALIGNMENT	include/sys/config.h	139;"	d
 MALLOC_ALIGNMENT	include/sys/config.h	150;"	d
 MALLOC_ALIGNMENT	include/sys/config.h	161;"	d
@@ -662,7 +670,7 @@ MAR7	device/net/rtl8139.h	/^	MAR6, MAR7,$/;"	e	enum:rtl_registers
 MAX_DEVICES	fs/device.c	17;"	d	file:
 MBR	fs/fat/fat.c	/^mbr_t MBR;$/;"	v
 MCR	device/serial.c	19;"	d	file:
-MINOR	include/kernel/fs/vfs.h	136;"	d
+MINOR	include/fs/vfs.h	139;"	d
 MINSIGSTKSZ	include/signal.h	204;"	d
 MOVSB	rme/rme.h	/^	MOVSB = 0xA4,	MOVSW = 0xA5,$/;"	e	enum:opcodes
 MOVSW	rme/rme.h	/^	MOVSB = 0xA4,	MOVSW = 0xA5,$/;"	e	enum:opcodes
@@ -750,7 +758,7 @@ NSIG	include/sys/signal.h	280;"	d
 NSIG	include/sys/signal.h	300;"	d
 NULL	fs/device.c	18;"	d	file:
 NULL	include/kernel/common.h	8;"	d
-NULL	include/kernel/types.h	19;"	d
+NULL	include/kernel/types.h	21;"	d
 NULL	include/stddef.h	8;"	d
 NULL	lib/stdio.c	5;"	d	file:
 NULL	lib/string.c	3;"	d	file:
@@ -797,9 +805,9 @@ PAODD	include/sys/termios.h	56;"	d
 PARENB	include/sys/termios.h	55;"	d
 PATH_MAX	include/sys/dirent.h	4;"	d
 PCI_ADDRESS	device/pci.c	15;"	d	file:
-PCI_BAR_IO	include/device/pci.h	82;"	d
-PCI_BAR_MEM	include/device/pci.h	81;"	d
-PCI_BAR_NONE	include/device/pci.h	83;"	d
+PCI_BAR_IO	include/device/pci.h	81;"	d
+PCI_BAR_MEM	include/device/pci.h	80;"	d
+PCI_BAR_NONE	include/device/pci.h	82;"	d
 PCI_CLASSCODETABLE_LEN	include/device/pci_dev.h	8719;"	d
 PCI_CLASSCODETABLE	include/device/pci_dev.h	/^}  PCI_CLASSCODETABLE, *PPCI_CLASSCODETABLE ;$/;"	t	typeref:struct:_PCI_CLASSCODETABLE
 PCI_COMMANDFLAGS_LEN	include/device/pci_dev.h	8742;"	d
@@ -1065,10 +1073,10 @@ SA_SIGINFO	include/sys/signal.h	74;"	d
 SCASB	rme/rme.h	/^	SCASB = 0xAE,	SCASW = 0xAF,$/;"	e	enum:opcodes
 SCASW	rme/rme.h	/^	SCASB = 0xAE,	SCASW = 0xAF,$/;"	e	enum:opcodes
 SCRATCH	device/serial.c	22;"	d	file:
-SECTOR_SIZE	include/kernel/fs/vfs.h	12;"	d
-SEEK_CUR	include/kernel/fs/vfs.h	8;"	d
-SEEK_END	include/kernel/fs/vfs.h	9;"	d
-SEEK_SET	include/kernel/fs/vfs.h	7;"	d
+SECTOR_SIZE	include/fs/vfs.h	14;"	d
+SEEK_CUR	include/fs/vfs.h	10;"	d
+SEEK_END	include/fs/vfs.h	11;"	d
+SEEK_SET	include/fs/vfs.h	9;"	d
 SEGV_ACCERR	include/signal.h	63;"	d
 SEGV_MAPERR	include/signal.h	62;"	d
 SET_COMM_FLAGS	rme/rme.c	107;"	d	file:
@@ -1371,52 +1379,64 @@ SYS_UTIME	include/thread/syscall.h	/^	SYS_UTIME,$/;"	e	enum:__anon35
 SYS_WAIT4	include/thread/syscall.h	/^	SYS_WAIT4 = 114,$/;"	e	enum:__anon35
 SYS_WAITPID	include/thread/syscall.h	/^	SYS_WAITPID, $/;"	e	enum:__anon35
 SYS_WRITE	include/thread/syscall.h	/^	SYS_WRITE, $/;"	e	enum:__anon35
+S_BLKSIZE	include/sys/stat.h	42;"	d
+S_ENFMT	include/sys/stat.h	51;"	d
+S_IEXEC	include/sys/stat.h	50;"	d
 S_IFBLK	fs/fs.c	86;"	d	file:
-S_IFBLK	include/kernel/fs/vfs.h	18;"	d
+S_IFBLK	include/sys/stat.h	57;"	d
 S_IFCHR	fs/fs.c	88;"	d	file:
-S_IFCHR	include/kernel/fs/vfs.h	20;"	d
+S_IFCHR	include/sys/stat.h	56;"	d
 S_IFDIR	fs/fs.c	87;"	d	file:
-S_IFDIR	include/kernel/fs/vfs.h	19;"	d
+S_IFDIR	include/sys/stat.h	55;"	d
 S_IFIFO	fs/fs.c	89;"	d	file:
-S_IFIFO	include/kernel/fs/vfs.h	21;"	d
+S_IFIFO	include/sys/stat.h	61;"	d
 S_IFLNK	fs/fs.c	84;"	d	file:
-S_IFLNK	include/kernel/fs/vfs.h	16;"	d
+S_IFLNK	include/sys/stat.h	59;"	d
 S_IFMT	fs/fs.c	82;"	d	file:
-S_IFMT	include/kernel/fs/vfs.h	14;"	d
+S_IFMT	include/sys/stat.h	54;"	d
 S_IFREG	fs/fs.c	85;"	d	file:
-S_IFREG	include/kernel/fs/vfs.h	17;"	d
+S_IFREG	include/sys/stat.h	58;"	d
 S_IFSOCK	fs/fs.c	83;"	d	file:
-S_IFSOCK	include/kernel/fs/vfs.h	15;"	d
+S_IFSOCK	include/sys/stat.h	60;"	d
+S_IREAD	include/sys/stat.h	48;"	d
 S_IRGRP	fs/fs.c	98;"	d	file:
-S_IRGRP	include/kernel/fs/vfs.h	30;"	d
+S_IRGRP	include/sys/stat.h	69;"	d
 S_IROTH	fs/fs.c	102;"	d	file:
-S_IROTH	include/kernel/fs/vfs.h	34;"	d
+S_IROTH	include/sys/stat.h	73;"	d
 S_IRUSR	fs/fs.c	94;"	d	file:
-S_IRUSR	include/kernel/fs/vfs.h	26;"	d
+S_IRUSR	include/sys/stat.h	65;"	d
 S_IRWXG	fs/fs.c	97;"	d	file:
-S_IRWXG	include/kernel/fs/vfs.h	29;"	d
+S_IRWXG	include/sys/stat.h	68;"	d
 S_IRWXO	fs/fs.c	101;"	d	file:
-S_IRWXO	include/kernel/fs/vfs.h	33;"	d
+S_IRWXO	include/sys/stat.h	72;"	d
 S_IRWXU	fs/fs.c	93;"	d	file:
-S_IRWXU	include/kernel/fs/vfs.h	25;"	d
+S_IRWXU	include/sys/stat.h	64;"	d
+S_ISBLK	include/sys/stat.h	83;"	d
+S_ISCHR	include/sys/stat.h	84;"	d
+S_ISDIR	include/sys/stat.h	85;"	d
+S_ISFIFO	include/sys/stat.h	86;"	d
 S_ISGID	fs/fs.c	91;"	d	file:
-S_ISGID	include/kernel/fs/vfs.h	23;"	d
+S_ISGID	include/sys/stat.h	45;"	d
+S_ISLNK	include/sys/stat.h	88;"	d
+S_ISREG	include/sys/stat.h	87;"	d
+S_ISSOCK	include/sys/stat.h	89;"	d
 S_ISUID	fs/fs.c	90;"	d	file:
-S_ISUID	include/kernel/fs/vfs.h	22;"	d
+S_ISUID	include/sys/stat.h	44;"	d
 S_ISVTX	fs/fs.c	92;"	d	file:
-S_ISVTX	include/kernel/fs/vfs.h	24;"	d
+S_ISVTX	include/sys/stat.h	46;"	d
 S_IWGRP	fs/fs.c	99;"	d	file:
-S_IWGRP	include/kernel/fs/vfs.h	31;"	d
+S_IWGRP	include/sys/stat.h	70;"	d
 S_IWOTH	fs/fs.c	103;"	d	file:
-S_IWOTH	include/kernel/fs/vfs.h	35;"	d
+S_IWOTH	include/sys/stat.h	74;"	d
+S_IWRITE	include/sys/stat.h	49;"	d
 S_IWUSR	fs/fs.c	95;"	d	file:
-S_IWUSR	include/kernel/fs/vfs.h	27;"	d
+S_IWUSR	include/sys/stat.h	66;"	d
 S_IXGRP	fs/fs.c	100;"	d	file:
-S_IXGRP	include/kernel/fs/vfs.h	32;"	d
+S_IXGRP	include/sys/stat.h	71;"	d
 S_IXOTH	fs/fs.c	104;"	d	file:
-S_IXOTH	include/kernel/fs/vfs.h	36;"	d
+S_IXOTH	include/sys/stat.h	75;"	d
 S_IXUSR	fs/fs.c	96;"	d	file:
-S_IXUSR	include/kernel/fs/vfs.h	28;"	d
+S_IXUSR	include/sys/stat.h	67;"	d
 Seg	rme/rme.c	/^static inline uint16_t *Seg(tRME_State *State, int code)$/;"	f	file:
 SubClass	include/device/pci_dev.h	/^	unsigned char	SubClass ;$/;"	m	struct:_PCI_CLASSCODETABLE
 SubDesc	include/device/pci_dev.h	/^	char *		SubDesc ;$/;"	m	struct:_PCI_CLASSCODETABLE
@@ -1477,7 +1497,7 @@ TRAP_BRKPT	include/signal.h	194;"	d
 TRAP_TRACE	include/signal.h	195;"	d
 TRASHIT	include/queue.h	115;"	d
 TRASHIT	include/queue.h	137;"	d
-TRUE	include/kernel/types.h	22;"	d
+TRUE	include/kernel/types.h	24;"	d
 TX_BUF	device/serial.c	12;"	d	file:
 TX_RING_LEN_BITS	device/net/pcnet.c	30;"	d	file:
 TX_RING_SIZE	device/net/pcnet.c	29;"	d	file:
@@ -1542,7 +1562,7 @@ UINT_MAX	include/sys/config.h	62;"	d
 UINT_MAX	include/sys/config.h	68;"	d
 UINT_MAX	include/sys/config.h	70;"	d
 UNALIGN	mm/liballoc.c	36;"	d	file:
-UNUSED	fs/fat/fat.c	5;"	d	file:
+UNUSED	fs/fat/fat.c	7;"	d	file:
 UNUSED	include/kernel/common.h	10;"	d
 USB_PID_DATA_DATA0	include/device/usb.h	18;"	d
 USB_PID_DATA_DATA1	include/device/usb.h	19;"	d
@@ -1837,6 +1857,14 @@ _FLOAT_RET	include/sys/config.h	75;"	d
 _FLOAT_RET	include/sys/config.h	81;"	d
 _HAVE_STDC	include/_ansi.h	23;"	d
 _HAVE_SYSTYPES	include/sys/config.h	87;"	d
+_IFBLK	include/sys/stat.h	36;"	d
+_IFCHR	include/sys/stat.h	35;"	d
+_IFDIR	include/sys/stat.h	34;"	d
+_IFIFO	include/sys/stat.h	40;"	d
+_IFLNK	include/sys/stat.h	38;"	d
+_IFMT	include/sys/stat.h	33;"	d
+_IFREG	include/sys/stat.h	37;"	d
+_IFSOCK	include/sys/stat.h	39;"	d
 _LARGEFILE64_SOURCE	include/sys/config.h	91;"	d
 _LIBALLOC_H	include/mm/liballoc.h	2;"	d
 _LOCK_RECURSIVE_T	include/sys/lock.h	/^typedef int _LOCK_RECURSIVE_T;$/;"	t
@@ -1994,6 +2022,7 @@ _SV	include/util/utlist.h	89;"	d
 _SYS_FEATURES_H	include/sys/features.h	22;"	d
 _SYS_QUEUE_H_	include/queue.h	34;"	d
 _SYS_SIGNAL_H	include/sys/signal.h	4;"	d
+_SYS_STAT_H	include/sys/stat.h	2;"	d
 _SYS_TERMIOS_H	include/sys/termios.h	3;"	d
 _SYS_TYPES_FD_SET	include/sys/types.h	213;"	d
 _SYS_TYPES_H	include/sys/types.h	60;"	d
@@ -2186,7 +2215,7 @@ __INTTYPES_DEFINED__	include/sys/types.h	23;"	d
 __INT_MAX__	include/sys/config.h	172;"	d
 __INT_MAX__	include/sys/config.h	174;"	d
 __LARGE64_FILES	include/sys/config.h	89;"	d
-__LIST_H	include/kernel/fs/list.h	2;"	d
+__LIST_H	include/fs/list.h	2;"	d
 __LOCK_INIT_RECURSIVE	include/sys/lock.h	12;"	d
 __LOCK_INIT	include/sys/lock.h	11;"	d
 __LONG_MAX__	include/sys/config.h	180;"	d
@@ -2353,9 +2382,9 @@ __int_least16_t	include/machine/_default_types.h	/^typedef __int32_t __int_least
 __int_least32_t	include/machine/_default_types.h	/^typedef __int32_t __int_least32_t;$/;"	t
 __int_least8_t	include/machine/_default_types.h	/^typedef __int16_t __int_least8_t;$/;"	t
 __int_least8_t	include/machine/_default_types.h	/^typedef __int32_t __int_least8_t;$/;"	t
-__list_add	include/kernel/fs/list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
-__list_del	include/kernel/fs/list.h	/^static inline void __list_del(struct list_head *prev, struct list_head *next)$/;"	f
-__list_splice	include/kernel/fs/list.h	/^static inline void __list_splice(struct list_head *list,$/;"	f
+__list_add	include/fs/list.h	/^static inline void __list_add(struct list_head *new,$/;"	f
+__list_del	include/fs/list.h	/^static inline void __list_del(struct list_head *prev, struct list_head *next)$/;"	f
+__list_splice	include/fs/list.h	/^static inline void __list_splice(struct list_head *list,$/;"	f
 __lock_acquire_recursive	include/sys/lock.h	18;"	d
 __lock_acquire	include/sys/lock.h	17;"	d
 __lock_close_recursive	include/sys/lock.h	16;"	d
@@ -2415,12 +2444,12 @@ __wch	include/sys/_types.h	/^    wint_t __wch;$/;"	m	union:__anon11::__anon12
 __x	include/bits/signal.h	/^	unsigned long __x[7];$/;"	m	struct:__fpstate
 __y	include/bits/signal.h	/^	unsigned char __y[80];$/;"	m	struct:__fpstate
 __z	include/bits/signal.h	/^	unsigned long __z;$/;"	m	struct:__fpstate
+_ac97_vendors	device/audio.c	/^struct _ac97_vendors{$/;"	s	file:
 _flock_t	include/sys/_types.h	/^typedef _LOCK_RECURSIVE_T _flock_t;$/;"	t
 _fpos64_t	include/sys/_types.h	/^typedef _off64_t _fpos64_t;$/;"	t
 _fpos_t	include/sys/_types.h	/^typedef long _fpos_t;		\/* XXX must match off_t in <sys\/types.h> *\/$/;"	t
 _handler	include/sys/signal.h	/^    _sig_func_ptr _handler;  \/* SIG_DFL, SIG_IGN, or pointer to a function *\/$/;"	m	union:sigaction::__anon14
 _iconv_t	include/sys/_types.h	/^typedef void *_iconv_t;$/;"	t
-_isprint	thread/exec.c	/^static inline int _isprint(char c)$/;"	f	file:
 _main_thread_name	thread/thread.c	/^char *_main_thread_name = "main";$/;"	v
 _mbstate_t	include/sys/_types.h	/^} _mbstate_t;$/;"	t	typeref:struct:__anon11
 _mode_t	include/sys/types.h	175;"	d
@@ -2436,7 +2465,8 @@ _types_fd_set	include/sys/types.h	/^} _types_fd_set;$/;"	t	typeref:struct:_types
 _utarray_eltptr	include/util/utarray.h	116;"	d
 aa	net/dns.c	/^	unsigned aa:1;$/;"	m	struct:dns	file:
 ac97_reset	device/audio.c	/^void ac97_reset()$/;"	f
-accesse_date	fs/fat/fat.c	/^	uint16_t accesse_date;$/;"	m	struct:fat_directory_entry	file:
+ac97_vendors	device/audio.c	/^}	ac97_vendors[] = {{0x83847600, "SigmaTel"}};$/;"	v	typeref:struct:_ac97_vendors
+accesse_date	fs/fat/fat.h	/^	uint16_t accesse_date;$/;"	m	struct:fat_directory_entry
 access	include/kernel/vm_defs.h	/^   uint8_t  access;              \/\/ Access flags, determine what ring this segment can be used in.$/;"	m	struct:gdt_entry_struct
 access	mm/gdt.c	/^	uint8_t access;$/;"	m	struct:segment_descriptor	file:
 acknum	net/tcp.c	/^	uint32_t acknum;$/;"	m	struct:tcp	file:
@@ -2500,7 +2530,8 @@ ata_sector_read	device/ata.c	/^size_t ata_sector_read(struct ata_drive *dev, voi
 ata_sector_write	device/ata.c	/^size_t ata_sector_write(struct ata_drive *dev, void *buf, unsigned long long lba, uint32_t count UNUSED)$/;"	f
 ata_write_block	device/ata.c	/^size_t ata_write_block(uint16_t dev, void *_buf, uint32_t block_num)$/;"	f
 ata_write	device/ata.c	/^void ata_write(struct ata_drive *dev, uint16_t port, uint16_t value)$/;"	f
-attrib	fs/fat/fat.c	/^	uint8_t attrib;$/;"	m	struct:fat_directory_entry	file:
+atime	include/fs/vfs.h	/^	uint32_t atime;$/;"	m	struct:inode
+attrib	fs/fat/fat.h	/^	uint8_t attrib;$/;"	m	struct:fat_directory_entry
 attribute	device/video/vga.c	/^	uint16_t attribute;$/;"	m	struct:vga_state	file:
 audio_device	device/audio.c	/^struct audio_device {$/;"	s	file:
 audio_init	device/audio.c	/^int audio_init()$/;"	f
@@ -2510,14 +2541,15 @@ audio_write	device/audio.c	/^int audio_write(uint16_t dev UNUSED, void *buf UNUS
 aux	device/audio.c	/^	void *aux;$/;"	m	struct:audio_device	file:
 aux	device/pci.c	/^	void *aux;$/;"	m	struct:pci_irq	file:
 aux	fs/ext2/ext2fs_defs.h	/^	ext2_aux_t *aux;$/;"	m	struct:ext2_fs
+aux	fs/fat/fat.c	/^	void *aux;$/;"	m	struct:vfs_fs	file:
 aux	include/device/console.h	/^	void *aux;$/;"	m	struct:console
-aux	include/kernel/fs/vfs.h	/^	void *aux;$/;"	m	struct:vfs_fs
+aux	include/fs/vfs.h	/^	void *aux;$/;"	m	struct:vfs_fs
 bOverrideAddress	rme/rme.h	/^		 int	bOverrideAddress;$/;"	m	struct:sRME_State::__anon2
 bOverrideOperand	rme/rme.h	/^		 int	bOverrideOperand;$/;"	m	struct:sRME_State::__anon2
 babble_detected	include/device/usb/uhci.h	/^	uint32_t babble_detected :1;$/;"	m	struct:td_ctrl_status
 background_image	device/video/bochs_vga.c	/^uint32_t *background_image = NULL;$/;"	v
 backtrace	include/kernel/common.h	/^static inline void backtrace(unsigned int level)$/;"	f
-backup_boot_sector	fs/fat/fat.c	/^	uint16_t backup_boot_sector;$/;"	m	struct:fat32_bootblock	file:
+backup_boot_sector	fs/fat/fat.h	/^	uint16_t backup_boot_sector;$/;"	m	struct:fat32_bootblock
 bars	include/device/pci.h	/^	uint32_t bars[6];$/;"	m	struct:pci_conf_hdr
 base0	mm/gdt.c	/^	uint16_t base0;$/;"	m	struct:segment_descriptor	file:
 base16	mm/gdt.c	/^	uint8_t base16;$/;"	m	struct:segment_descriptor	file:
@@ -2564,9 +2596,11 @@ bitmap_t	include/kernel/bitmap.h	/^} bitmap_t;$/;"	t	typeref:struct:bitmap
 bitmap	include/kernel/bitmap.h	/^typedef struct bitmap {$/;"	s
 bitmap	include/kernel/test.c	/^bitmap_t bitmap = array;$/;"	v
 bitstuff_err	include/device/usb/uhci.h	/^	uint32_t bitstuff_err:1;$/;"	m	struct:td_ctrl_status
+blkcnt_t	include/kernel/types.h	/^typedef uint32_t blkcnt_t;$/;"	t
+blksize_t	include/kernel/types.h	/^typedef uint32_t blksize_t;$/;"	t
 block_access_fn	fs/ext2/old/ext2-3.c	/^typedef int(*block_access_fn)(void *aux, void *buf, int block);$/;"	t	file:
 block_access_fn	fs/ext2/temp.c	/^typedef int(*block_access_fn)(void *aux, void *buf, int block);$/;"	t	file:
-block_access_fn	include/kernel/fs/vfs.h	/^typedef int(*block_access_fn)(void *aux, void *buf, int block);$/;"	t
+block_access_fn	include/fs/vfs.h	/^typedef int(*block_access_fn)(void *aux, void *buf, int block);$/;"	t
 block_bitmap	fs/ext2/ext2fs_defs.h	/^	uint32_t *block_bitmap;$/;"	m	struct:ext2_aux
 block_bitmap	fs/ext2/old/ext2fs.c	/^	uint32_t *block_bitmap;$/;"	m	struct:ext2_filesystem	file:
 block_bitmap	fs/fs.c	/^	uint32_t *block_bitmap;$/;"	m	struct:ext2_filesystem	file:
@@ -2578,16 +2612,16 @@ block_device	fs/device.c	/^struct block_device {$/;"	s	file:
 block_devices	fs/device.c	/^struct block_device block_devices[MAX_DEVICES]; $/;"	v	typeref:struct:block_device
 block_dev	fs/ext2/old/ext2-3.c	/^struct block_dev {$/;"	s	file:
 block_read2	fs/ext2/old/ext2-3.c	/^int block_read2(struct block_dev *dev,void *buf, int block, int block_size)$/;"	f
-block_read_fn	include/kernel/fs/vfs.h	/^typedef size_t (*block_read_fn) (uint16_t dev, void *buf, int block);$/;"	t
+block_read_fn	include/fs/vfs.h	/^typedef size_t (*block_read_fn) (uint16_t dev, void *buf, int block);$/;"	t
 block_read	fs/ext2/old/ext2-3.c	/^int block_read(struct block_dev *dev, void * buf, int block)$/;"	f
 block_readn	fs/ext2/old/ext2-3.c	/^int block_readn(struct block_dev *dev,void *buf, int block, int size)$/;"	f
 block_size	fs/ext2/ext2fs_defs.h	/^	uint32_t block_size;$/;"	m	struct:ext2_aux
-block_write_fn	include/kernel/fs/vfs.h	/^typedef size_t (*block_write_fn)(uint16_t dev, void *buf, int block);$/;"	t
+block_write_fn	include/fs/vfs.h	/^typedef size_t (*block_write_fn)(uint16_t dev, void *buf, int block);$/;"	t
 block	mm/liballoc.c	/^	struct liballoc_major *block;		\/\/\/< The owning block. A pointer to the major structure.$/;"	m	struct:liballoc_minor	typeref:struct:liballoc_minor::liballoc_major	file:
-blocks_per_alloc	fs/fat/fat.c	/^	uint8_t  blocks_per_alloc;$/;"	m	struct:fat16_bootblock	file:
-blocks_per_alloc	fs/fat/fat.c	/^	uint8_t  blocks_per_alloc;$/;"	m	struct:fat32_bootblock	file:
-blocks_per_track	fs/fat/fat.c	/^	uint16_t blocks_per_track;$/;"	m	struct:fat16_bootblock	file:
-blocks_per_track	fs/fat/fat.c	/^	uint16_t blocks_per_track;$/;"	m	struct:fat32_bootblock	file:
+blocks_per_alloc	fs/fat/fat.h	/^	uint8_t  blocks_per_alloc;$/;"	m	struct:fat16_bootblock
+blocks_per_alloc	fs/fat/fat.h	/^	uint8_t  blocks_per_alloc;$/;"	m	struct:fat32_bootblock
+blocks_per_track	fs/fat/fat.h	/^	uint16_t blocks_per_track;$/;"	m	struct:fat16_bootblock
+blocks_per_track	fs/fat/fat.h	/^	uint16_t blocks_per_track;$/;"	m	struct:fat32_bootblock
 bloom_bv	include/util/uthash.h	/^   uint8_t *bloom_bv;$/;"	m	struct:UT_hash_table
 bloom_nbits	include/util/uthash.h	/^   char bloom_nbits;$/;"	m	struct:UT_hash_table
 bloom_sig	include/util/uthash.h	/^   uint32_t bloom_sig; \/* used only to test bloom exists in external analysis *\/$/;"	m	struct:UT_hash_table
@@ -2607,10 +2641,10 @@ boot_device	include/multiboot.h	/^       multiboot_uint32_t boot_device;$/;"	m	s
 boot_loader_name	include/multiboot.h	/^       multiboot_uint32_t boot_loader_name;$/;"	m	struct:multiboot_info
 bootable	include/device/ata.h	/^	uint8_t bootable;$/;"	m	struct:partition_entry
 bootblock	fs/fat/fat.c	/^fat12_bootblock_t bootblock;$/;"	v
-bootcode	fs/fat/fat.c	/^	uint8_t bootcode[446];$/;"	m	struct:mbr_struct	file:
-bootflag	fs/fat/fat.c	/^	uint8_t bootflag;$/;"	m	struct:partition_entry	file:
-boot	fs/fat/fat.c	/^	uint8_t  boot[420];$/;"	m	struct:fat32_bootblock	file:
-boot	fs/fat/fat.c	/^	uint8_t  boot[448];$/;"	m	struct:fat16_bootblock	file:
+bootcode	fs/fat/fat.h	/^	uint8_t bootcode[446];$/;"	m	struct:mbr_struct
+bootflag	fs/fat/fat.h	/^	uint8_t bootflag;$/;"	m	struct:partition_entry
+boot	fs/fat/fat.h	/^	uint8_t  boot[420];$/;"	m	struct:fat32_bootblock
+boot	fs/fat/fat.h	/^	uint8_t  boot[448];$/;"	m	struct:fat16_bootblock
 brk	include/kernel/thread.h	/^	void * brk;$/;"	m	struct:thread
 broadcast	include/net/net_core.h	/^	int broadcast;$/;"	m	struct:sockbuf
 bss_end_addr	include/multiboot.h	/^       multiboot_uint32_t bss_end_addr;$/;"	m	struct:multiboot_header
@@ -2630,8 +2664,8 @@ bus	include/device/pci.h	/^    unsigned bus:8;$/;"	m	struct:cfg_addr2::__anon10
 byte_to_block	fs/ext2/ext2.c	/^int byte_to_block(ext2_fs_t *fs, ext2_inode_t *inode, size_t offset)$/;"	f
 byte_to_block	fs/ext2/old/ext2-3.c	/^int byte_to_block(ext2_fs_t *fs, ext2_inode_t *inode, int offset)$/;"	f
 byteorder	thread/load_elf.c	/^	uint8_t byteorder;$/;"	m	struct:elf_header	file:
-bytes_per_block	fs/fat/fat.c	/^	uint16_t bytes_per_block;$/;"	m	struct:fat16_bootblock	file:
-bytes_per_block	fs/fat/fat.c	/^	uint16_t bytes_per_block;$/;"	m	struct:fat32_bootblock	file:
+bytes_per_block	fs/fat/fat.h	/^	uint16_t bytes_per_block;$/;"	m	struct:fat16_bootblock
+bytes_per_block	fs/fat/fat.h	/^	uint16_t bytes_per_block;$/;"	m	struct:fat32_bootblock
 bytes_per_sector	include/device/ata.h	/^	uint16_t bytes_per_sector;$/;"	m	struct:ata_identify
 bytes_per_track	include/device/ata.h	/^	uint16_t bytes_per_track;$/;"	m	struct:ata_identify
 c_cc	include/sys/termios.h	/^	cc_t		c_cc[NCCS];$/;"	m	struct:termios
@@ -2661,20 +2695,20 @@ cfsetispeed	include/sys/termios.h	117;"	d
 cfsetospeed	include/sys/termios.h	116;"	d
 chaddr	net/dhcp.c	/^	uint8_t chaddr[16];$/;"	m	struct:dhcp_message	file:
 char_device_ioctl	fs/device.c	/^int char_device_ioctl(uint16_t dev, int request, ...)$/;"	f
-char_device_ops	include/kernel/fs/vfs.h	/^struct char_device_ops {$/;"	s
+char_device_ops	include/fs/vfs.h	/^struct char_device_ops {$/;"	s
 char_device_read	fs/device.c	/^size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte)$/;"	f
 char_device_write	fs/device.c	/^size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte)$/;"	f
 char_device	fs/device.c	/^struct char_device {$/;"	s	file:
 char_devices	fs/device.c	/^struct char_device char_devices[MAX_DEVICES]; $/;"	v	typeref:struct:char_device
-char_ioctl_fn	include/kernel/fs/vfs.h	/^typedef int (*char_ioctl_fn)(uint16_t dev, int request, ...);$/;"	t
-char_read_fn	include/kernel/fs/vfs.h	/^typedef size_t (*char_read_fn)(uint16_t dev, void *buf, off_t offset, size_t count);$/;"	t
-char_write_fn	include/kernel/fs/vfs.h	/^typedef size_t (*char_write_fn)(uint16_t dev, void *buf, off_t offset, size_t count);$/;"	t
+char_ioctl_fn	include/fs/vfs.h	/^typedef int (*char_ioctl_fn)(uint16_t dev, int request, ...);$/;"	t
+char_read_fn	include/fs/vfs.h	/^typedef size_t (*char_read_fn)(uint16_t dev, void *buf, off_t offset, size_t count);$/;"	t
+char_write_fn	include/fs/vfs.h	/^typedef size_t (*char_write_fn)(uint16_t dev, void *buf, off_t offset, size_t count);$/;"	t
 checksum	include/device/net/e1000.h	/^	uint16_t checksum;$/;"	m	struct:e1000_rx_desc
 checksum	include/multiboot.h	/^       multiboot_uint32_t checksum;$/;"	m	struct:multiboot_header
 checksum	net/icmp.c	/^	uint16_t checksum;$/;"	m	struct:icmp	file:
 checksum	net/udp.c	/^	uint16_t checksum;$/;"	m	struct:udp	file:
-chs_begin	fs/fat/fat.c	/^	uint8_t chs_begin[3];$/;"	m	struct:partition_entry	file:
-chs_end	fs/fat/fat.c	/^	uint8_t chs_end[3];$/;"	m	struct:partition_entry	file:
+chs_begin	fs/fat/fat.h	/^	uint8_t chs_begin[3];$/;"	m	struct:partition_entry
+chs_end	fs/fat/fat.h	/^	uint8_t chs_end[3];$/;"	m	struct:partition_entry
 ciaddr	net/dhcp.c	/^	uint32_t ciaddr;$/;"	m	struct:dhcp_message	file:
 cksum	net/ip.c	/^uint16_t cksum(uint16_t *buf, size_t nbytes)$/;"	f
 cksum	net/tcp.c	/^	uint16_t cksum;$/;"	m	struct:tcp	file:
@@ -2683,8 +2717,8 @@ class	thread/load_elf.c	/^	uint8_t class;$/;"	m	struct:elf_header	file:
 clg	include/device/pci.h	/^	uint8_t clg;$/;"	m	struct:pci_conf_hdr
 clock_t	include/sys/types.h	/^typedef _CLOCK_T_ clock_t;$/;"	t
 clockid_t	include/sys/types.h	/^typedef _CLOCKID_T_ clockid_t;$/;"	t
-cluster_high	fs/fat/fat.c	/^	uint16_t cluster_high;$/;"	m	struct:fat_directory_entry	file:
-cluster_low	fs/fat/fat.c	/^	uint16_t cluster_low;$/;"	m	struct:fat_directory_entry	file:
+cluster_high	fs/fat/fat.h	/^	uint16_t cluster_high;$/;"	m	struct:fat_directory_entry
+cluster_low	fs/fat/fat.h	/^	uint16_t cluster_low;$/;"	m	struct:fat_directory_entry
 cmdline	include/multiboot.h	/^       multiboot_uint32_t cmdline;$/;"	m	struct:multiboot_info
 cmdline	include/multiboot.h	/^       multiboot_uint32_t cmdline;$/;"	m	struct:multiboot_mod_list
 cmd	include/device/net/e1000.h	/^	uint8_t cmd;$/;"	m	struct:e1000_tx_desc
@@ -2723,13 +2757,14 @@ crc_timeout	include/device/usb/uhci.h	/^	uint32_t crc_timeout: 1;$/;"	m	struct:t
 crc	include/device/usb.h	/^	uint32_t crc :5;$/;"	m	struct:usb_packet_data_full
 crc	include/device/usb.h	/^	uint32_t crc :5;$/;"	m	struct:usb_packet_token_full
 crc	include/device/usb.h	/^	uint32_t crc :5;$/;"	m	struct:usb_packet_token_high
-creation_date	fs/fat/fat.c	/^	uint16_t creation_date;$/;"	m	struct:fat_directory_entry	file:
-creation_time	fs/fat/fat.c	/^	uint16_t creation_time;$/;"	m	struct:fat_directory_entry	file:
+creation_date	fs/fat/fat.h	/^	uint16_t creation_date;$/;"	m	struct:fat_directory_entry
+creation_time	fs/fat/fat.h	/^	uint16_t creation_time;$/;"	m	struct:fat_directory_entry
 cs	include/bits/signal.h	/^	unsigned short cs, __csh;$/;"	m	struct:sigcontext
 cs	include/kernel/interrupt.h	/^	uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
 cs	include/thread/tss.h	/^    sel_t		cs;$/;"	m	struct:tss
 cso	include/device/net/e1000.h	/^	uint8_t cso;$/;"	m	struct:e1000_tx_desc
 css	include/device/net/e1000.h	/^	uint8_t css;$/;"	m	struct:e1000_tx_desc
+ctime	include/fs/vfs.h	/^	uint32_t ctime;$/;"	m	struct:inode
 ctor_f	include/util/utarray.h	/^typedef void (ctor_f)(void *dst, const void *src);$/;"	t
 ctrl_status	include/device/usb/uhci.h	/^	struct td_ctrl_status ctrl_status;$/;"	m	struct:transfer_descriptor	typeref:struct:transfer_descriptor::td_ctrl_status
 cur_dir	include/kernel/thread.h	/^	struct file *cur_dir;$/;"	m	struct:thread	typeref:struct:thread::file
@@ -2750,8 +2785,8 @@ days	device/timer.c	/^char * days[7] = {$/;"	v
 default_signals	thread/thread.c	/^struct sigaction *default_signals[32];$/;"	v	typeref:struct:sigaction
 depth	include/device/usb/uhci.h	/^	uint32_t depth :1;$/;"	m	struct:frame_list_ptr
 depth	include/multiboot.h	/^       multiboot_uint32_t depth;$/;"	m	struct:multiboot_header
-desc	fs/fat/fat.c	/^	uint8_t desc[8];$/;"	m	struct:fat16_bootblock	file:
-desc	fs/fat/fat.c	/^	uint8_t desc[8];$/;"	m	struct:fat32_bootblock	file:
+desc	fs/fat/fat.h	/^	uint8_t desc[8];$/;"	m	struct:fat16_bootblock
+desc	fs/fat/fat.h	/^	uint8_t desc[8];$/;"	m	struct:fat32_bootblock
 dest_ip	include/net/net_core.h	/^	uint32_t dest_ip;$/;"	m	struct:sockbuf
 dest_mac	include/net/net_core.h	/^	char dest_mac[6];$/;"	m	struct:sockbuf
 dest_mac	net/net_core.c	/^uint8_t dest_mac[] = { 0x00,0x0c,0x29,0x95,0x05,0x2a};$/;"	v
@@ -2759,7 +2794,7 @@ detachstate	include/sys/types.h	/^  int  detachstate;$/;"	m	struct:__anon15
 detachstate	include/sys/types.h	/^  int  detachstate;$/;"	m	struct:pthread_attr_s
 dev_addr	include/device/usb/uhci.h	/^	uint32_t dev_addr :7;$/;"	m	struct:td_token
 dev_id	include/device/pci.h	/^	uint16_t dev_id;$/;"	m	struct:pci_conf_hdr
-dev_t	include/kernel/fs/vfs.h	/^typedef uint16_t dev_t;$/;"	t
+dev_t	include/fs/vfs.h	/^typedef uint16_t dev_t;$/;"	t
 dev_t	include/sys/types.h	/^typedef __dev_t dev_t;$/;"	t
 device_register	fs/device.c	/^void device_register(uint16_t device_type, uint16_t dev, void *read, void *write, void *ioctl)$/;"	f
 device	fs/fat/fat.c	/^	uint16_t device;$/;"	m	struct:buffer_element	file:
@@ -2769,11 +2804,11 @@ dev	fs/device.c	/^	uint16_t dev;$/;"	m	struct:block_device	file:
 dev	fs/device.c	/^	uint16_t dev;$/;"	m	struct:char_device	file:
 dev	fs/ext2/ext2fs_defs.h	/^	uint16_t dev;$/;"	m	struct:ext2_fs
 dev	fs/ext2/old/ext2-3.c	/^	uint16_t dev;$/;"	m	struct:block_dev	file:
+dev	fs/fat/fat.c	/^	uint16_t dev;$/;"	m	struct:vfs_fs	file:
 dev	include/device/net/e1000.h	/^	struct network_dev *dev;$/;"	m	struct:e1000	typeref:struct:e1000::network_dev
 dev	include/device/net/pcnet.h	/^	struct network_dev *dev;$/;"	m	struct:pcnet	typeref:struct:pcnet::network_dev
 dev	include/device/net/rtl8139.h	/^	struct network_dev *dev;$/;"	m	struct:rtl8139	typeref:struct:rtl8139::network_dev
-dev	include/kernel/fs/vfs.h	/^	uint16_t dev;$/;"	m	struct:file
-dev	include/kernel/fs/vfs.h	/^	uint16_t dev;$/;"	m	struct:vfs_fs
+dev	include/fs/vfs.h	/^	uint16_t dev;$/;"	m	struct:vfs_fs
 dev	include/net/net_core.h	/^	struct network_dev * dev;$/;"	m	struct:sockbuf	typeref:struct:sockbuf::network_dev
 dev	include/net/net_core.h	/^	struct network_dev *dev;$/;"	m	struct:socket	typeref:struct:socket::network_dev
 dev	net/udp.c	/^	struct network_dev *dev;$/;"	m	struct:udp_bound	typeref:struct:udp_bound::network_dev	file:
@@ -2791,11 +2826,11 @@ dhcp_send	net/dhcp.c	/^void dhcp_send(struct network_dev *dev, struct dhcp_messa
 dhcp_sendrequest	net/dhcp.c	/^void dhcp_sendrequest(struct sockbuf *rsb)$/;"	f
 dhcp_timeout	net/dhcp.c	/^uint32_t dhcp_timeout;\/\/ = 0x15180;$/;"	v
 dhcp_type	net/dhcp.c	/^int dhcp_type(struct dhcp_message *dhcp)$/;"	f
-directory_t	fs/fat/fat.c	/^typedef struct fat_directory_entry directory_t;$/;"	t	typeref:struct:fat_directory_entry	file:
+directory_t	fs/fat/fat.h	/^typedef struct fat_directory_entry directory_t;$/;"	t	typeref:struct:fat_directory_entry
 dirent	include/sys/dirent.h	/^struct dirent {$/;"	s
 dirstream	include/sys/dirent.h	/^typedef struct dirstream {$/;"	s
-disk_blocks	fs/fat/fat.c	/^	uint16_t disk_blocks;\/\/0 if overflow$/;"	m	struct:fat16_bootblock	file:
-disk_blocks	fs/fat/fat.c	/^	uint16_t disk_blocks;\/\/0 if overflow$/;"	m	struct:fat32_bootblock	file:
+disk_blocks	fs/fat/fat.h	/^	uint16_t disk_blocks;\/\/0 if overflow$/;"	m	struct:fat16_bootblock
+disk_blocks	fs/fat/fat.h	/^	uint16_t disk_blocks;\/\/0 if overflow$/;"	m	struct:fat32_bootblock
 disk	include/device/ata.h	/^	uint8_t disk[10];$/;"	m	struct:mbr
 divide_fault	device/interrupt.c	/^static void divide_fault(struct registers * regs)$/;"	f	file:
 dma_base	device/audio.c	/^	uint16_t dma_base;$/;"	m	struct:intel_ac97_state	file:
@@ -2825,6 +2860,7 @@ dst_port	include/net/net_core.h	/^	uint16_t dst_port;	$/;"	m	struct:socket
 dst	net/tcp.c	/^	uint16_t dst;$/;"	m	struct:tcp	file:
 dst	net/udp.c	/^	uint16_t dst;$/;"	m	struct:udp	file:
 dst	net/udp.c	/^	uint16_t dst;$/;"	m	struct:udp_cached	file:
+dtime	include/fs/vfs.h	/^	uint32_t dtime;$/;"	m	struct:inode
 dtor_f	include/util/utarray.h	/^typedef void (dtor_f)(void *elt);$/;"	t
 dtor	include/util/utarray.h	/^    dtor_f *dtor;$/;"	m	struct:__anon4
 dummy_signal	thread/scheduler.c	/^void dummy_signal(int test)$/;"	f
@@ -2988,20 +3024,20 @@ ext2_superblock	fs/fs.c	/^typedef struct ext2_superblock {$/;"	s	file:
 ext2_write_block	fs/ext2/ext2.c	/^size_t ext2_write_block(ext2_fs_t *fs, void *buf, int block)$/;"	f
 ext2_write_inode	fs/ext2/ext2.c	/^size_t ext2_write_inode(struct inode *inode,void *_buf, $/;"	f
 ext2	fs/ext2/old/ext2fs.c	/^int ext2(char *filename)$/;"	f
-ext_sig	fs/fat/fat.c	/^	uint8_t ext_sig;$/;"	m	struct:fat16_bootblock	file:
-ext_sig	fs/fat/fat.c	/^	uint8_t ext_sig;$/;"	m	struct:fat32_bootblock	file:
-false	include/kernel/types.h	24;"	d
-fat12_bootblock_t	fs/fat/fat.c	/^typedef struct fat16_bootblock fat12_bootblock_t;$/;"	t	typeref:struct:fat16_bootblock	file:
-fat16_bootblock_t	fs/fat/fat.c	/^typedef struct fat16_bootblock fat16_bootblock_t;$/;"	t	typeref:struct:fat16_bootblock	file:
-fat16_bootblock	fs/fat/fat.c	/^struct fat16_bootblock {$/;"	s	file:
-fat32_bootblock_t	fs/fat/fat.c	/^typedef struct fat32_bootblock fat32_bootblock_t;$/;"	t	typeref:struct:fat32_bootblock	file:
-fat32_bootblock	fs/fat/fat.c	/^struct fat32_bootblock {$/;"	s	file:
-fat_blocks	fs/fat/fat.c	/^	uint16_t fat_blocks;$/;"	m	struct:fat16_bootblock	file:
-fat_blocks	fs/fat/fat.c	/^	uint16_t fat_blocks;$/;"	m	struct:fat32_bootblock	file:
-fat_directory_entry	fs/fat/fat.c	/^struct fat_directory_entry {$/;"	s	file:
-fat_filesystem_t	fs/fat/fat.c	/^} fat_filesystem_t;$/;"	t	typeref:struct:fat_filesystem	file:
-fat_filesystem	fs/fat/fat.c	/^typedef struct fat_filesystem {$/;"	s	file:
-fatver	fs/fat/fat.c	/^	uint16_t fatver;$/;"	m	struct:fat32_bootblock	file:
+ext_sig	fs/fat/fat.h	/^	uint8_t ext_sig;$/;"	m	struct:fat16_bootblock
+ext_sig	fs/fat/fat.h	/^	uint8_t ext_sig;$/;"	m	struct:fat32_bootblock
+false	include/kernel/types.h	26;"	d
+fat12_bootblock_t	fs/fat/fat.h	/^typedef struct fat16_bootblock fat12_bootblock_t;$/;"	t	typeref:struct:fat16_bootblock
+fat16_bootblock_t	fs/fat/fat.h	/^typedef struct fat16_bootblock fat16_bootblock_t;$/;"	t	typeref:struct:fat16_bootblock
+fat16_bootblock	fs/fat/fat.h	/^struct fat16_bootblock {$/;"	s
+fat32_bootblock_t	fs/fat/fat.h	/^typedef struct fat32_bootblock fat32_bootblock_t;$/;"	t	typeref:struct:fat32_bootblock
+fat32_bootblock	fs/fat/fat.h	/^struct fat32_bootblock {$/;"	s
+fat_blocks	fs/fat/fat.h	/^	uint16_t fat_blocks;$/;"	m	struct:fat16_bootblock
+fat_blocks	fs/fat/fat.h	/^	uint16_t fat_blocks;$/;"	m	struct:fat32_bootblock
+fat_directory_entry	fs/fat/fat.h	/^struct fat_directory_entry {$/;"	s
+fat_filesystem_t	fs/fat/fat.h	/^} fat_filesystem_t;$/;"	t	typeref:struct:fat_filesystem
+fat_filesystem	fs/fat/fat.h	/^typedef struct fat_filesystem {$/;"	s
+fatver	fs/fat/fat.h	/^	uint16_t fatver;$/;"	m	struct:fat32_bootblock
 fd_mask	include/sys/types.h	/^typedef	long	fd_mask;$/;"	t
 fd_new	fs/ops.c	/^int fd_new()$/;"	f
 fd_set	include/sys/types.h	237;"	d
@@ -3011,16 +3047,16 @@ fd	include/sys/poll.h	/^	int fd;$/;"	m	struct:pollfd
 fds_bits	include/sys/types.h	/^	fd_mask	fds_bits[howmany(FD_SETSIZE, NFDBITS)];$/;"	m	struct:_types_fd_set
 fg	device/video/bochs_vga.c	/^	uint32_t fg;$/;"	m	struct:bochs_vga_state	file:
 file_count	fs/ops.c	/^uint8_t file_count = 0;$/;"	v
-file_size	fs/fat/fat.c	/^	uint32_t file_size;$/;"	m	struct:fat_directory_entry	file:
-file_system	fs/fat/fat.c	/^	uint8_t  file_system[8];$/;"	m	struct:fat16_bootblock	file:
-file_system	fs/fat/fat.c	/^	uint8_t  file_system[8];$/;"	m	struct:fat32_bootblock	file:
-file_type	include/kernel/fs/vfs.h	/^enum file_type { FILE_CHAR  = 0x2000, $/;"	g
+file_size	fs/fat/fat.h	/^	uint32_t file_size;$/;"	m	struct:fat_directory_entry
+file_system	fs/fat/fat.h	/^	uint8_t  file_system[8];$/;"	m	struct:fat16_bootblock
+file_system	fs/fat/fat.h	/^	uint8_t  file_system[8];$/;"	m	struct:fat32_bootblock
+file_type	include/fs/vfs.h	/^enum file_type { FILE_CHAR  = 0x2000, $/;"	g
 file_type	fs/ext2/ext2fs_defs.h	/^	uint8_t file_type;$/;"	m	struct:ext2_directory
 file_type	fs/fs.c	/^	uint8_t file_type;$/;"	m	struct:ext2_directory	file:
 file	net/dhcp.c	/^	uint8_t file[128];$/;"	m	struct:dhcp_message	file:
-filename	fs/fat/fat.c	/^	uint8_t filename[11];$/;"	m	struct:fat_directory_entry	file:
+filename	fs/fat/fat.h	/^	uint8_t filename[11];$/;"	m	struct:fat_directory_entry
 file	fs/ext2/old/ext2-3.c	/^struct file {$/;"	s	file:
-file	include/kernel/fs/vfs.h	/^struct file {$/;"	s
+file	include/fs/vfs.h	/^struct file {$/;"	s
 files	include/kernel/thread.h	/^	struct file *files[8];$/;"	m	struct:thread	typeref:struct:thread::file
 filesystem	fs/fs.c	/^	void *filesystem;$/;"	m	struct:vfs_file	file:
 filesystems	fs/vfs.c	/^vfs_fs_t * filesystems[10];$/;"	v
@@ -3030,9 +3066,10 @@ filter	include/device/net/pcnet.h	/^	uint32_t filter;$/;"	m	struct:pcnet_init
 firmware_rev	include/device/ata.h	/^	uint8_t  firmware_rev[8];$/;"	m	struct:ata_identify
 first	mm/liballoc.c	/^	struct liballoc_minor *first;		\/\/\/< A pointer to the first allocated memory in the block.	$/;"	m	struct:liballoc_major	typeref:struct:liballoc_major::liballoc_minor	file:
 flags2	include/device/net/pcnet.h	/^	uint32_t flags2;$/;"	m	struct:pcnet_desc
-flags	fs/fat/fat.c	/^	uint16_t flags;$/;"	m	struct:fat32_bootblock	file:
+flags	fs/fat/fat.c	/^	uint32_t flags;$/;"	m	struct:inode	file:
+flags	fs/fat/fat.h	/^	uint16_t flags;$/;"	m	struct:fat32_bootblock
+flags	include/fs/vfs.h	/^	uint32_t flags;$/;"	m	struct:inode
 flags	include/i386-defs.h	/^   uint8_t  flags;               \/\/ More flags. See documentation.$/;"	m	struct:idt_entry_struct
-flags	include/kernel/fs/vfs.h	/^	uint32_t flags;$/;"	m	struct:inode
 flags	include/multiboot.h	/^       multiboot_uint32_t flags;$/;"	m	struct:multiboot_header
 flags	include/multiboot.h	/^       multiboot_uint32_t flags;$/;"	m	struct:multiboot_info
 flags	mm/gdt.c	/^	uint8_t flags;$/;"	m	struct:segment_descriptor	file:
@@ -3048,12 +3085,13 @@ frame_list_ptr	include/device/usb/uhci.h	/^struct frame_list_ptr {$/;"	s
 framebuffer	device/video/bochs_vga.c	/^uint32_t *framebuffer;$/;"	v
 frames	include/device/usb/uhci.h	/^	struct frame_list_ptr *frames;$/;"	m	struct:uhci_controller	typeref:struct:uhci_controller::frame_list_ptr
 free	mm/liballoc.c	/^void PREFIX(free)(void *ptr)$/;"	f
-fs_info_sector	fs/fat/fat.c	/^	uint16_t fs_info_sector;$/;"	m	struct:fat32_bootblock	file:
+fs_info_sector	fs/fat/fat.h	/^	uint16_t fs_info_sector;$/;"	m	struct:fat32_bootblock
 fs	fs/ext2/old/ext2-3.c	/^	void *fs;$/;"	m	struct:file	file:
 fs	fs/ext2/old/ext2fs.c	/^	char *fs;$/;"	m	struct:ext2_filesystem	file:
+fs	fs/fat/fat.c	/^	vfs_fs_t *fs;	$/;"	m	struct:inode	file:
 fs	include/bits/signal.h	/^	unsigned short gs, __gsh, fs, __fsh, es, __esh, ds, __dsh;$/;"	m	struct:sigcontext
-fs	include/kernel/fs/vfs.h	/^	vfs_fs_t *fs;	$/;"	m	struct:file
-fs	include/kernel/fs/vfs.h	/^	vfs_fs_t *fs;	$/;"	m	struct:inode
+fs	include/fs/vfs.h	/^	vfs_fs_t *fs;	$/;"	m	struct:file
+fs	include/fs/vfs.h	/^	vfs_fs_t *fs;	$/;"	m	struct:inode
 fs	include/kernel/interrupt.h	/^	uint16_t fs, :16;$/;"	m	struct:registers
 fs	include/thread/tss.h	/^    sel_t		fs;$/;"	m	struct:tss
 function	include/device/pci.h	/^    unsigned function:3;$/;"	m	struct:cfg_addr
@@ -3090,6 +3128,7 @@ getchar	lib/stdio.c	/^char getchar()$/;"	f
 gets	lib/stdio.c	/^char *gets(char *str)$/;"	f
 giaddr	net/dhcp.c	/^	uint32_t giaddr;$/;"	m	struct:dhcp_message	file:
 gid_t	include/sys/types.h	/^typedef __gid_t gid_t;$/;"	t
+gid	include/fs/vfs.h	/^	uint16_t gid;$/;"	m	struct:inode
 global	device/net/pcnet.c	/^struct pcnet *global;$/;"	v	typeref:struct:pcnet
 global	device/net/rtl8139.c	/^struct rtl8139 *global;$/;"	v	typeref:struct:rtl8139
 gpRegs	rme/rme.h	/^enum gpRegs$/;"	g
@@ -3133,18 +3172,18 @@ hash_table	include/kernel/hash_table.h	/^struct hash_table {$/;"	s
 hashv	include/util/uthash.h	/^   unsigned hashv;                   \/* result of hash-fcn(key)        *\/$/;"	m	struct:UT_hash_handle
 hdrsize	thread/load_elf.c	/^	uint16_t hdrsize;$/;"	m	struct:elf_header	file:
 header_addr	include/multiboot.h	/^       multiboot_uint32_t header_addr;$/;"	m	struct:multiboot_header
-header	include/device/pci.h	/^		struct pci_conf_hdr *header;$/;"	m	struct:pci_device	typeref:struct:pci_device::pci_conf_hdr
+header	include/device/pci.h	/^	struct pci_conf_hdr *header;$/;"	m	struct:pci_device	typeref:struct:pci_device::pci_conf_hdr
 header	include/device/pci.h	/^	uint8_t header;$/;"	m	struct:pci_conf_hdr
-heads	fs/fat/fat.c	/^	uint16_t heads;$/;"	m	struct:fat16_bootblock	file:
-heads	fs/fat/fat.c	/^	uint16_t heads;$/;"	m	struct:fat32_bootblock	file:
+heads	fs/fat/fat.h	/^	uint16_t heads;$/;"	m	struct:fat16_bootblock
+heads	fs/fat/fat.h	/^	uint16_t heads;$/;"	m	struct:fat32_bootblock
 height	include/multiboot.h	/^       multiboot_uint32_t height;$/;"	m	struct:multiboot_header
 hex_dump	thread/exec.c	/^void hex_dump(void *ptr, int n)$/;"	f
 hh_head	include/util/uthash.h	/^   struct UT_hash_handle *hh_head;$/;"	m	struct:UT_hash_bucket	typeref:struct:UT_hash_bucket::UT_hash_handle
 hh_next	include/util/uthash.h	/^   struct UT_hash_handle *hh_next;   \/* next hh in bucket order        *\/$/;"	m	struct:UT_hash_handle	typeref:struct:UT_hash_handle::UT_hash_handle
 hh_prev	include/util/uthash.h	/^   struct UT_hash_handle *hh_prev;   \/* previous hh in bucket order    *\/$/;"	m	struct:UT_hash_handle	typeref:struct:UT_hash_handle::UT_hash_handle
 hho	include/util/uthash.h	/^   ptrdiff_t hho; \/* hash handle offset (byte pos of hash handle in element *\/$/;"	m	struct:UT_hash_table
-hidden_blocks	fs/fat/fat.c	/^	uint32_t hidden_blocks;$/;"	m	struct:fat16_bootblock	file:
-hidden_blocks	fs/fat/fat.c	/^	uint32_t hidden_blocks;$/;"	m	struct:fat32_bootblock	file:
+hidden_blocks	fs/fat/fat.h	/^	uint32_t hidden_blocks;$/;"	m	struct:fat16_bootblock
+hidden_blocks	fs/fat/fat.h	/^	uint32_t hidden_blocks;$/;"	m	struct:fat32_bootblock
 hlen	include/net/net_core.h	/^	uint8_t hlen;$/;"	m	struct:ether_arp
 hlen	net/dhcp.c	/^	uint8_t hlen;$/;"	m	struct:dhcp_message	file:
 h	device/video/bochs_vga.c	/^	int h, w;$/;"	m	struct:bochs_vga_state	file:
@@ -3203,6 +3242,7 @@ icmp_echoreceived	net/icmp.c	/^void icmp_echoreceived(struct sockbuf *rsb)$/;"	f
 icmp_received	net/icmp.c	/^void icmp_received(struct sockbuf *sb)$/;"	f
 icmp	net/icmp.c	/^struct icmp {$/;"	s	file:
 ideal_chain_maxlen	include/util/uthash.h	/^   unsigned ideal_chain_maxlen;$/;"	m	struct:UT_hash_table
+id	device/audio.c	/^	uint32_t id;$/;"	m	struct:_ac97_vendors	file:
 id	net/dns.c	/^	uint16_t id;$/;"	m	struct:dns	file:
 idt_build_entry	device/interrupt.c	/^static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uint8_t flags)$/;"	f	file:
 idt_entry_struct	include/i386-defs.h	/^struct idt_entry_struct$/;"	s
@@ -3236,7 +3276,6 @@ initrd_struct	fs/initrd.c	/^typedef struct initrd_struct {$/;"	s	file:
 initrd_t	fs/initrd.c	/^} initrd_t;$/;"	t	typeref:struct:initrd_struct	file:
 initrd_write_block	fs/initrd.c	/^int initrd_write_block(void *_disk UNUSED, void *src, uint32_t blocknum)$/;"	f
 inl	device/hw.c	/^uint32_t inl(uint16_t port)$/;"	f
-ino_t	fs/ext2/ext2.c	/^typedef uint32_t ino_t;$/;"	t	file:
 ino_t	include/sys/types.h	/^typedef	unsigned long	ino_t;$/;"	t
 ino_t	include/sys/types.h	/^typedef	unsigned short	ino_t;$/;"	t
 inode_bitmap	fs/ext2/ext2fs_defs.h	/^	uint32_t *inode_bitmap;$/;"	m	struct:ext2_aux
@@ -3244,7 +3283,8 @@ inode_bitmap	fs/ext2/old/ext2fs.c	/^	uint32_t *inode_bitmap;$/;"	m	struct:ext2_f
 inode_bitmap	fs/fs.c	/^	uint32_t *inode_bitmap;$/;"	m	struct:ext2_filesystem	file:
 inode_cached_t	fs/fs.c	/^} inode_cached_t;$/;"	t	typeref:struct:inode_cached	file:
 inode_cached	fs/fs.c	/^typedef struct inode_cached {$/;"	s	file:
-inode_num	include/kernel/fs/vfs.h	/^	uint32_t inode_num;$/;"	m	struct:inode
+inode_num	fs/fat/fat.c	/^	uint32_t inode_num;$/;"	m	struct:inode	file:
+inode_num	include/fs/vfs.h	/^	uint32_t inode_num;$/;"	m	struct:inode
 inode_print2	fs/ext2/old/ext2-3.c	/^void inode_print2(ext2_inode_t inode)$/;"	f
 inode_print2	fs/ext2/old/ext2fs2.c	/^void inode_print2(ext2_inode_t inode)$/;"	f
 inode_print	fs/ext2/ext2_debug.c	/^void inode_print(ext2_inode_t inode)$/;"	f
@@ -3255,8 +3295,9 @@ inode	fs/ext2/old/ext2-3.c	/^	ino_t inode;$/;"	m	struct:file	file:
 inode	fs/fs.c	/^	uint32_t inode;$/;"	m	struct:ext2_directory	file:
 inode	fs/fs.c	/^	uint32_t inode;$/;"	m	struct:inode_cached	file:
 inode	fs/fs.c	/^	uint32_t inode;$/;"	m	struct:vfs_file	file:
-inode	include/kernel/fs/vfs.h	/^	struct inode *inode;$/;"	m	struct:file	typeref:struct:file::inode
-inode	include/kernel/fs/vfs.h	/^struct inode {$/;"	s
+inode	include/fs/vfs.h	/^	struct inode *inode;$/;"	m	struct:file	typeref:struct:file::inode
+inode	fs/fat/fat.c	/^struct inode {$/;"	s	file:
+inode	include/fs/vfs.h	/^struct inode {$/;"	s
 input_buf	device/input.c	/^char input_buf[256];$/;"	v
 input_queue_getc	device/input.c	/^char input_queue_getc()$/;"	f
 input_queue_putc	device/input.c	/^void input_queue_putc(char c)$/;"	f
@@ -3276,6 +3317,7 @@ int_no	include/kernel/interrupt.h	/^	uint32_t int_no, err_code;    \/\/ Interrup
 int_pin	device/pci.c	/^	int int_pin;$/;"	m	struct:pci_irq	file:
 int_pin	include/device/pci.h	/^	uint8_t int_pin;$/;"	m	struct:pci_conf_hdr
 int_to_string	lib/stdio.c	/^static char *int_to_string(int num, int base, int size)$/;"	f	file:
+intel_ac97_handler	device/audio.c	/^void intel_ac97_handler(void *aux)$/;"	f
 intel_ac97_mixer_inw	device/audio.c	/^uint16_t intel_ac97_mixer_inw(struct intel_ac97_state *e, uint16_t port)$/;"	f
 intel_ac97_state	device/audio.c	/^struct intel_ac97_state {$/;"	s	file:
 interrupt_disable	device/interrupt.c	/^enum intr_status interrupt_disable()$/;"	f
@@ -3299,7 +3341,7 @@ io_base	include/device/usb/uhci.h	/^	uint32_t io_base;$/;"	m	struct:uhci_control
 io_bmap	include/thread/tss.h	/^			io_bmap	:16;$/;"	m	struct:tss
 ioc	include/device/usb/uhci.h	/^	uint32_t ioc :1;$/;"	m	struct:td_ctrl_status
 ioctl	fs/device.c	/^	char_ioctl_fn ioctl;$/;"	m	struct:char_device	file:
-ioctl	include/kernel/fs/vfs.h	/^	char_ioctl_fn ioctl;$/;"	m	struct:char_device_ops
+ioctl	include/fs/vfs.h	/^	char_ioctl_fn ioctl;$/;"	m	struct:char_device_ops
 ios	include/device/usb/uhci.h	/^	uint32_t ios :1;$/;"	m	struct:td_ctrl_status
 ip_address_print	net/ip.c	/^void ip_address_print(uint32_t ip)$/;"	f
 ip_dst	include/net/net_core.h	/^   struct in_addr ip_dst;$/;"	m	struct:ip	typeref:struct:ip::in_addr
@@ -3340,14 +3382,15 @@ isfinite	include/machine/ieeefp.h	79;"	d
 isinf	include/machine/ieeefp.h	84;"	d
 islower	lib/ctype.c	/^int islower(int c)$/;"	f
 isnan	include/machine/ieeefp.h	85;"	d
+isprint	lib/ctype.c	/^int isprint(char c)$/;"	f
 isrs	include/i386-defs.h	/^void (*isrs[])(void) = {$/;"	v
 isxdigit	lib/ctype.c	/^int isxdigit(int c)$/;"	f
 it_interval	include/sys/types.h	/^  struct timespec  it_interval;  \/* Timer period *\/$/;"	m	struct:itimerspec	typeref:struct:itimerspec::timespec
 it_value	include/sys/types.h	/^  struct timespec  it_value;     \/* Timer expiration *\/$/;"	m	struct:itimerspec	typeref:struct:itimerspec::timespec
 itimerspec	include/sys/types.h	/^struct itimerspec {$/;"	s
 jdt	device/timer.c	/^int32_t jdt(int8_t m, int8_t d, int16_t y)$/;"	f
-jmp	fs/fat/fat.c	/^	uint8_t jmp[3];$/;"	m	struct:fat16_bootblock	file:
-jmp	fs/fat/fat.c	/^	uint8_t jmp[3];$/;"	m	struct:fat32_bootblock	file:
+jmp	fs/fat/fat.h	/^	uint8_t jmp[3];$/;"	m	struct:fat16_bootblock
+jmp	fs/fat/fat.h	/^	uint8_t jmp[3];$/;"	m	struct:fat32_bootblock
 kassert	include/kernel/common.h	/^kassert(char *file, int line, bool condition, char *msg)$/;"	f
 kbd_e5	device/kbd.c	/^void kbd_e5(uint8_t c)$/;"	f
 kbd_getc	device/kbd.c	/^char kbd_getc()$/;"	f
@@ -3365,7 +3408,7 @@ keylen	include/kernel/hash_table.h	/^	unsigned int keylen;$/;"	m	struct:hash_ent
 keylen	include/util/uthash.h	/^   unsigned keylen;                  \/* enclosing struct's key len     *\/$/;"	m	struct:UT_hash_handle
 key	include/kernel/hash_table.h	/^	unsigned char *key;$/;"	m	struct:hash_entry
 key	include/util/uthash.h	/^   void *key;                        \/* ptr to enclosing struct's key  *\/$/;"	m	struct:UT_hash_handle
-kmain	init/kmain.c	/^void kmain(uint32_t mbd, uint32_t magic)$/;"	f
+kmain	init/kmain.c	/^void kmain(struct multiboot_info* mb, uint32_t magic)$/;"	f
 kmemcpy	lib/kernel/memory.c	/^uint8_t *kmemcpy(void *dest, void *src, size_t count)$/;"	f
 kmemcpyw	lib/kernel/memory.c	/^uint16_t *kmemcpyw(uint16_t *dest, uint16_t *src, size_t count)$/;"	f
 kmemset	lib/kernel/memory.c	/^uint8_t *kmemset(void *dest, uint8_t val, size_t count)$/;"	f
@@ -3384,7 +3427,7 @@ l_warningCount	mm/liballoc.c	/^static long long l_warningCount = 0;		\/\/\/< Num
 lastfile	include/queue.h	/^	char * lastfile;$/;"	m	struct:qm_trace
 lastline	include/queue.h	/^	int lastline;$/;"	m	struct:qm_trace
 latency	include/device/pci.h	/^	uint8_t latency;$/;"	m	struct:pci_conf_hdr
-lba_begin	fs/fat/fat.c	/^	uint32_t lba_begin;$/;"	m	struct:partition_entry	file:
+lba_begin	fs/fat/fat.h	/^	uint32_t lba_begin;$/;"	m	struct:partition_entry
 ldt	include/thread/tss.h	/^    sel_t		ldt;$/;"	m	struct:tss
 length	include/device/net/e1000.h	/^	uint16_t length;$/;"	m	struct:e1000_rx_desc
 length	include/device/net/e1000.h	/^	uint16_t length;$/;"	m	struct:e1000_tx_desc
@@ -3406,26 +3449,27 @@ limit0	mm/gdt.c	/^	uint16_t limit0;$/;"	m	struct:segment_descriptor	file:
 limit_low	include/kernel/vm_defs.h	/^   uint16_t limit_low;           \/\/ The lower 16 bits of the limit.$/;"	m	struct:gdt_entry_struct
 limit	include/i386-defs.h	/^   uint16_t limit : 16;$/;"	m	struct:idt_ptr_struct
 limit	include/kernel/vm_defs.h	/^   uint16_t limit;               \/\/ The upper 16 bits of all selector limits.$/;"	m	struct:gdt_ptr_struct
+links_count	include/fs/vfs.h	/^	uint16_t links_count;$/;"	m	struct:inode
 linux_sprintf	lib/vsprintf.c	/^int linux_sprintf(char * buf, const char *fmt, ...)$/;"	f
 linux_vsprintf	lib/vsprintf.c	/^int linux_vsprintf(char *buf, const char *fmt, va_list args)$/;"	f
-list_add_tail	include/kernel/fs/list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
-list_add	include/kernel/fs/list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
-list_del_init	include/kernel/fs/list.h	/^static inline void list_del_init(struct list_head *entry)$/;"	f
-list_del	include/kernel/fs/list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
-list_empty	include/kernel/fs/list.h	/^static inline int list_empty(struct list_head *head)$/;"	f
-list_entry	include/kernel/fs/list.h	192;"	d
+list_add_tail	include/fs/list.h	/^static inline void list_add_tail(struct list_head *new, struct list_head *head)$/;"	f
+list_add	include/fs/list.h	/^static inline void list_add(struct list_head *new, struct list_head *head)$/;"	f
+list_del_init	include/fs/list.h	/^static inline void list_del_init(struct list_head *entry)$/;"	f
+list_del	include/fs/list.h	/^static inline void list_del(struct list_head *entry)$/;"	f
+list_empty	include/fs/list.h	/^static inline int list_empty(struct list_head *head)$/;"	f
+list_entry	include/fs/list.h	192;"	d
 list_files	fs/ext2/old/ext2fs.c	/^void list_files(ext2_directory_t *dir, uint32_t len)$/;"	f
 list_files	fs/fs.c	/^void list_files(ext2_directory_t *dir, uint32_t len)$/;"	f
-list_for_each_entry_safe	include/kernel/fs/list.h	240;"	d
-list_for_each_entry	include/kernel/fs/list.h	228;"	d
-list_for_each_prev	include/kernel/fs/list.h	208;"	d
-list_for_each_safe	include/kernel/fs/list.h	218;"	d
-list_for_each	include/kernel/fs/list.h	200;"	d
-list_head	include/kernel/fs/list.h	/^struct list_head {$/;"	s
-list_move_tail	include/kernel/fs/list.h	/^static inline void list_move_tail(struct list_head *list,$/;"	f
-list_move	include/kernel/fs/list.h	/^static inline void list_move(struct list_head *list, struct list_head *head)$/;"	f
-list_splice_init	include/kernel/fs/list.h	/^static inline void list_splice_init(struct list_head *list,$/;"	f
-list_splice	include/kernel/fs/list.h	/^static inline void list_splice(struct list_head *list, struct list_head *head)$/;"	f
+list_for_each_entry_safe	include/fs/list.h	240;"	d
+list_for_each_entry	include/fs/list.h	228;"	d
+list_for_each_prev	include/fs/list.h	208;"	d
+list_for_each_safe	include/fs/list.h	218;"	d
+list_for_each	include/fs/list.h	200;"	d
+list_head	include/fs/list.h	/^struct list_head {$/;"	s
+list_move_tail	include/fs/list.h	/^static inline void list_move_tail(struct list_head *list,$/;"	f
+list_move	include/fs/list.h	/^static inline void list_move(struct list_head *list, struct list_head *head)$/;"	f
+list_splice_init	include/fs/list.h	/^static inline void list_splice_init(struct list_head *list,$/;"	f
+list_splice	include/fs/list.h	/^static inline void list_splice(struct list_head *list, struct list_head *head)$/;"	f
 list	include/kernel/hash_table.h	/^	struct list_head list;$/;"	m	struct:hash_entry	typeref:struct:hash_entry::list_head
 load_addr	include/multiboot.h	/^       multiboot_uint32_t load_addr;$/;"	m	struct:multiboot_header
 load_elf	thread/load_elf.c	/^int load_elf(const char *path, uintptr_t *eip)$/;"	f
@@ -3434,8 +3478,8 @@ locatable	include/device/pci.h	/^	unsigned locatable:2;$/;"	m	struct:pci_membar:
 location	mm/gdt.c	/^	uint32_t location;$/;"	m	struct:gdt_descriptor	file:
 lock	include/kernel/hash_table.h	/^	pthread_mutex_t lock;$/;"	m	struct:hash_table
 log2_num_buckets	include/util/uthash.h	/^   unsigned num_buckets, log2_num_buckets;$/;"	m	struct:UT_hash_table
-logical_drive	fs/fat/fat.c	/^	uint8_t logical_drive;$/;"	m	struct:fat16_bootblock	file:
-logical_drive	fs/fat/fat.c	/^	uint8_t logical_drive;$/;"	m	struct:fat32_bootblock	file:
+logical_drive	fs/fat/fat.h	/^	uint8_t logical_drive;$/;"	m	struct:fat16_bootblock
+logical_drive	fs/fat/fat.h	/^	uint8_t logical_drive;$/;"	m	struct:fat32_bootblock
 lookup_file	fs/ext2/old/ext2fs.c	/^int lookup_file(ext2_directory_t *dir, uint32_t len, char *filename)$/;"	f
 lookup_file	fs/fs.c	/^int lookup_file(ext2_directory_t *dir, uint32_t len, char *filename)$/;"	f
 lookup	fs/ext2/old/ext2-3.c	/^int lookup(ext2_fs_t *fs, char *name_)$/;"	f
@@ -3456,22 +3500,22 @@ magic	include/multiboot.h	/^       multiboot_uint32_t magic;$/;"	m	struct:multib
 magic	mm/liballoc.c	/^	unsigned int magic;					\/\/\/< A magic number to idenfity correctness.$/;"	m	struct:liballoc_minor	file:
 magic	thread/load_elf.c	/^	uint8_t magic[4];$/;"	m	struct:elf_header	file:
 magic	net/dhcp.c	/^uint8_t magic[] = {0x63, 0x82, 0x53, 0x63};$/;"	v
-main2	fs/fat/fat.c	/^int main2(int argc, char **argv)$/;"	f
 main	fs/ext2/old/ext2-3.c	/^int main(int argc,char**argv)$/;"	f
 main	fs/ext2/old/ext2fs2.c	/^int main(int argc, char **argv)$/;"	f
+main	fs/fat/fat.c	/^int main(int argc, char **argv)$/;"	f
 main	fs/fs.c	/^int main(int argc, char **argv)$/;"	f
 main	include/kernel/test.c	/^int main(int argc, char **argv)$/;"	f
 malloc	mm/liballoc.c	/^void *PREFIX(malloc)(size_t req_size)$/;"	f
 mask	net/ip.c	/^	uint32_t mask;$/;"	m	struct:ip_route_entry	file:
 max_lat	include/device/pci.h	/^	uint8_t max_lat;$/;"	m	struct:pci_conf_hdr
 maxlen	include/device/usb/uhci.h	/^	uint32_t maxlen : 11;$/;"	m	struct:td_token
-mbr_struct	fs/fat/fat.c	/^struct mbr_struct {$/;"	s	file:
-mbr_t	fs/fat/fat.c	/^typedef struct mbr_struct mbr_t;$/;"	t	typeref:struct:mbr_struct	file:
+mbr_struct	fs/fat/fat.h	/^struct mbr_struct {$/;"	s
+mbr_t	fs/fat/fat.h	/^typedef struct mbr_struct mbr_t;$/;"	t	typeref:struct:mbr_struct
 mbr	include/device/ata.h	/^	struct mbr *mbr;$/;"	m	struct:ata_drive	typeref:struct:ata_drive::mbr
 mbr	include/device/ata.h	/^struct mbr {$/;"	s
 mcontext_t	include/bits/signal.h	/^} mcontext_t;$/;"	t	typeref:struct:__anon6
-media_desc	fs/fat/fat.c	/^	uint8_t  media_desc;$/;"	m	struct:fat16_bootblock	file:
-media_desc	fs/fat/fat.c	/^	uint8_t  media_desc;$/;"	m	struct:fat32_bootblock	file:
+media_desc	fs/fat/fat.h	/^	uint8_t  media_desc;$/;"	m	struct:fat16_bootblock
+media_desc	fs/fat/fat.h	/^	uint8_t  media_desc;$/;"	m	struct:fat32_bootblock
 mem_base	include/device/net/e1000.h	/^	uint8_t *mem_base;$/;"	m	struct:e1000
 mem_base	include/device/net/pcnet.h	/^	uint8_t *mem_base;$/;"	m	struct:pcnet
 mem_base	include/device/net/rtl8139.h	/^	uint8_t *mem_base;$/;"	m	struct:rtl8139
@@ -3494,15 +3538,17 @@ mode_t	include/sys/types.h	/^typedef unsigned long mode_t;$/;"	t
 mode_t	include/sys/types.h	/^typedef unsigned short mode_t;$/;"	t
 mode_type	include/multiboot.h	/^       multiboot_uint32_t mode_type;$/;"	m	struct:multiboot_header
 model_num	include/device/ata.h	/^	uint16_t model_num[40];$/;"	m	struct:ata_identify
+mode	fs/fat/fat.c	/^	uint16_t mode;$/;"	m	struct:inode	file:
 mode	include/device/net/pcnet.h	/^	uint16_t mode;$/;"	m	struct:pcnet_init
-mode	include/kernel/fs/vfs.h	/^	uint16_t mode;$/;"	m	struct:inode
-modified_date	fs/fat/fat.c	/^	uint16_t modified_date;$/;"	m	struct:fat_directory_entry	file:
-modified_time	fs/fat/fat.c	/^	uint16_t modified_time;$/;"	m	struct:fat_directory_entry	file:
+mode	include/fs/vfs.h	/^	uint16_t mode;$/;"	m	struct:inode
+modified_date	fs/fat/fat.h	/^	uint16_t modified_date;$/;"	m	struct:fat_directory_entry
+modified_time	fs/fat/fat.h	/^	uint16_t modified_time;$/;"	m	struct:fat_directory_entry
 mods_addr	include/multiboot.h	/^       multiboot_uint32_t mods_addr;$/;"	m	struct:multiboot_info
 mods_count	include/multiboot.h	/^       multiboot_uint32_t mods_count;$/;"	m	struct:multiboot_info
 modules_init	init/kmain.c	/^void modules_init(struct multiboot_info *mb)$/;"	f
 monaco_font	include/font2.h	/^unsigned char monaco_font[256][11] ={$/;"	v
 month	device/timer.c	/^	uint8_t month;$/;"	m	struct:c_os_time	file:
+mtime	include/fs/vfs.h	/^	uint32_t mtime;$/;"	m	struct:inode
 multi_dma	include/device/ata.h	/^	uint16_t multi_dma;$/;"	m	struct:ata_identify
 multiboot_aout_symbol_table_t	include/multiboot.h	/^     typedef struct multiboot_aout_symbol_table multiboot_aout_symbol_table_t;$/;"	t	typeref:struct:multiboot_aout_symbol_table
 multiboot_aout_symbol_table	include/multiboot.h	/^     struct multiboot_aout_symbol_table$/;"	s
@@ -3522,15 +3568,18 @@ nIEN	include/device/ata.h	7;"	d
 nak_recv	include/device/usb/uhci.h	/^	uint32_t nak_recv :1;$/;"	m	struct:td_ctrl_status
 name_len	fs/ext2/ext2fs_defs.h	/^	uint8_t name_len;$/;"	m	struct:ext2_directory
 name_len	fs/fs.c	/^	uint8_t name_len;$/;"	m	struct:ext2_directory	file:
-namei	include/kernel/fs/vfs.h	/^	vfs_namei_t namei;$/;"	m	struct:vfs_superblock_ops
+namei	fs/fat/fat.c	/^	vfs_namei_t namei;$/;"	m	struct:vfs_superblock_ops	file:
+namei	include/fs/vfs.h	/^	vfs_namei_t namei;$/;"	m	struct:vfs_superblock_ops
+name	device/audio.c	/^	char * name;$/;"	m	struct:_ac97_vendors	file:
 name	fs/ext2/ext2fs_defs.h	/^	char name[10];$/;"	m	struct:ext2_fs
 name	fs/ext2/ext2fs_defs.h	/^	char name[255];$/;"	m	struct:ext2_directory
 name	fs/ext2/old/ext2-3.c	/^	char name[255];$/;"	m	struct:block_dev	file:
+name	fs/fat/fat.c	/^	char name[10];$/;"	m	struct:vfs_fs	file:
 name	fs/fs.c	/^	char *name;\/\/perhaps use name[255\/256] instead?NO! what about other fses?$/;"	m	struct:vfs_file	file:
 name	fs/fs.c	/^	uint8_t name[255];$/;"	m	struct:ext2_directory	file:
 name	include/device/ata.h	/^	char *name;$/;"	m	struct:ata_drive
-name	include/kernel/fs/vfs.h	/^	char name[10];$/;"	m	struct:vfs_fs
-name	include/kernel/fs/vfs.h	/^	char name[256];$/;"	m	struct:file
+name	include/fs/vfs.h	/^	char name[10];$/;"	m	struct:vfs_fs
+name	include/fs/vfs.h	/^	char name[256];$/;"	m	struct:file
 name	include/kernel/thread.h	/^	char *name;$/;"	m	struct:thread
 name	sh.c	/^	char name[32];$/;"	m	struct:command	file:
 neg	lib/stdio.c	/^char neg[2] = {'-','0'};$/;"	v
@@ -3544,7 +3593,7 @@ network_received	net/net_core.c	/^void network_received(struct sockbuf *sb)$/;"	
 network_setup	thread/syscall.c	/^int network_setup()$/;"	f
 network	net/ip.c	/^	uint32_t network;$/;"	m	struct:ip_route_entry	file:
 next	include/device/pci.h	/^	struct pci_device *next;$/;"	m	struct:pci_device	typeref:struct:pci_device::pci_device
-next	include/kernel/fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
+next	include/fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
 next	include/kernel/thread.h	/^	struct thread *prev, *next;$/;"	m	struct:thread	typeref:struct:thread::
 next	include/net/net_core.h	/^	struct network_dev *next;$/;"	m	struct:network_dev	typeref:struct:network_dev::network_dev
 next	include/util/uthash.h	/^   void *next;                       \/* next element in app order      *\/$/;"	m	struct:UT_hash_handle
@@ -3563,12 +3612,12 @@ num_cur_cylinders	include/device/ata.h	/^	uint16_t num_cur_cylinders;$/;"	m	stru
 num_cur_heads	include/device/ata.h	/^	uint16_t num_cur_heads;$/;"	m	struct:ata_identify
 num_cur_sectors	include/device/ata.h	/^	uint16_t num_cur_sectors;$/;"	m	struct:ata_identify
 num_cylinders	include/device/ata.h	/^	uint16_t num_cylinders;$/;"	m	struct:ata_identify
-num_fats	fs/fat/fat.c	/^	uint8_t	 num_fats;$/;"	m	struct:fat16_bootblock	file:
-num_fats	fs/fat/fat.c	/^	uint8_t	 num_fats;$/;"	m	struct:fat32_bootblock	file:
+num_fats	fs/fat/fat.h	/^	uint8_t	 num_fats;$/;"	m	struct:fat16_bootblock
+num_fats	fs/fat/fat.h	/^	uint8_t	 num_fats;$/;"	m	struct:fat32_bootblock
 num_heads	include/device/ata.h	/^	uint16_t num_heads;$/;"	m	struct:ata_identify
 num_items	include/util/uthash.h	/^   unsigned num_items;$/;"	m	struct:UT_hash_table
 num_ques	net/dns.c	/^	uint16_t num_ques;$/;"	m	struct:dns	file:
-num_sectors	fs/fat/fat.c	/^	uint32_t num_sectors;$/;"	m	struct:partition_entry	file:
+num_sectors	fs/fat/fat.h	/^	uint32_t num_sectors;$/;"	m	struct:partition_entry
 number	lib/vsprintf.c	/^static char * number(char * str, int num, int base, int size, int precision$/;"	f	file:
 num	device/video/bochs_vga.c	/^	int num;$/;"	m	struct:bochs_vga_state	file:
 num	include/device/console.h	/^	int num;$/;"	m	struct:console
@@ -3576,7 +3625,7 @@ num	include/multiboot.h	/^       multiboot_uint32_t num;$/;"	m	struct:multiboot_
 num	net/udp.c	/^	uint32_t num;$/;"	m	struct:udp_bound	file:
 off_t	include/kernel/types.h	/^typedef signed long int	off_t;$/;"	t
 off_t	include/sys/types.h	/^typedef _off_t	off_t;$/;"	t
-offset	include/kernel/fs/vfs.h	/^	uint32_t offset;$/;"	m	struct:file
+offset	include/fs/vfs.h	/^	uint32_t offset;$/;"	m	struct:file
 offset	net/tcp.c	/^	unsigned offset:4;$/;"	m	struct:tcp	file:
 oldmask	include/bits/signal.h	/^	unsigned long oldmask, cr2;$/;"	m	struct:sigcontext
 oldtss	include/thread/tss.h	/^    sel_t		oldtss;$/;"	m	struct:tss
@@ -3595,7 +3644,8 @@ op	net/dhcp.c	/^	uint8_t op;$/;"	m	struct:dhcp_message	file:
 op	net/dns.c	/^	unsigned op:4;$/;"	m	struct:dns	file:
 oprintf	lib/stdio.c	/^void oprintf(char *fmt, ...)$/;"	f
 ops	fs/ext2/ext2fs_defs.h	/^	vfs_ops_t *ops;$/;"	m	struct:ext2_fs
-ops	include/kernel/fs/vfs.h	/^	vfs_ops_t *ops;$/;"	m	struct:vfs_fs
+ops	fs/fat/fat.c	/^	vfs_ops_t *ops;$/;"	m	struct:vfs_fs	file:
+ops	include/fs/vfs.h	/^	vfs_ops_t *ops;$/;"	m	struct:vfs_fs
 our_ip	net/net_core.c	/^uint8_t our_ip[] = {128,135,155,203};$/;"	v
 outB	rme/rme.c	26;"	d	file:
 outD	rme/rme.c	28;"	d	file:
@@ -3608,8 +3658,9 @@ packet2	net/net_core.c	/^char packet2[] = {$/;"	v
 packet	device/net/pcnet.c	/^char packet[] = {$/;"	v
 pad2	include/device/net/pcnet.h	/^	unsigned pad2:4;$/;"	m	struct:pcnet_init
 pad	fs/device.c	/^	void *pad;$/;"	m	struct:block_device	file:
+pad	fs/fat/fat.c	/^	uint16_t pad;$/;"	m	struct:inode	file:
 pad	include/device/net/pcnet.h	/^	unsigned pad:4;$/;"	m	struct:pcnet_init
-pad	include/kernel/fs/vfs.h	/^	uint16_t pad;$/;"	m	struct:inode
+pad	include/fs/vfs.h	/^	uint16_t pad;$/;"	m	struct:inode
 pad	include/multiboot.h	/^       multiboot_uint32_t pad;$/;"	m	struct:multiboot_mod_list
 pad	thread/load_elf.c	/^	uint8_t pad[9];$/;"	m	struct:elf_header	file:
 page_bitmap	mm/palloc.c	/^bitmap_t page_bitmap;$/;"	v
@@ -3639,11 +3690,11 @@ pallocn_free	mm/palloc.c	/^int pallocn_free(void *addr, int pages)$/;"	f
 pallocn	mm/palloc.c	/^void *pallocn(uint32_t count)$/;"	f
 panic	include/kernel/common.h	/^static inline void panic(char *file, int line,char* msg)$/;"	f
 parent	include/kernel/thread.h	/^	pid_t parent;$/;"	m	struct:thread
-partition_entry	fs/fat/fat.c	/^struct partition_entry {$/;"	s	file:
+partition_entry	fs/fat/fat.h	/^struct partition_entry {$/;"	s
 partition_entry	include/device/ata.h	/^struct partition_entry {$/;"	s
-partition_t	fs/fat/fat.c	/^typedef struct partition_entry partition_t;$/;"	t	typeref:struct:partition_entry	file:
+partition_t	fs/fat/fat.h	/^typedef struct partition_entry partition_t;$/;"	t	typeref:struct:partition_entry
 partitions	include/device/ata.h	/^	struct partition_entry partitions[4];$/;"	m	struct:mbr	typeref:struct:mbr::partition_entry
-parts	fs/fat/fat.c	/^	partition_t parts[4];$/;"	m	struct:mbr_struct	file:
+parts	fs/fat/fat.h	/^	partition_t parts[4];$/;"	m	struct:mbr_struct
 payload	include/net/net_core.h	/^	void *payload;$/;"	m	struct:sockbuf
 pci_bus_scan	device/pci.c	/^void pci_bus_scan(int bus)$/;"	f
 pci_conf_hdr	include/device/pci.h	/^struct pci_conf_hdr {$/;"	s
@@ -3747,7 +3798,7 @@ pos	device/kbd.c	/^uint8_t pos = 0;$/;"	v
 prefetch	include/device/pci.h	/^	unsigned prefetch:1;$/;"	m	struct:pci_membar::__anon9
 prevfile	include/queue.h	/^	char * prevfile;$/;"	m	struct:qm_trace
 prevline	include/queue.h	/^	int prevline;$/;"	m	struct:qm_trace
-prev	include/kernel/fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
+prev	include/fs/list.h	/^	struct list_head *next, *prev;$/;"	m	struct:list_head	typeref:struct:list_head::
 prev	include/kernel/thread.h	/^	struct thread *prev, *next;$/;"	m	struct:thread	typeref:struct:thread::thread
 prev	include/util/uthash.h	/^   void *prev;                       \/* prev element in app order      *\/$/;"	m	struct:UT_hash_handle
 prev	mm/liballoc.c	/^	struct liballoc_major *prev;		\/\/\/< Linked list information.$/;"	m	struct:liballoc_major	typeref:struct:liballoc_major::liballoc_major	file:
@@ -3816,7 +3867,8 @@ ramdisk	fs/initrd.c	/^	uint8_t *ramdisk;$/;"	m	struct:initrd_struct	file:
 ra	net/dns.c	/^	unsigned ra:1;$/;"	m	struct:dns	file:
 rbuf	device/kbd.c	/^char rbuf[BUF_SIZE];$/;"	v
 rcode	net/dns.c	/^	unsigned rcode:4;$/;"	m	struct:dns	file:
-rdev	include/kernel/fs/vfs.h	/^	uint16_t rdev;$/;"	m	struct:inode
+rdev	fs/fat/fat.c	/^	uint16_t rdev;$/;"	m	struct:inode	file:
+rdev	include/fs/vfs.h	/^	uint16_t rdev;$/;"	m	struct:inode
 rd	net/dns.c	/^	unsigned rd:1;$/;"	m	struct:dns	file:
 read_block_at	fs/device.c	/^int read_block_at(uint16_t dev, void * _buf, int block, $/;"	f
 read_block_generic	fs/device.c	/^int read_block_generic(void * _buf, int size, int offset, int block_size, void *aux, block_access_fn f UNUSED)$/;"	f
@@ -3824,12 +3876,14 @@ read_block_generic	fs/ext2/old/ext2-3.c	/^int read_block_generic(void * _buf, in
 read_block_generic	fs/ext2/temp.c	/^int read_block_generic(void * _buf, int size, int offset, int block_size, void *aux, block_access_fn f)$/;"	f
 read_block	fs/device.c	/^int read_block(uint16_t dev, void * _buf, int block, int block_size)$/;"	f
 read_rtc_reg	device/timer.c	/^uint8_t read_rtc_reg(uint8_t reg)$/;"	f
-read_sb	include/kernel/fs/vfs.h	/^	vfs_read_sb_t read_sb;$/;"	m	struct:vfs_superblock_ops
+read_sb	fs/fat/fat.c	/^	vfs_read_sb_t read_sb;$/;"	m	struct:vfs_superblock_ops	file:
+read_sb	include/fs/vfs.h	/^	vfs_read_sb_t read_sb;$/;"	m	struct:vfs_superblock_ops
 read	fs/device.c	/^	block_read_fn read;$/;"	m	struct:block_device	file:
 read	fs/device.c	/^	char_read_fn read;$/;"	m	struct:char_device	file:
+read	fs/fat/fat.c	/^	vfs_read_inode_t read;$/;"	m	struct:vfs_superblock_ops	file:
 read	fs/fs.c	/^	vfs_read_block_t read;$/;"	m	struct:vfs_fs	file:
-read	include/kernel/fs/vfs.h	/^	char_read_fn read;$/;"	m	struct:char_device_ops
-read	include/kernel/fs/vfs.h	/^	vfs_read_inode_t read;$/;"	m	struct:vfs_superblock_ops
+read	include/fs/vfs.h	/^	char_read_fn read;$/;"	m	struct:char_device_ops
+read	include/fs/vfs.h	/^	vfs_read_inode_t read;$/;"	m	struct:vfs_superblock_ops
 ready_next	include/kernel/thread.h	/^	struct thread *ready_prev, *ready_next;$/;"	m	struct:thread	typeref:struct:thread::
 ready_prev	include/kernel/thread.h	/^	struct thread *ready_prev, *ready_next;$/;"	m	struct:thread	typeref:struct:thread::thread
 ready	thread/thread.c	/^thread_t *ready = NULL;$/;"	v
@@ -3857,10 +3911,10 @@ reserved0	include/device/ata.h	/^	uint16_t reserved0;$/;"	m	struct:ata_identify
 reserved1	include/device/ata.h	/^	uint16_t reserved1;$/;"	m	struct:ata_identify
 reserved2	include/device/ata.h	/^	uint16_t reserved2;$/;"	m	struct:ata_identify
 reserved2	include/device/pci.h	/^	uint32_t reserved2[2];$/;"	m	struct:pci_conf_hdr
-reserved_blocks	fs/fat/fat.c	/^	uint16_t reserved_blocks;$/;"	m	struct:fat16_bootblock	file:
-reserved_blocks	fs/fat/fat.c	/^	uint16_t reserved_blocks;$/;"	m	struct:fat32_bootblock	file:
-reserved	fs/fat/fat.c	/^	uint8_t reserved;$/;"	m	struct:fat_directory_entry	file:
-reserved	fs/fat/fat.c	/^	uint8_t reserved[12];$/;"	m	struct:fat32_bootblock	file:
+reserved_blocks	fs/fat/fat.h	/^	uint16_t reserved_blocks;$/;"	m	struct:fat16_bootblock
+reserved_blocks	fs/fat/fat.h	/^	uint16_t reserved_blocks;$/;"	m	struct:fat32_bootblock
+reserved	fs/fat/fat.h	/^	uint8_t reserved;$/;"	m	struct:fat_directory_entry
+reserved	fs/fat/fat.h	/^	uint8_t reserved[12];$/;"	m	struct:fat32_bootblock
 reserved	include/device/net/pcnet.h	/^	uint16_t reserved;$/;"	m	struct:pcnet_init
 reserved	include/device/pci.h	/^	uint32_t reserved[2];$/;"	m	struct:pci_conf_hdr
 reserved	include/device/pci.h	/^	unsigned reserved:1;$/;"	m	struct:pci_iobar::__anon8
@@ -3876,11 +3930,12 @@ return_from_signal	thread/scheduler.c	/^void return_from_signal()$/;"	f
 revents	include/sys/poll.h	/^	short revents;$/;"	m	struct:pollfd
 rev	include/device/pci.h	/^	uint8_t rev;$/;"	m	struct:pci_conf_hdr
 romaddr	include/device/pci.h	/^	uint32_t romaddr;$/;"	m	struct:pci_conf_hdr
-root_cluster	fs/fat/fat.c	/^	uint32_t root_cluster;$/;"	m	struct:fat32_bootblock	file:
-root_directories	fs/fat/fat.c	/^	uint16_t root_directories;$/;"	m	struct:fat16_bootblock	file:
-root_directories	fs/fat/fat.c	/^	uint16_t root_directories;$/;"	m	struct:fat32_bootblock	file:
+root_cluster	fs/fat/fat.h	/^	uint32_t root_cluster;$/;"	m	struct:fat32_bootblock
+root_directories	fs/fat/fat.h	/^	uint16_t root_directories;$/;"	m	struct:fat16_bootblock
+root_directories	fs/fat/fat.h	/^	uint16_t root_directories;$/;"	m	struct:fat32_bootblock
 root_fs	fs/vfs.c	/^vfs_fs_t *root_fs;$/;"	v
-root	include/kernel/fs/vfs.h	/^	struct inode *root;$/;"	m	struct:vfs_sb	typeref:struct:vfs_sb::inode
+root	fs/fat/fat.c	/^	struct inode *root;$/;"	m	struct:vfs_sb	typeref:struct:vfs_sb::inode	file:
+root	include/fs/vfs.h	/^	struct inode *root;$/;"	m	struct:vfs_sb	typeref:struct:vfs_sb::inode
 root	fs/vfs.c	/^struct file *root;$/;"	v	typeref:struct:file
 router	include/net/net_core.h	/^	uint32_t router[2];$/;"	m	struct:network_dev
 rtc_data_print	device/timer.c	/^void rtc_data_print(uint8_t *data)$/;"	f
@@ -3978,17 +4033,18 @@ sa_mask	include/sys/signal.h	/^  sigset_t    sa_mask;        \/* Additional set 
 sa_sigaction	include/signal.h	86;"	d
 sa_sigaction	include/sys/signal.h	103;"	d
 sa_sigaction	include/signal.h	/^		void (*sa_sigaction)(int, siginfo_t *, void *);$/;"	m	union:sigaction::__anon26
-sb	include/kernel/fs/vfs.h	/^	void *sb;$/;"	m	struct:vfs_sb
+sb	fs/fat/fat.c	/^	void *sb;$/;"	m	struct:vfs_sb	file:
+sb	include/fs/vfs.h	/^	void *sb;$/;"	m	struct:vfs_sb
 sb	net/arp.c	/^	struct sockbuf *sb;$/;"	m	struct:arp_queue_entry	typeref:struct:arp_queue_entry::sockbuf	file:
 schedparam	include/sys/types.h	/^  struct sched_param schedparam;$/;"	m	struct:__anon15	typeref:struct:__anon15::sched_param
 schedparam	include/sys/types.h	/^  struct sched_param schedparam;$/;"	m	struct:pthread_attr_s	typeref:struct:pthread_attr_s::sched_param
 schedpolicy	include/sys/types.h	/^  int schedpolicy;$/;"	m	struct:__anon15
 sec	device/timer.c	/^	uint8_t sec;$/;"	m	struct:c_os_time	file:
 secs	net/dhcp.c	/^	uint16_t secs;$/;"	m	struct:dhcp_message	file:
-sectors_per_fat	fs/fat/fat.c	/^	uint32_t sectors_per_fat;$/;"	m	struct:fat32_bootblock	file:
+sectors_per_fat	fs/fat/fat.h	/^	uint32_t sectors_per_fat;$/;"	m	struct:fat32_bootblock
 sectors_per_int	include/device/ata.h	/^	uint16_t sectors_per_int;$/;"	m	struct:ata_identify
-sectors_per_partition	fs/fat/fat.c	/^	uint32_t sectors_per_partition;$/;"	m	struct:fat16_bootblock	file:
-sectors_per_partition	fs/fat/fat.c	/^	uint32_t sectors_per_partition;$/;"	m	struct:fat32_bootblock	file:
+sectors_per_partition	fs/fat/fat.h	/^	uint32_t sectors_per_partition;$/;"	m	struct:fat16_bootblock
+sectors_per_partition	fs/fat/fat.h	/^	uint32_t sectors_per_partition;$/;"	m	struct:fat32_bootblock
 sectors_per_track	include/device/ata.h	/^	uint16_t sectors_per_track;$/;"	m	struct:ata_identify
 segment_descriptor	mm/gdt.c	/^struct segment_descriptor {$/;"	s	file:
 sel_t	include/thread/tss.h	/^typedef uint32_t sel_t;$/;"	t
@@ -4093,9 +4149,9 @@ sigismember	include/sys/signal.h	146;"	d
 signal_pending	include/kernel/thread.h	/^	int signal_pending;$/;"	m	struct:thread
 signal	thread/scheduler.c	/^void signal(registers_t *regs, thread_t *next)$/;"	f
 signals	include/kernel/thread.h	/^	struct sigaction **signals;$/;"	m	struct:thread	typeref:struct:thread::sigaction
-signature	fs/fat/fat.c	/^	uint16_t signature; $/;"	m	struct:fat16_bootblock	file:
-signature	fs/fat/fat.c	/^	uint16_t signature; $/;"	m	struct:fat32_bootblock	file:
-signature	fs/fat/fat.c	/^	uint16_t signature;$/;"	m	struct:mbr_struct	file:
+signature	fs/fat/fat.h	/^	uint16_t signature; $/;"	m	struct:fat16_bootblock
+signature	fs/fat/fat.h	/^	uint16_t signature; $/;"	m	struct:fat32_bootblock
+signature	fs/fat/fat.h	/^	uint16_t signature;$/;"	m	struct:mbr_struct
 signature	include/device/ata.h	/^	uint8_t signature[2];$/;"	m	struct:mbr
 signature	include/util/uthash.h	/^   uint32_t signature; \/* used only to find hash tables in external analysis *\/$/;"	m	struct:UT_hash_table
 sigset_t	include/sys/signal.h	/^typedef unsigned long sigset_t;$/;"	t
@@ -4119,9 +4175,10 @@ size_t	include/stddef.h	/^typedef unsigned int size_t;$/;"	t
 size	fs/ext2/ext2fs_defs.h	/^	uint32_t size;$/;"	m	struct:ext2_aux
 size	fs/ext2/old/ext2fs.c	/^	uint32_t size;$/;"	m	struct:ext2_filesystem	file:
 size	fs/fat/fat.c	/^	uint16_t size;$/;"	m	struct:buffer_element	file:
+size	fs/fat/fat.c	/^	uint32_t size;$/;"	m	struct:inode	file:
 size	fs/initrd.c	/^	uint32_t size;$/;"	m	struct:initrd_struct	file:
+size	include/fs/vfs.h	/^	uint32_t size;$/;"	m	struct:inode
 size	include/kernel/bitmap.h	/^	uint32_t size;$/;"	m	struct:bitmap
-size	include/kernel/fs/vfs.h	/^	uint32_t size;$/;"	m	struct:inode
 size	include/multiboot.h	/^       multiboot_uint32_t size;$/;"	m	struct:multiboot_elf_section_header_table
 size	include/multiboot.h	/^       multiboot_uint32_t size;$/;"	m	struct:multiboot_mmap_entry
 size	mm/gdt.c	/^	uint16_t size;$/;"	m	struct:gdt_descriptor	file:
@@ -4164,6 +4221,19 @@ ss	include/bits/signal.h	/^	unsigned short ss, __ssh;$/;"	m	struct:sigcontext
 ss	include/kernel/interrupt.h	/^	uint32_t eip, cs, eflags, useresp, ss; \/\/ Pushed by the processor automatically.$/;"	m	struct:registers
 ss	include/thread/tss.h	/^    sel_t		ss;$/;"	m	struct:tss
 ssys_fork	thread/fork.c	/^pid_t ssys_fork()$/;"	f
+st_atime	include/sys/stat.h	/^  time_t	st_atime;$/;"	m	struct:stat
+st_blksize	include/sys/stat.h	/^  blksize_t     st_blksize;$/;"	m	struct:stat
+st_blocks	include/sys/stat.h	/^  blkcnt_t	st_blocks;$/;"	m	struct:stat
+st_ctime	include/sys/stat.h	/^  time_t	st_ctime;$/;"	m	struct:stat
+st_dev	include/sys/stat.h	/^  dev_t		st_dev;$/;"	m	struct:stat
+st_gid	include/sys/stat.h	/^  gid_t		st_gid;$/;"	m	struct:stat
+st_ino	include/sys/stat.h	/^  ino_t		st_ino;$/;"	m	struct:stat
+st_mode	include/sys/stat.h	/^  mode_t	st_mode;$/;"	m	struct:stat
+st_mtime	include/sys/stat.h	/^  time_t	st_mtime;$/;"	m	struct:stat
+st_nlink	include/sys/stat.h	/^  nlink_t	st_nlink;$/;"	m	struct:stat
+st_rdev	include/sys/stat.h	/^  dev_t		st_rdev;$/;"	m	struct:stat
+st_size	include/sys/stat.h	/^  off_t		st_size;$/;"	m	struct:stat
+st_uid	include/sys/stat.h	/^  uid_t		st_uid;$/;"	m	struct:stat
 stack_fault	device/interrupt.c	/^static void stack_fault(struct registers * regs)$/;"	f	file:
 stack_prepare	thread/exec.c	/^static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew)$/;"	f	file:
 stack_t	include/signal.h	/^} stack_t;$/;"	t	typeref:struct:__anon27
@@ -4176,13 +4246,15 @@ start_cylinder	include/device/ata.h	/^	unsigned int start_cylinder :10;$/;"	m	st
 start_head	include/device/ata.h	/^	uint8_t start_head;$/;"	m	struct:partition_entry
 start_sector	include/device/ata.h	/^	unsigned int start_sector :6;$/;"	m	struct:partition_entry
 state	net/tcp.c	/^	enum tcp_states state;$/;"	m	struct:tcp_tcb	typeref:enum:tcp_tcb::tcp_states	file:
+stat	include/sys/stat.h	/^struct	stat $/;"	s
 status	include/device/net/e1000.h	/^	uint8_t status;$/;"	m	struct:e1000_rx_desc
 status	include/device/net/e1000.h	/^	uint8_t status;$/;"	m	struct:e1000_tx_desc
 status	include/device/net/pcnet.h	/^	uint16_t status;$/;"	m	struct:pcnet_desc
 status	include/device/pci.h	/^	uint16_t status;$/;"	m	struct:pci_conf_hdr
 status	include/kernel/thread.h	/^	enum thread_stat status;$/;"	m	struct:thread	typeref:enum:thread::thread_stat
 status	net/tcp.c	/^	enum tcp_states status;$/;"	m	struct:tcp_state	typeref:enum:tcp_state::tcp_states	file:
-storage	include/kernel/fs/vfs.h	/^	void *storage;$/;"	m	struct:inode
+storage	fs/fat/fat.c	/^	void *storage;$/;"	m	struct:inode	file:
+storage	include/fs/vfs.h	/^	void *storage;$/;"	m	struct:inode
 strcat	lib/string.c	/^char * strcat(char *dst, const char * src)$/;"	f
 strchr	lib/string.c	/^char * strchr(const char *str, int c)$/;"	f
 strcmp	lib/string.c	/^int strcmp ( const char * str1, const char * str2 )$/;"	f
@@ -4199,8 +4271,9 @@ strtok	lib/string.c	/^char * strtok ( char * str, const char * delimiters )$/;"	
 subnet_mask	include/net/net_core.h	/^	uint32_t subnet_mask;$/;"	m	struct:network_dev
 superblock	fs/ext2/ext2fs_defs.h	/^	vfs_sb_t *superblock;$/;"	m	struct:ext2_fs
 superblock	fs/ext2/old/ext2fs.c	/^	ext2_superblock_t *superblock;$/;"	m	struct:ext2_filesystem	file:
+superblock	fs/fat/fat.c	/^	vfs_sb_t *superblock;$/;"	m	struct:vfs_fs	file:
 superblock	fs/fs.c	/^	ext2_superblock_t *superblock;$/;"	m	struct:ext2_filesystem	file:
-superblock	include/kernel/fs/vfs.h	/^	vfs_sb_t *superblock;$/;"	m	struct:vfs_fs
+superblock	include/fs/vfs.h	/^	vfs_sb_t *superblock;$/;"	m	struct:vfs_fs
 suseconds_t	include/sys/types.h	/^typedef long suseconds_t;$/;"	t
 switch_fn	include/device/console.h	/^	console_switch_fn switch_fn;$/;"	m	struct:console
 sync	include/device/usb.h	/^	uint32_t sync;$/;"	m	struct:usb_packet_token_high
@@ -4229,6 +4302,7 @@ sys_read	fs/ops.c	/^ssize_t sys_read(int fildes, void *buf, size_t nbyte)$/;"	f
 sys_sigaction	thread/thread.c	/^int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)$/;"	f
 sys_sigsuspend	thread/thread.c	/^int sys_sigsuspend(const sigset_t *mask)$/;"	f
 sys_socket	net/socket.c	/^int sys_socket(int domain UNUSED, int type, int protocol UNUSED)$/;"	f
+sys_stat	fs/ops.c	/^int sys_stat(char *filename, struct stat *statbuf)$/;"	f
 sys_write	fs/ops.c	/^ssize_t sys_write(int fildes, void *buf, size_t nbyte)$/;"	f
 syscall_handler	thread/syscall.c	/^void syscall_handler (struct registers *regs)$/;"	f
 syscall_init	thread/syscall.c	/^void syscall_init()$/;"	f
@@ -4256,7 +4330,7 @@ tcp	net/tcp.c	/^struct tcp {$/;"	s	file:
 td_ctrl_status	include/device/usb/uhci.h	/^struct td_ctrl_status {$/;"	s
 td_token	include/device/usb/uhci.h	/^struct td_token {$/;"	s
 temp_net	device/net/pcnet.c	/^struct network_dev *temp_net;$/;"	v	typeref:struct:network_dev
-tenths	fs/fat/fat.c	/^	uint8_t tenths;$/;"	m	struct:fat_directory_entry	file:
+tenths	fs/fat/fat.h	/^	uint8_t tenths;$/;"	m	struct:fat_directory_entry
 terminate	include/device/usb/uhci.h	/^	uint32_t terminate :1;$/;"	m	struct:frame_list_ptr
 termios	include/sys/termios.h	/^struct termios {$/;"	s
 test_values	device/net/rtl8139.h	/^uint32_t test_values[] = {$/;"	v
@@ -4280,7 +4354,8 @@ time_msleep	device/timer.c	/^void time_msleep(int mseconds)$/;"	f
 time_sleep	device/timer.c	/^void time_sleep(int seconds)$/;"	f
 time_t	include/sys/types.h	/^typedef _TIME_T_ time_t;$/;"	t
 time_usleep	device/timer.c	/^void time_usleep(int useconds)$/;"	f
-time	include/kernel/fs/vfs.h	/^	uint32_t time;$/;"	m	struct:inode
+time	fs/fat/fat.c	/^	uint32_t time;$/;"	m	struct:inode	file:
+time	include/fs/vfs.h	/^	uint32_t time;$/;"	m	struct:inode
 timeout	net/arp.c	/^	int timeout;$/;"	m	struct:arp_cache_entry	file:
 timer_init	device/timer.c	/^void timer_init(uint32_t frequency)$/;"	f
 timer_intr	device/timer.c	/^void timer_intr(struct registers * regs)$/;"	f
@@ -4298,7 +4373,7 @@ transfer_descriptor	include/device/usb/uhci.h	/^struct transfer_descriptor {$/;"
 transport_type	include/net/net_core.h	/^enum transport_type {$/;"	g
 transport	include/net/net_core.h	/^	void *transport;$/;"	m	struct:sockbuf
 trapno	include/bits/signal.h	/^	unsigned long trapno, err, eip;$/;"	m	struct:sigcontext
-true	include/kernel/types.h	27;"	d
+true	include/kernel/types.h	29;"	d
 tss_init	thread/tss.c	/^void tss_init(void)$/;"	f
 tss_t	include/thread/tss.h	/^} tss_t;$/;"	t	typeref:struct:tss
 tss_update	thread/tss.c	/^tss_update(uint32_t esp)$/;"	f
@@ -4321,8 +4396,8 @@ tx_descs	include/device/net/pcnet.h	/^	struct pcnet_desc *tx_descs;$/;"	m	struct
 tx_descs	include/device/usb/uhci.h	/^	struct transfer_descriptor *tx_descs;$/;"	m	struct:uhci_controller	typeref:struct:uhci_controller::transfer_descriptor
 tx_free	include/device/net/e1000.h	/^	uint8_t *tx_free;$/;"	m	struct:e1000
 tx_len	include/device/net/pcnet.h	/^	unsigned tx_len:4;$/;"	m	struct:pcnet_init
-typecode	fs/fat/fat.c	/^	uint8_t typecode;$/;"	m	struct:partition_entry	file:
-type	fs/fat/fat.c	/^	int type;$/;"	m	struct:fat_filesystem	file:
+typecode	fs/fat/fat.h	/^	uint8_t typecode;$/;"	m	struct:partition_entry
+type	fs/fat/fat.h	/^	int type;$/;"	m	struct:fat_filesystem
 type	include/device/pci.h	/^	unsigned type:2;$/;"	m	struct:cfg_addr2::__anon10
 type	include/device/pci.h	/^    unsigned type:2;$/;"	m	struct:cfg_addr
 type	include/multiboot.h	/^       multiboot_uint32_t type;$/;"	m	struct:multiboot_mmap_entry
@@ -4369,6 +4444,7 @@ uhci_outb	device/usb/uhci.c	/^void uhci_outb(struct uhci_controller *uhci, uint1
 uhci_outl	device/usb/uhci.c	/^void uhci_outl(struct uhci_controller *uhci, uint16_t port, uint32_t val)$/;"	f
 uhci_outw	device/usb/uhci.c	/^void uhci_outw(struct uhci_controller *uhci, uint16_t port, uint16_t val)$/;"	f
 uid_t	include/sys/types.h	/^typedef __uid_t uid_t;$/;"	t
+uid	include/fs/vfs.h	/^	uint16_t uid;$/;"	m	struct:inode
 uint16_t	include/kernel/types.h	/^typedef unsigned short 	uint16_t;$/;"	t
 uint16_t	include/stdint.h	/^typedef unsigned short 	uint16_t;$/;"	t
 uint32_t	include/kernel/types.h	/^typedef unsigned int 	uint32_t;$/;"	t
@@ -4385,8 +4461,8 @@ u	include/multiboot.h	/^       } u;$/;"	m	struct:multiboot_info	typeref:union:mu
 unit	include/device/pci.h	/^    unsigned unit:5;$/;"	m	struct:cfg_addr
 unit	include/device/pci.h	/^    unsigned unit:5;$/;"	m	struct:cfg_addr2::__anon10
 unix_time	device/timer.c	/^uint32_t unix_time;$/;"	v
-unused	fs/fat/fat.c	/^	uint8_t unused;$/;"	m	struct:fat16_bootblock	file:
-unused	fs/fat/fat.c	/^	uint8_t unused;$/;"	m	struct:fat32_bootblock	file:
+unused	fs/fat/fat.h	/^	uint8_t unused;$/;"	m	struct:fat16_bootblock
+unused	fs/fat/fat.h	/^	uint8_t unused;$/;"	m	struct:fat32_bootblock
 urgent	net/tcp.c	/^	uint16_t urgent;$/;"	m	struct:tcp	file:
 usage	mm/liballoc.c	/^	unsigned int usage;					\/\/\/< The number of bytes used in the block.$/;"	m	struct:liballoc_major	file:
 usb_init	device/usb/usb.c	/^void usb_init()$/;"	f
@@ -4470,32 +4546,43 @@ vfs_file_t	fs/fs.c	/^} vfs_file_t;$/;"	t	typeref:struct:vfs_file	file:
 vfs_file	fs/fs.c	/^typedef struct vfs_file {$/;"	s	file:
 vfs_find_fs	fs/vfs.c	/^vfs_fs_t * vfs_find_fs(char *type)$/;"	f
 vfs_fs_t	fs/ext2/old/ext2fs2.c	/^typedef int vfs_fs_t;$/;"	t	file:
+vfs_fs_t	fs/fat/fat.c	/^typedef struct vfs_fs vfs_fs_t;$/;"	t	typeref:struct:vfs_fs	file:
 vfs_fs_t	fs/fs.c	/^} vfs_fs_t;$/;"	t	typeref:struct:vfs_fs	file:
-vfs_fs_t	include/kernel/fs/vfs.h	/^typedef struct vfs_fs vfs_fs_t;$/;"	t	typeref:struct:vfs_fs
+vfs_fs_t	include/fs/vfs.h	/^typedef struct vfs_fs vfs_fs_t;$/;"	t	typeref:struct:vfs_fs
+vfs_fs	fs/fat/fat.c	/^struct vfs_fs {$/;"	s	file:
 vfs_fs	fs/fs.c	/^typedef struct vfs_fs {$/;"	s	file:
-vfs_fs	include/kernel/fs/vfs.h	/^struct vfs_fs {$/;"	s
+vfs_fs	include/fs/vfs.h	/^struct vfs_fs {$/;"	s
 vfs_init	fs/vfs.c	/^void vfs_init()$/;"	f
 vfs_ioctl	fs/vfs.c	/^int  vfs_ioctl(struct file *file, $/;"	f
 vfs_mount_root	fs/vfs.c	/^void vfs_mount_root(uint16_t dev, char *type)$/;"	f
-vfs_mount_t	include/kernel/fs/vfs.h	/^typedef int (*vfs_mount_t) (uint16_t dev);$/;"	t
-vfs_namei_t	include/kernel/fs/vfs.h	/^typedef struct inode * (*vfs_namei_t) (struct inode *dir, char *path);$/;"	t	typeref:struct:vfs_namei_t
+vfs_mount_t	fs/fat/fat.c	/^typedef int (*vfs_mount_t) (uint16_t dev);$/;"	t	file:
+vfs_mount_t	include/fs/vfs.h	/^typedef int (*vfs_mount_t) (uint16_t dev);$/;"	t
+vfs_namei_t	fs/fat/fat.c	/^typedef struct inode * (*vfs_namei_t) (struct inode *dir, char *path);$/;"	t	typeref:struct:vfs_namei_t	file:
+vfs_namei_t	include/fs/vfs.h	/^typedef struct inode * (*vfs_namei_t) (struct inode *dir, char *path);$/;"	t	typeref:struct:vfs_namei_t
 vfs_namei	fs/vfs.c	/^struct inode * vfs_namei(struct inode *dir, char *file)$/;"	f
 vfs_open	fs/vfs.c	/^struct file *vfs_open(char *path)$/;"	f
-vfs_ops_t	include/kernel/fs/vfs.h	/^} vfs_ops_t;$/;"	t	typeref:struct:vfs_superblock_ops
+vfs_ops_t	fs/fat/fat.c	/^} vfs_ops_t;$/;"	t	typeref:struct:vfs_superblock_ops	file:
+vfs_ops_t	include/fs/vfs.h	/^} vfs_ops_t;$/;"	t	typeref:struct:vfs_superblock_ops
 vfs_pathsearch	fs/vfs.c	/^struct inode * vfs_pathsearch(struct file *dir, char *_path)$/;"	f
+vfs_read_inode_t	fs/fat/fat.c	/^typedef size_t (*vfs_read_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);$/;"	t	file:
 vfs_read_inode_t	fs/fs.c	/^typedef uint8_t * (*vfs_read_inode_t) (uint32_t inode, size_t length, size_t offset);$/;"	t	file:
-vfs_read_inode_t	include/kernel/fs/vfs.h	/^typedef size_t (*vfs_read_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);$/;"	t
-vfs_read_sb_t	include/kernel/fs/vfs.h	/^typedef int (*vfs_read_sb_t) (vfs_fs_t *fs, uint16_t dev);$/;"	t
+vfs_read_inode_t	include/fs/vfs.h	/^typedef size_t (*vfs_read_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);$/;"	t
+vfs_read_sb_t	fs/fat/fat.c	/^typedef int (*vfs_read_sb_t) (vfs_fs_t *fs, uint16_t dev);$/;"	t	file:
+vfs_read_sb_t	include/fs/vfs.h	/^typedef int (*vfs_read_sb_t) (vfs_fs_t *fs, uint16_t dev);$/;"	t
 vfs_read	fs/vfs.c	/^size_t vfs_read(struct file *file, void *buf, size_t nbyte)$/;"	f
 vfs_register_fs	fs/vfs.c	/^int vfs_register_fs(vfs_fs_t *fs)$/;"	f
-vfs_sb_t	include/kernel/fs/vfs.h	/^} vfs_sb_t;$/;"	t	typeref:struct:vfs_sb
-vfs_sb	include/kernel/fs/vfs.h	/^typedef struct vfs_sb {$/;"	s
+vfs_sb_t	fs/fat/fat.c	/^} vfs_sb_t;$/;"	t	typeref:struct:vfs_sb	file:
+vfs_sb_t	include/fs/vfs.h	/^} vfs_sb_t;$/;"	t	typeref:struct:vfs_sb
+vfs_sb	fs/fat/fat.c	/^typedef struct vfs_sb {$/;"	s	file:
+vfs_sb	include/fs/vfs.h	/^typedef struct vfs_sb {$/;"	s
 vfs_seek	fs/vfs.c	/^off_t vfs_seek(struct file *file, off_t offset, int whence)$/;"	f
-vfs_superblock_ops	include/kernel/fs/vfs.h	/^typedef struct vfs_superblock_ops {$/;"	s
+vfs_superblock_ops	fs/fat/fat.c	/^typedef struct vfs_superblock_ops {$/;"	s	file:
+vfs_superblock_ops	include/fs/vfs.h	/^typedef struct vfs_superblock_ops {$/;"	s
 vfs_virtual_sb	fs/ext2/old/ext2fs2.c	/^struct vfs_virtual_sb {$/;"	s	file:
+vfs_write_inode_t	fs/fat/fat.c	/^typedef size_t (*vfs_write_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);$/;"	t	file:
 vfs_write_inode_t	fs/fs.c	/^typedef uint32_t (*vfs_write_inode_t) (uint32_t inode, size_t length, size_t offset, uint8_t *buffer);$/;"	t	file:
-vfs_write_inode_t	include/kernel/fs/vfs.h	/^typedef size_t (*vfs_write_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);$/;"	t
-vfs_write	fs/vfs.c	/^off_t vfs_write(struct file *file, $/;"	f
+vfs_write_inode_t	include/fs/vfs.h	/^typedef size_t (*vfs_write_inode_t) (struct inode *, void *_buf, size_t length, off_t offset);$/;"	t
+vfs_write	fs/vfs.c	/^off_t vfs_write(struct file *file, void *buf, size_t nbyte)$/;"	f
 vga_clear	device/video/vga.c	/^void vga_clear(console_t *con)$/;"	f
 vga_console_init	device/video/vga.c	/^void vga_console_init(console_t *con, int num)$/;"	f
 vga_cursor_move	device/video/vga.c	/^static void vga_cursor_move(uint16_t pos)$/;"	f	file:
@@ -4515,10 +4602,10 @@ vm_init	mm/vm.c	/^void vm_init(struct multiboot_info *mb)$/;"	f
 vm_offset_t	include/sys/types.h	/^typedef unsigned long vm_offset_t;$/;"	t
 vm_size_t	include/sys/types.h	/^typedef unsigned long vm_size_t;$/;"	t
 void_handler	device/interrupt.c	/^static void void_handler(struct registers *regs)$/;"	f	file:
-volume_label	fs/fat/fat.c	/^	uint8_t volume_label[11];$/;"	m	struct:fat16_bootblock	file:
-volume_label	fs/fat/fat.c	/^	uint8_t volume_label[11];$/;"	m	struct:fat32_bootblock	file:
-volume_serial	fs/fat/fat.c	/^	uint32_t volume_serial;$/;"	m	struct:fat16_bootblock	file:
-volume_serial	fs/fat/fat.c	/^	uint32_t volume_serial;$/;"	m	struct:fat32_bootblock	file:
+volume_label	fs/fat/fat.h	/^	uint8_t volume_label[11];$/;"	m	struct:fat16_bootblock
+volume_label	fs/fat/fat.h	/^	uint8_t volume_label[11];$/;"	m	struct:fat32_bootblock
+volume_serial	fs/fat/fat.h	/^	uint32_t volume_serial;$/;"	m	struct:fat16_bootblock
+volume_serial	fs/fat/fat.h	/^	uint32_t volume_serial;$/;"	m	struct:fat32_bootblock
 vsprintf	lib/stdio.c	/^int vsprintf(char *buf, const char *fmt, va_list args)$/;"	f
 weekday	device/timer.c	/^	uint8_t weekday;$/;"	m	struct:c_os_time	file:
 width	include/multiboot.h	/^       multiboot_uint32_t width;$/;"	m	struct:multiboot_header
@@ -4531,8 +4618,9 @@ write_block_at	fs/device.c	/^int write_block_at(uint16_t dev, void * _buf, int b
 write_block	fs/device.c	/^int write_block(uint16_t dev, void * _buf, int block, int block_size)$/;"	f
 write	fs/device.c	/^	block_write_fn write;$/;"	m	struct:block_device	file:
 write	fs/device.c	/^	char_write_fn write;$/;"	m	struct:char_device	file:
-write	include/kernel/fs/vfs.h	/^	char_write_fn write;$/;"	m	struct:char_device_ops
-write	include/kernel/fs/vfs.h	/^	vfs_write_inode_t write;$/;"	m	struct:vfs_superblock_ops
+write	fs/fat/fat.c	/^	vfs_write_inode_t write;$/;"	m	struct:vfs_superblock_ops	file:
+write	include/fs/vfs.h	/^	char_write_fn write;$/;"	m	struct:char_device_ops
+write	include/fs/vfs.h	/^	vfs_write_inode_t write;$/;"	m	struct:vfs_superblock_ops
 xid	net/dhcp.c	/^	uint32_t xid;$/;"	m	struct:dhcp_message	file:
 x	device/video/bochs_vga.c	/^	int x, y;$/;"	m	struct:bochs_vga_state	file:
 x	device/video/vga.c	/^	int x, y;$/;"	m	struct:vga_state	file:

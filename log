@@ -1,0 +1,35 @@
+ChickenOS v0.02 booting
+Found SigmaTel AC97 codec
+Monday 4/14/13  1:35:3 timestamp: 1365903303
+Found Intel PIIX3 UHCI controller Rev 1 found at I/O base address c540
+Mem base address 0	IRQ 11 PIN 4
+Found 2 ports
+Initialzing VFS
+Initializing EXT2 FS
+Registered device 8:0
+Registered device 3:0
+Detected HD: QEMU HARDDISK  Capacity: 15MB
+Mounted ext2 fs @ dev 3:1 as root
+Entering user mode
+fork @ eip C0101494
+stack c03b9ed8 string /init *sp úÿÿ¿0`8À len 6
+stack c03b9ed8 string init *sp õÿÿ¿0`8Àÿÿÿÿè_À len 5
+stack bffffff5
+undefined system call 28!
+undefined system call 55!
+undefined system call 55!
+
+PAGE FAULT! @ 290
+kernel space
+read
+page not present
+
+REGS:
+edi 8 esi 296 ebp 23 esp C03B9DFC
+ebx 0 edx C01026C1 ecx 8 eax 296
+ds 10 es 10 fs 23 gs 23 int_no 14 err_code 0
+eip C01026C1 cs 8 eflags 296 useresp 296 ss 10
+
+file:device/interrupt.c line:337 [Page fault in kernel space!]
+Backtrace
+[0xc01002bf], [0xc0100bee], [0xc010055d], [0xc01026a3], [0xc01026c1], 
