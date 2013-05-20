@@ -198,11 +198,13 @@ thread_create(registers_t *regs ,uint32_t eip, uint32_t esp)
 	uintptr_t new_sp;
 	
 	kernel_stack = pallocn(STACK_PAGES);
+	//TODO: Perhaps we should allocate more than one page to the user stack?
 	user_stack = palloc();
 
 	cur = thread_current();
 	
 	new = (thread_t *)kernel_stack;	
+	//FIXME: iNext three lines don't take into account stack size
 	new_sp = (uintptr_t)kernel_stack + 4096;;
 
 	kmemsetl((uint32_t*)user_stack, 0, 1024);
@@ -223,10 +225,13 @@ thread_create(registers_t *regs ,uint32_t eip, uint32_t esp)
 	new->magic = THREAD_MAGIC;
 	new->pid = pid_allocate();
 	new->parent = cur->pid;
+	//TODO: Add constant for number of signals and use it here
 	new->signals = (struct sigaction **)kmalloc(sizeof(struct sigaction*) * 32);
 	kmemcpy(new->signals, cur->signals, sizeof(struct sigaction*) * 32);
+	
 	new->pgid = cur->pgid;
 	kmemcpy(new->files, cur->files, sizeof(struct file)*8);
+	
 	new->user = (uint8_t *)(PHYS_BASE - 0x1000);	
 	reg_frame = (void *)(kernel_stack + 4096);
 	reg_frame--;
