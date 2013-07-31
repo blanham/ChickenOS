@@ -7,7 +7,7 @@ extern _sbss
 MODULEALIGN equ  1<<0             ; align loaded modules on page boundaries
 MEMINFO     equ  1<<1             ; provide memory map
 VIDEOINFO	equ  1<<2 ;provide video info
-FLAGS       equ  MODULEALIGN | MEMINFO ;| VIDEOINFO  ; this is the Multiboot 'flag' field
+FLAGS       equ  MODULEALIGN | MEMINFO | VIDEOINFO  ; this is the Multiboot 'flag' field
 MAGIC       equ    0x1BADB002     ; 'magic number' lets bootloader find the header
 CHECKSUM    equ -(MAGIC + FLAGS)  ; checksum required
  
