@@ -13,7 +13,7 @@
 #include <device/pci.h>
 #include <net/net_core.h>
 #include <kernel/hw.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <kernel/memory.h>
 #include <device/net/e1000.h>
 struct e1000 *e1000_global;

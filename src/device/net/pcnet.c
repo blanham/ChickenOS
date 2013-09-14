@@ -9,7 +9,7 @@
 #include <device/pci.h>
 #include <net/net_core.h>
 #include <kernel/hw.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <kernel/memory.h>
 //#include "rtl8139.h"
 //http://code.google.com/searchframe#gufiwQeQ0iA/trunk/boot/u-boot-1.1.4/drivers/pcnet.c&q=pcnet&ct=rc&cd=3

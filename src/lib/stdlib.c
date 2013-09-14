@@ -2,8 +2,8 @@
 #include <kernel/memory.h>
 #include <kernel/common.h>
 #include <kernel/interrupt.h>
-#include <kernel/types.h>
-#include <kernel/vm.h>
+#include <types.h>
+#include <mm/vm.h>
 #include <mm/liballoc.h>
 #include <stddef.h>
 

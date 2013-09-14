@@ -1,6 +1,6 @@
 #include <common.h>
 #include <thread/tss.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <kernel/thread.h>
 #include <memory.h>
 tss_t tss;

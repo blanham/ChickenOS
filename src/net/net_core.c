@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdio.h>
 #include <mm/liballoc.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <kernel/memory.h>
 #include <net/net_core.h>
 #include <device/net/rtl8139.h>

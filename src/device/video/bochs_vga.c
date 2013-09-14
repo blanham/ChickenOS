@@ -8,9 +8,10 @@
 #include <device/video/font.h>
 #include <device/pci.h>
 #include <stdio.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <kernel/thread.h>
 #include <memory.h>
+#include <mm/paging.h>
 #include <mm/liballoc.h>
 #include <device/console.h>
 #include <vincent.h>

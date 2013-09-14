@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <memory.h>
+#include <mm/paging.h>
 #include <mm/liballoc.h>
 #include <thread.h>
 #include <fs/vfs.h>

@@ -1,6 +1,6 @@
-#ifndef C_OS_VM_H
-#define C_OS_VM_H
-#include <kernel/types.h>
+#ifndef C_OS_MM_VM_H
+#define C_OS_MM_VM_H
+#include <types.h>
 #include <multiboot.h>
 
 #define PAGE_SIZE 4096
@@ -12,7 +12,7 @@
 #define PAGE_WRITE	   0x02
 #define PAGE_USER	   0x04
 
-#define PTE_PRESENT 0x00000001
+//#define PTE_PRESENT 0x00000001
 
 #define KERNEL_SEG 0x10
 
@@ -27,19 +27,6 @@ typedef uint32_t * pagedir_t;
 /* mm/vm.c */
 void vm_init(struct multiboot_info *mb);
 
-/* mm/paging.c */
-void paging_init();
-pagedir_t pagedir_new();
-pagedir_t pagedir_clone(pagedir_t pd);
-void pagedir_install(uint32_t *pd);
-void pagedir_insert_page(pagedir_t pd, 
-	virt_addr_t phys, virt_addr_t virt,uint8_t flags);
-void pagedir_insert_pagen(pagedir_t pd, virt_addr_t kvirt, 
-	virt_addr_t uvirt,uint8_t flags, int n);
-void pagedir_insert_page_physical(pagedir_t pd, phys_addr_t kphys, 
-	virt_addr_t uvirt,uint8_t flags);
-void pagedir_insert_pagen_physical(pagedir_t pd, phys_addr_t kphys, 
-	virt_addr_t uvirt,uint8_t flags, int n);
 /* mm.gdt.c */
 void gdt_install();
 

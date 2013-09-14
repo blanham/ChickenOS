@@ -1,6 +1,6 @@
 #ifndef C_OS_TIMER_H
 #define C_OS_TIMER_H
-#include <kernel/types.h>
+#include <types.h>
 #include <sys/types.h>
 /*typedef uint32_t time_t;
 typedef int32_t suseconds_t;

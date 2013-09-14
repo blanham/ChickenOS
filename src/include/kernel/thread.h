@@ -1,19 +1,24 @@
 #ifndef C_OS_THREAD_H
 #define C_OS_THREAD_H
-#include <kernel/list.h>
 #include <kernel/interrupt.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <fs/vfs.h>
 #include <sys/signal.h>
 
-#include <util/utlist.h>
+#define STACK_SIZE 0x1000
+#define STACK_PAGES STACK_SIZE/PAGE_SIZE
 
+#define MAX_THREADS 256
 #define THREAD_MAGIC 0xc001c0de
+#define THREAD_ASSERT(x) ASSERT(x->magic == THREAD_MAGIC, "Thread's kernel stack overflowed")
 
 enum thread_stat {THREAD_DEAD, THREAD_READY, THREAD_RUNNING, THREAD_BLOCKED};
 
 //FIXME: is this the right place for this? 
 typedef int pid_t;
+
+
+
 //TODO: Priorities? Would really like to maybe implement the 4.3BSD scheduler
 // 		since we didn't get it working in pintos
 typedef struct thread {
@@ -21,26 +26,34 @@ typedef struct thread {
 	pid_t pid;
 	pid_t parent;
 	pid_t pgid;
-//TODO: will have to have list head for children
+
 	char *name;
 
-//	struct list_head list;
-//	struct list_head ready_list;
-//	struct list_head all_list;
-	struct thread *ready_prev, *ready_next;
-	struct thread *prev, *next;
+	//TODO: will have to have list head for children
 	
 	//fs stuff
 	struct file *cur_dir;
 	int fd;
-//TODO: this needs to be a list or possibly a hash or something
+	//TODO: Obviously we should be allowed to have more files open
+	//Probably copy Linux and have a files struct pointer
+	/*
+	struct files {
+
+		count
+		close_on_exec (flag)
+		open_fs
+		struct files *fds[256];
+
+	};
+
+
+	*/
 	struct file *files[8];
 	
 	//saved kernel stack
 	uint8_t *sp;
 	
 	//saved user stack
-	uint8_t *usersp;
 	uint8_t *user;
 	
 	//location of brk
@@ -66,29 +79,34 @@ typedef struct thread {
 
 /* thread.c */
 void thread_init();
-thread_t * thread_current();
-//thread_t * thread_create(void (*func)(void *), void *aux);
-
-//thread_t *thread_create(uint32_t eip, uint32_t esp);
-void thread_yield();
-void thread_exit();
 void thread_usermode(void);
-void thread_set_ready(thread_t *thread);
+pid_t pid_allocate();
+thread_t * thread_current();
+thread_t * thread_create(registers_t *regs ,uint32_t eip, uint32_t esp);
 
-/* thread.c - system calls */
+/* thread_ops.c - system calls */
 pid_t sys_fork(registers_t *regs);
 pid_t sys_getpid();
 pid_t sys_getpgrp();
-int sys_kill(int pid, int sig);
-int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
-int sys_sigsuspend(const sigset_t *mask);
 int sys_execve(const char *path, char *const argv[], char *const envp[]);
+void *sys_brk(uintptr_t ptr);
 
 //we define this so kmain can call the first user process 
 int execv(const char *path, char *const argv[]);
 
 /* thread/scheduler.c */
-void thread_scheduler();
+void thread_scheduler_init(thread_t *kernel_thread);
+void thread_scheduler(registers_t *regs);
+void thread_yield();
+void thread_exit();
+void thread_set_ready(thread_t *thread);
+void thread_queue(thread_t *thread);
+thread_t *thread_next();
+
+/* thread/signal.c */
+int sys_kill(int pid, int sig);
+int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+int sys_sigsuspend(const sigset_t *mask);
 
 /* thread/load_elf.c */
 #define ELF_MAGIC "\x7F""ELF"//why is this here?

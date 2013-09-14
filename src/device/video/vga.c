@@ -6,7 +6,7 @@
 #include <kernel/hw.h>
 #include <device/console.h>
 #include <device/video/vga.h>
-#include <vm.h>
+#include <mm/vm.h>
 
 /*
 void vga_init(struct multiboot_info *mb)
@@ -181,7 +181,7 @@ console_t *vga_init()
 	for(int i = 0; i < NUM_CONSOLES; i++)
 	{
 		new[i].putc = &vga_putc;
-		new[i].aux = kmalloc(sizeof(struct vga_state));
+		new[i].aux = kcalloc(sizeof(struct vga_state),1);
 		vga_console_init(&new[i], i);
 		console_register(&new[i]);	
 			

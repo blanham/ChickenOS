@@ -10,7 +10,7 @@
  */
 
 #include <stdarg.h>
-#include <kernel/types.h>
+#include <types.h>
 #include <string.h>
 #include <ctype.h>
 

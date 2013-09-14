@@ -1,4 +1,4 @@
-#include <kernel/types.h>
+#include <types.h>
 
 int isprint(char c)
 {

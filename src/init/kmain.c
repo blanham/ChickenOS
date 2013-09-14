@@ -9,8 +9,8 @@
 #include <device/audio.h>
 #include <device/serial.h>
 #include <kernel/timer.h>
-#include <kernel/types.h>
-#include <kernel/vm.h>
+#include <types.h>
+#include <mm/vm.h>
 #include <fs/vfs.h>
 #include <fs/initrd.h>
 #include <net/net_core.h>
@@ -20,22 +20,15 @@
 
 char *BOOT_MSG = "ChickenOS v0.02 booting\n";
 
-extern void print_mb(unsigned long addr, unsigned long magic);
-
-//FIXME: Move this somewhere else (init/boot.c?)
-void modules_init(struct multiboot_info *mb)
+extern void modules_init(struct multiboot_info *mb);
+void fork_test();
+void init();
+extern void multiboot_print(struct multiboot_info *mb);
+void ass()
 {
-	extern uint32_t *background_image;
-	
-	if(mb->mods_count > 0 )
-	{
-		background_image  = (uint32_t *)P2V(*((void**)P2V(mb->mods_addr)));
-	//	uintptr_t end  = (uintptr_t)*((void **)P2V(mb->mods_addr + 4));
-	//	initrd_init(P2V(start),P2V(end));
-	}
+	printf("ass\n");
+	while(1);
 }
-
-
 //mb is already a virtual address
 void kmain(struct multiboot_info* mb, uint32_t magic)
 {
@@ -65,9 +58,9 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 	//console working
 //	console_set_color(BLUE,WHITE);
 	console_puts(BOOT_MSG);
-
+//	multiboot_print(mb);
 	audio_init();
-
+	
 	extern void pci_list();
 
 //	pci_list();	
@@ -94,32 +87,51 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 	extern void ata_init();
 
 	ata_init();	
-
-
+	
 	vfs_mount_root(ATA0_0_DEV, "ext2");
 	
-	thread_usermode();
+extern uint32_t mem_size;
+	printf("Found %uMB RAM\n", mem_size / 1024);
 	
+	thread_usermode();
+		
 	//we have this special sycall at the moment
 	//to setup networking, later will be able to handle
-	//it in user space	
-//	network_setup();
+	//it in user space:
+	//network_setup();
+	//FIXME: probably reuse the above to do a dhcp request
 
-
-	char *argv[] = {"/init",NULL};	
-
+	//	dummy();
 	if(!fork() )
 	{
-		execv("/init", argv);
-		PANIC("execv(init) failed!");
+		while(1)
+			printf("derp\n");
+		init();
+		PANIC("init() returned!");
 	}
-
 	//only works because initial threads name is "main"
-	strcpy(thread_current()->name, "idle");
-	//needs to be sleep?
+	strncpy(thread_current()->name, "idle", 4);
+	while(1)
+		printf("herp\n");
+	//FIXME? needs to be sleep?
 	while(1);
+		asm volatile("hlt");
 
 	//should never return, unless things get really fucked
 	PANIC("kmain returned");
 }
 
+//FIXME:Here we should do housekeeping, launch any shells or login processes
+//		on the various psuedoterminals, and wait()s on children (which takes
+//		care of zombies processes) 
+void init()
+{
+	char *argv[] = {"/frotz","zo",NULL};
+	(void)argv;
+//		execv("/tests/fork", argv);
+		PANIC("execv(init) failed!");
+
+	
+	while(1)
+		;
+}

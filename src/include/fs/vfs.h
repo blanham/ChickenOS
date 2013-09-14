@@ -1,6 +1,6 @@
 #ifndef C_OS_VFS_H
 #define C_OS_VFS_H
-#include <kernel/types.h>
+#include <types.h>
 #include <sys/types.h>
 #include <kernel/list.h>
 #include <sys/stat.h>

@@ -7,5 +7,6 @@ sudo cp init ./mnt/init
 sudo cp frotz ./mnt/frotz
 sudo cp zo ./mnt/zo
 sudo cp chicken.bmp ./mnt/chicken.bmp
+sudo cp usrsrc/tests/bin/* ./mnt/tests/
 sync
 sudo umount ./mnt

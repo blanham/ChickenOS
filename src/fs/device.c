@@ -10,7 +10,7 @@
 #include <kernel/common.h>
 #include <kernel/memory.h>
 #include <fs/vfs.h>
-#include <kernel/types.h>
+#include <types.h>
 #include <mm/liballoc.h>
 #include <stdio.h>
 

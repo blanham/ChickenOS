@@ -1,6 +1,6 @@
 #ifndef C_OS_HW_H
 #define C_OS_HW_H
-#include <kernel/types.h>
+#include <types.h>
 void outb(uint16_t port, uint8_t value);
 void outw(uint16_t port, uint16_t value);
 void outl(uint16_t port, uint32_t value);

@@ -3,7 +3,7 @@
 #include <device/pci.h>
 #include <timer.h> 
 #include <kernel/hw.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <stdio.h>
 #include <kernel/memory.h>
 #include <mm/liballoc.h>
