@@ -1,6 +1,6 @@
 #ifndef C_OS_SYS_SOCKET_H
 #define C_OS_SYS_SOCKET_H
-#include <kernel/types.h>
+#include <types.h>
 typedef uint32_t socklen_t;
 typedef uint32_t sa_family_t;
 

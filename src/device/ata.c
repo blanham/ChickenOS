@@ -3,7 +3,7 @@
 #include <kernel/hw.h>
 #include <device/serial.h>
 #include <kernel/interrupt.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <kernel/timer.h>
 #include <mm/liballoc.h>
 #include <fs/vfs.h>

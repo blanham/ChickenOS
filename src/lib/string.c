@@ -102,6 +102,17 @@ char *strcpy(char *dst, const char *src)
 
 	return dst;
 }
+
+char *strncpy(char *dst, const char *src, size_t len)
+{
+	char *_dst = dst;
+	
+	while(((*_dst++ = *src++) != 0) && (--len != 0));
+
+	return dst;
+}
+
+
 char * strcat(char *dst, const char * src)
 {
 //	char *d = dst;

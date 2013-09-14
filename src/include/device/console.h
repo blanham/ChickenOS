@@ -1,6 +1,6 @@
 #ifndef C_OS_CONSOLE_H
 #define C_OS_CONSOLE_H
-#include <kernel/types.h>
+#include <types.h>
 
 enum console_color {
 	BLACK, BLUE, GREEN, CYAN,

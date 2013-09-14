@@ -344,3 +344,24 @@ int snprintf(char *buf, size_t size, const char *fmt, ...)
 	return ret;
 }
 
+void hex_dump(void *ptr, int n)
+{
+	uint8_t *p = ptr;	
+	for(int j =0; j < n; j++)
+	{
+		printf("%X ",p);
+		for(int i = 0; i < 16; i++)
+		{
+			printf("%.2X ",p[i]);
+		}
+		printf("|");
+		for(int i = 0; i < 16; i++)
+		{
+			printf("%c",isprint(p[i]) == 0 ? '.' : p[i]);
+		}
+		printf("|");
+		printf("\n");
+		p+=16;
+	}
+}
+

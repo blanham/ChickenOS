@@ -5,7 +5,7 @@
 #include <kernel/hw.h>
 #include <device/serial.h>
 #include <device/input.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <fs/vfs.h>
 #include <device/video/bochs_vga.h>
 #include <sys/ioctls.h>

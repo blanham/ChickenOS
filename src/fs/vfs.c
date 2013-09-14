@@ -3,10 +3,10 @@
  *	
  */
 #include <kernel/common.h>
-#include <kernel/types.h>
+#include <types.h>
 #include <kernel/memory.h>
 #include <kernel/thread.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <fs/vfs.h>
 #include <fs/ext2/ext2.h>
 #include <mm/liballoc.h>
@@ -382,17 +382,19 @@ off_t vfs_seek(struct file *file, off_t offset, int whence)
 	return file->offset;
 }
 //FIXME: I'm not sure if the logic here checks out
+//FIXME: Add various errors, most importantly
+//		EBADF, EACCES, ENOTDIR and EFAULT
 int vfs_chdir(const char *_path)
 {
 	struct file *file;
-	int ret = 0;
+	int ret = -1;
 	char *path = strdup(_path);
 	file  = vfs_open(path);
 	if(file != NULL)
 	{
 		vfs_close(thread_current()->cur_dir);
 		thread_current()->cur_dir = file;
-		ret = 1;
+		ret = 0;
 	}
 	kfree(path);
 	return ret;

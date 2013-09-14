@@ -1,10 +1,8 @@
 #ifndef C_OS_BITMAP_H
 #define C_OS_BITMAP_H
-#include <kernel/types.h>
+#include <types.h>
 //TODO: needs housekeeping
-//#include <stdint.h>
-//#include "types.h"
-//typedef uint32_t * bitmap_t;
+
 typedef struct bitmap {
 	uint32_t *data;
 	uint32_t size;
@@ -28,19 +26,19 @@ static inline void bitmap_init_phys(bitmap_t *bitmap, uint32_t size, uint32_t *p
 		
 	}
 }
+
 static inline int bitmap_test(bitmap_t *bitmap, uint32_t index)
 {
-	int array = index / 32;
+	int array_offset = index / 32;
 	int offset = index % 32;
 	
-	if((bitmap->data[array] & (BIT_HIGH >> offset)) != 0)
+	if((bitmap->data[array_offset] & (BIT_HIGH >> offset)) != 0)
 		return 1;
 	else
 		return -1;
 
-
-
 }
+
 static inline int bitmap_set(bitmap_t *bitmap, uint32_t index)
 {
 	int array = index / 32;
@@ -54,15 +52,15 @@ static inline int bitmap_set(bitmap_t *bitmap, uint32_t index)
 //	}
 
 }
+
 static inline int bitmap_set_multiple(bitmap_t *bitmap, uint32_t index, uint32_t count)
 {
 	for(uint32_t i = 0; i < count; i ++)
 		bitmap_set(bitmap, index + i);
 
-
-
 	return 0;
 }
+
 static inline int bitmap_clear(bitmap_t *bitmap, uint32_t index)
 {
 	int array = index / 32;
@@ -76,12 +74,11 @@ static inline int bitmap_clear(bitmap_t *bitmap, uint32_t index)
 //	}
 
 }
+
 static inline int bitmap_clear_multiple(bitmap_t *bitmap, uint32_t index, uint32_t count)
 {
 	for(uint32_t i = 0; i < count; i ++)
 		bitmap_clear(bitmap, index + i);
-
-
 
 	return 0;
 }
@@ -89,10 +86,15 @@ static inline int bitmap_clear_multiple(bitmap_t *bitmap, uint32_t index, uint32
 static inline uint32_t bitmap_find_first(bitmap_t *bitmap)
 {
 	uint32_t i;
-	for(i = 0; i < bitmap->size; i++)
-		if(bitmap_test(bitmap,i) == -1)
-			return i;
-
+	for(i = 0; i < bitmap->size/32; i++)
+	{
+		if(bitmap->data[i] == (uint32_t)~0)
+			continue;
+	
+		for(int j = 0; j < 32; j++)
+			if(bitmap_test(bitmap,i*32 + j) == -1)
+				return i;
+	}
 	return BITMAP_ERROR;
 }
 

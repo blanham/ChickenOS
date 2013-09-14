@@ -7,7 +7,7 @@ CFLAGS	=		-g -Wall -Werror $(INCLUDES) \
 				-fno-stack-protector -nostartfiles \
 				-nodefaultlibs -ffreestanding\
 				-nostdlib -nostdinc -fno-builtin
-#CFLAGS += -Wextra
+CFLAGS += 		-Wextra
 LINKER	=		ld -melf_i386 
 LDFLAGS	=		-Tinit/linker.ld 
 
@@ -42,13 +42,17 @@ DEVSRCS		=	device/intr-core.o  device/input.o\
 				device/timer.o device/serial.o device/ata.o\
 				device/pci.o $(VIDEOSOURCES) $(AUDIOSRCS)\
 				$(USBSOURCES)
+RME_OBJ =		rme.o prefixes.o ops_alu.o ops_stack.o ops_io.o ops_mov.o\
+				ops_string.o ops_jump.o ops_call.o ops_flags.o ops_misc.o
+RME_OBJ := 		$(addprefix rme2/,$(RME_OBJ))
+
 THREAD	=		thread/thread.o thread/thread_ops.o thread/syscall.o\
 				thread/scheduler.o	thread/tss.o thread/fork.o thread/exec.o\
 				thread/signal.o thread/load_elf.o sh.o
 				#have to have interrupt.o here at the moment 
-CORE	=		init/kmain.o init/loader.o device/interrupt.o
+CORE	=		init/kmain.o init/loader.o init/multiboot.o device/interrupt.o
 				
-SOURCES	=		$(CORE)  $(THREAD)  $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
+SOURCES	=		$(CORE)  $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
 				$(FSSRCS) $(KLIBSRCS) 
 #SOURCES = $(CORE) device/intr-core.o device/kbd.o device/serial.o thread/thread.o mm/palloc.o mm/liballoc.o mm/liballoc_funcs.o thread/syscall.o thread/tss.o device/console.o device/hw.o mm/gdt.o mm/paging.o mm/vm.o $(KLIBSRCS)
 #SOURCES = init/kmain.o init/loader.o 

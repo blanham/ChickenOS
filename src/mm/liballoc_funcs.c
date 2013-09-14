@@ -1,16 +1,20 @@
 #include <kernel/common.h>
 #include <kernel/interrupt.h>
-#include <kernel/types.h>
-#include <kernel/vm.h>
+#include <types.h>
+#include <mm/vm.h>
 #include <mm/liballoc.h>
+
+enum intr_status alloc_intr_status;
 
 //FIXME: Add locks here
 int liballoc_lock() {
 
-        return 0;
+    alloc_intr_status = interrupt_disable();
+    return 0;
 }
 
 int liballoc_unlock() {
+		interrupt_set(alloc_intr_status);
         return 0;
 }
 

@@ -1,4 +1,4 @@
-#include <kernel/types.h>
+#include <types.h>
 struct gdt_entry_struct
 {
    uint16_t limit_low;           // The lower 16 bits of the limit.

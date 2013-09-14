@@ -11,8 +11,8 @@
 
 static inline void kernel_halt()
 {
-	asm volatile ("hlt");
-	while(1);
+	while(1)
+		asm volatile ("hlt");
 }
 void kprintf(char *fmt, ...);
 
@@ -28,8 +28,8 @@ static inline void print_stack_trace ()
         eip = ebp+1;
         printf ("[0x%x], ", *eip);
         ebp = (uint32_t*) *ebp;	
-		if((uintptr_t)ebp < 0xC0000000)
-			break;
+	//	if((uintptr_t)ebp < 0xC0000000)
+		//	break;
       }
 }
 #define BACK(x) case x: ret = __builtin_return_address(x);break;
@@ -74,27 +74,23 @@ static inline void backtrace(unsigned int level)
 static inline void panic(char *file, int line,char* msg)
 {
 	//console_set_color(RED,WHITE);
-	//console_puts("KERNEL PANIC\n");
+	printf("KERNEL PANIC\n");
 	printf("file:%s line:%i [%s]\n",file, line, msg);
 	printf("Backtrace\n");
 	print_stack_trace();
 	kernel_halt();
 }
-#define ASSERT(condition, msg) kassert(__FILE__, __LINE__,condition, msg)
+#define ASSERT(condition, msg) kassert(__FILE__, __LINE__,condition, msg, __func__)
 static inline void
-kassert(char *file, int line, bool condition, char *msg)
+kassert(char *file, int line, bool condition, char *msg, const char *function)
 {
-	
 	if(condition == true)
 		return;
-	(void)msg;	
-	//console_set_color(GREEN,WHITE);
 	
-	//console_puts("Conditon failed:\t");
-	//console_puts(msg);
-	uint32_t *ptr = 0;
-	*ptr = 0;
-
+	//console_set_color(GREEN,WHITE);
+	printf("%s(): ",function);
+	printf("%s\n",msg);
+		
 	panic(file, line, "ASSERTION FAILED!");
 }
 #endif

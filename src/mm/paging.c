@@ -6,33 +6,14 @@
  *
  */
 #include <common.h>
-#include <kernel/vm.h>
+#include <mm/paging.h>
 #include <kernel/interrupt.h>
 #include <kernel/memory.h>
 #include <stdio.h>
 
-#define PDE_MASK	0xffc00000
-#define PDE_SHIFT 	22
-#define PDE_P		0x00000001
-#define PDE_RW		0x00000002
-#define PDE_USER	0x00000004
-#define PDE_WTHRU	0x00000008
-#define	PDE_DCACHE	0x00000010
-#define PDE_ACCESED	0x00000020
-#define PDE_DIRTY	0x00000040
-#define PDE_GLOBAL	0x00000080
 
-#define PTE_MASK	0x003ff000
-#define PTE_SHIFT 	12
-#define PTE_P		PDE_P		
-#define PTE_RW		PDE_RW		
-#define PTE_USER	PDE_USER	
-#define PTE_WTHRU	PDE_WTHRU	
-#define	PTE_DCACHE	PDE_DCACHE	
-#define PTE_ACCESED	PDE_ACCESED	
-#define PTE_DIRTY	PDE_DIRTY	
-
-
+//TODO: Cleanup, and add a pagedir_lookup function to see if an
+//		address is valid
 pagedir_t kernel_pd;
 typedef uint32_t * page_table_t;
 
@@ -44,7 +25,7 @@ pagedir_t pagedir_new()
 	
 	for(int i = 0; i < 1024; i++)
 	{
-		if((kernel_pd[i] & PTE_PRESENT) != 0)
+		if((kernel_pd[i] & PTE_P) != 0)
 		{
 			new_pt = palloc();
 			cur = kernel_pd[i] & ~0xfff;
@@ -60,13 +41,13 @@ void pagedir_delete(pagedir_t pd)
 {
 	for(int i = 0; i < 1024; i ++)
 	{
-		if((pd[i] & PTE_PRESENT) != 0)
+		if((pd[i] & PTE_P) != 0)
 		{
 			palloc_free((void *)P2V(pd[i]));
 		} 
 	}
 }
-
+//FIXME: 
 page_table_t pagetable_clone(page_table_t pt)
 {
 	page_table_t new = palloc();
@@ -90,7 +71,7 @@ pagedir_t pagedir_clone(pagedir_t pd)
 
 	for(int i = 0; i < 1024; i++)
 	{
-		if((pd[i] & PTE_PRESENT) != 0)
+		if((pd[i] & PTE_P) != 0)
 		{
 			new_pt = palloc();
 		//	new[i] = (uintptr_t)pagetable_clone((page_table_t)pd[i]);
@@ -131,10 +112,7 @@ void pagedir_insert_page(pagedir_t pd, virt_addr_t kvirt,
 	
 	pde_index = uvirt >> PDE_SHIFT;
 	pte_index = (uvirt & PTE_MASK) >> PTE_SHIFT;
-//	uint32_t _ebp = 0;
-//	asm volatile ("mov 4(%%ebp), %%eax;""mov %%eax, %0" :"=m" (_ebp));
 
-//	printf("pde_entry %x calling %x\n", pde_entry, _ebp);	
 	pde_entry +=pde_index;
 //	printf("pde_entry %x\n", pde_entry);	
 	if((*pde_entry & 0x1) == 0)
@@ -176,7 +154,7 @@ void pagedir_insert_page_physical(pagedir_t pd, phys_addr_t kphys,
 //	printf("pte_entry %x %x %x\n", *pte_entry, (uint32_t*)kphys, uvirt);
 	
 	*pte_entry = (kphys) | flags;
-//	*(uint32_t *)kphys = 88888;
+	
 	pagedir_install(pd);
 	//printf("pte_entry %x %x %x\n", *pte_entry, *(uint32_t*)kphys, uvirt);
 		

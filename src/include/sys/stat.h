@@ -1,6 +1,6 @@
 #ifndef	_SYS_STAT_H
 #define	_SYS_STAT_H
-//#include <kernel/types.h>
+//#include <types.h>
 
 
 

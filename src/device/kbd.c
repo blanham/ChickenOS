@@ -5,6 +5,7 @@
 #include <kernel/memory.h>
 #include <device/input.h>
 #include <stdio.h>
+
 uint16_t shifts;
 #define L_CTRL  0x0001
 #define R_CTRL  0x0002

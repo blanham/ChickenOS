@@ -1,6 +1,6 @@
 #include <common.h>
 #include <memory.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <thread/tss.h>
 struct segment_descriptor {
 	uint16_t limit0;
@@ -60,7 +60,7 @@ gdt_install(void)
 	gdt_fill(&gdt_entries[3], 0, 0xFFFFF, GDTF_BOTH, 0xFA);
 	gdt_fill(&gdt_entries[4], 0, 0xFFFFF, GDTF_BOTH, 0xF2);
 
-kmemset(&tss, 0, 104);
+	kmemset(&tss, 0, 104);
 	tss.ss0  = 0x10;
 	tss.io_bmap = sizeof(tss);	
 //	uint32_t esp;

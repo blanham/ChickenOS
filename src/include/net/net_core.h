@@ -1,6 +1,6 @@
 #ifndef C_OS_NET_NETCORE_H
 #define C_OS_NET_NETCORE_H
-#include <kernel/types.h>
+#include <types.h>
 #include <queue.h>
 #define ETH_ALEN 6
 #define MY_DEST_MAC0    0x00
@@ -138,6 +138,7 @@ struct sockbuf {
 	char dest_mac[6];
 	uint32_t dest_ip;
 	int broadcast;
+	
 	TAILQ_ENTRY(sockbuf) elem;
 };
 struct sockbuf *sockbuf_alloc(struct network_dev *dev, uint32_t len);

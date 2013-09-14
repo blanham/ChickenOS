@@ -14,6 +14,9 @@ SECTIONS {
 
    .data ALIGN (0x1000) : AT(ADDR(.data) - 0xC0000000) {
        *(.data)
+		_init_start = .;
+       *(.data.init)
+		_init_end = .;
    }
 
    .bss : AT(ADDR(.bss) - 0xC0000000) {

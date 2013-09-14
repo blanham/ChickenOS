@@ -5,7 +5,7 @@
  *	of pages
  */
 #include <kernel/common.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <kernel/interrupt.h>
 #include <kernel/bitmap.h>
 #include <kernel/memory.h>
@@ -72,12 +72,15 @@ void palloc_init(uint32_t page_count, uint32_t placement)
 {
 	void *start = 0;
 	uint32_t bitmap_ptr = placement;
-	uint32_t bitmap_length = (page_count/32);
+	uint32_t bitmap_length = (page_count/32) * sizeof(uint32_t);
+	
 	start = (void *)(placement + bitmap_length);
 
 	if(((uint32_t)start & ~PAGE_MASK) != 0)
 		start = (void *)(((uint32_t)start & PAGE_MASK) + PAGE_SIZE);
+	
 	bitmap_init_phys(&page_bitmap, page_count, (uint32_t *)bitmap_ptr);
+	
 	palloc_start = (phys_addr_t)start;
 }
 

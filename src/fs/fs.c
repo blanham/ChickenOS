@@ -1,4 +1,4 @@
-//#include "include/kernel/types.h"
+//#include "include/types.h"
 #include <stdint.h>
 #include <stdlib.h>
 typedef struct ext2_superblock {

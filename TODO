@@ -5,6 +5,9 @@ Core
 ===============================================================================
 -Improve quality of comments and commit messages
 -Need to implement synchronization primitives
+-Build a testing infrastructure
+-Use tables of function pointers for device drivers, tests and other things
+ http://linuxgazette.net/157/amurray.html 
 
 Console
 ===============================================================================
@@ -39,11 +42,40 @@ Syscalls
 -select()
 -termios stuff
 -various fs calls
+-GCC:
+	wait4
+	read
+	write
+	open
+	close
+	stat
+	fstat
+	lstat
+	lseek
+	mmap
+	mprotect
+	munmap
+	brk
+	rt_sigaction
+	ioctl
+	access
+	dup2
+	getpid
+	vfork
+	execve
+	fcntl
+	unlink
+	readlink
+	chmod
+	umask
+	getrlimit
+	getrusage
+	arch_prctl
+	setrlimit
 
 Network
 ===============================================================================
--TCP needs to be implemented properly
--Socket subsystem could use some work
+-Rewrite in progress
 -Implement local sockets
 -Try to figure out why we crash Virtualbox (and the host system) using the
  AM7990 driver
@@ -72,7 +104,7 @@ Sound
 Video
 ===============================================================================
 -Somehow get VBE/VESA to work so we can have something better than a simple 80
- column terminal
--Get linear framebuffer to work so we can do video
+ column terminal (partially done)
+-Get linear framebuffer to work so we can do video (partially done)
 -get X11 working (EXTREMELY AMBITIOUS)
 -port SDL (has been done by other hobbiest OSes)

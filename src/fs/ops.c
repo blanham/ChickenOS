@@ -3,10 +3,10 @@
  *	
  */
 #include <kernel/common.h>
-#include <kernel/types.h>
+#include <types.h>
 #include <kernel/memory.h>
 #include <kernel/thread.h>
-#include <kernel/vm.h>
+#include <mm/vm.h>
 #include <fs/vfs.h>
 #include <fs/ext2/ext2.h>
 #include <mm/liballoc.h>
