@@ -22,9 +22,14 @@
 #define PTE_ACCESED	PDE_ACCESED	
 #define PTE_DIRTY	PDE_DIRTY	
 
+#define PDE_COUNT 1024
+#define PTE_COUNT 1024
+#define PTE_SIZE  4096
+#define PDE_SIZE  4096
+#define KERNEL_PDE_START 768
 typedef uint32_t * pagedir_t;
 
-void paging_init();
+void paging_init(uint32_t mem_size);
 pagedir_t pagedir_new();
 pagedir_t pagedir_clone(pagedir_t pd);
 

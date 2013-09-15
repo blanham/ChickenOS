@@ -41,6 +41,6 @@ void vm_init(struct multiboot_info *mb)
 	mem_size += ((uintptr_t)&end - 0xC0010000)/1024;
 	palloc_init(page_count, placement);
 	
-	paging_init();	
+	paging_init(mem_size);	
 }
 
