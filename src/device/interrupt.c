@@ -104,7 +104,7 @@ void interrupt_handler(struct registers *regs)
 {
 	int irq = regs->int_no;
 	intr_handler *handler = intr_handlers[irq];
-	printf("interrupt %i\n", irq);
+//	printf("interrupt %i\n", irq);
 #ifdef DEBUG_INTR	
 	if(irq > 32 && irq < 32+32)
 		printf("irq %i\n",irq-32);
