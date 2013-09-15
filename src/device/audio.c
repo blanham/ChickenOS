@@ -3,6 +3,7 @@
 #include <device/audio.h>
 #include <device/pci.h>
 #include <hw.h>
+#include <sys/types.h>
 #include <device/audio/ac97.h>
 struct audio_device {
 

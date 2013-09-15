@@ -10,21 +10,22 @@
 #include <kernel/common.h>
 #include <kernel/memory.h>
 #include <fs/vfs.h>
-#include <types.h>
 #include <mm/liballoc.h>
 #include <stdio.h>
+#include <stddef.h>
+#include <stdint.h>
 
 #define MAX_DEVICES 20
 #define NULL 0
 
 struct char_device {
-	uint16_t dev;
+	dev_t dev;
 	char_read_fn read;
 	char_write_fn write;
 	char_ioctl_fn ioctl;
 };
 struct block_device {
-	uint16_t dev;
+	dev_t dev;
 	block_read_fn read;
 	block_write_fn write;
 	void *pad;
@@ -33,7 +34,7 @@ struct block_device {
 struct block_device block_devices[MAX_DEVICES]; 
 struct char_device char_devices[MAX_DEVICES]; 
 
-void device_register(uint16_t device_type, uint16_t dev, void *read, void *write, void *ioctl)
+void device_register(uint16_t device_type, dev_t dev, void *read, void *write, void *ioctl)
 {
 	if(device_type == FILE_CHAR)
 	{

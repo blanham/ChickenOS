@@ -1,6 +1,7 @@
 #ifndef C_OS_NET_NETCORE_H
 #define C_OS_NET_NETCORE_H
-#include <types.h>
+#include <stdint.h>
+#include <stddef.h>
 #include <queue.h>
 #define ETH_ALEN 6
 #define MY_DEST_MAC0    0x00

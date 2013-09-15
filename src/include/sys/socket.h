@@ -1,70 +1,49 @@
-#ifndef C_OS_SYS_SOCKET_H
-#define C_OS_SYS_SOCKET_H
-#include <types.h>
-typedef uint32_t socklen_t;
-typedef uint32_t sa_family_t;
+#ifndef C_SYS_SOCKET_H
+#define C_SYS_SOCKET_H
+#include <sys/types.h>
+
+#define AF_LOCAL 	AF_UNIX
+#define AF_UNIX 	0
+#define AF_INET 	1
+#define AF_INET6	28
+
+#define PF_UNSPEC 	AF_UNSPEC
+#define PF_LOCAL 	AF_LOCAL
+#define PF_UNIX		AF_UNIX
+#define PF_INET		AF_INET
+#define PF_INET6	AF_INET6
+
+#define SOCK_STREAM 1
+#define SOCK_DGRAM	2
+#define SOCK_RAW	3
+typedef unsigned long sa_family_t;
+typedef unsigned int socklen_t;
 
 struct sockaddr {
 	sa_family_t sa_family;
-	char		sa_data[];
+	char sa_data[];
 };
 
-enum {
-	AF_UNIX,
-	AF_UNSPEC,
-	AF_INET
-};
+int c_socket(int domain, int type, int protocol);;
 
-enum {
-	SHUT_RD,
-	SHUT_WR,
-	SHUT_RDWR
-};
+int c_connect(int s, const struct sockaddr *name, socklen_t namelen);
 
-enum {
-	SOCK_STREAM,
-	SOCK_DGRAM,
-	SOCK_RAW,
-	SOCK_SEQPACKET,
-	SOCK_RDM
-};
-/*
-struct msghdr {
-void         *msg_name        optional address
-socklen_t     msg_namelen     size of address
-struct iovec *msg_iov         scatter/gather array
-int           msg_iovlen      members in msg_iov
-void         *msg_control     ancillary data, see below
-socklen_t     msg_controllen  ancillary data buffer len
-int           msg_flags       flags on received message
-};
-struct cmsghdr {
-socklen_t     cmsg_len        data byte count, including the cmsghdr
-int           cmsg_level      originating protocol
-int           cmsg_type       protocol-specific type
+int c_bind(int s, const struct sockaddr *addr, socklen_t addrlen);
 
-};
+int c_listen(int s, int backlog);
 
-*/
-int sys_accept(int socket, struct sockaddr *address, socklen_t *address_len);
-int sys_bind(int socket, const struct sockaddr *address, socklen_t address_len);
-int sys_connect(int socket, const struct sockaddr *address,socklen_t address_len);
-int sys_getpeername(int socket, struct sockaddr *address,socklen_t *address_len);
-int sys_getsockname(int socket, struct sockaddr *address,socklen_t *address_len);
-int sys_getsockopt(int socket, int level, int option_name, void *option_value,
-	socklen_t *option_len);
-int sys_listen(int socket, int backlog);
-ssize_t sys_recv(int socket, void *buffer, size_t length, int flags);
-ssize_t sys_recvfrom(int socket, void *buffer, size_t length, int flags, 
-	struct sockaddr *address, socklen_t *address_len);
-//ssize_t recvmsg(int socket, struct msghdr *message, int flags);
-ssize_t sys_send(int socket, const void *message, size_t length, int flags);
-//ssize_t sendmsg(int socket, const struct msghdr *message, int flags);
-ssize_t sys_sendto(int socket, const void *message, size_t length, int flags, 
-	const struct sockaddr *dest_addr, socklen_t dest_len);
-int sys_setsockopt(int socket, int level, int option_name, const void *option_value,
-	socklen_t option_len);
-int sys_shutdown(int socket, int how);
-int sys_socket(int domain, int type, int protocol);
-int sys_socketpair(int domain, int type, int protocol, int socket_vector[2]);
+int c_accept(int s, struct sockaddr *addr, socklen_t *addrlen);
+
+int c_close(int s);
+
+ssize_t c_recv(int s, void *buf, size_t len, int flags);
+
+ssize_t c_recvfrom(int s, void *buf, size_t len, int flags,
+                 struct sockaddr *from, socklen_t *fromlen);
+
+ssize_t c_send(int s, const void *buf, size_t len, int flags);
+
+ssize_t c_sendto(int s, const void *buf, size_t len,
+               int flags, const struct sockaddr *to,
+               socklen_t tolen);
 #endif

@@ -9,7 +9,6 @@
 #include <device/audio.h>
 #include <device/serial.h>
 #include <kernel/timer.h>
-#include <types.h>
 #include <mm/vm.h>
 #include <fs/vfs.h>
 #include <fs/initrd.h>

@@ -3,7 +3,7 @@
  *
  */
 #include <common.h>
-#include <types.h>
+#include <stdint.h>
 #include <mm/vm.h>
 #include <mm/paging.h>
 #include <kernel/thread.h>

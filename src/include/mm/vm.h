@@ -1,6 +1,7 @@
 #ifndef C_OS_MM_VM_H
 #define C_OS_MM_VM_H
-#include <types.h>
+#include <stdint.h>
+#include <stddef.h>
 #include <multiboot.h>
 
 #define PAGE_SIZE 4096
@@ -18,7 +19,6 @@
 
 typedef uintptr_t phys_addr_t;
 typedef uintptr_t virt_addr_t;
-typedef uint32_t * pagedir_t;
 
 #define PHYS_BASE 0xC0000000
 #define V2P(p) ((virt_addr_t)((phys_addr_t)p - PHYS_BASE))

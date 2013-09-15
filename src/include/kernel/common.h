@@ -3,6 +3,7 @@
 /* 	ChickenOS - common.h
  * 	Contains commonly used routines such as kprintf and PANIC, and macros such as UNUSED
  */
+#include <stdbool.h>
 
 #ifndef NULL
 #define NULL 0

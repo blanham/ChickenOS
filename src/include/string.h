@@ -1,11 +1,11 @@
 #ifndef C_OS_LIB_STRING_H
 #define C_OS_LIB_STRING_H
-#include <types.h>
+#include <stddef.h>
 
 size_t strlen(const char *str);
 
 void *memcpy(void *, const void *, size_t);
-void *memset(void *dest, uint8_t val, size_t count);
+void *memset(void *dest, int val, size_t count);
 int memcmp (const void *s1, const void *s2, size_t n);
 
 char *strcpy(char *dst, const char *src);

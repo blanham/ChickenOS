@@ -1,6 +1,7 @@
 #ifndef C_OS_CONSOLE_H
 #define C_OS_CONSOLE_H
-#include <types.h>
+#include <stdint.h>
+#include <stddef.h>
 
 enum console_color {
 	BLACK, BLUE, GREEN, CYAN,
@@ -17,7 +18,7 @@ typedef struct console console_t;
 typedef void (*console_putc_fn)(console_t *, int c);
 typedef void (*console_switch_fn)(console_t *);
 
-typedef struct console {
+struct console {
 	uint32_t x,y;
 	uint32_t w,h;
 	int num;
@@ -25,7 +26,7 @@ typedef struct console {
 	console_putc_fn putc;
 	console_switch_fn switch_fn;
 	void *aux;
-} console_t;
+};
 #define NUM_CONSOLES 3
 
 

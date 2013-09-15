@@ -1,7 +1,8 @@
 #ifndef C_OS_STDIO_H
 #define C_OS_STDIO_H
 #include <stdarg.h>
-#include <types.h>
+#include <stdint.h>
+#include <stddef.h>
 #include <ctype.h>
 void putc(char c);
 int puts(char *string);

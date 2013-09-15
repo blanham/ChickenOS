@@ -1,6 +1,6 @@
 #ifndef C_OS_BITMAP_H
 #define C_OS_BITMAP_H
-#include <types.h>
+#include <stdint.h>
 //TODO: needs housekeeping
 
 typedef struct bitmap {

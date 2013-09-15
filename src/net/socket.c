@@ -67,8 +67,6 @@ int sys_socket(int domain UNUSED, int type, int protocol UNUSED)
 		case SOCK_STREAM:
 		case SOCK_DGRAM:
 		case SOCK_RAW:
-		case SOCK_SEQPACKET:
-		case SOCK_RDM:
 		default:
 		break;
 

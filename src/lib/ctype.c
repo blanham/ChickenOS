@@ -1,5 +1,4 @@
-#include <types.h>
-
+#include <ctype.h>
 int isprint(char c)
 {
 	if(('a' <= c) && (c <= 'z'))

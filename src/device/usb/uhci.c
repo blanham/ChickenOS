@@ -1,3 +1,4 @@
+#include <common.h>
 #include <device/usb.h>
 #include <device/usb/uhci.h>
 #include <device/pci.h>

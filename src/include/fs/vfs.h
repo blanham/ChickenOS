@@ -1,8 +1,9 @@
 #ifndef C_OS_VFS_H
 #define C_OS_VFS_H
-#include <types.h>
-#include <sys/types.h>
+#include <stdint.h>
+#include <stddef.h>
 #include <kernel/list.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 /* only define when STDIO is not included */
 #ifndef _STDIO_H
@@ -134,7 +135,6 @@ int sys_ioctl(int fildes, int request, ...);
 //device.c
 #define INITRD_DEV 0x400
 #define ATA0_0_DEV 0x301
-typedef uint16_t dev_t;
 #define MAJOR(x) ((x & 0xFF00) >> 8)
 #define MINOR(x) (x & 0xFF)
 

@@ -1,5 +1,5 @@
 #include <common.h>
-#include <types.h>
+#include <sys/types.h>
 #include <kernel/thread.h>
 
 pid_t sys_fork(registers_t *regs)

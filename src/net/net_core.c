@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <common.h>
 #include <stdio.h>
 #include <mm/liballoc.h>
 #include <mm/vm.h>
@@ -8,11 +8,12 @@
 #include <device/net/pcnet.h>
 #include <device/net/e1000.h>
 #include <net/dhcp.h>
+#include <sys/queue.h>
 uint8_t our_ip[] = {128,135,155,203};
 
 uint8_t their_ip[] = {128,135,155,44};
 uint8_t dest_mac[] = { 0x00,0x0c,0x29,0x95,0x05,0x2a};
-TAILQ_HEAD(, sockbuf) sockbuf_list = TAILQ_HEAD_INITIALIZER(sockbuf_list);
+//TAILQ_HEAD(, sockbuf) sockbuf_list = TAILQ_HEAD_INITIALIZER(sockbuf_list);
 
 uint16_t htons(uint16_t val)
 {
@@ -94,7 +95,7 @@ int sys_network_setup()
 extern void arp_init();
 void network_init()
 {
-	TAILQ_INIT(&sockbuf_list);
+//	TAILQ_INIT(&sockbuf_list);
 	arp_init();
 	//TODO: really need to set up a proper probe of net cards
 	//      maybe have a menu to pick if multiple cards are detected?
@@ -133,9 +134,9 @@ void sockbuf_free(struct sockbuf *sb)
 //	kfree(sb->data);
 //	kfree(sb);
 }
-void sockbuf_queue(struct sockbuf *sb)
+void sockbuf_queue(struct sockbuf *sb UNUSED)
 {
-	TAILQ_INSERT_HEAD(&sockbuf_list, sb, elem);
+//	TAILQ_INSERT_HEAD(&sockbuf_list, sb, elem);
 }
 void sockbuf_unqueue(struct sockbuf *sb)
 {

@@ -149,7 +149,7 @@ void *memcpy(void *dst, const void *src, size_t size)
 
 	return dst;
 }
-void *memset(void *dest, uint8_t val, size_t count)
+void *memset(void *dest, int val, size_t count)
 {
 	char *tmp = dest;
 	char *end = (char *)(tmp + count);

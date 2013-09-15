@@ -1,7 +1,7 @@
 #ifndef C_OS_INTERRUPT_H
 #define C_OS_INTERRUPT_H
 
-#include <types.h>
+#include <stdint.h>
 
 enum {
 	IRQ0 = 32, IRQ1, IRQ2, IRQ3,

@@ -2,16 +2,16 @@
  *	Patterned after the Linux 2.4 vfs
  *	
  */
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
 #include <kernel/common.h>
-#include <types.h>
 #include <kernel/memory.h>
 #include <kernel/thread.h>
 #include <mm/vm.h>
 #include <fs/vfs.h>
 #include <fs/ext2/ext2.h>
 #include <mm/liballoc.h>
-#include <stdio.h>
-#include <string.h>
 
 //FIXME: Probably shouldn't be a table
 vfs_fs_t * filesystems[10];

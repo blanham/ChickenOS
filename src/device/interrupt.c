@@ -304,9 +304,9 @@ static void page_fault(struct registers * regs)
 	bool is_user, is_write, not_present;
 	interrupt_disable();
 
-	is_user = ((PAGE_USER & error_code) ? TRUE : FALSE);
-	is_write = ((PAGE_WRITE & error_code) ? TRUE : FALSE);
-	not_present = ((PAGE_VIOLATION & error_code) ? FALSE : TRUE);
+	is_user = ((PAGE_USER & error_code) ? true : false);
+	is_write = ((PAGE_WRITE & error_code) ? true : false);
+	not_present = ((PAGE_VIOLATION & error_code) ? false : true);
 	
 	asm volatile ("mov %%cr2, %0"
 				  : "=r" (faulting_addr)

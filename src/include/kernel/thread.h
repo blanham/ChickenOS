@@ -2,8 +2,10 @@
 #define C_OS_THREAD_H
 #include <kernel/interrupt.h>
 #include <mm/vm.h>
+#include <mm/paging.h>
 #include <fs/vfs.h>
 #include <sys/signal.h>
+#include <sys/types.h>
 
 #define STACK_SIZE 0x1000
 #define STACK_PAGES STACK_SIZE/PAGE_SIZE
@@ -13,11 +15,6 @@
 #define THREAD_ASSERT(x) ASSERT(x->magic == THREAD_MAGIC, "Thread's kernel stack overflowed")
 
 enum thread_stat {THREAD_DEAD, THREAD_READY, THREAD_RUNNING, THREAD_BLOCKED};
-
-//FIXME: is this the right place for this? 
-typedef int pid_t;
-
-
 
 //TODO: Priorities? Would really like to maybe implement the 4.3BSD scheduler
 // 		since we didn't get it working in pintos

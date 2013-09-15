@@ -47,7 +47,7 @@ pagedir_t pagedir_clone(pagedir_t pd UNUSED)
 {
 	pagedir_t clone = pagedir_new();
 
-	for(int i = 0; i < KENERL_PDE_START; i++)
+	for(int i = 0; i < KERNEL_PDE_START; i++)
 	{
 		//if present
 		//pagetable_clone(pd, i)

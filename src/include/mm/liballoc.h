@@ -1,7 +1,8 @@
 #ifndef _LIBALLOC_H
 #define _LIBALLOC_H
 
-#include <types.h>
+#include <stdint.h>
+#include <stddef.h>
 /** \defgroup ALLOCHOOKS liballoc hooks 
  *
  * These are the OS specific functions which need to 

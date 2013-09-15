@@ -4,6 +4,7 @@
 #include <kernel/common.h>
 #include <kernel/thread.h>
 #include <kernel/hw.h>
+#include <sys/time.h>
 #include <stdio.h>
 
 #define PIT0_DATA 0x40
