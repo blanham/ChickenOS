@@ -21,8 +21,8 @@ typedef uintptr_t phys_addr_t;
 typedef uintptr_t virt_addr_t;
 
 #define PHYS_BASE 0xC0000000
-#define V2P(p) ((virt_addr_t)((phys_addr_t)p - PHYS_BASE))
-#define P2V(p) ((phys_addr_t)((virt_addr_t)p + PHYS_BASE))
+#define V2P(p) ((virt_addr_t)((phys_addr_t)(p) - PHYS_BASE))
+#define P2V(p) ((phys_addr_t)((virt_addr_t)(p) + PHYS_BASE))
 
 /* mm/vm.c */
 void vm_init(struct multiboot_info *mb);

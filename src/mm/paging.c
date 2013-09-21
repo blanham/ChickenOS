@@ -19,14 +19,6 @@ pagedir_t kernel_pd = & _kernel_pd[0];
 typedef uint32_t * page_table_t;
 
 #define ASSERT_PAGE_ALIGNED(x) ASSERT(((uintptr_t)x & 0xFFF) == 0, "Page alignment failed!")
-page_table_t pagetable_clone(pagedir_t pd UNUSED, uint32_t index UNUSED)
-{
-	//allocates new page for each mapped page and copies shit into it
-	return NULL;
-}
-
-
-
 
 pagedir_t pagedir_new()
 {
@@ -42,21 +34,6 @@ void pagedir_delete(pagedir_t pd UNUSED)
 {
 	
 }
-
-pagedir_t pagedir_clone(pagedir_t pd UNUSED)
-{
-	pagedir_t clone = pagedir_new();
-
-	for(int i = 0; i < KERNEL_PDE_START; i++)
-	{
-		//if present
-		//pagetable_clone(pd, i)
-
-	}
-
-	return clone;
-}
-
 
 void pagedir_install(uint32_t *pd)
 {
@@ -76,24 +53,60 @@ pagedir_t pagedir_get()
 	return (pagedir_t)P2V(pd);
 }
 
+page_table_t pagetable_clone(pagedir_t pd UNUSED, uint32_t index UNUSED)
+{
+	//allocates new page for each mapped page and copies shit into it
+	return NULL;
+}
+
+pagedir_t pagedir_clone(pagedir_t pd UNUSED)
+{
+	pagedir_t clone = pagedir_new();
+
+	for(int i = 0; i < KERNEL_PDE_START; i++)
+	{
+		if(pd[i] & PDE_P)
+			printf("present\n");	
+		//if present
+		//pagetable_clone(pd, i)
+
+	}
+
+	return clone;
+}
+
+void pagedir_insert_page_internel(pagedir_t pd, virt_addr_t kaddr, 
+	virt_addr_t uvirt,uint8_t flags, bool phys)
+{
+	page_table_t pde, pte;
+	uint32_t pd_idx = uvirt >> PDE_SHIFT;
+	uint32_t pt_idx = (uvirt & PTE_MASK) >> PTE_SHIFT;
+	
+	pde = &pd[pd_idx];
+
+	if((*pde & PDE_P) == 0)
+	{
+		*pde = V2P(palloc()) | flags | PDE_P;	
+	}
+	
+	pte = (page_table_t)P2V(*pde & ~0xFFF) + pt_idx;
+	
+	if(!phys)
+		kaddr = V2P(kaddr);
+
+	*pte = kaddr | flags | PTE_P;
+}	
+
 void pagedir_insert_page(pagedir_t pd, virt_addr_t kvirt, 
 	virt_addr_t uvirt,uint8_t flags)
 {
-	(void)pd;
-	(void)kvirt;
-	(void)uvirt;
-	(void)flags;
-}
+	pagedir_insert_page_internel(pd, kvirt, uvirt,flags, false);
+}	
 
 void pagedir_insert_page_physical(pagedir_t pd, phys_addr_t kphys, 
 	virt_addr_t uvirt,uint8_t flags)
 {
-	(void)pd;
-	(void)kphys;
-	(void)uvirt;
-	(void)flags;
-
-	//pagedir_install(pd);
+	pagedir_insert_page_internel(pd, kphys, uvirt,flags, true);
 }
 
 void pagedir_insert_pagen(pagedir_t pd, virt_addr_t kvirt, 
@@ -110,7 +123,7 @@ void pagedir_insert_pagen_physical(pagedir_t pd, phys_addr_t kphys,
 		pagedir_insert_page_physical(pd, kphys + PAGE_SIZE*i, uvirt + PAGE_SIZE*i, flags);
 }
 
-static phys_addr_t pagetable_init(phys_addr_t pt, uint8_t flags)
+static phys_addr_t pagetable_init(int pt, uint8_t flags)
 {
 	page_table_t new = palloc();
 	phys_addr_t offset = 0;
@@ -122,20 +135,19 @@ static phys_addr_t pagetable_init(phys_addr_t pt, uint8_t flags)
 	for(int i = 0; i < PTE_COUNT; i++)
 	{
 		new[i] = offset | (i * PAGE_SIZE) | flags;
-
 	}
 	
 	return V2P(new) | flags;
 }
 
-//FIXME: should take into account RAM size
 void paging_init(uint32_t mem_size UNUSED)
 {
-	
 	kmemset(kernel_pd, 0, PD_SIZE);
+
+	//FIXME: instead of 880, i believe it should be mem_size / (1024*1024)
  
 	for(int i = KERNEL_PDE_START; i < 880; i++)
-		kernel_pd[i] = pagetable_init(i - KERNEL_PDE_START, PTE_RW | PTE_P);
+		kernel_pd[i] = pagetable_init(i - KERNEL_PDE_START, PTE_USER | PTE_RW | PTE_P);
 	 
 	pagedir_install(kernel_pd);
 	
