@@ -58,6 +58,7 @@ SOURCES	=		$(CORE)  $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
 #SOURCES = $(CORE) device/intr-core.o device/kbd.o device/serial.o thread/thread.o mm/palloc.o mm/liballoc.o mm/liballoc_funcs.o thread/syscall.o thread/tss.o device/console.o device/hw.o mm/gdt.o mm/paging.o mm/vm.o $(KLIBSRCS)
 #SOURCES = init/kmain.o init/loader.o 
 all: $(SOURCES) link
+tftp: all
 	cp kernel.bin /tftpboot/chicken
 lib: $(LIBSRCS)
 test: all
