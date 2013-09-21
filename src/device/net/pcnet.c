@@ -3,6 +3,7 @@
  *
  */
 
+#include <common.h>
 #include <stdio.h>
 #include <mm/liballoc.h>
 #include <device/net/pcnet.h>
@@ -116,7 +117,6 @@ void pcnet_resetl(struct pcnet *l)
 
 size_t pcnet_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 {
-	dev =dev;
 	struct pcnet *l = dev->device;
 //	interrupt_disable();	
 	kmemcpy(l->tx_buffers[l->cur_tx], _buf, length);
@@ -220,9 +220,8 @@ void pcnet_handler(void *aux)
 //}
 	pcnet_csr_outl(l, 0, csr);
 }
-void pcnet_handler_old(struct registers *regs)
+void pcnet_handler_old(struct registers *regs UNUSED)
 {
-	regs = regs;
 	pcnet_handler(global);
 
 
@@ -234,7 +233,6 @@ void pcnet_start2(struct pcnet *l)
 	//2) get mac addr and store
 	char mac[6];
 	uint16_t val = 0;
-	val = val;
 	pci_register_irq(l->pci, &pcnet_handler, l);
 
 	for(int i = 0; i < 0x40; i++)

@@ -111,10 +111,9 @@ void network_dev_setip(struct network_dev *dev, uint32_t ip)
 {
 	dev->ip = ip;
 }
-void sockbuf_send(struct sockbuf *sb)
+void sockbuf_send(struct sockbuf *sb UNUSED)
 {
 
-sb = sb;
 
 }
 struct sockbuf *sockbuf_alloc(struct network_dev *dev, uint32_t len)
@@ -128,9 +127,8 @@ struct sockbuf *sockbuf_alloc(struct network_dev *dev, uint32_t len)
 	sockbuf_queue(new);
 	return new;
 }
-void sockbuf_free(struct sockbuf *sb)
+void sockbuf_free(struct sockbuf *sb UNUSED)
 {
- sb =sb;
 //	kfree(sb->data);
 //	kfree(sb);
 }
@@ -138,10 +136,9 @@ void sockbuf_queue(struct sockbuf *sb UNUSED)
 {
 //	TAILQ_INSERT_HEAD(&sockbuf_list, sb, elem);
 }
-void sockbuf_unqueue(struct sockbuf *sb)
+void sockbuf_unqueue(struct sockbuf *sb UNUSED)
 {
 //	TAILQ_REMOVE(&sockbuf_list, sb, elem);
-sb=sb;
 }
 void network_received(struct sockbuf *sb)
 {

@@ -1,3 +1,4 @@
+#include <common.h>
 #include <string.h>
 #include <mm/liballoc.h>
 #define NULL 0
@@ -41,11 +42,9 @@ int strncmp ( const char * str1, const char * str2, size_t num)
 	}
 	return str1[i] - str2[i]; 
 }
-
-char * strtok ( char * str, const char * delimiters )
+//FIXME: unimplemented
+char * strtok ( char * str UNUSED, const char * delimiters UNUSED)
 {
-	str = str;
-	delimiters = delimiters; 
 	
 
 	return NULL;

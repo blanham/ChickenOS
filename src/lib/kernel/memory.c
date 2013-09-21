@@ -2,7 +2,7 @@
 size_t kstrlen(uint8_t *str)
 {
 	uint8_t *tmp = str;
-	while(*tmp != '\0');
+	while(*tmp != '\0')
 		tmp++;
 	return tmp - str;
 

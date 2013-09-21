@@ -18,7 +18,7 @@
 #include <thread/syscall.h>
 
 char *BOOT_MSG = "ChickenOS v0.02 booting\n";
-
+uintptr_t main_loc;
 extern void modules_init(struct multiboot_info *mb);
 void fork_test();
 void init();
@@ -29,8 +29,9 @@ void ass()
 	while(1);
 }
 //mb is already a virtual address
-void kmain(struct multiboot_info* mb, uint32_t magic)
+void kmain(struct multiboot_info* mb, uint32_t magic) 
 {
+	main_loc = (uintptr_t)&kmain;
    	if ( magic != 0x2BADB002 )
    	{
 	//	console_puts("Bad magic number, halting\r");
@@ -91,7 +92,6 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 	
 extern uint32_t mem_size;
 	printf("Found %uMB RAM\n", mem_size / 1024);
-	
 	thread_usermode();
 		
 	//we have this special sycall at the moment
@@ -99,7 +99,8 @@ extern uint32_t mem_size;
 	//it in user space:
 	//network_setup();
 	//FIXME: probably reuse the above to do a dhcp request
-
+	while(1)
+		;
 	//	dummy();
 	if(!fork() )
 	{
@@ -113,7 +114,8 @@ extern uint32_t mem_size;
 	while(1)
 		printf("herp\n");
 	//FIXME? needs to be sleep?
-	while(1);
+	while(1)
+		;
 		asm volatile("hlt");
 
 	//should never return, unless things get really fucked

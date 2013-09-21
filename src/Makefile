@@ -1,11 +1,12 @@
 CROSS	=		/usr/local/cross/bin
 CC		=		$(CROSS)/i586-elf-gcc
-CC		=		gcc -m32 #clang -m32
+CC		=		gcc -m32
+CC		=		clang -m32
 #LINKER	=		$(CROSS)/i586-elf-ld
 CFLAGS	=		-g -Wall -Werror $(INCLUDES) \
 				-std=gnu99	\
-				-fno-stack-protector -nostartfiles \
-				-nodefaultlibs -ffreestanding\
+				-fno-stack-protector \
+			-ffreestanding\
 				-nostdlib -nostdinc -fno-builtin
 CFLAGS += 		-Wextra
 LINKER	=		ld -melf_i386 

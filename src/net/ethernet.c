@@ -102,7 +102,6 @@ void ethernet_send2(struct network_dev *dev, uint8_t *payload, size_t len, uint1
 
 void ethernet_send(struct sockbuf *sb, uint16_t ether_type)
 {
-	sb = sb;
 	ethernet_send2(sb->dev, sb->data,sb->length, ether_type, (char *)sb->dest_mac); 
 }
 

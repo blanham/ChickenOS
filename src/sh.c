@@ -34,7 +34,6 @@ int sh_main(void *aux)
 {
 	printf("ChickenOS Shell %s\n",aux);
 	char cmd[32];
-	aux = aux;
 	int tmp;
 	while(1)
 	{

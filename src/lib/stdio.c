@@ -1,3 +1,4 @@
+#include <common.h>
 #include <device/console.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -191,7 +192,6 @@ void oprintf(char *fmt, ...)
 				break;
 			case 'f':
 				d_val = va_arg(ap,double);
-				d_val = d_val;
 				break;
 			case 's':
 				s_val = va_arg(ap, char *);
@@ -255,7 +255,6 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 
 			case 'c':
 				c_val = va_arg(ap, int);
-				c_val = c_val;
 				//putc(c_val);
 				cbuf[0]  = c_val;
 				strcat(buf, cbuf);
@@ -273,7 +272,6 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				break;
 			case 'f':
 				d_val = va_arg(ap,double);
-				d_val = d_val;
 				break;
 			case 's':
 				s_val = va_arg(ap, char *);
@@ -303,7 +301,6 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 		for(int i= 0; i < 100; i++)
 			allocp[i] = 0;
 	}
-	strip = strip;	
 	return 0;//buf - _buf;
 }
 extern int linux_vsprintf(char *buf, const char *fmt, va_list args);
@@ -331,12 +328,11 @@ int sprintf(char *buf, const char *fmt, ...)
 	va_end(ap);
 	return ret;
 }
-
-int snprintf(char *buf, size_t size, const char *fmt, ...)
+//FIXME: doesn't use size
+int snprintf(char *buf, size_t size UNUSED, const char *fmt, ...)
 {
 	va_list ap;
 	int ret;
-	size = size;
 	va_start(ap, fmt);
 	ret = vsprintf(buf, fmt, ap);
 //	puts(buf);

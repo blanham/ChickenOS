@@ -85,8 +85,8 @@ extern void test_signals();
 void syscall_handler (struct registers *regs)
 {
 	int call = regs->eax;
-	char *buf = NULL;
-	buf = buf;
+//	char *buf = NULL;
+//	buf = buf;
 //	printf("call %i\n",call);
 	switch (call)
 	{
@@ -117,8 +117,9 @@ void syscall_handler (struct registers *regs)
 			regs->eax = sys_getpgrp();
 			break;
 		case SYS_FORK:
-			regs->eax = sys_fork(regs);
 			printf("fork @ eip %X\n", regs->eip);
+			regs->eax = sys_fork(regs);
+			printf("fork finished\n");
 			//dump_regs(regs);
 			return;
 		case SYS_EXECVE:

@@ -43,9 +43,6 @@ void thread_init()
 
 
 
-//extern uint32_t get_eip();
-extern void pagedir_insert_page(pagedir_t pd, 
-	virt_addr_t phys, virt_addr_t virt,uint8_t flags);
 void thread_usermode(void)
 {
 	uint32_t cur_esp,new_esp;
@@ -63,26 +60,22 @@ void thread_usermode(void)
 
 	pagedir_insert_pagen(cur->pd, (uintptr_t)userstack, 
 			(uintptr_t)PHYS_BASE - STACK_SIZE, 0x7, STACK_PAGES);
+	extern uintptr_t main_loc;
 
-	
+
+	printf("Main %p\n", main_loc);
+
 	//puts new kernel stack in tss
 	//FIXME? Since this is the kernel thread
 	//we have important stuff on the stack
 	//without the -8 offset we have a race condition
 	//where, if an interrupt happens between the iret
 	//below and returning, the stack is trashed
-	dump_regs(cur->regs);
 	void *temp_kern = pallocn(STACK_PAGES);
 	kmemcpy(temp_kern, cur, STACK_SIZE);
-	tss_update((uintptr_t)temp_kern + STACK_SIZE);
-//	tss_update((uintptr_t)cur_esp - 8);
-	printf("%X %X %X ASDFAFSD\n", cur->regs, temp_kern, cur);
-	cur->sp = (void *)cur_esp - 8;
-	cur->sp = (void *)temp_kern - 8;
-	cur->regs = (void*)(((uintptr_t)temp_kern & ~0xFFF) | ((uintptr_t)cur->regs & 0xFFF));
-	dump_regs(cur->regs);
-	printf("%X %X %X ASDFAFSD\n", cur->regs, temp_kern, cur);
-//	cur->regs = (void *)palloc();//0xdeadbeef;
+		//tss_update((uintptr_t)temp_kern + STACK_SIZE);
+	tss_update((uintptr_t)cur_esp - 8);
+	
 	printf("Entering user mode\n");
 	//console_set_color(BLACK,WHITE);
 	
@@ -94,7 +87,6 @@ void thread_usermode(void)
 	
 	//use the previous offset we had before, but on the new userstack
 	new_esp = (uintptr_t)(cur_esp & 0xfff) + (PHYS_BASE - 0x1000);
-
 	
 	asm volatile(
 				"cli\n"
@@ -165,7 +157,7 @@ thread_create(registers_t *regs ,uint32_t eip, uint32_t esp)
 	registers_t *reg_frame;
 	uint8_t *kernel_stack, *user_stack;
 	uintptr_t new_sp;
-	return NULL;	
+	
 	old_level = interrupt_disable();
 	
 	cur = thread_current();
@@ -184,7 +176,8 @@ thread_create(registers_t *regs ,uint32_t eip, uint32_t esp)
 	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
 		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
 
-//	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
+	printf("useresp %x\n", regs->useresp);
+	kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
 
 	reg_frame = (void *)((kernel_stack + STACK_SIZE) - sizeof(*reg_frame));
 	new->regs = (struct registers *)reg_frame;

@@ -62,7 +62,7 @@ size_t ext2_write_block(ext2_fs_t *fs, void *buf, int block)
 //FIXME: fix error handling to catch all memory leaks
 int ext2_read_superblock(vfs_fs_t *fs, uint16_t dev)
 {
-	struct inode *root;
+	struct inode *root = NULL;
 	int count;
 	ext2_fs_t *ext2 = (ext2_fs_t *)fs;
 	ext2_superblock_t *sb;

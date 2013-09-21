@@ -28,38 +28,40 @@ void thread_scheduler_init(thread_t *kernel_thread)
 	tss_init();
 }
 
-void thread_scheduler(registers_t *regs)
+extern void pic_send_end(int irq);
+
+void thread_scheduler(registers_t *regs UNUSED)
 {
-	uint32_t _esp = 0xfeedface;
+	uint32_t _esp = 0;
 	thread_t *cur = thread_current();
 	thread_t *next = thread_next();
-//	if(next == NULL)
-		next = cur;
+	
+	if(next == NULL)
+	next = cur;
+/*
 	//i believe that signals go here:
 	//if(next->signal_pending != 0)
 	//signal(regs, next);
-	
-	cur->sp = (uint8_t *)regs->ESP - 4;
+*/	
+	cur->sp = (uint8_t *)regs->ESP;
 	cur->regs = regs;
 	_esp = (uint32_t)next->sp;
-
-	tss_update((uintptr_t)next + STACK_SIZE);
-	printf("Switching to pid %i from pid %i esp %x regs->esp %x %x\n\n",
-		next->pid, cur->pid,_esp, regs->esp,  regs->eip, next->regs->eip);
-
+//	printf("Switching to pid %i from pid %i esp %x regs->esp %x %x\n\n",
+	//	next->pid, cur->pid,_esp, regs->esp,  regs->eip, next->regs->eip);
+/*
 	printf("resg %x next->regs %x %X %X	%X %X\n\n", regs, next->regs, cur, next, cur->sp, _esp);
 	dump_regs(regs);
 	printf("\n");
 	dump_regs(next->regs);
 	printf("\n");
-
-//	dump_regs(next->regs);
-//	next->regs->ss = 0x1b;
+	*/
+	tss_update((uintptr_t)next + STACK_SIZE);
+//	printf("dfaddfafds\n");
+//	dump_regs((void *)_esp + 4);
 
 	//have to reset timer interrupt here
-	extern void pic_send_end(int irq);
 	pic_send_end(0);
-
+	
 	asm volatile(
 					"mov %0,%%esp\n"
 					"jmp intr_return"

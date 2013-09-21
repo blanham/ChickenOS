@@ -1,3 +1,4 @@
+#include <common.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -141,7 +142,7 @@ void vga_clear(console_t *con)
 	vga_cursor_move(0);
 }
 
-void vga_console_init(console_t *con, int num)
+void vga_console_init(console_t *con, int num UNUSED)
 {
 	
 	struct vga_state *state = (struct vga_state *)con->aux;
@@ -156,7 +157,6 @@ void vga_console_init(console_t *con, int num)
 //	else
 	//	state->videoram = videoram;
 //	state->num = num;
-	num = num;
 //	if(num == 0)
 		state->videoram = videoram;
 }

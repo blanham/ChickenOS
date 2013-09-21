@@ -37,7 +37,7 @@ void arp_send(struct network_dev *dev, uint32_t ip)
 	struct ether_arp *arp;
 	struct sockbuf *sb;
 	arp = kcalloc(sizeof(*arp) , 1);
-	ip = (ip);
+	//ip = (ip);
 	arp->type = htons(1);
 	arp->proto = htons(0x800);
 	arp->hlen = 6;

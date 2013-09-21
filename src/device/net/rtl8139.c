@@ -97,9 +97,6 @@ char lpacket[] = {
 size_t rtl8139_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 {
 	struct rtl8139 *rtl = dev->device;
-	rtl = rtl;
-	_buf = _buf;
-	length = length;
 	
 	void* tx_buffer = (void *)(rtl->tx_buffers + 8192*rtl->tx_cur);
 	kmemset(tx_buffer, 0, (length <60) ? 60 : length);

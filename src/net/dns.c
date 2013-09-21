@@ -84,10 +84,9 @@ void dns_sendquery(struct network_dev *dev, char * name)
 
 void dns_lookup(struct network_dev *dev, char *domain)
 {
-	domain = domain;
 	
 	uint32_t bound =udp_bind(dev, 53);
-	bound = bound;
+	(void)bound;
 	dns_sendquery(dev, domain);
 
 

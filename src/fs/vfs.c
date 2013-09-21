@@ -30,15 +30,14 @@ struct file *vfs_file_new(struct inode *inode, char *name)
 	strcpy(new->name, name);
 	return new;
 }
-
+//FIXME: Not implemented
 int vfs_file_free(struct file *file)
 {
 	struct inode *inode = file->inode;
 	kfree(file);
 	//decrement reference count
 	//if 0 take out of cache
-	inode = inode;
-
+	(void)inode;
 	return 0;
 }
 
