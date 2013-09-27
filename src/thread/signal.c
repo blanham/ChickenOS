@@ -28,7 +28,7 @@ void dummy_signal(int test)
 void return_from_signal()
 {
 	thread_current()->signal_pending = -1;
-	SYSCALL_0N(200);
+	(void)SYSCALL_0N(200);
 }
 extern bool thread_start;
 void signal(registers_t *regs UNUSED, thread_t *next UNUSED)
