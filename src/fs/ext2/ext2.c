@@ -82,7 +82,7 @@ int ext2_read_superblock(vfs_fs_t *fs, uint16_t dev)
 	
 	if(sb->s_magic != EXT2_MAGIC)
 	{
-		printf("bad magic number\n");
+		printf("bad magic number: %X\n", sb->s_magic);
 		goto fail;
 	}
 

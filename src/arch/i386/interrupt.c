@@ -17,11 +17,11 @@
 
 //#define DEBUG_INTR
 
-idt_entry_t idt_table[NUM_INTRS];
+extern idt_entry_t idt_table[NUM_INTRS];
 idt_ptr_t	idt_ptr;
 intr_handler *intr_handlers[NUM_INTRS];
 static enum intr_status interrupt_status;
-void *idt_pointer;
+//void *idt_pointer;
 extern void syscall_isr();
 extern void sysc();	
 //extern void idt_flush(uint32_t);
@@ -71,7 +71,7 @@ void interrupt_init()
 	
 	pic_init();
 
-	idt_pointer = (void *)&idt_table;
+	//idt_pointer = (void *)&idt_table;
 	for(int i = 0; i < NUM_ISRS + NUM_IRQS; i++)
 		idt_build_entry(&idt_table[i], (uint32_t)isrs[i], 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
 	

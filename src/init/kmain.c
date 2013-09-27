@@ -113,10 +113,10 @@ extern uint32_t mem_size;
 	strncpy(thread_current()->name, "idle", 4);
 	while(1)
 		printf("herp\n");
-	//FIXME? needs to be sleep?
+	//FIXME? needs to be sleep? if we need halt it needs to be a macro
 	while(1)
 		;
-		asm volatile("hlt");
+		//asm volatile("hlt");
 
 	//should never return, unless things get really fucked
 	PANIC("kmain returned");

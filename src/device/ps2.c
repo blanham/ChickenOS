@@ -1,7 +1,6 @@
 #include <common.h>
 #include <device/console.h>
 #include <kernel/hw.h>
-#include <kernel/interrupt.h>
 #include <kernel/memory.h>
 #include <device/input.h>
 #include <stdio.h>
@@ -40,13 +39,12 @@ char kbd_map_shifted[256] = {
 
 
 };
+
 char kbd_getc()
 {
 	while(pos == 0);
 	return rbuf[--pos];
 }
-
-
 
 void kbd_e5(uint8_t c)
 {
@@ -72,24 +70,14 @@ void kbd_e5(uint8_t c)
 	}
 }
 
-/* FIXME: Maybe move this somewhere else? */
-void reboot()
-{
-	uint8_t test = 0x02;
-	while((test & 0x02) != 0)
-		test = inb(0x64);
-	outb(0x64, 0xFE);
-	asm volatile ("hlt");
+extern uint8_t kbd_read();
+extern void reboot();
 
-}
-
-void kbd_intr(struct registers * regs UNUSED)
+void ps2_intr(void)
 {
-	uint8_t c = inb(0x60);
+	uint8_t c = kbd_read();
 	switch(c)
 	{
-		
-		
 		case 0x2A:
 			shifts |= L_SHIFT;
 			break;
@@ -120,7 +108,7 @@ void kbd_intr(struct registers * regs UNUSED)
 			break;
 
 		case 0xe0:
-			c = inb(0x60);
+			c = kbd_read();
 			if(c & 0x80){
 				return;
 			}else{
@@ -146,12 +134,5 @@ void kbd_intr(struct registers * regs UNUSED)
 			rbuf[pos++] = c;
 		//	input_queue_putc(c);
 	}
-}
-void kbd_init()
-{
-//	for(int i = 0; i < 255; i++)
-//		rbuf[i] = 0;	
-	interrupt_register(0x21, &kbd_intr);
-
 }
 

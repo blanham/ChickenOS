@@ -120,6 +120,8 @@ enum {
 				   	);					\
 					ret;})
 
+#define ERROR_RETURN(x) return (-x)
+
 void syscall_init();
 int fork();
 int dummy();
