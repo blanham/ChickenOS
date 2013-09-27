@@ -5,17 +5,30 @@ Core
 ===============================================================================
 -Improve quality of comments and commit messages
 -Need to implement synchronization primitives
+	-Can use gcc/clang provide test and set primitives
 -Build a testing infrastructure
+	-probably start with fs first (well defined i/o API)
+	-some parts will have to be built in
+		-maybe scriptable w/ Lua?
 -Use tables of function pointers for device drivers, tests and other things
- http://linuxgazette.net/157/amurray.html 
+ http://linuxgazette.net/157/amurray.html
+-Port to ARM
+	-Requires major refactoring and restructuring of the build process 
+-General fix of build process
 
 Console
 ===============================================================================
 -Modify the kernel's printf to output info separately from tty0
+	-printf ->stderr probably
+	-kprintf ->fb console, serial
 -Improve keyboard support (Seem to run into issues with Newlib's getc)
 -Actually queue keycodes
 -Implement line disciplines (raw and cooked mode)
 -Proper blocking I/O
+-Take stb_ttf and write a small app that takes a TTF font and generates
+ either a bitmap or a c header
+-Proper serial support, separate back end from character i/o
+	-necesary for ARM
 
 Threads
 ===============================================================================
@@ -24,10 +37,14 @@ Threads
 -Implement passing open files to child threads
 -Implement wait queue
 -May have to change/rewrite the scheduler
+-Start factoring out platform specific code
 
 Userspace
 ===============================================================================
 -Continue adding missing system calls to Newlib port
+	-Seriously considering using or writing an alternative
+	-Fork it?
+		-BSD, so not bad, but will have to include copyright chain
 -Figure out why C++ binaries crash
 -Get dash working properly
 -Port coreutils or busybox
@@ -95,11 +112,13 @@ Filesystem
 -Maybe implement ISO9660 support for reading CDs
 -Add a block cache (can likely use pintos code for reference)
 -Continue work on the network filesystem, and maybe add NFS support
+-Compartmentalize VFS, filesystems, block cache, and disk i/o from each other
 
 Sound
 ===============================================================================
 -Implement Soundblaster 16 support
 -AC97 support may not be that hard to implement
+-Goal is to be able to listen to one thing at a time
 
 Video
 ===============================================================================
