@@ -1,5 +1,6 @@
 *.sw*
 bochsout.txt
+log
 tmp/
 utils/
 ./util/
