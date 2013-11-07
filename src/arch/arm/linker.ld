@@ -1,29 +1,33 @@
 ENTRY(_loader)
 OUTPUT_FORMAT(elf32-littlearm)
-
 SECTIONS {
-   /* The kernel will live at 3GB + 1MB in the virtual
-      address space, which will be mapped to 1MB in the
-      physical address space. */
-   . = 0xC0100000;
+	/* The kernel will live at 3GB + 1MB in the virtual
+	  address space, which will be mapped to 1MB in the
+	  physical address space. */
+	. = 0xC0100000;
+	.text : AT(ADDR(.text) - 0xC0000000) {
+		*(.multiboot)
+		*(.text)
+		*(.rodata*)
+	}
+	.user ALIGN (0x1000) : AT(ADDR(.user) - 0xC0000000) {
+		*(.user)
+		. = ALIGN(0x1000);
+	}
 
-   .text : AT(ADDR(.text) - 0xC0000000) {
-       *(.text)
-       *(.rodata*)
-   }
-
-   .data ALIGN (0x1000) : AT(ADDR(.data) - 0xC0000000) {
-       *(.data)
+	.data ALIGN (0x1000) : AT(ADDR(.data) - 0xC0000000) {
+		*(.data)
 		_init_start = .;
-       *(.data.init)
+		*(.data.init)
 		_init_end = .;
-   }
+	}
 
-   .bss ALIGN (0x1000) : AT(ADDR(.bss) - 0xC0000000) {
-       _sbss = .;
-       *(COMMON)
-       *(.bss)
-       _ebss = .;
-   }
+	.bss : AT(ADDR(.bss) - 0xC0000000) {
+	   _sbss = .;
+	   *(COMMON)
+	   *(.bss)
+	   _ebss = .;
+	}
+	
 	end = .;
 }
