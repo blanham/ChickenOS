@@ -10,6 +10,8 @@
 #define STACK_SIZE 0x1000
 #define STACK_PAGES STACK_SIZE/PAGE_SIZE
 
+#define NUM_SIGNALS 32
+
 #define MAX_THREADS 256
 #define THREAD_MAGIC 0xc001c0de
 #define THREAD_ASSERT(x) ASSERT(x->magic == THREAD_MAGIC, "Thread's kernel stack overflowed")
@@ -106,7 +108,8 @@ int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 int sys_sigsuspend(const sigset_t *mask);
 
 /* thread/load_elf.c */
-#define ELF_MAGIC "\x7F""ELF"//why is this here?
+//FIXME:why is this here?
+#define ELF_MAGIC "\x7F""ELF"
 int load_elf(const char *path, uintptr_t *eip);
 
 #endif

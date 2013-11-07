@@ -9,7 +9,6 @@
 #include <kernel/thread.h>
 #include <kernel/memory.h>
 #include <kernel/interrupt.h>
-#include <thread/tss.h>
 #include <mm/liballoc.h>
 
 
@@ -24,7 +23,8 @@ void thread_init()
 	interrupt_disable();
 
 	//do this inline, otherwise assertion fails in thread_current()	
-	asm ("mov %%esp, %0": "=m"(kernel_thread) );
+	stackpointer_get(kernel_thread);
+
 	kernel_thread = (thread_t *) ((uintptr_t)kernel_thread & ~(STACK_SIZE -1));
 	
 	kernel_thread->pid = 0;
@@ -40,75 +40,6 @@ void thread_init()
 
 	thread_scheduler_init(kernel_thread);
 }
-
-
-
-void thread_usermode(void)
-{
-	uint32_t cur_esp,new_esp;
-	thread_t *cur;
-	void *userstack;
-
-	interrupt_disable();
-
-	asm volatile("mov %%esp, %0":"=m"(cur_esp));
-
-	cur = thread_current();
-
-	userstack = pallocn(STACK_PAGES);
-	kmemcpy(userstack, cur, STACK_SIZE);
-
-	pagedir_insert_pagen(cur->pd, (uintptr_t)userstack, 
-			(uintptr_t)PHYS_BASE - STACK_SIZE, 0x7, STACK_PAGES);
-	extern uintptr_t main_loc;
-
-
-	printf("Main %p\n", main_loc);
-
-	//puts new kernel stack in tss
-	//FIXME? Since this is the kernel thread
-	//we have important stuff on the stack
-	//without the -8 offset we have a race condition
-	//where, if an interrupt happens between the iret
-	//below and returning, the stack is trashed
-	void *temp_kern = pallocn(STACK_PAGES);
-	kmemcpy(temp_kern, cur, STACK_SIZE);
-		//tss_update((uintptr_t)temp_kern + STACK_SIZE);
-	tss_update((uintptr_t)cur_esp - 8);
-	
-	printf("Entering user mode\n");
-	//console_set_color(BLACK,WHITE);
-	
-	//TODO: 7/8/13 It appears the changes in this funtion
-	//have made this call obsolete
-	//triple faults in BOCHS, and pagefaults at 0x1000 below
-	//PHYS_BASE without this pagedir_install
-	pagedir_install(cur->pd);
-	
-	//use the previous offset we had before, but on the new userstack
-	new_esp = (uintptr_t)(cur_esp & 0xfff) + (PHYS_BASE - 0x1000);
-	
-	asm volatile(
-				"cli\n"
-				"mov $0x23, %%ax\n"
-				"mov %%ax, %%ds\n" 
-				"mov %%ax, %%es\n" 
-				"mov %%ax, %%fs\n" 
-				"mov %%ax, %%gs\n" 
-				"mov %0, %%eax\n"
-				"push $0x23\n"
-				"pushl %%eax\n"
-				"push $0x200\n"
-				"pushl $0x1b\n"
-				"push $1f\n"
-				"iret\n"
-				"1:"	
-				::
-				"m"(new_esp)
-				);
-}
-
-
 
 thread_t *
 thread_new()
@@ -128,26 +59,34 @@ thread_clone(thread_t *cur)
 	new = thread_new();
 	kmemcpy(new, cur, sizeof(thread_t));
 
-	
 	new->parent = cur->pid;
 	new->pgid = cur->pgid;
 	new->pid = pid_allocate();
 	
 	new->cur_dir = cur->cur_dir;
 
-	//FIXME: Should be a vfs call that increases reference counts	
+	//FIXME: Should be a vfs call that increases reference counts
+	//FIXME: Also should be more than 8 files	
 	kmemcpy(new->files, cur->files, sizeof(struct file)*8);
 	printf("here\n");
 
-	//TODO: Add constant for number of signals and use it here
-	new->signals = (struct sigaction **)kmalloc(sizeof(struct sigaction*) * 32);
-	kmemcpy(new->signals, cur->signals, sizeof(struct sigaction*) * 32);
+	new->signals = (struct sigaction **)
+		kcalloc(sizeof(struct sigaction*), NUM_SIGNALS);
+	kmemcpy(new->signals, cur->signals, sizeof(struct sigaction*) * NUM_SIGNALS);
 
 	new->magic = THREAD_MAGIC;
 
 	return new;
 }
+//TODO: Better to do it this way:
+/*thread_t *
+thread_create(void *ip, void *aux, enum thread_type type)
+{
 
+}
+//The lazy way of copying most shit from a passed in regs, works
+but better to just always build a stack
+*/
 //FIXME: doesn't copy open files over to new process in the case of a fork
 thread_t * 
 thread_create(registers_t *regs ,uint32_t eip, uint32_t esp)
@@ -228,21 +167,11 @@ pid_t pid_allocate()
 	return pid_count;
 }
 
-bool
-in_kernel(void)
-{
-	uint16_t ss;	
-	asm volatile ("mov %%ss, %0\n" : "=r"(ss));
-	if((ss & 3) == 0)
-		return true;
-
-	return false;
-}
-
 thread_t * thread_current()
 {
 	thread_t *ret; 
-	asm ("mov %%esp, %0": "=m"(ret) );
+	
+	stackpointer_get(ret);
 
 	ret = (thread_t *) ((uintptr_t)ret & ~(STACK_SIZE -1));
 	
