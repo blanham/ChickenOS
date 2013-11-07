@@ -9,7 +9,7 @@ CFLAGS	=		-g -Wall -Werror $(INCLUDES) \
 				-std=gnu99	\
 				-fno-stack-protector \
 				-ffreestanding\
-				-nostdlib -nostdinc -fno-builtin
+				-nostdlib -nostdinc -fno-builtin -DARCH_I386
 CFLAGS += 		-Wextra
 LINKER	=		ld -melf_i386 
 LDFLAGS	=		-T arch/$(ARCH)/linker.ld 
