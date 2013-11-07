@@ -1,5 +1,6 @@
 #ifndef C_OS_STDINT_H
 #define C_OS_STDINT_H
+//TODO: Needs tp depend on architecture for length
 /* stdint.h
  *
  */
