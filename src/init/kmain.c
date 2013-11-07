@@ -28,6 +28,9 @@ void ass()
 	printf("ass\n");
 	while(1);
 }
+//TODO: need to change signature since ARM has no multiboot
+//      (unless I write a stub that takes info from u-boot 
+//		and shoves it into a multiboot struct) 
 //mb is already a virtual address
 void kmain(struct multiboot_info* mb, uint32_t magic) 
 {
@@ -40,7 +43,20 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 	
 	/* begin initializations */
 	modules_init(mb);
-
+/*
+	Instead of the preceding and following functions taking the mb
+	have a function called boot_info_parse that calls accessor functions:
+		vm_init_info
+		modules_init_info
+	tht are boot info agnostic
+	so then you have
+	multiboot_init(mb):
+		struct mem_extents extents
+			^put shit from mb strudt into that
+		vm_init_info(extents)
+	OR
+		just a commandline + parser	
+*/
 	vm_init(mb);
 
 	thread_init();
@@ -102,21 +118,19 @@ extern uint32_t mem_size;
 	while(1)
 		;
 	//	dummy();
+	//TODO: fuck using a fork, start an init kernel thread that calls
+	//		execve
 	if(!fork() )
 	{
 		while(1)
 			printf("derp\n");
-		init();
+		init(NULL);
 		PANIC("init() returned!");
 	}
 	//only works because initial threads name is "main"
 	strncpy(thread_current()->name, "idle", 4);
-	while(1)
-		printf("herp\n");
-	//FIXME? needs to be sleep? if we need halt it needs to be a macro
-	while(1)
-		;
-		//asm volatile("hlt");
+
+	kernel_halt();	
 
 	//should never return, unless things get really fucked
 	PANIC("kmain returned");
@@ -125,7 +139,8 @@ extern uint32_t mem_size;
 //FIXME:Here we should do housekeeping, launch any shells or login processes
 //		on the various psuedoterminals, and wait()s on children (which takes
 //		care of zombies processes) 
-void init()
+void init(void *aux UNUSED) __attribute__((section(".user"))); 
+void init(void *aux UNUSED) 
 {
 	char *argv[] = {"/frotz","zo",NULL};
 	(void)argv;
