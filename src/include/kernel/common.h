@@ -5,34 +5,24 @@
  */
 #include <stdbool.h>
 
-#ifndef NULL
-#define NULL 0
-#endif
-#define UNUSED  __attribute__((unused))
-
-static inline void kernel_halt()
-{
-	while(1)
-		asm volatile ("hlt");
-}
-void kprintf(char *fmt, ...);
-
 //fix this once I have a kernel printf
 #include <device/console.h>
 #include <stdio.h>
-static inline void print_stack_trace ()
-{
-      uint32_t *ebp, *eip;
-      asm volatile ("mov %%ebp, %0" : "=r" (ebp)); // Start with the current EBP value.
-      while (ebp)
-      {
-        eip = ebp+1;
-        printf ("[0x%x], ", *eip);
-        ebp = (uint32_t*) *ebp;	
-	//	if((uintptr_t)ebp < 0xC0000000)
-		//	break;
-      }
-}
+
+#ifdef ARCH_ARM
+#include <arch/arm/common.h>
+#elif ARCH_I386
+#include <arch/i386/common.h>
+#endif
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+#define UNUSED  __attribute__((unused))
+
+void kprintf(char *fmt, ...);
+
 #define BACK(x) case x: ret = __builtin_return_address(x);break;
 //horrible, horrible abuse of GCC's builtin return_address 
 //funtion, needs to print to serial so output can be pasted
