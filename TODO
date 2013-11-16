@@ -14,6 +14,10 @@ Core
  http://linuxgazette.net/157/amurray.html
 -Port to ARM
 	-Requires major refactoring and restructuring of the build process 
+	-need to be able to easily change PHYS_BASE (3GB for i386, 2GB for arm32)
+	-paging info:
+		http://www.cs.rutgers.edu/~pxk/416/notes/09a-paging.html
+		http://ftp.netbsd.org/pub/NetBSD/NetBSD-current/src/sys/arch/arm/include/arm32/pte.h	
 -General fix of build process
 
 Console
