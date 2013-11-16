@@ -7,10 +7,138 @@
 #include <thread.h>
 #include <kernel/interrupt.h>
 #include <fs/vfs.h>
-enum exe_type {EXE_INVALID, EXE_ELF, EXE_SCRIPT};
-static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew);
 
-enum exe_type exec_type(const char *path)
+#define MAX_ARGS 256
+#define MAX_ENVS 256
+
+enum exe_type {EXE_INVALID, EXE_ELF, EXE_SCRIPT};
+
+static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[]);
+static enum exe_type exec_type(const char *path);
+
+
+
+
+static void duplicate_table(char * dest[], char *const source[]);
+int sys_execve(const char *_path, char *const _argv[], char *const _envp[]) 
+{
+	registers_t *regs;
+	thread_t *cur = thread_current();
+	uint32_t *user_stack;
+	char **argv;
+	char **envp;
+	char *path;
+	
+	argv = kcalloc(sizeof(char *), MAX_ARGS);
+	envp = kcalloc(sizeof(char *), MAX_ARGS);
+
+	
+	if(_path == NULL || _argv == NULL)
+		goto failure;
+	
+	path = strdup(_path);
+	
+	duplicate_table(argv, _argv);
+	if(_envp != NULL)
+	duplicate_table(envp, _envp);
+
+	if(exec_type(path) == EXE_ELF)
+	{
+		//FIXME: This is shitty, should either get regs from
+		//the threads cur->regs, or have them passed in
+		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
+		
+		user_stack = palloc();
+		kmemset(user_stack,0, 4096);
+
+		//FIXME: some things may carry over	
+		cur->pd = pagedir_new();
+		
+		pagedir_insert_page(cur->pd, (uintptr_t)user_stack, 
+			(uintptr_t)PHYS_BASE - 0x1000, 0x7);
+
+		pagedir_install(cur->pd);
+		
+	
+		if(load_elf(path, &regs->eip) != 0)
+			goto failure;
+
+		//backtrack from end of string to get name
+		//FIXED: Might not have to do this, just get name from argv[0]
+		//name = (char *)path + strlen(path);
+		//while((*(--name - 1) != '/') && (name != path));
+		
+		kfree(cur->name);
+		cur->name = strdup(argv[0]);
+	
+		regs->useresp = stack_prepare(cur->name, argv, envp);
+		
+		//FIXME: probably not the best address for break
+		//should be right above the code segment of the
+		//executable
+		cur->brk = (void *)0x84000000;
+
+		pagedir_insert_pagen(cur->pd, (uintptr_t)pallocn(1000), (uintptr_t)cur->brk, 0x7, 1000);
+	}
+
+	//if we return, then something is wrong	
+failure:
+	return -1;
+}
+
+static void push_arg(char *arg, uint8_t **sp);
+static int build_table(char **table, char * const source[], uint8_t **stack);
+static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[])
+{
+	uint8_t *stack = (uint8_t *)PHYS_BASE;
+	char **arg_table;//[MAX_ARGS];
+	char **envp_table;//[MAX_ENVS];
+	int argc = 0, envc = 0;	
+
+	//alocate these so we doun't blow the stack	
+	arg_table = kcalloc(MAX_ARGS, sizeof(uint32_t *));
+	envp_table = kcalloc(MAX_ENVS, sizeof(uint32_t *));
+
+
+	memset(arg_table, 0, sizeof(char *)*MAX_ARGS);
+	memset(envp_table, 0, sizeof(char *)*MAX_ENVS);
+
+	//first thing on stack is 0
+	*(uint32_t *)stack = 0;
+	stack -= 4;
+
+	//then the executable path
+	push_arg(path, &stack);
+
+	//the environment, and then arguments
+	envc = build_table(envp_table, envp, &stack);
+	argc = build_table(arg_table, argv, &stack);
+	
+	//align stackpointer to 4 byte boundary
+	stack -= ( ((uintptr_t)stack %4));
+	
+	//copy tables into stack
+	stack -= 4;
+	stack -= envc*4;
+	memcpy(stack, envp_table, envc*4);
+	
+	stack -= 4;
+	stack -= argc*4;
+	memcpy(stack, arg_table, argc*4);
+	
+	//put argc at top of stack
+	stack -= 4;
+	*(uint32_t *)stack = argc;
+
+	//hex_dump((void *)(PHYS_BASE - 16*4), 4);
+
+	kfree(arg_table);
+	kfree(envp_table);
+	
+	return (uintptr_t)stack;	
+}
+
+static enum exe_type exec_type(const char *path)
 {
 	int fd;
 	void *magic;
@@ -33,111 +161,39 @@ enum exe_type exec_type(const char *path)
 	
 	return ret;
 }
-int sys_execve(const char *path, char *const argv[], char *const envp[]) 
+
+static void duplicate_table(char * dest[], char *const source[])
 {
-	char *name;
-	registers_t *regs;
-	thread_t *cur = thread_current();
-	int newargv, newargc;
-
-	if(path == NULL || argv == NULL)
-		return -1;
-
+	char **p;
+	int count =0;
 	
-	if(exec_type(path) == EXE_ELF)
+	for(p = (char **)source; *p != NULL; p++)
 	{	
-		regs = (void *)((uintptr_t)cur + 4096 - sizeof(*regs));
-		//dump_regs(regs);
-
-		//FIXME: this is the wrong place to do this, usually done in init
-		{
-		sys_open("/dev/tty0", 0);
-		sys_open("/dev/tty0", 0);
-		sys_open("/dev/tty0", 0);
-		}
-
-		//here we need to get rid of old pagetable mappings we are not using
-		//I assume we can just use the kernel pagedirectory?
-		
-		if(load_elf(path, &regs->eip) != 0)
-			goto failure;
-
-		if(envp != NULL)
-			printf("passing environment not yet supported!\n");
-
-		//backtrack from end of string to get name
-		name = (char *)path + strlen(path);
-		while((*(--name - 1) != '/') && (name != path));
-		
-		//FIXME: possible memory leak, but we can't realloc() the original threads ->name	
-		cur->name = kcalloc(strlen(name) + 1,1);
-		strncpy(cur->name, name, strlen(name) + 1);
-	
-		//TODO: perhaps just pass these in? or pass in regs	
-		regs->useresp = stack_prepare((char *)name, argv, &newargv, &newargc);
-		regs->esi = newargc;
-		regs->ecx = (uint32_t)newargv;
-		
-		//FIXME: probably not the best address for break
-		cur->brk = (void *)0x80000000;
-		pagedir_insert_pagen(cur->pd, (uintptr_t)pallocn(1000), (uintptr_t)cur->brk, 0x7, 1000);
-	
+		dest[count] = strdup(*p);
+		count++;
 	}
-	//if we return, then something is wrong	
-failure:
-	return -1;
-}
+	
+	dest[count] = 0;
+}  
 
-static void push_arg(char *arg, char **sp)
+static void push_arg(char *arg, uint8_t **sp)
 {
 		int len = strlen(arg) + 1;
 		*sp -= len;
-		strncpy(*sp, arg, len);
-		//printf("stack %x string %s *sp %s len %i\n", sp, arg, *sp, len);
+		strncpy((char *)*sp, arg, len);
 }
-//TODO: we need a function that deallocates everything on exit()
-static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew)
+
+static int build_table(char **table, char * const source[], uint8_t **stack)
 {
-	int argc = 1;
-	char **table;
-	char *stack = (void *)PHYS_BASE;//FIXME: Is this right?, or are we stepping on ourselves here?
-	char **argvp = (char **)argv;
-	
-	while(*argvp++ != NULL)	
-		argc++;
-
-	table = kcalloc(argc + 1, sizeof(uint32_t *));
-
-	for(int i = argc-2; i >= 0; i--)
-	{	
-		push_arg(argv[i], &stack);
-		table[i+1] = stack;
+	char **p = (char **)source;
+	int arg_count = 0;
+	while(*p != NULL)
+	{
+		push_arg(*p++, stack);
+		table[arg_count] = (char *)*stack;
+		arg_count++;
 	}
-	
-	//push path
-	push_arg(path, &stack);
-	//first entry of table is path
-	table[0] = stack;
-	//printf("stack %x\n", stack);
 
-	//keep stack aligned
-	stack -= (uintptr_t)stack % 4;
-	
-	stack -= 4;
-	*(uint32_t *)stack = 0;
-
-	stack = stack - (argc * 4);
-	kmemcpy(stack, table, argc * 4);
-	
-	stack -= 4;
-	*(uint32_t *)stack = (uint32_t)stack + 4;
-
-//	hex_dump((void *)(PHYS_BASE - 16*3), 3);
-	*argvnew = (int)stack;
-	*argcnew = argc;
-//	printf(" stack %x argvnew %x argcnew %i\n", stack, *argvnew, *argcnew);
-
-	kfree(table);
-	return (uintptr_t)stack;
+	return arg_count;
 }
 
