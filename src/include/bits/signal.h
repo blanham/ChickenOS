@@ -1,17 +1,57 @@
 #if defined(_POSIX_SOURCE) || defined(_POSIX_C_SOURCE) \
- || defined(_XOPEN_SOURCE) || defined(_GNU_SOURCE)
+ || defined(_XOPEN_SOURCE) || defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
 
-struct __fpstate {
-	unsigned long __x[7];
-	unsigned char __y[80];
-	unsigned long __z;
+#ifdef _GNU_SOURCE
+#define REG_GS          0
+#define REG_FS          1
+#define REG_ES          2
+#define REG_DS          3
+#define REG_EDI         4
+#define REG_ESI         5
+#define REG_EBP         6
+#define REG_ESP         7
+#define REG_EBX         8
+#define REG_EDX         9
+#define REG_ECX         10
+#define REG_EAX         11
+#define REG_TRAPNO      12
+#define REG_ERR         13
+#define REG_EIP         14
+#define REG_CS          15
+#define REG_EFL         16
+#define REG_UESP        17
+#define REG_SS          18
+#endif
+
+#if defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
+typedef int greg_t, gregset_t[19];
+typedef struct _fpstate {
+	unsigned long cw, sw, tag, ipoff, cssel, dataoff, datasel;
+	struct {
+		unsigned short significand[4], exponent;
+	} _st[8];
+	unsigned long status;
+} *fpregset_t;
+struct sigcontext {
+	unsigned short gs, __gsh, fs, __fsh, es, __esh, ds, __dsh;
+	unsigned long edi, esi, ebp, esp, ebx, edx, ecx, eax;
+	unsigned long trapno, err, eip;
+	unsigned short cs, __csh;
+	unsigned long eflags, esp_at_signal;
+	unsigned short ss, __ssh;
+	struct _fpstate *fpstate;
+	unsigned long oldmask, cr2;
 };
-
 typedef struct {
-	unsigned long __gregs[19];
-	void *__fpregs;
-	unsigned long __oldmask, __cr2;
+	gregset_t gregs;
+	fpregset_t fpregs;
+	unsigned long oldmask, cr2;
 } mcontext_t;
+#else
+typedef struct {
+	unsigned __space[22];
+} mcontext_t;
+#endif
 
 typedef struct __ucontext {
 	unsigned long uc_flags;
@@ -19,7 +59,7 @@ typedef struct __ucontext {
 	stack_t uc_stack;
 	mcontext_t uc_mcontext;
 	sigset_t uc_sigmask;
-	struct __fpstate __fpregs_mem;
+	unsigned long __fpregs_mem[28];
 } ucontext_t;
 
 #define SA_NOCLDSTOP  1
@@ -31,20 +71,6 @@ typedef struct __ucontext {
 #define SA_RESETHAND  0x80000000
 #define SA_RESTORER   0x04000000
 
-#ifdef _GNU_SOURCE
-struct sigcontext {
-	unsigned short gs, __gsh, fs, __fsh, es, __esh, ds, __dsh;
-	unsigned long edi, esi, ebp, esp, ebx, edx, ecx, eax;
-	unsigned long trapno, err, eip;
-	unsigned short cs, __csh;
-	unsigned long eflags, esp_at_signal;
-	unsigned short ss, __ssh;
-	struct __fpstate *fpstate;
-	unsigned long oldmask, cr2;
-};
-#define NSIG      64
-#endif
-
 #endif
 
 #define SIGHUP    1
@@ -53,6 +79,7 @@ struct sigcontext {
 #define SIGILL    4
 #define SIGTRAP   5
 #define SIGABRT   6
+#define SIGIOT    SIGABRT
 #define SIGBUS    7
 #define SIGFPE    8
 #define SIGKILL   9
@@ -80,3 +107,6 @@ struct sigcontext {
 #define SIGPWR    30
 #define SIGSYS    31
 #define SIGUNUSED SIGSYS
+
+#define _NSIG 65
+

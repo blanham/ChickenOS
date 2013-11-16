@@ -4,7 +4,7 @@
 #include <mm/vm.h>
 #include <mm/paging.h>
 #include <fs/vfs.h>
-#include <sys/signal.h>
+#include <signal.h>
 #include <sys/types.h>
 
 #define STACK_SIZE 0x1000
@@ -59,11 +59,13 @@ typedef struct thread {
 	void * brk;
 	
 	//signal stuff - need to add handlers - list?
+	//yeah, just have a queue here
 	int signal_pending;
 	struct sigaction **signals;
 	
 	//this pointer to registers on kernel
-	//stack probably not needed	
+	//stack is used for manipulating the user stack
+	//for signal handling	
 	struct registers *regs;
 	
 	/* pagedirectory for this thread */
@@ -76,19 +78,23 @@ typedef struct thread {
 	uint32_t magic;	
 } thread_t;
 
+/* arch/$ARCH/thread.c */
+void arch_thread_init();
+
 /* thread.c */
 void thread_init();
 void thread_usermode(void);
 pid_t pid_allocate();
 thread_t * thread_current();
-thread_t * thread_create(registers_t *regs ,uint32_t eip, uint32_t esp);
+pid_t thread_create(registers_t *regs, void (*eip)(void *), void * esp);
 
 /* thread_ops.c - system calls */
 pid_t sys_fork(registers_t *regs);
 pid_t sys_getpid();
 pid_t sys_getpgrp();
 int sys_execve(const char *path, char *const argv[], char *const envp[]);
-void *sys_brk(uintptr_t ptr);
+int sys_brk(void *addr);
+void *sys_sbrk(intptr_t ptr);
 
 //we define this so kmain can call the first user process 
 int execv(const char *path, char *const argv[]);

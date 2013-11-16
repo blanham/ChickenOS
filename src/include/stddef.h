@@ -1,15 +1,18 @@
-#ifndef C_OS_STDDEF_H
-#define C_OS_STDDEF_H
+#ifndef _STDDEF_H
+#define _STDDEF_H
 
-typedef long ptrdiff_t;
+#define NULL 0L
 
-#ifndef _SIZE_T
-typedef unsigned int size_t;
-#define _SIZE_T
+#define __NEED_ptrdiff_t
+#define __NEED_size_t
+#define __NEED_wchar_t
+
+#include <bits/alltypes.h>
+
+#if __GNUC__ > 3
+#define offsetof(type, member) __builtin_offsetof(type, member)
+#else
+#define offsetof(type, member) ((size_t)( (char *)&(((type *)0)->member) - (char *)0 ))
 #endif
 
-typedef int wint_t;
-#ifndef NULL
-#define NULL 0
-#endif
 #endif

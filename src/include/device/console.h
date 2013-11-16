@@ -2,6 +2,7 @@
 #define C_OS_CONSOLE_H
 #include <stdint.h>
 #include <stddef.h>
+#include <termios.h>
 
 enum console_color {
 	BLACK, BLUE, GREEN, CYAN,
@@ -23,6 +24,7 @@ struct console {
 	uint32_t w,h;
 	int num;
 	int foreground;
+	struct termios termios;
 	console_putc_fn putc;
 	console_switch_fn switch_fn;
 	void *aux;

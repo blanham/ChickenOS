@@ -8,10 +8,9 @@ static inline void kernel_halt()
 	while(1)
 		asm volatile ("hlt");
 }
-
-static inline void print_stack_trace ()
+static inline void print_user_trace (uint32_t *ebp)
 {
-   /*   uint32_t *ebp, *eip;
+      uint32_t *eip;
       asm volatile ("mov %%ebp, %0" : "=r" (ebp)); // Start with the current EBP value.
       while (ebp)
       {
@@ -20,7 +19,21 @@ static inline void print_stack_trace ()
         ebp = (uint32_t*) *ebp;	
 	//	if((uintptr_t)ebp < 0xC0000000)
 		//	break;
-      }*/
+      }
+}
+
+static inline void print_stack_trace ()
+{
+      uint32_t *ebp, *eip;
+      asm volatile ("mov %%ebp, %0" : "=r" (ebp)); // Start with the current EBP value.
+      while (ebp)
+      {
+        eip = ebp+1;
+        printf ("[0x%x], ", *eip);
+        ebp = (uint32_t*) *ebp;	
+	//	if((uintptr_t)ebp < 0xC0000000)
+		//	break;
+      }
 }
 
 

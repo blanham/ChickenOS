@@ -1,8 +1,9 @@
-#ifndef ERRNO_H
-#define ERRNO_H
+#ifndef C_OS_ERRNO_H
+#define C_OS_ERRNO_H
 
-#define ENOENT 2
-#define EACCES 13
-#define ENOSYS 38
+#define EPERM		1
+#define ENOENT		2
+#define EACCES		13
+#define ENOSYS		38
 
 #endif

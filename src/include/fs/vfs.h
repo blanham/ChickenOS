@@ -1,5 +1,6 @@
 #ifndef C_OS_VFS_H
 #define C_OS_VFS_H
+#include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <kernel/list.h>
@@ -117,7 +118,7 @@ int vfs_close(struct file *file);
 size_t vfs_read(struct file *file, void *buf, size_t nbyte);
 off_t vfs_write(struct file *file, void *buf, size_t nbyte);
 off_t vfs_seek(struct file *file, off_t offset, int whence);
-int vfs_ioctl(struct file *file, int request, ...);
+int vfs_ioctl(struct file *file, int request, va_list args);
 int vfs_chdir(const char *path);
 
 /* ops.c - standard file ops */
@@ -130,7 +131,7 @@ char* sys_getcwd(char *buf, size_t size);
 int sys_creat(const char *path, mode_t mode);
 int sys_stat(char *filename, struct stat *statbuf);
 off_t sys_lseek(int fildes, off_t offset, int whence);
-int sys_ioctl(int fildes, int request, ...);
+int sys_ioctl(int fildes, int request, va_list args);
 
 //device.c
 #define INITRD_DEV 0x400
@@ -154,7 +155,7 @@ typedef size_t (*block_write_fn)(uint16_t dev, void *buf, int block);
 void  device_register(uint16_t type, dev_t dev, void *read, void *write, void *ioctl);
 typedef int(*block_access_fn)(void *aux, void *buf, int block);
 
-int char_device_ioctl(uint16_t dev, int request, ...);
+int char_device_ioctl(uint16_t dev, int request, va_list args);
 size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte);
 size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte);
 size_t block_device_read(uint16_t dev, void *buf, uint32_t block);
