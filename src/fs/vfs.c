@@ -295,7 +295,7 @@ size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 		ret = file->fs->ops->read(file->inode, buf,
 			nbyte, file->offset);
 	}
-	file->offset += ret; 
+	file->offset += ret;
 	return ret;
 
 }
@@ -303,6 +303,8 @@ size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 {
 	int ret = 0;
+	if(nbyte == 0)
+		return 0;
 	if(file == NULL || buf == NULL)
 		return -1;
 	if((file->inode->mode & S_IFCHR) != 0){
@@ -323,20 +325,15 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 	return ret;
 }
 
-//FIXME: Might actually take va_list
-int  vfs_ioctl(struct file *file, 
-	int request, ...)
+int  vfs_ioctl(struct file *file, int request, va_list args)
 {
 	int ret = 0;
-	va_list va;
-	va_start(va, request);
 	if(file == NULL)
 		return -1;
 
-	printf("test %x\n", file);
 	if((file->inode->mode & S_IFCHR) != 0){
 		ret = char_device_ioctl(file->inode->rdev, 
-			request, va);
+			request, args);
 	}else if((file->inode->mode & S_IFBLK) != 0){
 	//	ret = block_device_readn(file->inode->rdev, 
 	//		buf, 0, file->offset, nbyte);
@@ -348,7 +345,6 @@ int  vfs_ioctl(struct file *file,
 	//		nbyte, file->offset);
 		return -1;
 	}
-	va_end(va);
 	return ret;
 }
 

@@ -72,7 +72,7 @@ network: all
 	cd .. && ./new_update.sh &&  qemu -rtc base=localtime \
 	-m 64 -hda disk.img -serial file:log -net nic,vlan=0,model=e1000,macaddr=00:00:00:00:00:00 -net tap,vlan=0,ifname=tap0,script=no  && cd src 
 debug: all
-	cd .. && ./new_update.sh &&  /usr/local/bin/qemu-system-i386 -rtc base=localtime \
+	cd .. && ./new_update.sh &&  qemu-system-i386 -rtc base=localtime \
 	-m 64 -usb -hda disk.img -s -S -serial file:log && cd src 
 
 clean:

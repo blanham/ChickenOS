@@ -16,7 +16,6 @@
 #include <stdint.h>
 
 #define MAX_DEVICES 20
-#define NULL 0
 
 struct char_device {
 	dev_t dev;
@@ -124,11 +123,11 @@ size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte)
 	return ret;
 }
 
-int char_device_ioctl(uint16_t dev, int request, ...)
+int char_device_ioctl(uint16_t dev, int request, va_list args)
 {
 	size_t ret = 0;
 	struct char_device *device = &char_devices[MAJOR(dev)];
-	ret = device->ioctl(dev, request, NULL);
+	ret = device->ioctl(dev, request, args);
 
 	return ret;
 }

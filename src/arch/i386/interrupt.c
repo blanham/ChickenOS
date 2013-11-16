@@ -298,7 +298,7 @@ static void stack_fault(struct registers * regs)
 }
 static void page_fault(struct registers * regs)
 {
-	uintptr_t faulting_addr;//, new_page;
+	uintptr_t faulting_addr, new_page;
 	uint32_t error_code = regs->err_code;
 	thread_t *cur = thread_current();
 	bool is_user, is_write, not_present;
@@ -336,18 +336,28 @@ static void page_fault(struct registers * regs)
 		PANIC("Page fault in kernel space!");
 
 	}else {
-		//TODO: Stack growth will me handled here
-	/*	if(faulting_addr + 0x1000 > (uintptr_t)cur->user)
+
+		//if we are within a page of the stack pointer
+		//allocate a new page
+		if(faulting_addr + 0x1000 > (uintptr_t)cur->user)
 		{
 			cur->user -=0x1000;
 			new_page = (uintptr_t)palloc();
-			pagedir_insert_page(cur->pd, new_page, (uintptr_t)cur->user, 0x7);
+
+			pagedir_insert_page(cur->pd, new_page, (uintptr_t)cur->user , 0x7);
+			pagedir_install(cur->pd);
+		
 			return;
 
-		} */
-		//kill process
+		} 
+
+		//otherwise fail for now
+		//TODO: laxy loading and mmaping will both need to 
+		//look to see if the page is just unmapped and put it in
+		//TODO: send SIGSEGV to thread
 		printf("Page fault in user space @ %X PID %i eip %x\n", faulting_addr, cur->pid, regs->eip);	
 		printf("REGS:\n");
+	
 		dump_regs(regs);
 	
 		if(is_write)
@@ -360,15 +370,12 @@ static void page_fault(struct registers * regs)
 		else
 			printf("protection violation\n");
 
-		printf("\n");
-
 
 		printf("\n");
 		thread_current()->status = THREAD_DEAD;
-	//	interrupt_enable();
 		while(1);
 		thread_yield();
-	//	thread_exit();
+		thread_exit();
 
 	}
 }

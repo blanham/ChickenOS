@@ -7,7 +7,7 @@
 #include <device/usb.h>
 #include <device/video.h>
 #include <device/audio.h>
-#include <device/serial.h>
+#include <device/tty.h>
 #include <kernel/timer.h>
 #include <mm/vm.h>
 #include <fs/vfs.h>
@@ -18,16 +18,14 @@
 #include <thread/syscall.h>
 
 char *BOOT_MSG = "ChickenOS v0.02 booting\n";
+
 uintptr_t main_loc;
+
+void init(void *aux UNUSED) __attribute__((section(".user"))); 
 extern void modules_init(struct multiboot_info *mb);
 void fork_test();
-void init();
 extern void multiboot_print(struct multiboot_info *mb);
-void ass()
-{
-	printf("ass\n");
-	while(1);
-}
+
 //TODO: need to change signature since ARM has no multiboot
 //      (unless I write a stub that takes info from u-boot 
 //		and shoves it into a multiboot struct) 
@@ -58,6 +56,8 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 		just a commandline + parser	
 */
 	vm_init(mb);
+	
+	tty_init();
 
 	thread_init();
 
@@ -91,7 +91,6 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 	
 	usb_init();
 
-	serial_init();
 
 	//network_init();
 
@@ -104,33 +103,28 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 
 	ata_init();	
 	
+	//TODO: move this to a mount_root() function
+	//		can take drive, but should autodetect
+	//		filesytem type from the partition table
 	vfs_mount_root(ATA0_0_DEV, "ext2");
-	
-extern uint32_t mem_size;
+
+	extern uint32_t mem_size;
 	printf("Found %uMB RAM\n", mem_size / 1024);
-	thread_usermode();
-		
-	//we have this special sycall at the moment
-	//to setup networking, later will be able to handle
-	//it in user space:
-	//network_setup();
-	//FIXME: probably reuse the above to do a dhcp request
+
+	//init thread is started in user mode
+	//so we don't need to switch into user mode	
+	thread_create(NULL,(void *)init, NULL);
+
+	//restarts interrupts, allowing new thread to be
+	//scheduled
+	interrupt_enable();	
+
+	//should probably be a sleep() or something
+	kernel_halt();
+	
+
 	while(1)
 		;
-	//	dummy();
-	//TODO: fuck using a fork, start an init kernel thread that calls
-	//		execve
-	if(!fork() )
-	{
-		while(1)
-			printf("derp\n");
-		init(NULL);
-		PANIC("init() returned!");
-	}
-	//only works because initial threads name is "main"
-	strncpy(thread_current()->name, "idle", 4);
-
-	kernel_halt();	
 
 	//should never return, unless things get really fucked
 	PANIC("kmain returned");
@@ -139,15 +133,27 @@ extern uint32_t mem_size;
 //FIXME:Here we should do housekeeping, launch any shells or login processes
 //		on the various psuedoterminals, and wait()s on children (which takes
 //		care of zombies processes) 
-void init(void *aux UNUSED) __attribute__((section(".user"))); 
 void init(void *aux UNUSED) 
 {
-	char *argv[] = {"/frotz","zo",NULL};
+	char *argv[] = {"/busybox","sh",NULL};
+	char *path = "/busybox";
 	(void)argv;
-//		execv("/tests/fork", argv);
-		PANIC("execv(init) failed!");
+	if(!fork())
+	{
+	//we have this special sycall at the moment
+	//to setup networking, later will be able to handle
+	//it in user space:
+	//network_setup();
+	//FIXME: probably reuse the above to do a dhcp request
+	//	dummy();
+		SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
+		SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
+		SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
 
-	
+		execv(path, argv);
+		PANIC("execv(init) failed!");
+	}
+
 	while(1)
 		;
 }

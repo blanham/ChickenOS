@@ -1,7 +1,6 @@
 #include <common.h>
 #include <string.h>
 #include <mm/liballoc.h>
-#define NULL 0
 #include <stdio.h>
 size_t strlen(const char *str)
 {

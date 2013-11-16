@@ -85,7 +85,7 @@ int sys_stat(char *filename, struct stat *statbuf)
 {
 	printf("sys_stat: %s %p\n", filename, statbuf);
 	
-	return ENOENT;
+	return -ENOENT;
 }
 
 int sys_chdir(const char *path)
@@ -93,12 +93,16 @@ int sys_chdir(const char *path)
 	return vfs_chdir(path);
 }
 
+
+
+
 //FIXME: Placeholder
+//For Linux compatibility, return length not buf
 char *sys_getcwd(char *buf, size_t size UNUSED)
 {
 	strcpy(buf, "/");
 	
-	return buf;
+	return (char *)strlen(buf);
 }
 
 
@@ -116,15 +120,14 @@ int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
 }
 
 //FIXME: doesn't handle varargs
-int sys_ioctl(int fildes, int request, ...)
+int sys_ioctl(int fildes, int request, va_list args)
 {
 	struct file *fp;
 	if(fildes == -1)
 		return -1;
 	fp = thread_current()->files[fildes];
-	printf("fildes %i file %x\n", fildes, fp);
 	if(fp == NULL)
 		return -1;
-	return vfs_ioctl(fp, request, NULL);
+	return vfs_ioctl(fp, request, args);
 }
 

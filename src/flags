@@ -1,0 +1,2 @@
+-g -Wall -Werror -I./include -I./fs -I./include/kernel -std=gnu99 -fno-stack-protector -ffreestanding	-nostdlib -nostdinc -fno-builtin -DARCH_I386
+

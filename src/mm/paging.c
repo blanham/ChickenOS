@@ -14,7 +14,7 @@
 
 //TODO: Cleanup, and add a pagedir_lookup function to see if an
 //		address is valid
-uint32_t _kernel_pd[4096] __attribute__((aligned (4096)));
+uint32_t _kernel_pd[1024] __attribute__((aligned (4096)));
 pagedir_t kernel_pd = & _kernel_pd[0];
 typedef uint32_t * page_table_t;
 
@@ -59,17 +59,21 @@ page_table_t pagetable_clone(pagedir_t pd UNUSED, uint32_t index UNUSED)
 	return NULL;
 }
 
-pagedir_t pagedir_clone(pagedir_t pd UNUSED)
+pagedir_t pagedir_clone2(pagedir_t pd UNUSED)
 {
 	pagedir_t clone = pagedir_new();
-
+	kmemcpy(clone, pd, 4096);
+	pd[KERNEL_PDE_START -1] = 0;
 	for(int i = 0; i < KERNEL_PDE_START; i++)
 	{
 		if(pd[i] & PDE_P)
+		{
+			
+		//	clone[i] = pd[i];
 			printf("present\n");	
 		//if present
 		//pagetable_clone(pd, i)
-
+		}
 	}
 
 	return clone;
@@ -205,7 +209,7 @@ void pagedir_delete(pagedir_t pd)
 		} 
 	}
 }
-
+*/
 pagedir_t pagedir_clone(pagedir_t pd)
 {
 	pagedir_t new = palloc();
@@ -226,17 +230,8 @@ pagedir_t pagedir_clone(pagedir_t pd)
 
 	return new;	
 }
+/*
 
-
-void pagedir_install(uint32_t *pd)
-{
-	virt_addr_t pdn = V2P(pd);
-	asm volatile (	"mov %0, %%eax\n"
-				"mov %%eax, %%cr3\n"
-				"mov %%cr0, %%eax\n"
-				"orl $0x80000000, %%eax\n"
-				"mov %%eax, %%cr0\n" :: "m" (pdn));
-}
 
 
 

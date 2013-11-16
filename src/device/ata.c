@@ -1,7 +1,6 @@
 #include <kernel/common.h>
 #include <kernel/memory.h>
 #include <kernel/hw.h>
-#include <device/serial.h>
 #include <kernel/interrupt.h>
 #include <mm/vm.h>
 #include <kernel/timer.h>
@@ -10,7 +9,7 @@
 #include <device/ata.h>
 
 struct ata_drive drives[4];
-
+//XXX: Why is this switch statement like this?
 void ata_write(struct ata_drive *dev, uint16_t port, uint16_t value)
 {
 	switch(port)

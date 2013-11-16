@@ -7,7 +7,11 @@
 //	in memory log for dmesg functionality
 void kprintf(char *fmt, ...)
 {
-	(void)fmt;	
+	va_list args;
+	
+	va_start(args, fmt);
+//	i=linux_vsprintf(buf,fmt,args);
+	va_end(args);
 
-
+	
 }

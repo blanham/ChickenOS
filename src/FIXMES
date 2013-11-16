@@ -1,0 +1,709 @@
+./thread/thread.c
+81: //TODO: Better to do it this way:
+82: void
+83: thread_create2(void (*ip)(void*), void *aux)//, enum thread_type type)
+84: {
+85: thread_t *new = thread_new();
+86: thread_t *cur = thread_current();
+
+./thread/thread.c
+125: //TODO: Perhaps we should allocate more than one page to the user stack?
+126: user_stack = pallocn(1);
+127: kmemset(user_stack,0, 4096);
+128: 
+129: uint32_t *test = (uint32_t *)(user_stack + 4096);
+130: if(regs == NULL)
+
+./thread/syscall.c
+84: //TODO: need to verify pointers before letting functions dereference them
+85: void syscall_handler (struct registers *regs)
+86: {
+87: int call = regs->eax;
+88: //	char *buf = NULL;
+89: //	buf = buf;
+
+./thread/exec.c
+76: //TODO: perhaps just pass these in? or pass in regs
+77: regs->useresp = stack_prepare((char *)name, argv, &newargv, &newargc);
+78: regs->esi = newargc;
+79: regs->ecx = (uint32_t)newargv;
+80: 
+81: //FIXME: probably not the best address for break
+
+./thread/exec.c
+98: //TODO: we need a function that deallocates everything on exit()
+99: static uintptr_t stack_prepare(char *path, char *const argv[], int *argvnew, int *argcnew)
+100: {
+101: int argc = 1;
+102: char **table;
+103: char *stack = (void *)PHYS_BASE;//FIXME: Is this right?, or are we stepping on ourselves here?
+
+./thread/scheduler.c
+102: //TODO: Implement this as a heap-based priority queue
+103: thread_t *thread_next()
+104: {
+105: //	thread_t *cur = thread_current();
+106: if(thread_ptr > thread_cnt)
+107: thread_ptr = 0;
+
+./lib/kprintf.c
+4: //TODO:
+5: //	always outputs to serial
+6: //	outputs to console until we hit init
+7: //	in memory log for dmesg functionality
+8: void kprintf(char *fmt, ...)
+9: {
+
+./net/net_core.c
+100: //TODO: really need to set up a proper probe of net cards
+101: //      maybe have a menu to pick if multiple cards are detected?
+102: net_device = rtl8139_init();
+103: if(net_device == NULL)
+104: net_device = e1000_init();
+105: if(net_device == NULL)
+
+./init/kmain.c
+32: //TODO: need to change signature since ARM has no multiboot
+33: //      (unless I write a stub that takes info from u-boot
+34: //		and shoves it into a multiboot struct)
+35: //mb is already a virtual address
+36: void kmain(struct multiboot_info* mb, uint32_t magic)
+37: {
+
+./init/kmain.c
+108: //TODO: move this to a mount_root() function
+109: //		can take drive, but should autodetect
+110: //		filesytem type from the partition table
+111: vfs_mount_root(ATA0_0_DEV, "ext2");
+112: 
+113: extern uint32_t mem_size;
+
+./init/multiboot.c
+12: /* TODO: Load all data from header into an accesible struct
+13: *       or supply accessors (e.g. multiboot_get_module() or
+14: *		 multiboot_get_cmdline()
+15: */
+16: 
+17: //FIXME: Move this somewhere else (init/boot.c?)
+
+./include/stdint.h
+3: //TODO: Needs tp depend on architecture for length
+4: /* stdint.h
+5: *
+6: */
+7: typedef signed   char 	int8_t;
+8: typedef unsigned char 	uint8_t;
+
+./include/kernel/bitmap.h
+4: //TODO: needs housekeeping
+5: 
+6: typedef struct bitmap {
+7: uint32_t *data;
+8: uint32_t size;
+9: } bitmap_t;
+
+./include/kernel/thread.h
+21: //TODO: Priorities? Would really like to maybe implement the 4.3BSD scheduler
+22: // 		since we didn't get it working in pintos
+23: typedef struct thread {
+24: 
+25: pid_t pid;
+26: pid_t parent;
+
+./include/kernel/thread.h
+31: //TODO: will have to have list head for children
+32: 
+33: //fs stuff
+34: struct file *cur_dir;
+35: int fd;
+./include/kernel/thread.h
+36: //TODO: Obviously we should be allowed to have more files open
+37: //Probably copy Linux and have a files struct pointer
+38: /*
+39: struct files {
+40: 
+41: count
+*/
+./include/arch/i386/interrupt.h
+27: /*TODO:rename me to registers_dump*/
+28: void dump_regs(registers_t *regs);
+29: void arch_interrupt_init();
+30: #endif
+1: /*
+2: *  $Id: _default_types.h,v 1.2 2008/06/11 22:14:54 jjohnstn Exp $
+*/
+./mm/vm.c
+25: //TODO: doublecheck if this is correct (needs to skip over all modules
+26: placement =(uint32_t) P2V(*(void **)P2V(mb->mods_addr + 4));
+27: }else{
+28: placement = (unsigned)&end;
+29: }
+30: 
+
+./mm/paging.c
+15: //TODO: Cleanup, and add a pagedir_lookup function to see if an
+16: //		address is valid
+17: uint32_t _kernel_pd[1024] __attribute__((aligned (4096)));
+18: pagedir_t kernel_pd = & _kernel_pd[0];
+19: typedef uint32_t * page_table_t;
+20: 
+
+./fs/vfs.c
+57: //TODO: return is not directory error
+58: PANIC("calling vfs_namei on a non-directory inode");
+59: }
+60: 
+61: return dir->fs->ops->namei(dir, file);
+62: }
+
+./fs/vfs.c
+185: //TODO: Copy the Linux module setup
+186: //		Wherein we put everything in a
+187: //		null-terminated array of function
+188: //		pointers that we iterate over
+189: int vfs_register_fs(vfs_fs_t *fs)
+190: {
+
+./fs/ext2/ext2.c
+46: //TODO:if part of mount point,keep in cache
+47: vfs->flags = 0;
+48: vfs->storage = ext2;
+49: vfs->fs = (vfs_fs_t *)fs;
+50: }
+51: 
+
+./device/console.c
+95: //TODO: some of these will probably be taken care of here
+96: //		and some will need to be taken care of in the drivers
+97: int console_ioctl(uint16_t dev, int request, va_list args UNUSED)
+98: {
+99: int tty = MINOR(dev);
+100: switch(request)
+
+./device/pci.c
+111: //TODO: make this a list later
+112: struct pci_irq *irq = &pci_irqs[int_line][int_pin];
+113: 
+114: irq->handler = handler;
+115: irq->int_pin = int_pin;
+116: irq->aux = aux;
+
+./device/net/rtl8139.c
+139: //TODO: need to register pci IRQs instead of doing it directly
+140: //interrupt_register(32 + rtl->pci_hdr->int_line, &rtl_handler);
+141: 
+142: pci_register_irq(rtl->pci, &rtl_handler, rtl);
+143: rtl_outl(rtl, 0x44, (1 << 7) | 8|  (1 << 1));
+144: rtl_outw(rtl, 0x3c, 0x5 );
+
+./arch/i386/thread.c
+55: //TODO: 7/8/13 It appears the changes in this funtion
+56: //have made this call obsolete
+57: //triple faults in BOCHS, and pagefaults at 0x1000 below
+58: //PHYS_BASE without this pagedir_install
+59: pagedir_install(cur->pd);
+60: 
+
+./arch/i386/interrupt.c
+339: //TODO: Stack growth will me handled here
+340: /*	if(faulting_addr + 0x1000 > (uintptr_t)cur->user)
+341: {
+342: cur->user -=0x1000;
+343: new_page = (uintptr_t)palloc();
+344: pagedir_insert_page(cur->pd, new_page, (uintptr_t)cur->user, 0x7);
+*/
+./lib/newvsprintf.c.nocompile
+119: * XXX:  %D  -- Hexdump, takes pointer and separator string:
+120: *		("%6D", ptr, ":")   -> XX:XX:XX:XX:XX:XX
+121: *		("%*D", len, ptr, " " -> XX XX XX XX ...
+122: */
+123: int
+124: kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap)
+
+./include/sys/queue.h
+725: * XXX insque() and remque() are an old way of handling certain queues.
+726: * They bogusly assumes that all queue heads look alike.
+727: */
+728: 
+729: struct quehead {
+730: struct quehead *qh_link;
+
+./include/device/pci_dev.h
+3324: { 0x110A, 0x4036, "XXX", "simens i/o control" } ,
+3325: { 0x104B, 0x1040, "BA81C15", "BT958 SCSI Host Adaptor" } ,
+3326: { 0x104B, 0x8130, "-", "Flashpoint LT" } ,
+3327: { 0x1180, 0x0475, "RL5c592", "Cardbus Controller" } ,
+3328: { 0x1180, 0x0476, "RL5c476 II", "RICOH SmartCard Reader" } ,
+3329: { 0x1180, 0x0478, "RB5c478", "Cardbus Controller" } ,
+
+./device/ata.c
+13: //XXX: Why is this switch statement like this?
+14: void ata_write(struct ata_drive *dev, uint16_t port, uint16_t value)
+15: {
+16: switch(port)
+17: {
+18: case 0:
+
+./Makefile
+19: #FIXME: this should only be one path
+20: INCLUDES=		-I./include -I./fs -I./include/kernel -I./rme2
+21: 
+22: ARCHSRCS=		$(patsubst %.c,%.o,$(wildcard arch/$(ARCH)/*.c))\
+23: $(patsubst %.s,%.o,$(wildcard arch/$(ARCH)/*.s))
+24: 
+*/
+./thread/thread.c
+37: //FIXME:
+38: kernel_thread->name = _main_thread_name;
+39: kernel_thread->magic = THREAD_MAGIC;
+40: 
+41: thread_scheduler_init(kernel_thread);
+42: }
+
+./thread/thread.c
+68: //FIXME: Should be a vfs call that increases reference counts
+./thread/thread.c
+69: //FIXME: Also should be more than 8 files
+70: kmemcpy(new->files, cur->files, sizeof(struct file)*8);
+71: printf("here\n");
+72: 
+73: new->signals = (struct sigaction **)
+74: kcalloc(sizeof(struct sigaction*), NUM_SIGNALS);
+
+./thread/thread.c
+108: //FIXME: doesn't copy open files over to new process in the case of a fork
+109: thread_t *
+110: thread_create(registers_t *regs ,uint32_t eip, uint32_t esp)
+111: {
+112: thread_t *new, *cur;
+113: enum intr_status old_level;
+
+./thread/thread_ops.c
+33: //FIXME: Needs more error/bounds checking
+34: void *sys_brk(uintptr_t ptr)
+35: {
+36: void * old;
+37: thread_t *cur = thread_current();
+38: 
+
+./thread/syscall.c
+68: //FIXME: Old network stuff that should be moved or removed
+69: extern void send_packet();
+70: int sys_dummy()
+71: {
+72: //	PANIC("YAY!");
+73: send_packet();
+
+./thread/syscall.c
+127: //FIXME: Is this needed?
+128: thread_yield();
+129: return;
+130: case SYS_SBRK:
+131: regs->eax = (uintptr_t)sys_brk(regs->ebx);
+132: return;
+
+./thread/syscall.c
+149: //FIXME: This needs to be implemented properly
+150: printf("exit (%i)\n",regs->ebx);
+151: while(1);
+152: thread_exit();
+153: return;
+154: case SYS_GETTIMEOFDAY:
+
+./thread/exec.c
+52: //FIXME: this is the wrong place to do this, usually done in init
+53: {
+54: sys_open("/dev/tty0", 0);
+55: sys_open("/dev/tty0", 0);
+56: sys_open("/dev/tty0", 0);
+57: }
+
+./thread/exec.c
+72: //FIXME: possible memory leak, but we can't realloc() the original threads ->name
+73: cur->name = kcalloc(strlen(name) + 1,1);
+74: strncpy(cur->name, name, strlen(name) + 1);
+75: 
+76: //TODO: perhaps just pass these in? or pass in regs
+77: regs->useresp = stack_prepare((char *)name, argv, &newargv, &newargc);
+
+./thread/exec.c
+81: //FIXME: probably not the best address for break
+82: cur->brk = (void *)0x80000000;
+83: pagedir_insert_pagen(cur->pd, (uintptr_t)pallocn(1000), (uintptr_t)cur->brk, 0x7, 1000);
+84: 
+85: }
+86: //if we return, then something is wrong
+
+./thread/exec.c
+103: char *stack = (void *)PHYS_BASE;//FIXME: Is this right?, or are we stepping on ourselves here?
+104: char **argvp = (char **)argv;
+105: 
+106: while(*argvp++ != NULL)
+107: argc++;
+108: 
+
+./thread/scheduler.c
+125: //FIXME: This needs to be done differently
+126: //		pallocn_free(cur, STACK_PAGES);
+127: 
+128: }
+129: cur->status = THREAD_DEAD;
+130: asm volatile("sti");
+
+./lib/stdio.c
+7: //FIXME Get rid of this
+8: #define ALLOCSIZE 10000
+9: static char allocbuf[ALLOCSIZE];
+10: static char *allocp = allocbuf;
+11: /* temporary memory functions taken from K&R*/
+12: 
+*/
+./lib/stdio.c
+331: //FIXME: doesn't use size
+332: int snprintf(char *buf, size_t size UNUSED, const char *fmt, ...)
+333: {
+334: va_list ap;
+335: int ret;
+336: va_start(ap, fmt);
+
+./lib/string.c
+45: //FIXME: unimplemented
+46: char * strtok ( char * str UNUSED, const char * delimiters UNUSED)
+47: {
+48: 
+49: 
+50: return NULL;
+
+./init/kmain.c
+138: //FIXME:Here we should do housekeeping, launch any shells or login processes
+139: //		on the various psuedoterminals, and wait()s on children (which takes
+140: //		care of zombies processes)
+141: void init(void *aux UNUSED)
+142: {
+143: char *argv[] = {"/frotz","zo",NULL};
+
+./init/kmain.c
+151: //FIXME: probably reuse the above to do a dhcp request
+152: //	dummy();
+153: ////	SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
+154: //	SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
+155: //	SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
+156: 
+
+./init/multiboot.c
+17: //FIXME: Move this somewhere else (init/boot.c?)
+18: void modules_init(struct multiboot_info *mb)
+19: {
+20: extern uint32_t *background_image;
+21: 
+22: if(mb->mods_count > 0 )
+
+./include/_ansi.h
+19: /* FIXME: This probably needs some work.  Perhaps sys/config.h can be
+20: prevailed upon to give us a clue.  */
+21: 
+22: #ifdef __STDC__
+23: #define _HAVE_STDC
+24: #endif
+
+./include/kernel/common.h
+63: //FIXME: Get colored coded messages fixed
+64: #define PANIC(x) panic(__FILE__, __LINE__, x);
+65: static inline void panic(char *file, int line,char* msg)
+66: {
+67: //console_set_color(RED,WHITE);
+68: printf("KERNEL PANIC\n");
+
+./include/kernel/thread.h
+111: //FIXME:why is this here?
+112: #define ELF_MAGIC "\x7F""ELF"
+113: int load_elf(const char *path, uintptr_t *eip);
+114: 
+115: #endif
+116: 
+
+./include/device/pci.h
+29: //	uint8_t class[3];//FIXME: What is this?
+30: uint8_t pci_interface;
+31: uint8_t pci_minor;
+32: uint8_t pci_major;
+33: uint8_t clg;
+34: uint8_t latency;
+
+./mm/liballoc_funcs.c
+9: //FIXME: Add locks here
+10: int liballoc_lock() {
+11: 
+12: alloc_intr_status = interrupt_disable();
+13: return 0;
+14: }
+
+./mm/vm.c
+34: //FIXME - 	might be fixable by splitting page allocator initilization into kernel and
+35: //			user pages
+36: //	size = 1024 * 1024; //needed for machines with large amounts of memory at the moment
+37: //because we only have 4MB, and the bitmap overflows it
+38: uint32_t page_count = (mem_size/4) - (V2P(placement)/PAGE_SIZE);
+39: 
+
+./mm/palloc.c
+4: *	FIXME: Seems to deadlock after allocating 225MB worth
+5: *	of pages
+6: */
+7: #include <kernel/common.h>
+8: #include <mm/vm.h>
+9: #include <kernel/interrupt.h>
+
+./mm/paging.c
+32: //FIXME: doesn't do anything for now
+33: void pagedir_delete(pagedir_t pd UNUSED)
+34: {
+35: 
+36: }
+37: 
+
+./mm/paging.c
+151: //FIXME: instead of 880, i believe it should be mem_size / (1024*1024)
+152: 
+153: for(int i = KERNEL_PDE_START; i < 880; i++)
+154: kernel_pd[i] = pagetable_init(i - KERNEL_PDE_START, PTE_USER | PTE_RW | PTE_P);
+155: 
+156: pagedir_install(kernel_pd);
+
+./mm/paging.c
+161: //FIXME:
+162: /*
+163: page_table_t pagetable_clone(page_table_t pt)
+164: {
+165: page_table_t new = palloc();
+166: ASSERT_PAGE_ALIGNED(pt);
+*/
+./fs/device.c
+354: //FIXME
+355: //kfree(bounce);
+356: return count;
+357: }
+358: 
+359: 
+
+./fs/vfs.c
+16: //FIXME: Probably shouldn't be a table
+17: vfs_fs_t * filesystems[10];
+18: vfs_fs_t *root_fs;
+19: 
+./fs/vfs.c
+20: //FIXME: This is incorrect, should he hashed or something
+21: struct inode *open_inodes[100];
+22: struct file *root;
+23: 
+24: 
+25: struct file *vfs_file_new(struct inode *inode, char *name)
+
+./fs/vfs.c
+33: //FIXME: Not implemented
+34: int vfs_file_free(struct file *file)
+35: {
+36: struct inode *inode = file->inode;
+37: kfree(file);
+38: //decrement reference count
+
+./fs/vfs.c
+46: //FIXME: Traversing mounts, '.' and '..', and non-directory inodes broken
+47: //		 Some kind of cache would probably be a good idea
+48: struct inode * vfs_namei(struct inode *dir, char *file)
+49: {
+50: if(dir->flags & I_MOUNT && dir != root->inode)
+51: {
+
+./fs/vfs.c
+91: //FIXME	leaving this here for now
+92: //		but i've probably fixed the main bug
+93: //		causing this
+94: printf("dir search or insert broken. path %s\n",path);
+95: 
+96: return NULL;
+
+./fs/vfs.c
+109: //FIXME: needs to use strcpy or strncpy
+110: kmemcpy((uint8_t *)_path, (uint8_t *)filename, 10);
+111: //	strcpy(_path, filename);
+112: kfree(path);
+113: return res;
+114: }
+
+./fs/vfs.c
+116: //FIXME: use linked list or hash
+117: vfs_fs_t * vfs_find_fs(char *type)
+118: {
+119: vfs_fs_t *find = NULL;
+120: int i;
+121: for(i = 0; i < 10; i++)
+
+./fs/vfs.c
+155: //FIXME: needs to be a list
+156: open_inodes[0] = fs->superblock->root;
+157: 
+158: //root->inode = fs->superblock->root;
+159: 
+./fs/vfs.c
+160: //FIXME: use vfs_new_file instead:
+161: root = vfs_file_new(fs->superblock->root, "/");
+162: //	strcpy(root->name, "/");
+163: //	root->dev = dev;
+164: //	root->offset = 0;
+165: //	root->fs = fs;
+
+./fs/vfs.c
+312: //FIXME: This returns -1 so we don't fuxxor our disk image accidentally
+313: //	ret = block_device_readn(file->inode->rdev,
+314: //		buf, 0, file->offset, nbyte);
+315: return -1;
+316: }else if((file->inode->mode & S_IFREG) != 0){
+317: if(file->fs == NULL || file->fs->ops->write == NULL)
+
+./fs/vfs.c
+326: //FIXME: Might actually take va_list
+327: int  vfs_ioctl(struct file *file,
+328: int request, ...)
+329: {
+330: int ret = 0;
+331: va_list va;
+
+./fs/vfs.c
+357: //FIXME: Error catching
+358: //		check if fd is open and return EBADF
+359: //		check if file offset is negative and return EINVAL
+360: //		check if offset overflows off_t and return EOVERFLOW
+361: //		check if pipe and return ESPIPE
+362: off_t vfs_seek(struct file *file, off_t offset, int whence)
+
+./fs/vfs.c
+383: //FIXME: I'm not sure if the logic here checks out
+./fs/vfs.c
+384: //FIXME: Add various errors, most importantly
+385: //		EBADF, EACCES, ENOTDIR and EFAULT
+386: int vfs_chdir(const char *_path)
+387: {
+388: struct file *file;
+389: int ret = -1;
+
+./fs/ops.c
+96: //FIXME: Placeholder
+97: char *sys_getcwd(char *buf, size_t size UNUSED)
+98: {
+99: strcpy(buf, "/");
+100: 
+101: return buf;
+
+./fs/ops.c
+106: //FIXME: Placeholder
+107: int sys_dup(int oldfd UNUSED)
+108: {
+109: return -1;//ENOSYS;
+110: }
+111: 
+./fs/ops.c
+112: //FIXME: Placeholder
+113: int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
+114: {
+115: return -1;//ENOSYS;
+116: }
+117: 
+./fs/ops.c
+118: //FIXME: doesn't handle varargs
+119: int sys_ioctl(int fildes, int request, ...)
+120: {
+121: struct file *fp;
+122: if(fildes == -1)
+123: return -1;
+
+./fs/ext2/ext2.c
+17: //FIXME
+18: vfs_ops_t ext2_ops = {
+19: ext2_read_inode,//vfs_read_inode_t read;
+20: ext2_write_inode,//vfs_write_inode_t write;
+21: ext2_read_superblock,//vfs_read_sb_t read_sb;
+22: ext2_namei//vfs_namei_t namei;
+
+./fs/ext2/ext2.c
+62: //FIXME: fix error handling to catch all memory leaks
+63: int ext2_read_superblock(vfs_fs_t *fs, uint16_t dev)
+64: {
+65: struct inode *root = NULL;
+66: int count;
+67: ext2_fs_t *ext2 = (ext2_fs_t *)fs;
+
+./fs/ext2/ext2.c
+184: //FIXME: There are some magic numbers in here that should be gotten rid of
+185: int byte_to_block(ext2_fs_t *fs, ext2_inode_t *inode, size_t offset)
+186: {
+187: uint32_t block_size = fs->aux->block_size;
+188: off_t block_offset = offset / block_size;
+189: uint32_t *indirect = NULL;
+
+./fs/ext2/ext2.c
+384: //FIXME:should use strncpy
+385: strcpy(new->name, "ext2");
+386: return vfs_register_fs((vfs_fs_t *)new);
+387: }
+388: 
+1: 
+
+./fs/ext2/old/ext2-3.c
+240: //FIXME: fixed sizes
+241: 
+242: int64_t block = (int64_t)gd->bg_inode_table*(int64_t)block_size;
+243: 
+244: //	read_block_generic(table, size, gd->bg_inode_table, block_size, &loop, (block_access_fn)ext2_block_read2);
+245: //	read_block_generic(table, sizeof(ext2_inode_t), 11829250*4096, block_size, &loop, (block_access_fn)ext2_block_read2);
+
+./fs/ext2/old/ext2-3.c
+349: //FIXME: handle other cases
+350: int inode = 2;
+351: 
+352: char *name = malloc(strlen(name_));
+353: strcpy(name, name_);
+354: 
+
+./device/console.c
+116: //FIXME: needs to be:
+117: //	device_file_register(0x800, FILE_CHAR, console_ops);
+118: }
+119: 
+120: void console_register(console_t *console)
+121: {
+
+./device/video/bochs_vga.c
+20: //FIXME: move this somewhere better
+21: uint32_t *background_image = NULL;
+22: 
+23: struct bochs_vga_state {
+24: struct pci_device *pci;
+25: int x, y;
+
+./device/video/bochs_vga.c
+73: //FIXME: Perhaps unroll these loops?
+74: for(int i =0; i < 8; i++)
+75: {
+76: temp = vincent_font[d][i];;
+77: for(int j = 0; j < 8; j++)
+78: {
+
+./arch/i386/kbd.c
+7: /* FIXME: Maybe move this somewhere else? */
+8: void reboot()
+9: {
+10: uint8_t test = 0x02;
+11: while((test & 0x02) != 0)
+12: test = inb(0x64);
+*/
+./arch/i386/thread.c
+42: //FIXME? Since this is the kernel thread
+43: //we have important stuff on the stack
+44: //without the -8 offset we have a race condition
+45: //where, if an interrupt happens between the iret
+46: //below and returning, the stack is trashed
+47: void *temp_kern = pallocn(STACK_PAGES);
+
+
+/* ex: set syntax=c: */

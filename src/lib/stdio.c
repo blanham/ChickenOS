@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#define NULL 0
 //FIXME Get rid of this
 #define ALLOCSIZE 10000
 static char allocbuf[ALLOCSIZE];
