@@ -4,6 +4,7 @@
 #include <kernel/memory.h>
 #include <kernel/interrupt.h>
 #include <thread/tss.h>
+#include <kernel/interrupt.h>
 
 bool
 in_kernel(void)
@@ -16,6 +17,41 @@ in_kernel(void)
 	return false;
 }
 
+void arch_thread_init()
+{
+	tss_init();
+}
+
+void thread_yield()
+{
+	asm volatile("int $32");
+}
+
+void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next)
+{
+	extern void pic_send_end(int irq);
+	uint32_t _esp = 0;
+	cur->sp = (uint8_t *)regs->ESP;
+	_esp = (uint32_t)next->sp;
+
+	tss_update((uintptr_t)next + STACK_SIZE);
+	pagedir_install(next->pd);
+//	printf("dfaddfafds\n");
+//	dump_regs((void *)_esp + 4);
+
+	//have to reset timer interrupt here
+	pic_send_end(0);
+	
+	asm volatile(
+					"mov %0,%%esp\n"
+					"jmp intr_return"
+					:: "r"(_esp)
+				);
+
+
+}
+
+//Heh, we don't need this anymore
 void thread_usermode(void)
 {
 	uint32_t cur_esp,new_esp;

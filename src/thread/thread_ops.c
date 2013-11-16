@@ -4,20 +4,14 @@
 
 pid_t sys_fork(registers_t *regs)
 {
-	pid_t pid;
-	thread_t *new;
-	new = thread_create(regs, regs->eip, (PHYS_BASE - 4096) + (regs->useresp & 0xfff));
-	if(new == NULL)
-		return -1;
-	pid = new->pid;
-	return pid;
+	return thread_create(regs, NULL, NULL);
 }
 
 pid_t sys_getpid()
 {
 	thread_t *cur = thread_current();
 	pid_t pid = cur->pid;
-	printf("cur %X pid = %i\n",cur,pid);
+//	printf("cur %X pid = %i\n",cur,pid);
 	return pid;
 }
 
@@ -29,9 +23,23 @@ pid_t sys_getpgrp()
 	return pgid;
 }
 
+int sys_brk(void *_addr)
+{
+	thread_t *cur = thread_current();
+	uintptr_t addr = (uintptr_t)_addr; 
+	if(addr == 0)
+	{
+		return (int)cur->brk;
+	}
+	
+	cur->brk = _addr;
+//	printf("addr %x cur %x\n", addr, cur->brk);
+//	cur->brk = (void *)((uintptr_t)0x8000000 + (uintptr_t)addr);
+	return (int)addr;
+}
 
 //FIXME: Needs more error/bounds checking
-void *sys_brk(uintptr_t ptr)
+void *sys_sbrk(intptr_t ptr)
 {
 	void * old;
 	thread_t *cur = thread_current();

@@ -85,8 +85,15 @@ extern void test_signals();
 void syscall_handler (struct registers *regs)
 {
 	int call = regs->eax;
+	struct vec {
+				void *shit;
+		size_t len;
+			};
+	int count;
+	struct vec *ass; 
 //	char *buf = NULL;
 //	buf = buf;
+	//	if(call != 45)
 //	printf("call %i\n",call);
 	switch (call)
 	{
@@ -101,12 +108,97 @@ void syscall_handler (struct registers *regs)
 		case SYS_WRITE:
 			regs->eax = sys_write((int)regs->ebx, (char *)regs->ecx, (int)regs->edx);
 			break;
+		//getppid
+		case 64:
+			regs->eax = 2;
+			return;
+		//readv
+		case 145:
+			ass = (void *)regs->ecx;
+			if((int)regs->edx < 0)
+			{
+				regs->eax = -1;
+				return;
+			}	
+			regs->eax = 0;
+		//	if(regs->ebx < 2)
+		//		regs->edx = 1;
+		//	uint8_t * buf;
+
+	
+	
+	for(int i = 0; i < (int)regs->edx; i++)
+			{
+			
+			//	printf("address %p len %i\n", ass[i]->shit, ass[i]->len);
+			}
+			for(int i = 0; i < (int)regs->edx; i++)
+			{
+				//	printf("address %p len %i\n", ass[i]->shit, ass[i]->len);
+			//	if(ass[i]->shit == NULL)
+			//	{
+				//	dump_regs(regs);
+				//	regs->eax++;
+			//	}else
+				if(ass[i]->len == 0)
+					continue;
+			//	if(regs->ebx == 0)
+				{//	strcpy(ass[i]->shit, "ass\n");
+				//	regs->eax = strlen(ass[i]->shit) + 1;
+
+				//	break;
+				}
+
+			//	memset(ass[i]->shit, 0, ass[i]->len);
+			//	printf("fd %i\n", regs->ebx);
+				count = sys_read((int)regs->ebx, ass[i]->shit, ass[i]->len);
+			//	printf("ret = %u\n", count);
+			//	if(count >= 0)
+		//	printf("count %i %x\n", regs->eax, * (char *)ass[i]->shit);
+				regs->eax += count;
+		//	printf("OUT %s\n", ass[i]->shit);	
+		}
+			//if(regs->eax == 20) regs->eax =21;
+	//if(regs->ebx < 2)
+	//		regs->eax = 1024;	
+		return;
+
+		//writev
+		case 146:
+			ass = (void *)regs->ecx;
+			if((int)regs->edx < 0)
+			{
+				regs->eax = -1;
+				return;
+			}	
+			regs->eax = 0;
+			for(int i = 0; i < (int)regs->edx; i++)
+			{
+				//	printf("address %p len %i\n", ass[i]->shit, ass[i]->len);
+			//	if(ass[i]->shit == NULL)
+			//	{
+				//	dump_regs(regs);
+				//	regs->eax++;
+			//	}else
+				count = sys_write((int)regs->ebx, ass[i]->shit, ass[i]->len);
+			//	printf("ret = %u\n", count);
+				if(count >= 0)
+				regs->eax += count;
+			}
+		//	printf("count %i\n", regs->eax);
+			//if(regs->eax == 20) regs->eax =21;
+			return;
 		case SYS_OPEN:
 			regs->eax = sys_open((char *)regs->ebx, 0, NULL);
 			return;
 		case SYS_LSEEK:
 			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->ecx, (int) regs->edx);
 			return;
+		case 140:
+			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->edx, (int) regs->edi);
+			*(long *)regs->esi = regs->eax;
+			return;
+
 		case SYS_STAT:
 			regs->eax = sys_stat((char *)regs->ebx, (struct stat *)regs->ecx);
 			return;
@@ -117,21 +209,21 @@ void syscall_handler (struct registers *regs)
 			regs->eax = sys_getpgrp();
 			break;
 		case SYS_FORK:
-			printf("fork @ eip %X\n", regs->eip);
 			regs->eax = sys_fork(regs);
-			printf("fork finished\n");
-			//dump_regs(regs);
 			return;
 		case SYS_EXECVE:
 			regs->eax = sys_execve((char *)regs->ebx, (char **)regs->ecx, (char **)regs->edx);
 			//FIXME: Is this needed?
-			thread_yield();
+			//thread_yield();
 			return;
-		case SYS_SBRK:
-			regs->eax = (uintptr_t)sys_brk(regs->ebx);
+		case SYS_BRK:
+			regs->eax = (uint32_t)sys_brk((void *)regs->ebx);
 			return;
+	//	case SYS_SBRK:
+		//	regs->eax = (uintptr_t)sys_sbrk(regs->ebx);
+		//	return;
 		case SYS_IOCTL:
-			regs->eax = sys_ioctl((int)regs->ebx, (int)regs->ecx, regs->edx);
+			regs->eax = sys_ioctl((int)regs->ebx, (int)regs->ecx, (void *)regs->edx);
 			return;
 		case SYS_KILL:
 			regs->eax = sys_kill(regs->ebx, regs->ecx);
@@ -155,15 +247,23 @@ void syscall_handler (struct registers *regs)
 			regs->eax = sys_gettimeofday((struct timeval *)regs->ebx, (void *)regs->ecx);
 			return;
 		case SYS_GETCWD:
-			regs->eax = (int)sys_getcwd((char *)regs->ebx, (size_t)regs->ecx);
-			break;
+			regs->eax = (uint32_t)sys_getcwd((char *)regs->ebx, (size_t)regs->ecx);
+			printf("ret cwd %x\n", regs->eax);
+			return;
 		//case SYS_NETWORK:
 			//regs->eax = sys_network_setup();
 			//break;
 		case SYS_DUMMY:
 			printf("DUMMY\n");
 			//regs->eax = sys_dummy();
-			break;	
+			break;
+		case 29:
+			while(1);
+		//wait4
+		case 114:
+		//rt_sigsuspend	
+		case 179:
+			return;
 		default:
 			printf("undefined system call %i!\n",call);
 			regs->eax = 0;//ENOSYS;

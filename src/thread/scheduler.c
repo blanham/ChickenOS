@@ -3,7 +3,6 @@
  */
 #include <common.h>
 #include <kernel/thread.h>
-#include <thread/tss.h> 
 #include <kernel/memory.h>
 #include <device/console.h>
 #include <kernel/interrupt.h>
@@ -11,6 +10,7 @@
 #include <thread/syscall.h>
 #include <stdio.h>
 
+//FIXME: This needs to be removed and a list added
 thread_t *table[MAX_THREADS];
 int thread_cnt = 1;
 int thread_ptr = 0;
@@ -25,28 +25,26 @@ void thread_scheduler_init(thread_t *kernel_thread)
 	kmemset(table, 0, MAX_THREADS*sizeof(thread_t*));
 	table[0] = kernel_thread;
 	thread_set_ready(kernel_thread);
-	tss_init();
 }
 
-extern void pic_send_end(int irq);
 
-void thread_scheduler(registers_t *regs UNUSED)
+extern void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next);
+void thread_scheduler(registers_t *regs)
 {
-	uint32_t _esp = 0;
 	thread_t *cur = thread_current();
 	thread_t *next = thread_next();
 	
 	if(next == NULL)
-	next = cur;
+		next = cur;
+
+	//save position of regs on stack for signal handling
+	cur->regs = regs;
 /*
 	//i believe that signals go here:
 	//if(next->signal_pending != 0)
 	//signal(regs, next);
 */	
-	cur->sp = (uint8_t *)regs->ESP;
-	cur->regs = regs;
-	_esp = (uint32_t)next->sp;
-//	printf("Switching to pid %i from pid %i esp %x regs->esp %x %x\n\n",
+	//	printf("Switching to pid %i from pid %i esp %x regs->esp %x %x\n\n",
 	//	next->pid, cur->pid,_esp, regs->esp,  regs->eip, next->regs->eip);
 /*
 	printf("resg %x next->regs %x %X %X	%X %X\n\n", regs, next->regs, cur, next, cur->sp, _esp);
@@ -55,28 +53,19 @@ void thread_scheduler(registers_t *regs UNUSED)
 	dump_regs(next->regs);
 	printf("\n");
 	*/
-	tss_update((uintptr_t)next + STACK_SIZE);
-//	printf("dfaddfafds\n");
-//	dump_regs((void *)_esp + 4);
-
-	//have to reset timer interrupt here
-	pic_send_end(0);
-	
-	asm volatile(
-					"mov %0,%%esp\n"
-					"jmp intr_return"
-					:: "r"(_esp)
-				);
+	thread_reschedule(regs, cur, next);
 }
 
+//FIXME: call a assembly function that builds a reg stack,
+//		and then calls thread_scheduler()
 /* throw an int 32, manually invoking the timer interrupt */
 /* can we just call the scheduler using the saved refs in 
  * thread struct?
  */
-void thread_yield()
+/*void thread_yield()
 {
 	asm volatile("int $32");
-}
+}*/
 
 void thread_set_ready(thread_t *thread)
 {
@@ -111,7 +100,7 @@ thread_t *thread_next()
 
 void thread_exit()
 {
-	asm volatile("cli");
+//	asm volatile("cli");
 	thread_t *cur = thread_current();
 	//keep a tmp pointer to next process
 	//which the scheduler uses to get the next process
@@ -126,7 +115,7 @@ void thread_exit()
 
 	}
 	cur->status = THREAD_DEAD;
-	asm volatile("sti");
+//	asm volatile("sti");
 	thread_yield();
 
 }

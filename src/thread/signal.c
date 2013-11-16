@@ -31,7 +31,27 @@ void return_from_signal()
 	(void)SYSCALL_0N(200);
 }
 extern bool thread_start;
-void signal(registers_t *regs UNUSED, thread_t *next UNUSED)
+
+void new_signal(thread_t *next UNUSED)
+{
+	/*	check if thread is in kernel or user mode
+		usermode:
+		get index into signal table
+		save current sigmask (where?)
+			it has to be restored, fuck
+		mask this signal and others given
+		eip = signals[index]
+			
+		push current eip and sig num on stack
+		we could push a call to a signal return fucntion
+		after signal finished, does a thread yield()
+	*/
+
+
+
+}
+
+void signal_do(registers_t *regs UNUSED, thread_t *next UNUSED)
 {
 /*	if(next->signal_pending > 0 && next->pid != 0)
 	{

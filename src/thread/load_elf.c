@@ -109,6 +109,7 @@ static void elf_load_program(elf_header_t *header, int fd)
 int load_elf(const char *path, uintptr_t *eip)
 {
 	int fd;
+	int ret = 0;
 	elf_header_t *header;
 	header = kmalloc(sizeof(*header));
 
@@ -118,9 +119,10 @@ int load_elf(const char *path, uintptr_t *eip)
 		return -1;
 	}	
 		
-	if(sys_read(fd, header, sizeof(*header)) != sizeof(*header))
+	if((ret = sys_read(fd, header, sizeof(*header))) != sizeof(*header))
 	{
-		printf("Error reading ELF header\n");
+		printf("Error reading ELF header\nShould have read %x bytes, actually read %x bytes\n",
+				sizeof(*header), ret);
 		return -1;
 	}
 	if(memcmp(header->magic, ELF_MAGIC, 4) != 0)

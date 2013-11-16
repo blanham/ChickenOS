@@ -14,6 +14,8 @@ conditions
 
 probably define memory barrier as well
 
+wait queues
+
 
 
 
