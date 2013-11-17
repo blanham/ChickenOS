@@ -1,3 +1,4 @@
+syn keyword CTagsImport re os ycm_core
 syn keyword CTagsGlobalVariable compilation_database_folder database
 syn keyword CTagsFunction grep DirectoryOfThisScript main FlagsForFile MakeRelativePathsInFlagsAbsolute
 
