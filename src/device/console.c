@@ -107,8 +107,8 @@ int console_ioctl(uint16_t dev, int request, va_list args )
 		ass = va_arg(args, void *);
 	//	va_end(args);
 		printf("ass %p\n",ass);
-	//	if(ass != 0)
-	//	kmemcpy(ass, termios, sizeof(termios));
+		if(ass != 0)
+				kmemcpy(ass, termios, sizeof(termios));
 			return 0;
 		case 0x540f:
 			return -1;//12;

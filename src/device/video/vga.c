@@ -1,6 +1,7 @@
 #include <common.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <memory.h>
 #include <mm/liballoc.h>
@@ -30,7 +31,9 @@ struct vga_state {
 	int x, y;
 	int h, w;	
 	uint16_t attribute;
-
+	int escape;
+	char ansibuf[32];
+	int bufpos;
 };
 
 
@@ -68,6 +71,13 @@ static void vga_scroll(console_t *con)
 	state->y = 24;
 }
 
+void vga_clear(console_t *con)
+{
+	struct vga_state *state = (struct vga_state *)con->aux;
+	kmemsetw(state->videoram, BLANK, 80*25);
+	state->y = state->x = 0;
+	vga_cursor_move(0);
+}
 
 void vga_switch(console_t *con)
 {
@@ -76,10 +86,98 @@ void vga_switch(console_t *con)
 
 }
 
+void vga_putc_internal(console_t *con, int c);
+void vga_putc(console_t *con, int c);
+void vga_escape(console_t *con, int c)
+{
+	struct vga_state *state = (struct vga_state *)con->aux;
+	(void)c;
+	char *p;
+	char *d;
+	switch(state->escape)
+	{
+		case 1:
+			if(c == '[')
+				state->escape = 2;
+			else
+				state->escape = 0;
+			break;			
+		case 2:
+			switch(c)
+			{
+				case 0 ... 63:
+					state->ansibuf[state->bufpos++] = c & 0xff;
+					break;
+				case 'H':
+					state->ansibuf[state->bufpos] = 0;
+					p = (char *)&state->ansibuf;
+					int x = strtol(state->ansibuf, &p, 10);
+					p++;
+					int y = strtol(p, &d, 10);
+					state->x = y-1;
+					state->y = x-1;	
+					vga_cursor_move(CURSOR_POS);
+					state->escape = 0;
+					break;
+				case 'J':
+					vga_clear(con);
+					state->escape = 0;
+					break;
+				case 'K':
+					//kmemsetw(&state->videoram[state->x*80], BLANK, 80);
+					state->escape = 0;
+					break;
+				default:
+					state->escape = 0;
+			//vga_putc_internal(con, c);	
+					break;
+
+			}
+			break;
+		default:
+			state->escape = 0;
+
+			vga_putc_internal(con, '?');	
+
+
+	}
+}
+void vga_putc_internal(console_t *con, int c)
+{
+	struct vga_state *state = (struct vga_state *)con->aux;
+	
+	state->videoram[CURSOR_POS] = state->attribute | c;
+	state->x++;
+
+
+
+}
 void vga_putc(console_t *con, int c)
 {
 	struct vga_state *state = (struct vga_state *)con->aux;
 //	enum intr_status old = interrupt_disable();
+
+	if(state->x >= 80) 
+	{
+		state->x = 0;
+		state->y++;
+	}
+	if(state->y >= 25)
+	{
+		vga_scroll(con);
+	//	console.y = 0;
+	}
+	
+//	if(con == console)
+		vga_cursor_move(CURSOR_POS);
+//	interrupt_set(old);
+
+	if(state->escape)
+	{
+		vga_escape(con, c);
+		return;
+	}
+	state->bufpos = 0;
 	switch(c)
 	{
 		case 0x08:
@@ -99,25 +197,15 @@ void vga_putc(console_t *con, int c)
 		case '\r':
 			state->x = 0;
 			break;
+		case 0x1b:
+			state->escape = 1;
+			break;	
+
 		default:
 			//bochs_vga_putc(c, con->x, con->y);
 			state->videoram[CURSOR_POS] = state->attribute | c;
 			state->x++;
 	}
-	if(state->x >= 80) 
-	{
-		state->x = 0;
-		state->y++;
-	}
-	if(state->y >= 25)
-	{
-		vga_scroll(con);
-	//	console.y = 0;
-	}
-	
-//	if(con == console)
-		vga_cursor_move(CURSOR_POS);
-//	interrupt_set(old);
 }
 
 
@@ -134,13 +222,6 @@ int tty_puts(int num, char *string)
 	return cnt;
 }
 
-void vga_clear(console_t *con)
-{
-	struct vga_state *state = (struct vga_state *)con->aux;
-	kmemsetw(state->videoram, BLANK, 80*25);
-	state->y = state->x = 0;
-	vga_cursor_move(0);
-}
 
 void vga_console_init(console_t *con, int num UNUSED)
 {
@@ -159,6 +240,8 @@ void vga_console_init(console_t *con, int num UNUSED)
 //	state->num = num;
 //	if(num == 0)
 		state->videoram = videoram;
+	state->escape = 0;
+	state->bufpos = 0;
 }
 
 void console_init(console_t *con)
