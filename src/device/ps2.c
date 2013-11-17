@@ -34,7 +34,7 @@ char kbd_map_unshifted[256] = {
 char kbd_map_shifted[256] = {
 ' ',ESC,'!','@','#','$','%','^','&','*','(',41,'_','+',BKSPACE,TAB,
 'Q','W','E','R','T','Y','U','I','O','P',' ',' ',CR, ' ','A','S',
-'D','F','G','H','J','K','L',';','"',' ',' ', '|', 'Z','X','C',
+'D','F','G','H','J','K','L',':','"',' ',' ', '|', 'Z','X','C',
 'V','B','N','M','<','>','?'
 
 
@@ -117,11 +117,11 @@ void ps2_intr(void)
 			}
 			break;
 		/* ESC shutsdown for now */
-		case 1:
-			printf("esc\n");
-			reboot();
-			shutdown();
-			break;
+	//	case ESC:
+		//	printf("esc\n");
+		//	reboot();
+		//	shutdown();
+		//	break;
 	
 		default:
 			if(c & 0x80)
