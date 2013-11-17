@@ -94,7 +94,7 @@ void syscall_handler (struct registers *regs)
 //	char *buf = NULL;
 //	buf = buf;
 	//	if(call != 45)
-//	printf("call %i\n",call);
+	printf("call %i\n",call);
 	switch (call)
 	{
 		case SYS_READ:
@@ -198,7 +198,9 @@ void syscall_handler (struct registers *regs)
 			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->edx, (int) regs->edi);
 			*(long *)regs->esi = regs->eax;
 			return;
-
+		case SYS_STAT64:
+			regs->eax = sys_stat64((char *)regs->ebx, (struct stat64 *)regs->ecx);
+			break;
 		case SYS_STAT:
 			regs->eax = sys_stat((char *)regs->ebx, (struct stat *)regs->ecx);
 			return;
@@ -259,10 +261,15 @@ void syscall_handler (struct registers *regs)
 			break;
 		case 29:
 			while(1);
+		//access
+		case 33:
+			regs->eax = 0;
+			return;
 		//wait4
 		case 114:
 		//rt_sigsuspend	
-		case 179:
+		case 179: case 168: case 174: case 175:
+			regs->eax = 0;//ENOSYS;
 			return;
 		default:
 			printf("undefined system call %i!\n",call);
