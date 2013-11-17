@@ -140,7 +140,7 @@ void syscall_handler (struct registers *regs)
 				//	dump_regs(regs);
 				//	regs->eax++;
 			//	}else
-				if(ass[i]->len == 0)
+				if(ass[i].len == 0)
 					continue;
 			//	if(regs->ebx == 0)
 				{//	strcpy(ass[i]->shit, "ass\n");
@@ -151,7 +151,7 @@ void syscall_handler (struct registers *regs)
 
 			//	memset(ass[i]->shit, 0, ass[i]->len);
 			//	printf("fd %i\n", regs->ebx);
-				count = sys_read((int)regs->ebx, ass[i]->shit, ass[i]->len);
+				count = sys_read((int)regs->ebx, ass[i].shit, ass[i].len);
 			//	printf("ret = %u\n", count);
 			//	if(count >= 0)
 		//	printf("count %i %x\n", regs->eax, * (char *)ass[i]->shit);
@@ -180,7 +180,7 @@ void syscall_handler (struct registers *regs)
 				//	dump_regs(regs);
 				//	regs->eax++;
 			//	}else
-				count = sys_write((int)regs->ebx, ass[i]->shit, ass[i]->len);
+				count = sys_write((int)regs->ebx, ass[i].shit, ass[i].len);
 			//	printf("ret = %u\n", count);
 				if(count >= 0)
 				regs->eax += count;
