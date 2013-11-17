@@ -76,7 +76,9 @@ size_t ata_sector_write(struct ata_drive *dev, void *buf, unsigned long long lba
 
 	for(int i = 0; i < 256; i++)
 	{
-		time_msleep(1);
+		//FIXME: should be delayed
+		//but thus doesn't work, interrupt problem?
+		//time_msleep(1);
 		ata_write(dev, ATA_DATA, data[i]);
 	}
 	
