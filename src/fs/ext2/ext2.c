@@ -6,7 +6,7 @@
 #include "ext2fs.h"
 #include <stdio.h>
 #include <string.h>
-
+#include <sys/stat.h>
 #define BLOCK_SIZE 512
 #define EXT2_SB_SIZE 1024
 #define EXT2_SB_BLOCK 2
@@ -24,24 +24,29 @@ vfs_ops_t ext2_ops = {
 
 void ext2_inode_to_vfs(ext2_fs_t *fs,struct inode *vfs,ext2_inode_t *ext2,uint32_t inode)
 {
-	vfs->inode_num = inode;
-	vfs->mode = ext2->i_mode;
-	vfs->size = ext2->i_size;
-	
-	vfs->atime = ext2->i_atime;
-	vfs->ctime = ext2->i_ctime;
-	vfs->dtime = ext2->i_dtime;
-	vfs->mtime = ext2->i_mtime;
-
-	vfs->uid = ext2->i_uid;
-	vfs->gid = ext2->i_gid;
-
-	vfs->links_count = ext2->i_links_count;
+	struct stat *st = &vfs->info;	
+	st->st_dev = fs->dev;
+	st->st_ino = inode;
+	st->st_mode = ext2->i_mode;
+	st->st_nlink = ext2->i_links_count;
+	st->st_uid = ext2->i_uid;
+	st->st_gid = ext2->i_gid;
 
 	if(ext2->i_mode & S_IFCHR || ext2->i_mode & S_IFBLK)
 	{
-		vfs->rdev = ext2->i_block[0];
+		st->st_rdev = ext2->i_block[0];
 	}
+
+	st->st_size = ext2->i_size;
+	st->st_atime = ext2->i_atime;
+	st->st_ctime = ext2->i_ctime;
+//	st->st_dtime = ext2->i_dtime;
+	st->st_mtime = ext2->i_mtime;
+	st->st_blksize = 512;
+	st->st_blocks = ext2->i_size / st->st_blksize;
+	if(ext2->i_size % st->st_blksize)
+		st->st_blocks++;
+
 	
 	//TODO:if part of mount point,keep in cache
 	vfs->flags = 0;
@@ -148,11 +153,11 @@ struct inode * ext2_load_inode(ext2_fs_t *fs, int inode)
 struct inode * ext2_namei(struct inode *dir, char *file)
 {
 	ext2_fs_t *fs = (ext2_fs_t *)dir->fs;
-	struct inode *inode = ext2_load_inode((ext2_fs_t *)dir->fs, dir->inode_num);
+	struct inode *inode = ext2_load_inode((ext2_fs_t *)dir->fs, dir->info.st_ino);
 	ext2_inode_t * in = (ext2_inode_t *)(inode->storage);
 	int len = 0;	
-	ext2_directory_t *ext2_dir = kmalloc(inode->size);
-	int count =inode->size;
+	ext2_directory_t *ext2_dir = kmalloc(inode->info.st_size);
+	int count =inode->info.st_size;
 	void *fdir = ext2_dir;
 	
 //	inode_print(*in);
@@ -322,6 +327,7 @@ size_t ext2_write_inode(struct inode *inode,void *_buf,
 	size_t count = 0;
 	int block, block_ofs, cur_block_size, 
 		to_end, till_end, cur_size;
+	printf("ass\n");
 	if(nbytes + offset > ext2_ino->i_size)
 	{
 		printf("extensible files not yet supported\n");
@@ -370,7 +376,7 @@ size_t ext2_write_inode(struct inode *inode,void *_buf,
 done:
 	if(bounce != NULL)
 		kfree(bounce);
-	
+	printf("shit\n");	
 	return count;
 }
 

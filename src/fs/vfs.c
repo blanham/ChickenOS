@@ -12,7 +12,7 @@
 #include <fs/vfs.h>
 #include <fs/ext2/ext2.h>
 #include <mm/liballoc.h>
-
+#include <errno.h>
 //FIXME: Probably shouldn't be a table
 vfs_fs_t * filesystems[10];
 vfs_fs_t *root_fs;
@@ -52,7 +52,7 @@ struct inode * vfs_namei(struct inode *dir, char *file)
 		PANIC("traversing mounts not yet implemented");
 	} 
 
-	if((dir->mode & S_IFDIR) == 0)
+	if((dir->info.st_mode & S_IFDIR) == 0)
 	{
 		//TODO: return is not directory error
 		PANIC("calling vfs_namei on a non-directory inode");
@@ -133,7 +133,7 @@ vfs_fs_t * vfs_find_fs(char *type)
 void vfs_file_print(struct file *file)
 {
 	printf("File: %s\n",file->name);
-	printf("Device %x\n",file->inode->rdev);
+	printf("Device %x\n",file->inode->info.st_rdev);
 
 }
 
@@ -283,13 +283,13 @@ size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 
 	if(file == NULL || buf == NULL)
 		return -1;
-	if((file->inode->mode & S_IFCHR) != 0){
-		ret = char_device_read(file->inode->rdev, 
+	if((file->inode->info.st_mode & S_IFCHR) != 0){
+		ret = char_device_read(file->inode->info.st_rdev, 
 			buf, file->offset, nbyte);
-	}else if((file->inode->mode & S_IFBLK) != 0){
-		ret = block_device_readn(file->inode->rdev, 
+	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
+		ret = block_device_readn(file->inode->info.st_rdev, 
 			buf, 0, file->offset, nbyte);
-	}else if((file->inode->mode & S_IFREG) != 0){
+	}else if((file->inode->info.st_mode & S_IFREG) != 0){
 		if(file->fs == NULL || file->fs->ops->read == NULL)
 			return -1;
 		ret = file->fs->ops->read(file->inode, buf,
@@ -307,15 +307,16 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 		return 0;
 	if(file == NULL || buf == NULL)
 		return -1;
-	if((file->inode->mode & S_IFCHR) != 0){
-		ret = char_device_write(file->inode->rdev, 
+	if((file->inode->info.st_mode & S_IFCHR) != 0){
+		ret = char_device_write(file->inode->info.st_rdev, 
 			buf, file->offset, nbyte);
-	}else if((file->inode->mode & S_IFBLK) != 0){
+	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
 //FIXME: This returns -1 so we don't fuxxor our disk image accidentally
 	//	ret = block_device_readn(file->inode->rdev, 
 	//		buf, 0, file->offset, nbyte);
+		printf("lulz\n");
 		return -1;
-	}else if((file->inode->mode & S_IFREG) != 0){
+	}else if((file->inode->info.st_mode & S_IFREG) != 0){
 		if(file->fs == NULL || file->fs->ops->write == NULL)
 			return -1;
 		ret = file->fs->ops->write(file->inode, buf,
@@ -331,14 +332,14 @@ int  vfs_ioctl(struct file *file, int request, va_list args)
 	if(file == NULL)
 		return -1;
 
-	if((file->inode->mode & S_IFCHR) != 0){
-		ret = char_device_ioctl(file->inode->rdev, 
+	if((file->inode->info.st_mode & S_IFCHR) != 0){
+		ret = char_device_ioctl(file->inode->info.st_rdev, 
 			request, args);
-	}else if((file->inode->mode & S_IFBLK) != 0){
+	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
 	//	ret = block_device_readn(file->inode->rdev, 
 	//		buf, 0, file->offset, nbyte);
 		return -1;
-	}else if((file->inode->mode & S_IFREG) != 0){
+	}else if((file->inode->info.st_mode & S_IFREG) != 0){
 	//	if(file->fs == NULL || file->fs->ops->write == NULL)
 	//		return -1;
 	//	ret = file->fs->ops->write(file->inode, buf,
@@ -394,3 +395,65 @@ int vfs_chdir(const char *_path)
 	kfree(path);
 	return ret;
 }
+
+int vfs_stat(const char *path, struct stat *buf)
+{
+	(void)path;
+	(void)buf;
+
+	return 0;
+}
+
+int vfs_stat64(const char *path, struct stat64 *buf)
+{
+	struct file *cur = thread_current()->cur_dir;
+	struct inode *lookup = vfs_pathsearch(cur, (char *)path);
+	
+	if(lookup == NULL)
+		return -(ENOENT);
+	
+	memcpy(buf, &lookup->info, sizeof(struct stat));
+	
+	return 0;
+}/*
+struct inode {
+	uint32_t inode_num;
+	uint16_t mode;
+	uint16_t pad;
+	uint32_t size;
+	uint32_t atime;
+	uint32_t ctime;
+	uint32_t dtime;
+	uint32_t mtime;
+	uint32_t time;
+	uint16_t gid;
+	uint16_t uid;
+	uint16_t links_count;
+	uint16_t rdev;
+	//if part of mount point,keep in cache
+	uint32_t flags;
+	void *storage;
+	//may need parent
+	vfs_fs_t *fs;	
+};
+
+struct stat64
+{
+	dev_t st_dev;
+	int __st_dev_padding;
+	long __st_ino_truncated;
+	mode_t st_mode;
+	nlink_t st_nlink;
+	uid_t st_uid;
+	gid_t st_gid;
+	dev_t st_rdev;
+	int __st_rdev_padding;
+	off64_t st_size;
+	blksize_t st_blksize;
+	blkcnt64_t st_blocks;
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
+	ino64_t st_ino;
+};:*/
+

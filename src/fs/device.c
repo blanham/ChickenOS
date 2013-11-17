@@ -224,7 +224,6 @@ int write_block(uint16_t dev, void * _buf, int block, int block_size)
 		return -1;
 	
 	dblock = (block * block_size) / SECTOR_SIZE;
-
 	while(block_size > 0)
 	{
 		if(block_device_write(dev, buf + count, dblock) != SECTOR_SIZE)

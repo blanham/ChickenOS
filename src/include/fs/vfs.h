@@ -6,6 +6,31 @@
 #include <kernel/list.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+typedef int64_t ino64_t;
+typedef int64_t off64_t;
+typedef uint64_t blkcnt64_t;
+
+
+struct stat64
+{
+	dev_t st_dev;
+	int __st_dev_padding;
+	long __st_ino_truncated;
+	mode_t st_mode;
+	nlink_t st_nlink;
+	uid_t st_uid;
+	gid_t st_gid;
+	dev_t st_rdev;
+	int __st_rdev_padding;
+	off64_t st_size;
+	blksize_t st_blksize;
+	blkcnt64_t st_blocks;
+	struct timespec st_atim;
+	struct timespec st_mtim;
+	struct timespec st_ctim;
+	ino64_t st_ino;
+};
 /* only define when STDIO is not included */
 #ifndef _STDIO_H
 #define SEEK_SET 0
@@ -75,20 +100,9 @@ struct vfs_fs {
 	uint16_t dev;
 	vfs_ops_t *ops;
 };
+//FIXME: redo this to contain struct stat
 struct inode {
-	uint32_t inode_num;
-	uint16_t mode;
-	uint16_t pad;
-	uint32_t size;
-	uint32_t atime;
-	uint32_t ctime;
-	uint32_t dtime;
-	uint32_t mtime;
-	uint32_t time;
-	uint16_t gid;
-	uint16_t uid;
-	uint16_t links_count;
-	uint16_t rdev;
+	struct stat info; 
 	//if part of mount point,keep in cache
 	uint32_t flags;
 	void *storage;
@@ -120,6 +134,8 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte);
 off_t vfs_seek(struct file *file, off_t offset, int whence);
 int vfs_ioctl(struct file *file, int request, va_list args);
 int vfs_chdir(const char *path);
+int vfs_stat(const char *path, struct stat *buf);
+int vfs_stat64(const char *path, struct stat64 *buf);
 
 /* ops.c - standard file ops */
 int sys_open(const char *path, int oflag, ...);
@@ -129,10 +145,10 @@ ssize_t sys_write(int filedes, void *buf, size_t nbyte);
 char* sys_getcwd(char *buf, size_t size);
 
 int sys_creat(const char *path, mode_t mode);
-int sys_stat(char *filename, struct stat *statbuf);
+int sys_stat(const char *filename, struct stat *statbuf);
 off_t sys_lseek(int fildes, off_t offset, int whence);
 int sys_ioctl(int fildes, int request, va_list args);
-
+int sys_stat64(const char *path, struct stat64 *buf);
 //device.c
 #define INITRD_DEV 0x400
 #define ATA0_0_DEV 0x301
