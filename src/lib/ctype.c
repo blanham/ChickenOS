@@ -55,7 +55,10 @@ int islower(int c)
 		return 1;
 	return 0;
 }
-
+int isspace(int c)
+{
+	return c == ' ' || (unsigned)c-'\t' < 5;
+}
 int toupper(int c)
 {
 	int dif = 'A' - 'a';
