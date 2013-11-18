@@ -90,11 +90,19 @@ thread_t *thread_dequeue()
 //TODO: Implement this as a heap-based priority queue
 thread_t *thread_next()
 {
+	thread_t *next;
 //	thread_t *cur = thread_current();
 	if(thread_ptr > thread_cnt)
 	thread_ptr = 0;
 
-	return table[thread_ptr++];
+	next = table[thread_ptr++];
+	
+	if(next == NULL || next->status != THREAD_READY)
+	{
+		next = thread_next();
+	}
+
+	return next;
 }
 
 
@@ -102,6 +110,7 @@ void thread_exit()
 {
 //	asm volatile("cli");
 	thread_t *cur = thread_current();
+	thread_t *next = thread_next();
 	//keep a tmp pointer to next process
 	//which the scheduler uses to get the next process
 	//need to set a value in the thread_t to tell
@@ -118,6 +127,7 @@ void thread_exit()
 //	asm volatile("sti");
 	thread_yield();
 
+	thread_reschedule(cur->regs, cur, next);
 }
 
 

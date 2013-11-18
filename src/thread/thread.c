@@ -117,7 +117,8 @@ thread_create(registers_t *regs, void (*eip)(void *), void * esp)
 	
 	if(regs != NULL)
 	{
-		kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);	
+		//FIXME: what isf user stack is bigger?
+		kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);
 		kmemcpy(reg_frame, regs, sizeof(registers_t));		
 		//this is a fork, so we want to be 0
 		reg_frame->eax = 0;	
