@@ -162,8 +162,15 @@ int sys_gettimeofday(struct timeval *tp, void *tzp UNUSED)
 	{
 		tp->tv_sec = unix_time;
 		tp->tv_usec = (ticks % 100) * 100;
-
+		
 	}	
 
+	return 0;
+}
+int sys_clock_gettime(int type, struct timespec *tp)
+{
+	(void)type;
+	tp->tv_sec = unix_time;
+	tp->tv_nsec = 0;
 	return 0;
 }

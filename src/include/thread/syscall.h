@@ -68,9 +68,12 @@ enum {
 	SYS_CHOWN = 182,
 	SYS_GETCWD,
 	SYS_SBRK,
+	SYS_MMAP2 = 192,
 	SYS_STAT64 = 195,
+	SYS_FUTEX = 240,
 	SYS_NETWORK = 255, 
-	SYS_DUMMY = 256
+	SYS_DUMMY = 256,
+	SYS_CLOCK_GETTIME = 265
 };
 #define SYSCALL_0N(num) ({				\
 					int ret;			\
