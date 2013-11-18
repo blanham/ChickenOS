@@ -12,7 +12,6 @@
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
 #include <stdio.h>
-
 extern uint32_t end;
 uint32_t mem_size;
 void vm_init(struct multiboot_info *mb)
@@ -44,3 +43,28 @@ void vm_init(struct multiboot_info *mb)
 	paging_init(mem_size);	
 }
 
+void *mmap_base = (void *)0x5000000;
+void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset)
+{
+	(void)addr;
+	(void)length;
+	(void)prot;
+	(void)flags;
+	(void)fd;
+	(void)pgoffset;
+	printf("Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n",
+					addr, length, prot, flags, fd, pgoffset);
+	if(addr == 0)
+		addr = mmap_base;
+	void *new = palloc(length / PAGE_SIZE);
+	pagedir_t pd = thread_current()->pd;
+	pagedir_insert_pagen(pd, (uintptr_t)new, (uintptr_t)mmap_base, 0x7, length/PAGE_SIZE);
+	
+	addr = mmap_base;
+	mmap_base += length;
+
+	
+	
+	
+	return addr;//(void*)-1;//NULL;
+}

@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <multiboot.h>
+#include <sys/mman.h>
 
 #define PAGE_SIZE 4096
 #define PAGE_MASK 0xFFFFF000
@@ -26,6 +27,7 @@ typedef uintptr_t virt_addr_t;
 
 /* mm/vm.c */
 void vm_init(struct multiboot_info *mb);
+void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset);
 
 /* mm.gdt.c */
 void gdt_install();
