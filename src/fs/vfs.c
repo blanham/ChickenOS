@@ -12,6 +12,7 @@
 #include <fs/vfs.h>
 #include <fs/ext2/ext2.h>
 #include <mm/liballoc.h>
+#include <fcntl.h>
 #include <errno.h>
 //FIXME: Probably shouldn't be a table
 vfs_fs_t * filesystems[10];
@@ -77,7 +78,6 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	//	return NULL;
 //	}
 	
-
 	if(path[0] == '/')
 		res = root->inode;
 	else
@@ -91,7 +91,7 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 		//FIXME	leaving this here for now
 		//		but i've probably fixed the main bug
 		//		causing this
-		printf("dir search or insert broken. path %s\n",path);
+		//printf("dir search or insert broken. path %s\n",path);
 		
 		return NULL;
 	}
@@ -102,7 +102,7 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 		strcpy(filename, tok);
 		if((res = vfs_namei(res, tok)) == NULL)
 		{
-			printf("file not found?\n");
+		//	printf("file not found?\n");
 			return NULL;
 		}
 	}
@@ -257,12 +257,19 @@ int vfs_mount(const char *device, struct file *dir, char *type)
 }
 */
 
-struct file *vfs_open(char *path)
+struct file *vfs_open(char *path, int oflags, va_list args)
 {
+	(void)args;
 	struct file *cur = thread_current()->cur_dir;
 	struct inode *lookup = vfs_pathsearch(cur, path);
 	if(lookup == NULL)
+	{
+		if((oflags & O_CREAT) != 0)
+		{
+			printf("need to create file\n");
+		}
 		return NULL;
+	}
 	struct file *new = vfs_file_new(lookup, path);
 	return new;
 }
@@ -385,7 +392,7 @@ int vfs_chdir(const char *_path)
 	struct file *file;
 	int ret = -1;
 	char *path = strdup(_path);
-	file  = vfs_open(path);
+	file  = vfs_open(path, 0, NULL);
 	if(file != NULL)
 	{
 		vfs_close(thread_current()->cur_dir);

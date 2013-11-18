@@ -15,6 +15,7 @@
 #include <mm/liballoc.h>
 #include <thread/syscall.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include <errno.h>
 //file stuff should be seperated out
 struct file *open_files[100];
@@ -28,19 +29,27 @@ int fd_new()
 }
 
 
-int sys_open(const char *_path, int oflag UNUSED, ...)
+int sys_open(const char *_path, int oflag, va_list args)
 {
 	char *path = strdup(_path);
-	struct file * fp = vfs_open(path);
-	int td = thread_current()->fd++;
+	struct file * fp = vfs_open(path, oflag, args);
+	int td = 0;
+	printf("open %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
+	(void)args;
+	
 	if(fp == NULL)
-		return -1;
-//	int fd = fd_new();
-//	open_files[fd] = fp;
-	printf("open %s flag %i\n", _path, oflag);
+	{
+		goto fail;
+	}
+//#finish:
+	td = thread_current()->fd++;
 	thread_current()->files[td] = fp;
+	
 	kfree(path);
 	return td;
+fail:
+	kfree(path);
+	return -1;
 }
 int sys_close(int fd)
 {
@@ -93,12 +102,10 @@ int sys_stat(const char *filename, struct stat *statbuf)
 	statbuf->st_ino = 32;
 //	statbuf->st
 	
-	kmemcpy(statbuf, stat_test, sizeof(struct stat));
 	return vfs_stat(filename, statbuf);
 }
 int sys_stat64(const char *filename, struct stat64 *statbuf)
 {
-	printf("sys_stat: %s %p\n", filename, statbuf);
 //	statbuf->st_size = 61438;
 //	statbuf->st_ino = 32;
 //	statbuf->st

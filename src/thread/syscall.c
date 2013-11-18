@@ -80,6 +80,7 @@ int network_setup()
 }
 
 extern void test_signals();
+	typedef long * arg56;
 
 //TODO: need to verify pointers before letting functions dereference them
 void syscall_handler (struct registers *regs)
@@ -94,7 +95,8 @@ void syscall_handler (struct registers *regs)
 //	char *buf = NULL;
 //	buf = buf;
 	//	if(call != 45)
-	printf("call %i\n",call);
+	long *arg;
+	//printf("call %i\n",call);
 	switch (call)
 	{
 		case SYS_READ:
@@ -189,7 +191,7 @@ void syscall_handler (struct registers *regs)
 			//if(regs->eax == 20) regs->eax =21;
 			return;
 		case SYS_OPEN:
-			regs->eax = sys_open((char *)regs->ebx, 0, NULL);
+			regs->eax = sys_open((char *)regs->ebx, regs->ecx, (va_list)regs->edx);
 			return;
 		case SYS_LSEEK:
 			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->ecx, (int) regs->edx);
@@ -242,7 +244,6 @@ void syscall_handler (struct registers *regs)
 		case SYS_EXIT:
 			//FIXME: This needs to be implemented properly
 			printf("exit (%i)\n",regs->ebx);
-			while(1);
 			thread_exit();
 			return;
 		case SYS_GETTIMEOFDAY:
@@ -252,7 +253,14 @@ void syscall_handler (struct registers *regs)
 			regs->eax = (uint32_t)sys_getcwd((char *)regs->ebx, (size_t)regs->ecx);
 			printf("ret cwd %x\n", regs->eax);
 			return;
-		//case SYS_NETWORK:
+		case SYS_MMAP2:
+			arg = (void *)regs->useresp-8;
+			printf("arg %x\n", regs->edi);
+			dump_regs(regs);
+			regs->eax = (uint32_t)sys_mmap2((void *)regs->ebx, (size_t)regs->ecx, (int)regs->edx, 
+											(int)regs->esi, (int)arg[0], (off_t)arg[1]);
+			return;
+				//case SYS_NETWORK:
 			//regs->eax = sys_network_setup();
 			//break;
 		case SYS_DUMMY:
@@ -270,6 +278,15 @@ void syscall_handler (struct registers *regs)
 		//rt_sigsuspend	
 		case 179: case 168: case 174: case 175:
 			regs->eax = 0;//ENOSYS;
+			return;
+		case SYS_CLOCK_GETTIME:
+			regs->eax = sys_clock_gettime((int)regs->ebx, (struct timespec *)regs->ecx);
+			return;
+		case SYS_FUTEX:
+			printf("Futexes not yet supported, halting process\n");
+			printf("op %x\n", regs->ecx);
+			while(1);
+			regs->eax = 0;
 			return;
 		default:
 			printf("undefined system call %i!\n",call);

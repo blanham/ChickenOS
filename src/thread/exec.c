@@ -17,7 +17,7 @@ static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[
 static enum exe_type exec_type(const char *path);
 
 
-
+char *envpr[] = {"S"," ", "","","","","","","",""};
 
 static void duplicate_table(char * dest[], char *const source[]);
 int sys_execve(const char *_path, char *const _argv[], char *const _envp[]) 
@@ -146,7 +146,7 @@ static enum exe_type exec_type(const char *path)
 	
 	magic = kcalloc(512,1);
 	
-	fd = sys_open(path, 0);
+	fd = sys_open(path, 0, 0);
 	
 	sys_read(fd, magic, 512);
 	

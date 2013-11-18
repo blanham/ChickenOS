@@ -83,22 +83,26 @@ static void elf_load_program(elf_header_t *header, int fd)
 	{
 		if(program->ph_type == PT_LOAD)
 		{
-		//	elf_print_programs(program);
+			elf_print_programs(program);
 			sys_lseek(fd, program->ph_offset, SEEK_SET);
 			pages = program->ph_memsize/PAGE_SIZE + 1;
 			code = pallocn(pages);
-			
+			void *old = code;	
 			if(program->ph_filesize < program->ph_memsize)
 			{
-				memset((void *)(code + program->ph_filesize), 0x0, program->ph_memsize - program->ph_filesize);
+				memset(code, 0, pages*4096);
+				//memset((void *)(code + program->ph_filesize), 0x0, program->ph_memsize - program->ph_filesize);
 			}
 			if((program->ph_offset & 0xFFF) != 0)
 			{
 				code = code + (program->ph_offset & 0xfff) ;
+				program->ph_virtaddr -= (program->ph_offset & 0xfff);
+				pages++;
+				printf("code %p virtaddr %p\n", code,program->ph_virtaddr);
 			}
 			sys_read(fd, code, program->ph_filesize);
-
-			pagedir_insert_pagen(pd, (uintptr_t)((uintptr_t) code & ~0xFFF), program->ph_virtaddr, 0x7, pages);
+			printf("%p %p %p %p %i %i\n",code,old, program->ph_virtaddr, program->ph_offset, program->ph_memsize/PAGE_SIZE,pages); 
+			pagedir_insert_pagen(pd, (uintptr_t)old, program->ph_virtaddr, 0x7, pages);
 		//	printf("insert %i pages\n",pages);
 		}	
 		program++;
@@ -113,7 +117,7 @@ int load_elf(const char *path, uintptr_t *eip)
 	elf_header_t *header;
 	header = kmalloc(sizeof(*header));
 
-	if((fd = sys_open(path, 0)) < 0)
+	if((fd = sys_open(path, 0, 0)) < 0)
 	{
 		printf("wellp, we're boned\n");
 		return -1;

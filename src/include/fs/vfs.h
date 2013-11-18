@@ -127,7 +127,7 @@ int vfs_register_fs(vfs_fs_t *fs);
 void vfs_init();
 void vfs_mount_root(uint16_t dev, char *type);
 
-struct file *vfs_open(char *path);
+struct file *vfs_open(char *path, int oflags, va_list args);
 int vfs_close(struct file *file);
 size_t vfs_read(struct file *file, void *buf, size_t nbyte);
 off_t vfs_write(struct file *file, void *buf, size_t nbyte);
@@ -138,7 +138,7 @@ int vfs_stat(const char *path, struct stat *buf);
 int vfs_stat64(const char *path, struct stat64 *buf);
 
 /* ops.c - standard file ops */
-int sys_open(const char *path, int oflag, ...);
+int sys_open(const char *path, int oflag, va_list args);
 int sys_close(int fd);
 ssize_t sys_read(int fildes, void *buf, size_t nbyte);
 ssize_t sys_write(int filedes, void *buf, size_t nbyte);
