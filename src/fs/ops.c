@@ -17,6 +17,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <sys/uio.h>
 //file stuff should be seperated out
 struct file *open_files[100];
 uint8_t file_count = 0;
@@ -79,6 +80,23 @@ ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 
 	return ret;
 }
+
+ssize_t sys_readv(int fd, const struct iovec *iov, int iovcnt)
+{
+	(void)fd;
+	(void)iov;
+	(void)iovcnt;
+	return 0;
+}
+
+ssize_t sys_writev(int fd, const struct iovec *iov, int iovcnt)
+{
+	(void)fd;
+	(void)iov;
+	(void)iovcnt;
+	return 0;
+}
+
 /*int creat(const char *path, mode_t mode)*/
 /*int creat(const char *path UNUSED, uint32_t mode UNUSED)
 {
