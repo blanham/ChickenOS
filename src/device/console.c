@@ -58,7 +58,7 @@ void console_switch(int num)
 {
 	consoles[num]->switch_fn(consoles[num]);
 }
-
+int echo = 1;
 size_t console_read(uint16_t dev UNUSED, void *_buf, off_t off UNUSED, size_t count)
 {
 	char *buf = _buf;
@@ -69,6 +69,7 @@ size_t console_read(uint16_t dev UNUSED, void *_buf, off_t off UNUSED, size_t co
 	while(count--)
 	{
 		c = console_getc();//ty_getc(consoles[tty]);
+		if(echo)
 		tty_putc(consoles[tty],c);
 		*buf = c;
 		buf++;
@@ -107,6 +108,7 @@ int console_ioctl(uint16_t dev, int request, va_list args )
 		ass = va_arg(args, void *);
 	//	va_end(args);
 		printf("ass %p\n",ass);
+		echo = 0;
 		if(ass != 0)
 				kmemcpy(ass, termios, sizeof(termios));
 			return 0;
