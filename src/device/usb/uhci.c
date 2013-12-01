@@ -171,12 +171,12 @@ struct uhci_controller * uhci_init()
 	
 		//fence?
 	
-		asm volatile("mfence":::"memory");	
+	//	asm volatile("mfence":::"memory");	
 		//might need this
 		pci_reg_outw(new->pci, UHCI_PCI_LEGACY/4, 0x200);	
 		//fence?	
 
-		asm volatile("mfence":::"memory");	
+	//	asm volatile("mfence":::"memory");	
 		uhci_outw(new, UHCI_IO_USBCMD, 1);//UHCI_USBCMD_RS | UHCI_USBCMD_CF | UHCI_USBCMD_MAXP);
 		uhci_outw(new, UHCI_IO_USBINTR,0xf);// 
 			//UHCI_USBINTR_SPIE | UHCI_USBINTR_IOCEN | UHCI_USBINTR_REINEN | UHCI_USBINTR_CRCOUT);

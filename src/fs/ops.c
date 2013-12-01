@@ -30,13 +30,12 @@ int fd_new()
 }
 
 
-int sys_open(const char *_path, int oflag, va_list args)
+int sys_open(const char *_path, int oflag, mode_t mode)
 {
 	char *path = strdup(_path);
-	struct file * fp = vfs_open(path, oflag, args);
+	struct file * fp = vfs_open(path, oflag, mode);
 	int td = 0;
 	printf("open %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
-	(void)args;
 	
 	if(fp == NULL)
 	{
@@ -165,7 +164,7 @@ int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
 }
 
 //FIXME: doesn't handle varargs
-int sys_ioctl(int fildes, int request, va_list args)
+int sys_ioctl(int fildes, int request, uint32_t args)
 {
 	struct file *fp;
 	if(fildes == -1)

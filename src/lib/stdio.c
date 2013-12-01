@@ -159,7 +159,7 @@ void oprintf(char *fmt, ...)
 	char c_val;
 	int i_val;
 	double d_val;
-
+	(void)d_val;
 	va_start(ap, fmt);
 	for(p = fmt; *p; p++)
 	{
@@ -232,7 +232,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	int i_val;
 	double d_val;
 	char cbuf[2] = {0,0};
-	
+	(void)d_val;	
 	for(p = (char *)fmt; *p; p++)
 	{
 		if(*p != '%'){

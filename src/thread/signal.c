@@ -21,8 +21,8 @@
 void dummy_signal(int test)
 {
 	static int i = 0;
-	uint32_t esp;
-	asm volatile("mov %%esp, %0":"=m"(esp));
+	uint32_t esp = 0;
+//	asm volatile("mov %%esp, %0":"=m"(esp));
 	printf("dummy signal %i %X %X\n",test, i++, esp);
 }
 void return_from_signal()

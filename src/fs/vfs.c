@@ -257,9 +257,9 @@ int vfs_mount(const char *device, struct file *dir, char *type)
 }
 */
 
-struct file *vfs_open(char *path, int oflags, va_list args)
+struct file *vfs_open(char *path, int oflags, mode_t mode)
 {
-	(void)args;
+	(void)mode;
 	struct file *cur = thread_current()->cur_dir;
 	struct inode *lookup = vfs_pathsearch(cur, path);
 	if(lookup == NULL)
@@ -333,7 +333,7 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 	return ret;
 }
 
-int  vfs_ioctl(struct file *file, int request, va_list args)
+int  vfs_ioctl(struct file *file, int request, uint32_t args)
 {
 	int ret = 0;
 	if(file == NULL)

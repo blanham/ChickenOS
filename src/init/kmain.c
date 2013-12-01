@@ -39,6 +39,7 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 		return;
    	}
 	
+	#ifdef ARCH_I386
 	/* begin initializations */
 	modules_init(mb);
 /*
@@ -125,7 +126,11 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 
 	while(1)
 		;
-
+	#elif ARCH_ARM
+	(void)mb;
+	while(1)
+		;
+	#endif
 	//should never return, unless things get really fucked
 	PANIC("kmain returned");
 }
@@ -135,7 +140,7 @@ void kmain(struct multiboot_info* mb, uint32_t magic)
 //		care of zombies processes) 
 void init(void *aux UNUSED) 
 {
-	char *argv[] = {"/busybox","sh",NULL};
+	char *argv[] = {"/busybox","vi",NULL};
 	char *path = "/busybox";
 	(void)argv;
 	if(!fork())

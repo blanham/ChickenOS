@@ -1,17 +1,17 @@
-ARCH = i386
-ARMPRE	=		arm-none-gnueabi-
+ARCH = arm
+ARMPRE	=		arm-none-eabi-
 CROSS	=		/usr/local/cross/bin
 CC		=		$(CROSS)/i586-elf-gcc
-CC		=		gcc -m32
-CC		=		clang -m32
+CC		=		$(ARMPRE)gcc
+#CC		=		clang -m32
 #LINKER	=		$(CROSS)/i586-elf-ld
 CFLAGS	=		-g -Wall -Werror $(INCLUDES) \
 				-std=gnu99	\
 				-fno-stack-protector \
 				-ffreestanding -Wextra\
-				-nostdlib -nostdinc -fno-builtin -DARCH_I386
+				-nostdlib -nostdinc -fno-builtin -DARCH_ARM
 CFLAGS += 		-Wextra
-LINKER	=		ld -melf_i386 
+LINKER	=		$(ARMPRE)ld # -melf_i386 
 LDFLAGS	=		-T arch/$(ARCH)/linker.ld 
 ARMAS	=		$(ARMPRE)as	
 AS		=		nasm
@@ -29,22 +29,22 @@ VFS		= 		$(patsubst %.c,%.o,$(wildcard fs/*.c))
 #needs cleanup before chaging to patsubst
 EXT2	= 		fs/ext2/ext2.o fs/ext2/ops.o
 
-FSSRCS	=		$(VFS) $(EXT2)
+FSSRCS	=		#$(VFS) $(EXT2)
 
 MEMSRCS = 		$(patsubst %.c,%.o,$(wildcard mm/*.c))
 
-NETCORESRCS=	$(patsubst %.c,%.o,$(wildcard net/*.c))
-NETDEVSRCS=		$(patsubst %.c,%.o,$(wildcard device/net/*.c))
+NETCORESRCS=	#$(patsubst %.c,%.o,$(wildcard net/*.c))
+NETDEVSRCS=		#$(patsubst %.c,%.o,$(wildcard device/net/*.c))
 
 NETSRCS=		$(NETCORESRCS) $(NETDEVSRCS)
 
-USBSRCS 	=	device/usb/usb.o device/usb/uhci.o
+USBSRCS 	=	#device/usb/usb.o device/usb/uhci.o
 
 AUDIOSRCS	=	#device/audio/ac97.o device/audio/intel_ac97.o
 
-VIDEOSRCS	=	device/video/vga.o device/video/bochs_vga.o
+VIDEOSRCS	=	#device/video/vga.o device/video/bochs_vga.o
 
-DEVCORE		=	$(patsubst %.c,%.o,$(wildcard device/*.c))
+DEVCORE		=	device/interrupt.o#$(patsubst %.c,%.o,$(wildcard device/*.c))
 
 DEVSRCS		=	$(DEVCORE) $(VIDEOSRCS) $(AUDIOSRCS) $(USBSRCS)
 
@@ -79,7 +79,7 @@ clean:
 	rm -f kernel.bin $(SOURCES)
 
 link:
-	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES) ./libgcc.a
+	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES) #./arm-libgcc.a
 
 
 
@@ -90,5 +90,5 @@ link:
 ifeq ($(ARCH), i386)
 	$(AS) $(ASFLAGS) $<
 else
-	$(ARMAS) $<
+	$(ARMAS) -o $@ $<
 endif

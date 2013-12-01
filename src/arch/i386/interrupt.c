@@ -1,4 +1,4 @@
-/*	ChickenOS - interrupt.c
+/*	ChickenOS - i386/interrupt.c
  *  Borrows from Bran and JamesM's tutorials and
  *  the pintos teaching os
  */
@@ -20,7 +20,6 @@
 extern idt_entry_t idt_table[NUM_INTRS];
 idt_ptr_t	idt_ptr;
 intr_handler *intr_handlers[NUM_INTRS];
-static enum intr_status interrupt_status;
 //void *idt_pointer;
 extern void syscall_isr();
 extern void sysc();	
@@ -59,10 +58,8 @@ void idt_init()
 }
 
 
-void interrupt_init()
+void arch_interrupt_init()
 {
-	interrupt_status = INTR_DISABLED;
-
 	interrupt_disable();
 	
 	gdt_install();
@@ -90,6 +87,16 @@ void interrupt_init()
 	interrupt_register(12, &stack_fault);
 	interrupt_register(13, &gpf);
 	interrupt_register(14, &page_fault);
+}
+
+void arch_interrupt_enable()
+{
+	asm volatile ("sti");
+}
+
+void arch_interrupt_disable()
+{
+	asm volatile ("cli");
 }
 
 void interrupt_register(int irq, intr_handler *handler)
@@ -196,38 +203,6 @@ static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uin
 	entry->base_lo = ((uint32_t)func) & 0xFFFF;
 	entry->base_hi = (((uint32_t)func) >> 16) & 0xFFFF;
 } 
-
-enum intr_status interrupt_get()
-{
-	return interrupt_status;
-}
-
-enum intr_status interrupt_disable()
-{
-	enum intr_status old = interrupt_get();
-	asm volatile ("cli"); 
-	interrupt_status = INTR_DISABLED;
-	
-	return old;
-}
-
-enum intr_status interrupt_enable()
-{
-	enum intr_status old = interrupt_get();
-	asm volatile ("sti"); 
-	interrupt_status = INTR_ENABLED;
-	
-	return old;
-}
-
-enum intr_status interrupt_set(enum intr_status status)
-{
-	if(status == INTR_ENABLED)
-		return interrupt_enable();
-	else
-		return interrupt_disable();
-}
-
 void dump_regs(struct registers *regs)
 {
 	printf("ESP %X\n", regs->ESP);

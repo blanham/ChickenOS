@@ -1,5 +1,14 @@
 #ifndef C_OS_SYSCALL_H
 #define C_OS_SYSCALL_H
+
+#ifdef ARCH_I386
+#include <arch/i386/syscall.h>
+#elif ARCH_ARM
+#include <arch/arm/syscall.h>
+#else
+#error unsupported architecture
+#endif
+
 enum { 
 	SYS_EXIT = 1, 
 	SYS_FORK, 
@@ -75,55 +84,6 @@ enum {
 	SYS_DUMMY = 256,
 	SYS_CLOCK_GETTIME = 265
 };
-#define SYSCALL_0N(num) ({				\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num)			\
-				   	);					\
-					ret;})
-
-#define SYSCALL_1N(num, arg0) ({		\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0) 		\
-				   	);					\
-					ret;})
-
-#define SYSCALL_2N(num, arg0,arg1) ({	\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0), 		\
-					  "c" (arg1)		\
-										\
-				   	);					\
-					ret;})
-#define SYSCALL_3N(num, arg0,arg1, arg2) ({	\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0), 		\
-					  "c" (arg1),		\
-					  "d" (arg2) 		\
-				   	);					\
-					ret;})
-#define SYSCALL_4N(num, arg0,arg1, arg2, arg3) ({	\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0), 		\
-					  "c" (arg1),		\
-					  "d" (arg2), 		\
-					  "S" (arg3)		\
-				   	);					\
-					ret;})
-
 #define ERROR_RETURN(x) return (-x)
 
 void syscall_init();

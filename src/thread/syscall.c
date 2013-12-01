@@ -85,6 +85,9 @@ extern void test_signals();
 //TODO: need to verify pointers before letting functions dereference them
 void syscall_handler (struct registers *regs)
 {
+#ifdef ARCH_ARM
+	(void)regs;
+#else
 	int call = regs->eax;
 	struct vec {
 				void *shit;
@@ -191,7 +194,7 @@ void syscall_handler (struct registers *regs)
 			//if(regs->eax == 20) regs->eax =21;
 			return;
 		case SYS_OPEN:
-			regs->eax = sys_open((char *)regs->ebx, regs->ecx, (va_list)regs->edx);
+			regs->eax = sys_open((char *)regs->ebx, regs->ecx, (mode_t)regs->edx);
 			return;
 		case SYS_LSEEK:
 			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->ecx, (int) regs->edx);
@@ -227,7 +230,7 @@ void syscall_handler (struct registers *regs)
 		//	regs->eax = (uintptr_t)sys_sbrk(regs->ebx);
 		//	return;
 		case SYS_IOCTL:
-			regs->eax = sys_ioctl((int)regs->ebx, (int)regs->ecx, (void *)regs->edx);
+			regs->eax = sys_ioctl((int)regs->ebx, (int)regs->ecx, (uint32_t)regs->edx);
 			return;
 		case SYS_KILL:
 			regs->eax = sys_kill(regs->ebx, regs->ecx);
@@ -293,6 +296,7 @@ void syscall_handler (struct registers *regs)
 			regs->eax = 0;//ENOSYS;
 			return;
 	}
+	#endif
 }
 
 void syscall_init()
