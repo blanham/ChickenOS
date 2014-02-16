@@ -34,7 +34,7 @@
 #define RX_RING_LEN_BITS	((PCNET_LOG_RX_BUFFERS) << 4)
 
 #define PKT_BUF_SZ		1544
-struct pcnet *global;
+static struct pcnet *global;
 
 char packet[] = {
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x08, 0x00, 
