@@ -56,7 +56,8 @@ struct inode * vfs_namei(struct inode *dir, char *file)
 	if((dir->info.st_mode & S_IFDIR) == 0)
 	{
 		//TODO: return is not directory error
-		PANIC("calling vfs_namei on a non-directory inode");
+	//	PANIC("calling vfs_namei on a non-directory inode");
+		return NULL;
 	}
 	
 	return dir->fs->ops->namei(dir, file);
@@ -79,9 +80,9 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 //	}
 	
 	if(path[0] == '/')
-		res = root->inode;
+		res = thread_current()->file_info->root;
 	else
-		res = thread_current()->cur_dir->inode;	
+		res = thread_current()->file_info->cur;
 	
 	if((tok = (char *)strtok_r(path, "/", &saveptr)) == NULL)
 		return NULL;
@@ -99,6 +100,7 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	strcpy(filename, tok);
 	while((tok = (char *)strtok_r(NULL, "/", &saveptr)) != NULL)
 	{
+		printf("TOk %s\n", tok);
 		strcpy(filename, tok);
 		if((res = vfs_namei(res, tok)) == NULL)
 		{
@@ -164,7 +166,8 @@ void vfs_mount_root(uint16_t dev, char *type)
 //	root->offset = 0;
 //	root->fs = fs;
 
-	thread_current()->cur_dir = root;
+	thread_current()->file_info->cur = root->inode;
+	thread_current()->file_info->root = root->inode;
 	root_fs = fs;
 
 	printf("Mounted %s fs @ dev %i:%i as root\n",type, MAJOR(dev),MINOR(dev));
@@ -203,11 +206,13 @@ int vfs_register_fs(vfs_fs_t *fs)
 
 	return 0;
 }
+extern void chardevs_init();
 void vfs_init()
 {
 	//root = (struct file *)kcalloc(sizeof(struct file),1);
 
 	printf("Initialzing VFS\n");
+	chardevs_init();
 	if(ext2_init() < 0)
 		PANIC("failed to init ext2 fs\n");
 
@@ -260,8 +265,11 @@ int vfs_mount(const char *device, struct file *dir, char *type)
 struct file *vfs_open(char *path, int oflags, mode_t mode)
 {
 	(void)mode;
-	struct file *cur = thread_current()->cur_dir;
-	struct inode *lookup = vfs_pathsearch(cur, path);
+	struct inode *cur = thread_current()->file_info->cur;
+	struct file *tmp = kcalloc(sizeof(*tmp), 1);
+	tmp->inode = cur;	
+	struct inode *lookup = vfs_pathsearch(tmp, path);
+
 	if(lookup == NULL)
 	{
 		if((oflags & O_CREAT) != 0)
@@ -270,6 +278,7 @@ struct file *vfs_open(char *path, int oflags, mode_t mode)
 		}
 		return NULL;
 	}
+	kfree(tmp);
 	struct file *new = vfs_file_new(lookup, path);
 	return new;
 }
@@ -287,7 +296,6 @@ int vfs_close(struct file *file)
 size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 {
 	int ret = 0;
-
 	if(file == NULL || buf == NULL)
 		return -1;
 	if((file->inode->info.st_mode & S_IFCHR) != 0){
@@ -321,7 +329,7 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 //FIXME: This returns -1 so we don't fuxxor our disk image accidentally
 	//	ret = block_device_readn(file->inode->rdev, 
 	//		buf, 0, file->offset, nbyte);
-		printf("lulz\n");
+		printf("Writing it currently disabled\n");
 		return -1;
 	}else if((file->inode->info.st_mode & S_IFREG) != 0){
 		if(file->fs == NULL || file->fs->ops->write == NULL)
@@ -333,12 +341,11 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 	return ret;
 }
 
-int  vfs_ioctl(struct file *file, int request, uint32_t args)
+int  vfs_ioctl(struct file *file, int request, char * args)
 {
 	int ret = 0;
 	if(file == NULL)
 		return -1;
-
 	if((file->inode->info.st_mode & S_IFCHR) != 0){
 		ret = char_device_ioctl(file->inode->info.st_rdev, 
 			request, args);
@@ -395,8 +402,8 @@ int vfs_chdir(const char *_path)
 	file  = vfs_open(path, 0, NULL);
 	if(file != NULL)
 	{
-		vfs_close(thread_current()->cur_dir);
-		thread_current()->cur_dir = file;
+		//vfs_close(thread_current()->cur_dir);
+		thread_current()->file_info->cur = file->inode;
 		ret = 0;
 	}
 	kfree(path);
@@ -413,12 +420,14 @@ int vfs_stat(const char *path, struct stat *buf)
 
 int vfs_stat64(const char *path, struct stat64 *buf)
 {
-	struct file *cur = thread_current()->cur_dir;
-	struct inode *lookup = vfs_pathsearch(cur, (char *)path);
+	struct inode *cur = thread_current()->file_info->cur;
+	struct file *tmp = kcalloc(sizeof(*tmp), 1);
+	tmp->inode = cur;
+	struct inode *lookup = vfs_pathsearch(tmp, (char *)path);
 	
 	if(lookup == NULL)
 		return -(ENOENT);
-	
+	kfree(tmp);	
 	memcpy(buf, &lookup->info, sizeof(struct stat));
 	
 	return 0;

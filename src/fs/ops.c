@@ -30,10 +30,13 @@ int fd_new()
 }
 
 
+
 int sys_open(const char *_path, int oflag, mode_t mode)
 {
+	thread_t *cur = thread_current();
 	char *path = strdup(_path);
 	struct file * fp = vfs_open(path, oflag, mode);
+	
 	int td = 0;
 	printf("open %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
 	
@@ -41,11 +44,18 @@ int sys_open(const char *_path, int oflag, mode_t mode)
 	{
 		goto fail;
 	}
-//#finish:
-	td = thread_current()->fd++;
-	thread_current()->files[td] = fp;
-	
+
+	for(int i = 0; i < cur->file_info->files_count; i++)
+	{	
+		if(cur->file_info->files[i] == NULL)
+		{
+			td = i;
+			cur->file_info->files[i] = fp;
+			break;
+		}
+	}
 	kfree(path);
+	printf("FD %i\n", td);
 	return td;
 fail:
 	kfree(path);
@@ -53,8 +63,8 @@ fail:
 }
 int sys_close(int fd)
 {
-	struct file *fp = thread_current()->files[fd];
-	thread_current()->fd--;
+	struct file *fp = thread_current()->file_info->files[fd];
+	thread_current()->file_info->files[fd] = NULL;
 	if(fp == NULL)
 		return -1;
 	return vfs_close(fp);
@@ -63,14 +73,14 @@ int sys_close(int fd)
 
 ssize_t sys_read(int fildes, void *buf, size_t nbyte)
 {
-	struct file *fp = thread_current()->files[fildes];
-	if(fp == NULL)
+	struct file *fp = thread_current()->file_info->files[fildes];
+	if(fp == NULL || fildes < 0)
 		return -1;
 	return vfs_read(fp, buf, nbyte);
 }
 ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 {
-	struct file *fp = thread_current()->files[fildes];
+	struct file *fp = thread_current()->file_info->files[fildes];
 	
 	if(fp == NULL)
 		return -1;
@@ -103,7 +113,7 @@ ssize_t sys_writev(int fd, const struct iovec *iov, int iovcnt)
 }*/
 off_t sys_lseek(int fildes, off_t offset, int whence)
 {
-	struct file *fp = thread_current()->files[fildes];
+	struct file *fp = thread_current()->file_info->files[fildes];
 	if(fp == NULL)
 		return -1;
 	return vfs_seek(fp, offset, whence);
@@ -118,7 +128,7 @@ int sys_stat(const char *filename, struct stat *statbuf)
 	statbuf->st_size = 61438;
 	statbuf->st_ino = 32;
 //	statbuf->st
-	
+	printf("filename %s\n", filename);
 	return vfs_stat(filename, statbuf);
 }
 int sys_stat64(const char *filename, struct stat64 *statbuf)
@@ -128,7 +138,7 @@ int sys_stat64(const char *filename, struct stat64 *statbuf)
 //	statbuf->st
 	
 //	kmemcpy(statbuf, stat_test, sizeof(struct stat));
-
+	printf("filename64 %s\n", filename);
 	return vfs_stat64(filename, statbuf);
 }
 
@@ -164,14 +174,15 @@ int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
 }
 
 //FIXME: doesn't handle varargs
-int sys_ioctl(int fildes, int request, uint32_t args)
+int sys_ioctl(int fildes, int request, char * argp)
 {
 	struct file *fp;
 	if(fildes == -1)
 		return -1;
-	fp = thread_current()->files[fildes];
+	fp = thread_current()->file_info->files[fildes];
 	if(fp == NULL)
 		return -1;
-	return vfs_ioctl(fp, request, args);
+	//printf("fildes %i\n", fildes);
+	return vfs_ioctl(fp, request, argp);
 }
 
