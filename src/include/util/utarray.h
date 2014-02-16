@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008-2011, Troy D. Hanson   http://uthash.sourceforge.net
+Copyright (c) 2008-2013, Troy D. Hanson   http://troydhanson.github.com/uthash/
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -22,12 +22,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* a dynamic array implementation using macros 
- * see http://uthash.sourceforge.net/utarray
  */
 #ifndef UTARRAY_H
 #define UTARRAY_H
 
-#define UTARRAY_VERSION 1.9.4
+#define UTARRAY_VERSION 1.9.8
 
 #ifdef __GNUC__
 #define _UNUSED_ __attribute__ ((__unused__)) 
@@ -116,8 +115,8 @@ typedef struct {
 #define _utarray_eltptr(a,j) ((char*)((a)->d + ((a)->icd.sz*(j) )))
 
 #define utarray_insert(a,p,j) do {                                            \
+  if (j > (a)->i) utarray_resize(a,j);                                        \
   utarray_reserve(a,1);                                                       \
-  if (j > (a)->i) break;                                                      \
   if ((j) < (a)->i) {                                                         \
     memmove( _utarray_eltptr(a,(j)+1), _utarray_eltptr(a,j),                  \
              ((a)->i - (j))*((a)->icd.sz));                                   \
@@ -129,7 +128,7 @@ typedef struct {
 
 #define utarray_inserta(a,w,j) do {                                           \
   if (utarray_len(w) == 0) break;                                             \
-  if (j > (a)->i) break;                                                      \
+  if (j > (a)->i) utarray_resize(a,j);                                        \
   utarray_reserve(a,utarray_len(w));                                          \
   if ((j) < (a)->i) {                                                         \
     memmove(_utarray_eltptr(a,(j)+utarray_len(w)),                            \
@@ -190,7 +189,7 @@ typedef struct {
 #define utarray_renew(a,u) do {                                               \
   if (a) utarray_clear(a); \
   else utarray_new((a),(u));   \
-} while(0);
+} while(0) 
 
 #define utarray_clear(a) do {                                                 \
   if ((a)->i > 0) {                                                           \
@@ -212,8 +211,9 @@ typedef struct {
 
 #define utarray_front(a) (((a)->i) ? (_utarray_eltptr(a,0)) : NULL)
 #define utarray_next(a,e) (((e)==NULL) ? utarray_front(a) : ((((a)->i) > (utarray_eltidx(a,e)+1)) ? _utarray_eltptr(a,utarray_eltidx(a,e)+1) : NULL))
+#define utarray_prev(a,e) (((e)==NULL) ? utarray_back(a) : ((utarray_eltidx(a,e) > 0) ? _utarray_eltptr(a,utarray_eltidx(a,e)-1) : NULL))
 #define utarray_back(a) (((a)->i) ? (_utarray_eltptr(a,(a)->i-1)) : NULL)
-#define utarray_eltidx(a,e) (((char*)(e) >= (char*)((a)->d)) ? (((char*)(e) - (char*)((a)->d))/(a)->icd.sz) : -1)
+#define utarray_eltidx(a,e) (((char*)(e) >= (char*)((a)->d)) ? (((char*)(e) - (char*)((a)->d))/(ssize_t)(a)->icd.sz) : -1)
 
 /* last we pre-define a few icd for common utarrays of ints and strings */
 static void utarray_str_cpy(void *dst, const void *src) {

@@ -2,8 +2,8 @@
 #define C_OS_MM_VM_H
 #include <stdint.h>
 #include <stddef.h>
-#include <multiboot.h>
 #include <sys/mman.h>
+#include <chicken/boot.h>
 
 #define PAGE_SIZE 4096
 #define PAGE_MASK 0xFFFFF000
@@ -26,10 +26,11 @@ typedef uintptr_t virt_addr_t;
 #define P2V(p) ((phys_addr_t)((virt_addr_t)(p) + PHYS_BASE))
 
 /* mm/vm.c */
-void vm_init(struct multiboot_info *mb);
+void vm_init(struct kernel_boot_info *info);
 void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset);
 
 /* mm.gdt.c */
+//TODO: Get rid of this
 void gdt_install();
 
 /* mm/palloc.c */

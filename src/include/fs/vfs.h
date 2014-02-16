@@ -3,7 +3,6 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <stddef.h>
-#include <kernel/list.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -132,7 +131,7 @@ int vfs_close(struct file *file);
 size_t vfs_read(struct file *file, void *buf, size_t nbyte);
 off_t vfs_write(struct file *file, void *buf, size_t nbyte);
 off_t vfs_seek(struct file *file, off_t offset, int whence);
-int vfs_ioctl(struct file *file, int request, uint32_t args);
+int vfs_ioctl(struct file *file, int request, char *args);
 int vfs_chdir(const char *path);
 int vfs_stat(const char *path, struct stat *buf);
 int vfs_stat64(const char *path, struct stat64 *buf);
@@ -147,7 +146,7 @@ char* sys_getcwd(char *buf, size_t size);
 int sys_creat(const char *path, mode_t mode);
 int sys_stat(const char *filename, struct stat *statbuf);
 off_t sys_lseek(int fildes, off_t offset, int whence);
-int sys_ioctl(int fildes, int request, uint32_t args);
+int sys_ioctl(int fildes, int request, char *args);
 int sys_stat64(const char *path, struct stat64 *buf);
 //device.c
 #define INITRD_DEV 0x400
@@ -157,7 +156,7 @@ int sys_stat64(const char *path, struct stat64 *buf);
 
 typedef size_t (*char_read_fn)(uint16_t dev, void *buf, off_t offset, size_t count);
 typedef size_t (*char_write_fn)(uint16_t dev, void *buf, off_t offset, size_t count);
-typedef int (*char_ioctl_fn)(uint16_t dev, int request, uint32_t arg);
+typedef int (*char_ioctl_fn)(uint16_t dev, int request, char *arg);
 
 struct char_device_ops {
 	char_read_fn read;
@@ -171,7 +170,7 @@ typedef size_t (*block_write_fn)(uint16_t dev, void *buf, int block);
 void  device_register(uint16_t type, dev_t dev, void *read, void *write, void *ioctl);
 typedef int(*block_access_fn)(void *aux, void *buf, int block);
 
-int char_device_ioctl(uint16_t dev, int request, uint32_t args);
+int char_device_ioctl(uint16_t dev, int request, char *args);
 size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte);
 size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte);
 size_t block_device_read(uint16_t dev, void *buf, uint32_t block);

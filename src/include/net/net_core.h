@@ -129,7 +129,7 @@ struct sockbuf {
 	
 	void *transport;
 	uint16_t t_proto;
-	uint32_t t_len;;
+	uint32_t t_len;
 	
 	void *payload;
 	uint32_t p_len;

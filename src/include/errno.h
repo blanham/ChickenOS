@@ -1,9 +1,27 @@
-#ifndef C_OS_ERRNO_H
-#define C_OS_ERRNO_H
+#ifndef	_ERRNO_H
+#define _ERRNO_H
 
-#define EPERM		1
-#define ENOENT		2
-#define EACCES		13
-#define ENOSYS		38
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <features.h>
+
+#include <bits/errno.h>
+
+#ifdef __GNUC__
+__attribute__((const))
+#endif
+int *__errno_location(void);
+#define errno (*__errno_location())
+
+#ifdef _GNU_SOURCE
+extern char *program_invocation_short_name, *program_invocation_name;
+#endif
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
+
