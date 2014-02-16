@@ -2,8 +2,6 @@
  *	Handles paging, gdt, and page allocation
  *  Heap allocation is implemented with liballoc
  *  which uses pages from the page allocator
- *  Uses code borrowed from JamesM's kernel tutorial
- *
  */
 #include <common.h>
 #include <mm/vm.h>
@@ -12,10 +10,18 @@
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
 #include <stdio.h>
+#include <multiboot.h>
+
 extern uint32_t end;
 uint32_t mem_size;
-void vm_init(struct multiboot_info *mb)
+//TODO: Pagefaults should really be handled here, at least the
+//		platform independent parts
+//TODO: Generic page insertion here?
+void vm_init(struct kernel_boot_info *info)
 {
+	//FIXME: Finish multiboot parser
+	struct multiboot_info *mb = (void *)info->aux;
+
 	virt_addr_t placement = 0;
 	mem_size = mb->mem_upper;
 	
