@@ -4,10 +4,10 @@
 #include <stdarg.h>
 #include <string.h>
 //FIXME Get rid of this
-#define ALLOCSIZE 10000
+/*#define ALLOCSIZE 10000
 static char allocbuf[ALLOCSIZE];
 static char *allocp = allocbuf;
-/* temporary memory functions taken from K&R*/
+// temporary memory functions taken from K&R
 
 char *alloc(int n)
 {
@@ -24,7 +24,7 @@ void afree(char *p)
 	if (p >= allocbuf && p < allocbuf + ALLOCSIZE)
 		allocp = p;
 }
-
+*/
 void putc(char c)
 {
 	console_putc(c);
@@ -84,7 +84,7 @@ char dp[256];
 static char *int_to_string(int num, int base, int size)
 {
 	int i;
-	char *tmp = allocp;//alloc(size);
+	char *tmp = NULL;//allocp;//alloc(size);
 	for(i = 0; i < 100; i++)
 		tmp[i] = 0;
 	char * ascii = {"0123456789ABCDEF"};
@@ -211,8 +211,8 @@ void oprintf(char *fmt, ...)
 				putc(*p);
 				break;
 		}
-		for(int i= 0; i < 100; i++)
-			allocp[i] = 0;
+	//	for(int i= 0; i < 100; i++)
+	//		allocp[i] = 0;
 	}
 	
 	va_end(ap);
@@ -297,22 +297,38 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 				//putc(*p);
 				break;
 		}
-		for(int i= 0; i < 100; i++)
-			allocp[i] = 0;
+//		for(int i= 0; i < 100; i++)
+//			allocp[i] = 0;
 	}
 	return 0;//buf - _buf;
 }
-extern int linux_vsprintf(char *buf, const char *fmt, va_list args);
+int
+kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap);
+
+void testc(int c, void *aux UNUSED)
+{
+	putc(c);
+}
+void serial_testc(int c, void *aux UNUSED)
+{
+	serial_putc(c);
+}
+
 int printf(const char *fmt, ...)
 {
 	va_list ap;
-	char buf[512];
 	int ret;
-	memset(buf, 0, 512);
 	va_start(ap, fmt);
-	ret = linux_vsprintf(buf, fmt, ap);
-	puts(buf);
-	//console_puts("\n");
+	ret = kvprintf(fmt, testc, NULL, 10, ap);
+	va_end(ap);
+	return ret;
+}
+int serial_printf(const char *fmt, ...)
+{
+	va_list ap;
+	int ret;
+	va_start(ap, fmt);
+	ret = kvprintf(fmt, serial_testc, NULL, 10, ap);
 	va_end(ap);
 	return ret;
 }

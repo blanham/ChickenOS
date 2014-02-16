@@ -8,11 +8,11 @@ size_t kstrlen(uint8_t *str)
 
 }
 
-uint8_t *kmemcpy(void *dest, void *src, size_t count)
+uint8_t *kmemcpy(void *dest, const void *src, size_t count)
 {
 	uint8_t *tmp = dest;
 	uint8_t *dest_ = dest;
-	uint8_t *src_ = src;
+	const uint8_t *src_ = src;
 	while(count-- != 0)
 		*dest_++ = *src_++;
 

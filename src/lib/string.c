@@ -50,7 +50,7 @@ char * strtok ( char * str UNUSED, const char * delimiters UNUSED)
 }
 char * strchr(const char *str, int c)
 {
-	char *_str = (char *)str;
+/*	char *_str = (char *)str;
 
 	while(1)
 		if(*_str == (char)c)
@@ -59,7 +59,13 @@ char * strchr(const char *str, int c)
 			return NULL;
 		else
 			_str++;
+*/
+	do {
+		if(*str == c)
+			return (char *)str;
+	} while(*str++);
 
+	return NULL;
 }
 char * strtok_r ( char * str, const char * delimiters, char **save )
 {

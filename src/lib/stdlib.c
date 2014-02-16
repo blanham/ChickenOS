@@ -6,7 +6,7 @@
 #include <mm/liballoc.h>
 #include <stddef.h>
 
-
+/*
 void *calloc(size_t num, size_t size)
 {
 	return kcalloc(num, size);
@@ -15,7 +15,8 @@ void *calloc(size_t num, size_t size)
 void free(void *ptr)
 {
 	kfree(ptr);
-}
+}*/
+
 long int strtol(const char* str, char **end, int base)
 {
 	(void)base;

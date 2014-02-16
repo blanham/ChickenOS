@@ -431,20 +431,20 @@ number:
 	}
 #undef PCHAR
 }
-
+/*
 static void
 putchar(int c, void *arg)
 {
-	/* add your putchar here */
+	// add your putchar here 
 }
-
+*/
 void
-printf(const char *fmt, ...)
+aaprintf(const char *fmt, ...)
 {
 	/* http://www.pagetable.com/?p=298 */
 	va_list ap;
 
 	va_start(ap, fmt);
-	kvprintf(fmt, putchar, NULL, 10, ap);
+//	kvprintf(fmt, putchar, NULL, 10, ap);
 	va_end(ap);
 }
