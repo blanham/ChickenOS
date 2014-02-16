@@ -1,13 +1,17 @@
-
 global _loader                          ; Make entry point visible to linker.
-extern kmain                            ; _main is defined elsewhere
+extern kmain
+extern multiboot_parse
+
 extern end
 extern _sbss 
+global MultiBootHeader
+
+
 ; setting up the Multiboot header - see GRUB docs for details
 MODULEALIGN equ  1<<0             ; align loaded modules on page boundaries
 MEMINFO     equ  1<<1             ; provide memory map
 VIDEOINFO	equ  1<<2 ;provide video info
-FLAGS       equ  MODULEALIGN | MEMINFO; | VIDEOINFO  ; this is the Multiboot 'flag' field
+FLAGS       equ  MODULEALIGN + MEMINFO + VIDEOINFO  ; this is the Multiboot 'flag' field
 MAGIC       equ    0x1BADB002     ; 'magic number' lets bootloader find the header
 CHECKSUM    equ -(MAGIC + FLAGS)  ; checksum required
  
@@ -41,16 +45,17 @@ MultiBootHeader:
     dd MAGIC
     dd FLAGS
     dd CHECKSUM
-;	dd 0
-;	dd 0
-;	dd 0
-;	dd 0
-;	dd 0
-;	dd 0
-;	dd 1
-;	dd 1
-;	dd 1
-;	dd 1 
+	dd 0 ;header_addr
+	dd 0 ;load_addr
+	dd 0 ;load_end_addr
+	dd 0 ;bss_end_addr
+	dd 0 ;entry_addr
+	dd 1 ;mode_type: (0 for linear fb, 1 for ega text)
+	dd 1024 ;width, pixels for lfb, chars for text, 0 is default
+	dd 768 ;height, ass above
+	dd 0 ;depth
+
+times 64 dd 0
 ; reserve initial kernel stack space -- that's 16k.
 STACKSIZE equ 0x4000
 section .text
@@ -86,13 +91,17 @@ StartInHigherHalf:
     mov esp, stack+STACKSIZE           ; set up the stack
     push eax                           ; pass Multiboot magic number
  
-    ; pass Multiboot info structure -- WARNING: This is a physical address and may not be
+    ; pass Multiboot info structure -- WARNING:  may not be
     ; in the first 4MB!
     ; 4/8/2013 - add KERNEL_VIRTUAL_BASE so it is a virtual address
 	add ebx, KERNEL_VIRTUAL_BASE
 	push ebx
  
-    call  kmain                  ; call kernel proper
+    call  multiboot_parse	; Parse multiboot header before calling kmain()
+	push eax
+
+	call kmain
+
 halt:    
 	hlt                          ; halt machine should kernel return
 	jmp halt
@@ -123,6 +132,7 @@ tss_flush:
 	mov ax, 0x28
 	ltr ax
 	ret
+
 section .bss
 align 4096
 [global stack]

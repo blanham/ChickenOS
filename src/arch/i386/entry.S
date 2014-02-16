@@ -1,0 +1,76 @@
+global entry
+extern _loader
+STACKSIZE equ 0x1000
+;Multiboot constants here
+
+section .multiboot
+align 4
+
+section .data
+align 4096
+firstpd:
+	resb 4096
+
+[bits 16]
+section .realmode
+realgdt:
+	dd  0x00000000, 0x00000000              ; GDT[0]: null descriptor
+	dd  0x0000FFFF, 0x000F9C00              ; GDT[1]: code segment descriptor
+	dd  0x0000FFFF, 0x000F9200              ; GDT[2]: d
+realidt:
+	dw 0x3ff
+	dw 0
+realstack:
+	resb 1024
+oldcr0:
+	dd 0
+pmode16:
+	cli
+	mov eax, 8
+	mov ds, eax
+	mov es, eax
+	mov fs, eax
+	mov gs, eax
+	mov eax, cr0
+	dd 0
+;	mov [oldcr0], eax
+;	and eax, 0x7ffffffe
+;	mov cr0, eax
+	jmp realmode
+realmode:
+	;mov sp, realstack
+	mov ax, 0
+	mov ds, ax
+	mov es, ax
+	mov fs, ax
+	mov gs, ax
+	;lidt [realidt]
+	sti
+	dd 0
+jumpg:
+	hlt
+	jmp jumpg
+
+	jmp test
+
+
+[bits 32]
+section .txt
+oldgdt:
+	dd 0
+entry:
+	cli
+	sgdt [oldgdt]
+	lgdt [realgdt]
+;	jmp pmode16
+test:
+;	lgdt [oldgdt]
+	jmp _loader
+	cli
+	hlt
+
+	
+section .bss
+;align 4096
+stack:
+	resb STACKSIZE

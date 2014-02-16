@@ -24,7 +24,7 @@ int serial_ready()
 
 void serial_putc(char c)
 {
-	//FIXME: should be a line discipline thingm probably?
+	//FIXME: should be a line discipline thing probably?
 	if(c == '\n')
 	{
 		serial_putc('\r');
@@ -53,12 +53,14 @@ void serial_set_baud(uint16_t port, uint16_t baud)
 /* serial port major number in Linux is 4 */
 void serial_init()
 {
+	int count = 0;
 	//probe serial ports from bios data
 	uint16_t *com = (uint16_t *)0xC0000400;
 	for (int i = 0; i < 4; i++)
 	{
 		if(com[i] != 0)
 		{	
+			count++;
 			//FIXME: log serial probing
 			//log/printf("Found COM port @ 0x%X\n", com[i]);
 			com_port = com[i];
@@ -71,3 +73,12 @@ void serial_init()
 	outb(com_port + LCR, 0x0c);
 	//interrupt_register(IRQ4, serial_interrupt);
 }
+
+void pc_serial_init()
+{
+
+
+
+
+}
+

@@ -106,12 +106,12 @@ void interrupt_register(int irq, intr_handler *handler)
 	if(irq >= NUM_ISRS && irq <= NUM_ISRS + NUM_IRQS)
 		pic_unmask(irq-0x20);
 }
-
+void tss_update(uint32_t esp);
 void interrupt_handler(struct registers *regs)
 {
 	int irq = regs->int_no;
 	intr_handler *handler = intr_handlers[irq];
-//	printf("interrupt %i\n", irq);
+	
 #ifdef DEBUG_INTR	
 	if(irq > 32 && irq < 32+32)
 		printf("irq %i\n",irq-32);
@@ -350,7 +350,7 @@ static void page_fault(struct registers * regs)
 		thread_current()->status = THREAD_DEAD;
 		while(1);
 		thread_yield();
-		thread_exit();
+		thread_exit(1);
 
 	}
 }

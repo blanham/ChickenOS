@@ -70,7 +70,7 @@ gdt_install(void)
 	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13;
 
 
-	gdt_fill(&gdt_entries[5], (uintptr_t)&tss, 0x67, 0xcf, GDTA_TSS);
+	gdt_fill(&gdt_entries[5], (uintptr_t)&tss, (uint32_t)&tss + sizeof(tss), 0xcf, 0xe9);
 	gdt_flush((uintptr_t)&gdt_desc);
 	/*asm volatile(
 			//	"jmp $0x8, $test\n"
@@ -89,4 +89,10 @@ gdt_install(void)
 				"K"(KERNEL_SEG)//,
 			//	"q"(0x28)
 				);*/
+}
+
+void gdt_thing()
+{
+
+	gdt_flush((uintptr_t)&gdt_desc);
 }
