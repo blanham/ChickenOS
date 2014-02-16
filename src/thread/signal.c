@@ -2,6 +2,7 @@
  *	Thread level support of signals  
  */
 #include <common.h>
+#include <errno.h>
 #include <kernel/thread.h>
 #include <thread/tss.h> 
 #include <kernel/memory.h>
@@ -11,123 +12,270 @@
 #include <thread/syscall.h>
 #include <stdio.h>
 #include <mm/liballoc.h>
+#include <thread/tss.h>
 
-//This should be done differently:
-//push the current eip on the stack
-//push the signal number
-//and then set the eip to the handler
-//when the handler returns, it will return to eip
-//thus resuming control flow 
-void dummy_signal(int test)
-{
-	static int i = 0;
-	uint32_t esp = 0;
-//	asm volatile("mov %%esp, %0":"=m"(esp));
-	printf("dummy signal %i %X %X\n",test, i++, esp);
-}
-void return_from_signal()
-{
-	thread_current()->signal_pending = -1;
-	(void)SYSCALL_0N(200);
-}
+/*
+	Signal control flow:
+	When switching to a new thread:
+		Check if thread->signal_pending != 0:
+			If so run do_signal(regs, thread)
+				If in user mode:
+					save old usermode esp
+					set regs->useresp = thread->signal_stack()
+
+   */
+
 extern bool thread_start;
+void signal_test_user_func(int sig)  __attribute__((section(".user"))); 
+void signal_test_restore_func(long unknown)  __attribute__((section(".user"))); 
 
-void new_signal(thread_t *next UNUSED)
+int sigisemptyset(const sigset_t *set)
 {
-	/*	check if thread is in kernel or user mode
-		usermode:
-		get index into signal table
-		save current sigmask (where?)
-			it has to be restored, fuck
-		mask this signal and others given
-		eip = signals[index]
-			
-		push current eip and sig num on stack
-		we could push a call to a signal return fucntion
-		after signal finished, does a thread yield()
-	*/
-
-
-
+	static const unsigned long  empty[_NSIG/8/sizeof(long)];
+	int ret =  !memcmp(set, &empty, _NSIG/8);
+	return ret;
 }
-
-void signal_do(registers_t *regs UNUSED, thread_t *next UNUSED)
+int sigaddset(sigset_t *set, int sig)
 {
-/*	if(next->signal_pending > 0 && next->pid != 0)
+	unsigned int s = sig - 1;
+	if(s >= _NSIG-1 || sig-32U < 3)
 	{
-		uint8_t *new_useresp = (uint8_t *)next->regs->useresp;
-		next->usersp = (void *)new_useresp;
-		new_useresp -= sizeof(*regs);
-
-		kmemcpy(new_useresp, (void *)next->regs, sizeof(*regs));
-		uint32_t *test = (uint32_t *)new_useresp;
-		
-		*test-- = next->signal_pending;
-		*test =(uintptr_t)return_from_signal;
-		
-		next->regs->eip = (uintptr_t)dummy_signal;
-		next->regs->useresp = (uintptr_t)test;
-		next->signal_pending = -2;
-	}else if(next->signal_pending == -2)
-	{
-		registers_t *r = (void *)next->usersp - 4;
-		r--;
-		kmemcpy((void *)next->sp, r, sizeof(*regs));
-		
-		next->regs->useresp = (uintptr_t)next->usersp; 
-	}*/
+		printf("Sig %i %i %i\n", sig, s >= _NSIG-1, sig-32U < 3);
+		ASSERT(0, "Invalid signal number passed!");
+	}
+	set->__bits[s/8/sizeof *set->__bits] |= 1UL << ( s & 8 * sizeof(*set->__bits) - 1);	
+	return 0;
 }
-
-int sys_sigsuspend(const sigset_t *mask)
+int sigdelset(sigset_t *set, int sig)
 {
-	(void) mask;
-	//for(int i = 0; i < 1; i++)
-	//	printf("Signal: %x\n",  *(uint32_t *)*mask);
-	printf("Sigsuspend called, hanging\n");
-	while(1);
+	unsigned int s = sig - 1;
+	if(s >= _NSIG-1 || sig-32U < 3)
+	{
+		printf("Sig %i %i %i\n", sig, s >= _NSIG-1, sig-32U < 3);
+		ASSERT(0, "Invalid signal number passed!");
+	}
+	set->__bits[s/8/sizeof *set->__bits] &= ~(1UL << ( s & 8 * sizeof(*set->__bits) - 1));	
 	return 0;
 }
 
-int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
+int sigpopset(sigset_t *set)
+{
+	int ret =32 - __builtin_clzl(set->__bits[0]);
+/*	printf("ret %i\n", ret);ret =__builtin_clzl(set->__bits[1]);
+	printf("ret %i\n", ret);*/
+	return ret;
+}
+int sigismember(const sigset_t *set, int sig)
+{
+	unsigned int s = sig - 1;
+	if(s >= _NSIG-1 || sig-32U < 3)
+	{
+		printf("Sig %i %i %i\n", sig, s >= _NSIG-1, sig-32U < 3);
+		ASSERT(0, "Invalid signal number passed!");
+	}
+
+	return !!(set->__bits[s/8/sizeof *set->__bits] & 1UL<<(s&8*sizeof *set->__bits-1));
+}
+int sys_sigreturn(registers_t *regs, unsigned long dunno UNUSED)
 {
 	thread_t *cur = thread_current();
-	
-	if((oact != NULL) && (sig < 32))
-	{
-		if(cur->signals[sig] != NULL)
-			kmemcpy(oact, cur->signals[sig], sizeof(*oact));
-	}
-	
-	if((act != NULL) && (sig < 32))
-	{
-		if(cur->signals[sig] == NULL)
-			cur->signals[sig] = kmalloc(sizeof(struct sigaction));
+	registers_t *regs_bottom = (void *)cur + STACK_SIZE - sizeof(registers_t);
+	printf("DUNON %i\n", dunno);
+	interrupt_disable();
+	ASSERT(regs_bottom == regs, "Tried to handle a signal inside interrupt context\n");
+//	dump_regs(regs);
+//	printf("eax %i\n", regs->eax);
 
-		kmemcpy(cur->signals[sig], (void *)act, sizeof(*oact));
-		
-	//	printf("mask %x %x %x\n", act->sa_flags, act->sa_mask, act->sa_handler);
+	kmemcpy(regs_bottom, cur->signal_regs, sizeof(*regs_bottom));
+//
+	printf("eax %i\n", regs->eax);
+
+//	dump_regs(regs);
+	sigdelset(&cur->sig_info->pending, 17);
+//	thread_scheduler(regs_bottom);
+	return -EINTR;//regs->eax;
+}
+
+
+//#define SIGNAL_TEST
+void signal_do(registers_t *regs, thread_t *next)
+{
+	volatile registers_t *regs_bottom = (void *)next + STACK_SIZE - sizeof(registers_t);
+	int sig_num;// = next->sig_info->signal_pending;
+	struct k_sigaction *sig;
+	volatile uint32_t *push = NULL;
+	(void)regs;
+//	printf("Maybe %i\n",sigpopset(&next->sig_info->pending));
+	sig_num = sigpopset(&next->sig_info->pending);
+	sig = &next->sig_info->signals[sig_num];
+	//hack until we do proper signal ignoring
+	if(sig->handler == NULL)
+	{
+		next->sig_info->signal_pending = 0;
+		return;
 	}
-	 
-	if((act == NULL) && (oact == NULL))
-		return -1; 
+	interrupt_disable();
+	void * restore;
+	uint32_t new_eip;
+
+//	printf("handler %p flgs %lx restorer %p mask1 %x mask2 %x sig %i\n",
+//			sig->handler, sig->flags, sig->restorer, sig->mask[0], sig->mask[1], sig_num);
+
+#ifdef SIGNAL_TEST
+	restore = (void*)signal_test_user_func;
+	new_eip = (uint32_t)signal_test_restore_func;
+#else
+	restore = (void*)sig->restorer;
+	new_eip = (uintptr_t)sig->handler;
+#endif
+
+	if(next->signal_regs == NULL)
+		next->signal_regs = kcalloc(1, sizeof(registers_t));
+
+	kmemcpy(next->signal_regs, (void *)regs_bottom, sizeof(*regs_bottom));
+	next->useresp = (uint8_t *)regs_bottom->useresp;
+
+	push = (uint32_t *)regs_bottom->useresp;
+	*--push = 0xDEADC0DE;
+	*--push = sig_num;
+	*--push =(uintptr_t)restore;
+
+	regs_bottom->useresp = (uintptr_t)push;
+	regs_bottom->eip = (uint32_t)new_eip;
+
+	next->sig_info->signal_pending = 0; 
+//	next->status = THREAD_UNINTERRUPTIBLE;
+	interrupt_enable();
+
+}
+
+//TODO: Doesn't return EINTR if we were interrupted by a signal
+int sys_sigsuspend(const sigset_t *mask)
+{
+	thread_t *cur = thread_current();
+	struct thread_signals *sig_info = cur->sig_info;
+	sigset_t save;
+
+	interrupt_disable();
+	//verify_pointer(mask, sizeof(*mask));
+	
+	kmemcpy(&save, &sig_info->sigmask, sizeof(sig_info->sigmask));
+	kmemcpy(&sig_info->sigmask, (void *)mask, sizeof(*mask));
+//	printf("Blocking! Esp ~= %x\n", &mask);
+	cur->status = THREAD_BLOCKED;
+//	thread_scheduler(sig_info->regs);
+//	thread_yield();
+//	printf("We woke up! pid %i\n", thread_sig_inforent()->pid);
+//	printf("We woke up! pid %i\n", sig_info->pid);
+	kmemcpy(&sig_info->sigmask, &save, sizeof(sig_info->sigmask));
+//	registers_t *regs_bottom = (void *)sig_info + STACK_SIZE - sizeof(registers_t);
+//	dump_regs(regs_bottom);
+
+	interrupt_enable();
+
+	return -EINTR;
+}
+
+int sys_sigaction(int sig, const struct k_sigaction *act, struct k_sigaction *oact)
+{
+	thread_t *cur = thread_current();
+
+	//verify_pointer(act, sizeof(*act));
+	//verify_pointer(oact, sizeof(*oact));
+	interrupt_disable();
+
+//	printf("%i %x %x cur %x\n", sig, act, oact, cur);
+	
+	if(sig > NUM_SIGNALS -1 || sig == SIGKILL || sig == SIGSTOP)
+		return -EINVAL;
+
+//	printf("sigaction %ii %i %i %i\n", sig, SIGKILL, SIGSTOP, NUM_SIGNALS-1);
+
+	if(oact != NULL)
+	{
+		kmemcpy(oact, &cur->sig_info->signals[sig], sizeof(*oact));
+	}
+
+	if(act != NULL)
+	{
+	//	printf("%x\n", act->handler);
+		kmemcpy(&cur->sig_info->signals[sig], act, sizeof(*act));
+	//	printf("%x\n", &cur->sig_info->signals[sig]);
+	}
+
+	interrupt_enable();
 
 	return 0;
 }
 
-int sys_kill(int pid, int sig)
+int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
-//	thread_t * p = NULL;
-	(void)pid;
-	(void)sig;
-	printf("Kill(): pid %i sig %i\n", pid, sig);
-	//list_for_each_entry(p, &all_list, all_list)
+	thread_t *cur = thread_current();
+	struct thread_signals *sig_info = cur->sig_info;
+
+	//verify_pointer(set, sizeof(*set));
+	//verify_pointer(oldset, sizeof(*set));
+//	printf("%p %p\n", set, oldset);
+	if(oldset != NULL)
 	{
-	//	if(p->pid == pid)
-	//	{
-	//		p->signal_pending = sig;
-	//	}
+		kmemcpy(oldset->__bits, sig_info->sigmask.__bits, sizeof(sigset_t));
 	}
-//	thread_yield();
+//	printf(" HOW %i\n", how);
+	if(set != NULL)
+	switch(how)
+	{	
+		case SIG_BLOCK:
+			sig_info->sigmask.__bits[0] |= set->__bits[0];
+			sig_info->sigmask.__bits[1] |= set->__bits[1];
+			return 0;
+		case SIG_UNBLOCK:
+			sig_info->sigmask.__bits[0] &= ~set->__bits[0];
+			sig_info->sigmask.__bits[1] &= ~set->__bits[1];
+			return 0;
+		case SIG_SETMASK:
+			kmemcpy(sig_info->sigmask.__bits, set->__bits, sizeof(sigset_t));
+			return 0;
+		default:
+			return -EINVAL;
+	}
+	return -EINVAL;
+}
+
+//FIXME handle permissions?
+int sys_kill(pid_t pid, int sig)
+{
+	thread_t *p = thread_by_pid(pid);
+
+	if(p == NULL)
+		return -ESRCH;
+
+	if(sig > NUM_SIGNALS-1)
+		return -EINVAL;
+
+	//printf("sys_kill: Thread %x Pid %i Sig %i sp %x\n", p, pid, sig, p->sp);
+
+	//FIXME: Not right
+	if(p->status == THREAD_BLOCKED)
+		p->status = THREAD_READY;
+	
+	sigaddset(&p->sig_info->pending, sig);
+	p->sig_info->signal_pending = 1;
+	
 	return 0;
+}
+
+void signal_test_restore_func(long unknown) 
+{
+	//thread_t *cur = thread_current();
+	printf("Signal #%x Address %x\n", unknown, &unknown);
+	printf("Return address: %p\n",  __builtin_return_address (0));
+	printf("Frame address: %p\n",  (uint32_t *)__builtin_frame_address (0));
+}
+void signal_test_user_func(int sig) 
+{
+	printf("Signal #%x Address %x\n", sig, &sig);
+	printf("Return address: %p\n",  __builtin_return_address (0));
+	printf("Frame address: %p\n",  (uint32_t *)__builtin_frame_address (0));
+
 }
 

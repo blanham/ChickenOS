@@ -1,0 +1,152 @@
+/*  vim: set syntax=c */
+//#define SIGNAL_TEST
+void signal_do2(registers_t *regs, thread_t *next)
+{
+	int sig_num = next->signal_pending;
+	struct k_sigaction *sig;
+	sig = &next->signals[sig_num];
+	(void)sig;
+	uint32_t new_eip;
+	void * restore;
+	uint8_t *new_useresp;
+	registers_t *reg_frame;
+	fuckass = kcalloc(sizeof(*fuckass), 1);	
+#ifdef SIGNAL_TEST
+	restore = (void*)signal_test_user_func;
+	new_eip = (uint32_t)signal_test_restore_func;
+#else
+	restore = (void*)sig->restorer;
+	new_eip = (uintptr_t)sig->handler;
+#endif
+
+
+	kmemcpy(next->ksignal_stack, (void *)next, STACK_SIZE);
+	
+	printf("PHYS BASE REGS %X\n", __builtin_frame_address(0));
+//	dump_regs((void *)next + STACK_SIZE - 0x00);
+//	dump_regs((void *)next + STACK_SIZE - 0x08);
+	dump_regs((void *)next + STACK_SIZE - sizeof(registers_t));
+//	dump_regs((void *)regs);
+//	while(1)
+		
+//		;
+	tss_update((uintptr_t)next->ksignal_stack + STACK_SIZE);
+	new_useresp = (uint8_t *)next->useresp;
+	save_eip = next->regs->eip;
+ 	save_r = (uint32_t)(void *)regs;
+
+	reg_frame = regs;//(void *)(next->sp + 4);// - 0x100;//new_useresp;
+
+	kmemcpy(fuckass, reg_frame,sizeof(*reg_frame));
+
+	save_r = (uintptr_t)next->sp + 4;//n
+
+	printf("Regframe %x\n", reg_frame);
+
+	dump_regs(regs);
+
+//	next->regs = reg_frame;
+	/*reg_frame--;
+	reg_frame->esp = */
+	printf("reg_frame %x sp %x\n", reg_frame, next->sp);	
+
+	printf("handler %p flgs %lx restorer %p mask1 %x mask2 %x sig %i\n",
+			sig->handler, sig->flags, sig->restorer, sig->mask[0], sig->mask[1], sig_num);
+
+	reg_frame->eip = (uintptr_t)new_eip;
+	reg_frame->ebp = (uintptr_t)new_useresp - 16;	
+	reg_frame->cs = 0x1b;
+	reg_frame->ds = reg_frame->es = reg_frame->fs = 
+	reg_frame->gs = reg_frame->ss = 0x23;
+	reg_frame->eflags = 0x200;
+
+	printf("regs 2 %x\n", next->pid);
+	dump_regs(regs);
+	printf("\n");
+
+	uint32_t *push = (uint32_t *)new_useresp;
+	
+	*push-- = next->signal_pending;
+	*push =(uintptr_t)restore;
+
+	next->usersp = next->sp;
+
+	reg_frame->useresp = (uintptr_t)push;
+
+	next->signal_pending = 0;
+	next->status = THREAD_UNINTERRUPTIBLE;
+	extern tss_t tss;
+	printf("ESP %x\n", tss.esp0);
+
+//	tss_update((uintptr_t)next - 0x800);
+	extern tss_t tss;
+	printf("ESP %x\n", tss.esp0);
+extern void tss_flush();
+//tss_flush();
+extern void gdt_thing();
+//gdt_thing();
+}
+
+//we fuck off and have it return to user mode
+void signal_do2(registers_t *regs, thread_t *next)
+{
+	struct k_sigaction *sig;
+	volatile uint32_t *esp;
+	uint32_t new_eip;
+	void * restore;
+	int sig_num = next->signal_pending;
+	sig = &next->signals[next->signal_pending];
+
+	interrupt_disable();
+
+	printf("PID %i\n", next->pid, next);
+	printf("base %x\n", next->signals);
+
+#ifdef SIGNAL_TEST
+	restore = (void*)signal_test_user_func;
+	new_eip = (uint32_t)signal_test_user_func;
+#else
+	restore = (void*)sig->restorer;
+	new_eip = (uintptr_t)sig->handler;
+#endif
+
+	//esp = (uint32_t *)palloc();
+	esp = (uint32_t *)thread_current()->useresp;
+
+	printf("sig %x\n", sig);
+	printf("handler %p flgs %lx restorer %p mask1 %x mask2 %x sig %i\n",
+			sig->handler, sig->flags, sig->restorer, sig->mask[0], sig->mask[1], sig_num);
+
+	save_r = regs->useresp;
+	next->signal_pending = 0;
+
+	//allocate new registers_t
+	//use intr_return to do shit?
+	//or just the scheduler?
+
+	asm volatile(
+				"mov %2, %%esp\n"
+				"pushl %1\n"
+				"pushl %3\n"//$0xdeadbeef\n"
+				"mov $0x23, %%ax\n"
+				"mov %%ax, %%ds\n" 
+				"mov %%ax, %%es\n" 
+				"mov %%ax, %%fs\n" 
+				"mov %%ax, %%gs\n" 
+				"mov %%esp, %%eax\n"
+				"pushl $0x23\n"
+				"pushl %%eax\n"
+				"pushf\n"
+				"popl %%eax\n"
+				"mov $0x200, %%eax\n" //"orl $0x200, %%eax\n"
+				"pushl %%eax\n"
+				"pushl $0x1b\n"
+				"push %0\n"
+				"iret\n"
+				::
+				"m"(new_eip), "m"(sig_num), "m" (esp), "m"(restore)
+				);
+		PANIC("Past stuff\n");
+}
+
+

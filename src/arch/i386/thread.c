@@ -24,6 +24,7 @@ void arch_thread_init()
 
 void thread_yield()
 {
+	
 	asm volatile("int $32");
 }
 
@@ -32,13 +33,19 @@ void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next)
 	extern void pic_send_end(int irq);
 	uint32_t _esp = 0;
 	cur->sp = (uint8_t *)regs->ESP;
-	_esp = (uint32_t)next->sp;
 
-	tss_update((uintptr_t)next + STACK_SIZE);
 	pagedir_install(next->pd);
 //	printf("dfaddfafds\n");
 //	dump_regs((void *)_esp + 4);
+	tss_update((uintptr_t)next + STACK_SIZE);
 
+	if(next->sig_info->signal_pending != 0)
+	{
+	//registers_t *regs_bottom = (void *)next + STACK_SIZE - sizeof(registers_t);
+	//	printf("NEXT %X sp %x eip %x usereip %x\n", next, next->sp, next->regs->eip, regs_bottom->eip);
+		signal_do(next->regs, next);
+	}
+	_esp = (uint32_t)next->sp;
 	//have to reset timer interrupt here
 	pic_send_end(0);
 	
@@ -51,7 +58,8 @@ void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next)
 
 }
 
-//Heh, we don't need this anymore
+//Not used anymore, kept for reference
+/*
 void thread_usermode(void)
 {
 	uint32_t cur_esp,new_esp;
@@ -69,10 +77,8 @@ void thread_usermode(void)
 
 	pagedir_insert_pagen(cur->pd, (uintptr_t)userstack, 
 			(uintptr_t)PHYS_BASE - STACK_SIZE, 0x7, STACK_PAGES);
-	extern uintptr_t main_loc;
 
 
-	printf("Main %p\n", main_loc);
 
 	//puts new kernel stack in tss
 	//FIXME? Since this is the kernel thread
@@ -116,5 +122,5 @@ void thread_usermode(void)
 				"m"(new_esp)
 				);
 }
-
+*/
 

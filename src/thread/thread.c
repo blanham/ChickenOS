@@ -11,11 +11,36 @@
 #include <kernel/memory.h>
 #include <kernel/interrupt.h>
 #include <mm/liballoc.h>
+#include <util/utlist.h>
 
+//XXX: Remove this when we reintegrate fs code
+extern struct file *root;
 
-struct sigaction *default_signals[32];
-char *_main_thread_name = "idle";
-
+struct thread_files *thread_files_alloc(struct thread_files *old)
+{
+	struct thread_files * new = kcalloc(sizeof(struct thread_files), 1);
+	if(old)
+	{
+		kmemcpy(new, old, sizeof(struct thread_files));
+		new->files = kcalloc(sizeof(struct file *), 32);
+		new->files_flags = kcalloc(sizeof(int), 32);
+		//FIXME: increment ref count on root and cur_dir inodes
+		for(int i = 0; i < old->files_count; i++)
+		{
+			//new->files[i] = vfs_reopen(olf->files[i]);
+			new->files[i] = old->files[i];
+			//new->files_flags[i] = 0;
+		}
+	}
+	else
+	{
+	//	new->root = new->cur = root->inode; 
+		new->files_count = 32;
+		new->files = kcalloc(sizeof(struct file *), 32);
+		new->files_flags = kcalloc(sizeof(int), 32);
+	}
+	return new;
+}
 
 void thread_init()
 {
@@ -25,22 +50,18 @@ void thread_init()
 
 	//do this inline, otherwise assertion fails in thread_current()	
 	stackpointer_get(kernel_thread);
-
 	kernel_thread = (thread_t *) ((uintptr_t)kernel_thread & ~(STACK_SIZE -1));
-	
-	kernel_thread->pid = 0;
-	kernel_thread->parent = 0;
-	kernel_thread->pgid = 0;
 
-	kernel_thread->pd = pagedir_new();
-	kernel_thread->signals = default_signals;
-
-	//FIXME:
-	kernel_thread->name = _main_thread_name;
+	kmemset(kernel_thread,0, sizeof(thread_t));	
 	kernel_thread->magic = THREAD_MAGIC;
 
-	thread_scheduler_init(kernel_thread);
+	kernel_thread->pd = pagedir_new();
+	kernel_thread->file_info = thread_files_alloc(NULL); 
+	kernel_thread->sig_info = kcalloc(sizeof(struct thread_signals), 1);
 
+	kernel_thread->name = strdup("idle");
+
+	thread_scheduler_init(kernel_thread);
 	arch_thread_init();
 }
 
@@ -53,45 +74,47 @@ thread_new()
 	return new;
 }
 
+void
+thread_add_child(thread_t *parent, thread_t *child)
+{
+	LL_APPEND2(parent->children, child, child_next);
+}
 
 thread_t *
 thread_clone(thread_t *cur)
 {
-	thread_t *new;
-	
-	new = thread_new();
+	thread_t *new = thread_new();
+
+	//FIXME: Just manually move things over
 	kmemcpy(new, cur, sizeof(thread_t));
 
-	new->parent = cur->pid;
+	new->ppid = cur->pid;
 	new->pgid = cur->pgid;
 	new->pid = pid_allocate();
 	
-	new->cur_dir = cur->cur_dir;
+	new->file_info = thread_files_alloc(cur->file_info);
+	new->sig_info = kcalloc(sizeof(struct thread_signals), 1);
 
-	//FIXME: Should be a vfs call that increases reference counts
-	//FIXME: Also should be more than 8 files	
-	kmemcpy(new->files, cur->files, sizeof(struct file)*8);
+	kmemcpy(new->sig_info->signals, cur->sig_info->signals, 
+			sizeof(struct k_sigaction) * NUM_SIGNALS);
 
-	new->signals = (struct sigaction **)
-		kcalloc(sizeof(struct sigaction*), NUM_SIGNALS);
-	kmemcpy(new->signals, cur->signals, sizeof(struct sigaction*) * NUM_SIGNALS);
-
-	new->magic = THREAD_MAGIC;
 	new->name = strdup(cur->name);
+	new->magic = THREAD_MAGIC;
+
+	thread_add_child(cur, new);
+
 	return new;
 }
 
 //The lazy way of copying most shit from a passed in regs, works
 //but better to just always build a stack
-
-//FIXME: doesn't copy open files over to new process in the case of a fork
 pid_t 
 thread_create(registers_t *regs, void (*eip)(void *), void * esp)
 {
 	thread_t *new, *cur;
 	enum intr_status old_level;
 	registers_t *reg_frame;
-	uint8_t *kernel_stack, *user_stack;
+	uint8_t *kernel_stack, *user_stack;//, *signal_stack;
 	uintptr_t new_sp;
 	uint32_t *usersp;	
 	old_level = interrupt_disable();
@@ -100,6 +123,7 @@ thread_create(registers_t *regs, void (*eip)(void *), void * esp)
 	new = thread_clone(cur);
 	
 	kernel_stack = (uint8_t *)new;
+	cur->children = new;
 	
 	//Allocates one page, if we page fault under the stack pointer we add more
 	user_stack = palloc();
@@ -107,17 +131,19 @@ thread_create(registers_t *regs, void (*eip)(void *), void * esp)
 
 	usersp = (uint32_t *)(user_stack + 4096);
 	new_sp = (uintptr_t)kernel_stack + STACK_SIZE;
-	
+
+
 	new->pd = pagedir_clone(cur->pd);
+	//FIXME: what if user stack is bigger?
 	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
 		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
-	
+
 	reg_frame = (void *)((kernel_stack + STACK_SIZE) - sizeof(*reg_frame));
 	new->regs = (struct registers *)reg_frame;
 	
 	if(regs != NULL)
 	{
-		//FIXME: what isf user stack is bigger?
+		//FIXME: what if user stack is bigger?
 		kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);
 		kmemcpy(reg_frame, regs, sizeof(registers_t));		
 		//this is a fork, so we want to be 0
@@ -150,7 +176,11 @@ thread_create(registers_t *regs, void (*eip)(void *), void * esp)
 
 	return new->pid;	
 }
-
+/*
+void thread_add_child(thread_t *thread, thread_t *child)
+{
+}
+*/
 pid_t pid_allocate()
 {
 	static pid_t pid_count = 0;
@@ -167,9 +197,11 @@ thread_t * thread_current()
 	stackpointer_get(ret);
 
 	ret = (thread_t *) ((uintptr_t)ret & ~(STACK_SIZE -1));
-	
-	THREAD_ASSERT(ret);
-
+	if(ret->magic != THREAD_MAGIC)
+	{	
+		printf("PID %i\n", ret->pid);
+		THREAD_ASSERT(ret);
+	}
 	return ret;
 }
 
