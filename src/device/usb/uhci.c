@@ -93,9 +93,7 @@ struct uhci_controller * uhci_init()
 	struct uhci_controller *new;
 	uint32_t ret;
 
-	//FUCK we have a broken pointer or something somewhere
-	//Allocate a ton of space to allocate a new chunk of pages
-	new = (struct uhci_controller *)kcalloc(sizeof(*new),4096);
+	new = (struct uhci_controller *)kcalloc(sizeof(*new),1);
 	
 	//frames need page aligned 4096 byte buffer
 	//so we just grab a page.
