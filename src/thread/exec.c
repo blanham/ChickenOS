@@ -4,7 +4,7 @@
 #include <memory.h>
 #include <errno.h>
 #include <mm/liballoc.h>
-#include <mm/paging.h>
+#include <mm/vm.h>
 #include <thread.h>
 #include <kernel/interrupt.h>
 #include <fs/vfs.h>
@@ -14,7 +14,7 @@
 
 enum exe_type {EXE_INVALID, EXE_ELF, EXE_SCRIPT};
 
-static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[]);
+static uintptr_t stack_prepare(void *stack, char *path, char *const argv[], char *const envp[]);
 
 static enum exe_type exec_type(const char *path);
 
@@ -39,6 +39,7 @@ int sys_execve(const char *_path, char *const _argv[], char *const _envp[])
 	char **argv = NULL, **envp = NULL;
 	char *path;
 	enum exe_type type;
+	int ret = -ENOEXEC;
 
 	if(_path == NULL || _argv == NULL)
 		goto failure;
@@ -73,20 +74,25 @@ int sys_execve(const char *_path, char *const _argv[], char *const _envp[])
 		kmemset(user_stack,0, 4096);
 
 		//FIXME: some things may carry over	
-		cur->pd = pagedir_new();
 		
-		pagedir_insert_page(cur->pd, (uintptr_t)user_stack, 
-			(uintptr_t)PHYS_BASE - 0x1000, 0x7);
+//		pagedir_insert_page(cur->mm->pd, (uintptr_t)user_stack, 
+//		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
 
-		pagedir_install(cur->pd);
-	
-		if(load_elf(path, &regs->eip) != 0)
+	cur->mm->pd = pagedir_new();
+		pagedir_install(cur->mm->pd);
+	cur->mm->regions = NULL;
+	memregion_add(cur, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN, 
+			MAP_GROWSDOWN | MAP_FIXED, NULL, user_stack); 
+	memregion_add(cur, HEAP_BASE, PAGE_SIZE, PROT_GROWSUP, MAP_PRIVATE | MAP_FIXED, NULL, NULL); 
+		pagedir_install(cur->mm->pd);
+
+		if((ret = load_elf(path, &regs->eip)) != 0)
 			goto failure;
 
 		kfree(cur->name);
 		cur->name = strdup(argv[0]);
 	
-		regs->useresp = stack_prepare(cur->name, argv, envp);
+		regs->useresp = stack_prepare(user_stack + 4096, cur->name, argv, envp);
 		/*uint32_t *auxv = (void *)regs->useresp + 4;
 		kmemset((void *)regs->useresp - 24, 0xff, 48);
 	//	build_auxv(&auxv);
@@ -97,23 +103,26 @@ int sys_execve(const char *_path, char *const _argv[], char *const _envp[])
 		//FIXME: probably not the best address for break
 		//should be right above the code segment of the
 		//executable, 
-		cur->brk = (void *)0xA400000;
+		cur->mm->brk = (void *)HEAP_BASE;
 
-		pagedir_insert_pagen(cur->pd, (uintptr_t)pallocn(1000), (uintptr_t)cur->brk, 0x7, 1000);
+	//	cur->mm->pd = pagedir_new();
+	//	pagedir_insert_pagen(cur->mm->pd, (uintptr_t)pallocn(100), (uintptr_t)cur->mm->brk, 0x7, 100);
+	//	pagedir_install(cur->mm->pd);
+
 	}
 
 	//if we return, then something is wrong	
 failure:
 	kfree(argv);
 	kfree(envp);
-	return -1;
+	return ret;
 }
 
 static void push_arg(char *arg, uint8_t **sp);
 static int build_table(char **table, char * const source[], uint8_t **stack);
-static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[])
+static uintptr_t stack_prepare(void * stackp, char *path, char *const argv[], char *const envp[])
 {
-	uint8_t *stack = (uint8_t *)PHYS_BASE;
+	uint8_t *stack = (uint8_t *)PHYS_BASE;(void)stackp;
 	char **arg_table;//[MAX_ARGS];
 	char **envp_table;//[MAX_ENVS];
 	int argc = 0, envc = 0;	
@@ -157,6 +166,7 @@ static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[
 
 	kfree(arg_table);
 	kfree(envp_table);
+
 	
 	return (uintptr_t)stack;	
 }

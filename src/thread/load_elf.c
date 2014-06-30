@@ -3,111 +3,68 @@
 #include <string.h>
 #include <stdbool.h>
 #include <memory.h>
-#include <mm/paging.h>
+#include <mm/vm.h>
 #include <mm/liballoc.h>
+#include <errno.h> 
 #include <thread.h>
 #include <fs/vfs.h>
 #include <elf.h>
-typedef struct elf_header {
-	uint8_t magic[4];
-	uint8_t class;
-	uint8_t byteorder;
-	uint8_t hversion;
-	uint8_t pad[9];
-	uint16_t filetype;
-	uint16_t archtype;
-	uint32_t fversion;
-	uint32_t entry;
-	uint32_t phdrpos;
-	uint32_t shdrpos;
-	uint32_t flags;
-	uint16_t hdrsize;
-	uint16_t phdrent;
-	uint16_t phdrcnt;
-	uint16_t shdrent;
-	uint16_t shdrcnt;
-	uint16_t strsec;
-} __attribute__((packed)) elf_header_t;
-typedef struct elf_section {
-	uint32_t sh_name;
-	uint32_t sh_type;
-	uint32_t sh_flags;
-	uint32_t sh_addr;
-	uint32_t sh_offset;
-	uint32_t sh_size;
-	uint32_t sh_link;
-	uint32_t sh_info;
-	uint32_t sh_align;
-	uint32_t sh_entsize;
-}  __attribute__((packed)) elf_section_t;
-typedef struct elf_program_header {
-	uint32_t ph_type;
-	uint32_t ph_offset;
-	uint32_t ph_virtaddr;
-	uint32_t ph_physaddr;
-	uint32_t ph_filesize;
-	uint32_t ph_memsize;
-	uint32_t ph_flags;
-	uint32_t ph_align;
-} __attribute__((packed)) elf_program_header_t;
-//	PRIntf("phdrpos %X shdrpos %X\n",header->phdrpos, header->shdrpos);
-//	printf("phdrent %X phdrcnt %i shdrent %X shdrcnt %i\n",	
-//		header->phdrent, header->phdrcnt, header->shdrent, header->shdrcnt);
 
-void elf_print_sections(elf_section_t *sections)
+void elf_print_sections(Elf32_Shdr  *sections)
 {
-//	uint32_t sh_name;
-//	uint32_t sh_type;
-//	uint32_t sh_flags;
 	printf("type %i addr %X offset %i size %X link %X info %X align %X entsize %x\n",
  		sections->sh_type, sections->sh_addr, sections->sh_offset, sections->sh_size,
-		sections->sh_link, sections->sh_info, sections->sh_align, sections->sh_entsize);
-
+		sections->sh_link, sections->sh_info, sections->sh_addralign, sections->sh_entsize);
 }
 
-void elf_print_programs(elf_program_header_t *program)
+void elf_print_programs(Elf32_Phdr *program)
 {
 	printf("type %i offset %X virtaddt %X filesize %X memsize %X align %X\n",
-		program->ph_type, program->ph_offset, program->ph_virtaddr,
- 		program->ph_filesize, program->ph_memsize, program->ph_align);
+		program->p_type, program->p_offset, program->p_vaddr,
+ 		program->p_filesz, program->p_memsz, program->p_align);
 }
 
-static void elf_load_program(elf_header_t *header, int fd)
+void elf_load_program(Elf32_Ehdr *header, struct file *file)
 {
-	elf_program_header_t *program = kmalloc(sizeof(*program)*header->phdrcnt);
+	Elf32_Phdr *program;
+	pagedir_t pd = thread_current()->mm->pd;
 	void *code;
-	pagedir_t pd = thread_current()->pd;
 	int pages = 0;
 
-	sys_lseek(fd, header->phdrpos, SEEK_SET);
-	sys_read(fd, program, sizeof(*program)*header->phdrcnt);
+   	program = kcalloc(sizeof(*program), header->e_phnum);
 
-	for(int i = 0; i < header->phdrcnt; i++)
+	//FIXME: hack so we don't allocate fd
+	file->offset = header->e_phoff;
+	vfs_read(file, program, sizeof(*program)*header->e_phnum);
+
+	for(int i = 0; i < header->e_phnum; i++)
 	{
-		if(program->ph_type == PT_LOAD)
+		if(program->p_type == PT_LOAD)
 		{
-			elf_print_programs(program);
-			sys_lseek(fd, program->ph_offset, SEEK_SET);
-			pages = program->ph_memsize/PAGE_SIZE + 1;
+			//elf_print_programs(program);
+			file->offset =program->p_offset;
+			pages = program->p_memsz/PAGE_SIZE + 1;
+
 			code = pallocn(pages);
+
 			void *old = code;	
-			if(program->ph_filesize < program->ph_memsize)
+			if(program->p_filesz < program->p_memsz)
 			{
-				memset(code, 0, pages*4096);
+				memset(code, 0, pages * PAGE_SIZE);
 				//memset((void *)(code + program->ph_filesize), 0x0, program->ph_memsize - program->ph_filesize);
 			}
-			if((program->ph_offset & 0xFFF) != 0)
+			if((program->p_offset & 0xFFF) != 0)
 			{
-				code = code + (program->ph_offset & 0xfff) ;
+				code = code + (program->p_offset & 0xfff) ;
 				//program->ph_virtaddr -= (program->ph_offset & 0xfff);
 				pages++;
 				//printf("code %p virtaddr %p\n", code,program->ph_virtaddr);
 			}
-			sys_read(fd, code, program->ph_filesize);
-			printf("%p %p %p %p %i %i\n",
-					code,old, program->ph_virtaddr, program->ph_offset, 
-					program->ph_memsize/PAGE_SIZE,pages); 
-			pagedir_insert_pagen(pd, (uintptr_t)old, program->ph_virtaddr, 0x7, pages+1);
+			vfs_read(file, code, program->p_filesz);
+		//	printf("%p %p %p %p %i %i\n",
+		//			code,old, program->ph_virtaddr, program->ph_offset, 
+		//			program->ph_memsize/PAGE_SIZE,pages); 
+			pagedir_insert_pagen(pd, (uintptr_t)old, program->p_vaddr, 0x7, pages+1);
 		//	printf("insert %i pages\n",pages);
 		}	
 		program++;
@@ -115,48 +72,166 @@ static void elf_load_program(elf_header_t *header, int fd)
 
 	pagedir_install(pd);
 }
-int load_elf2(int fd, uintptr_t *entry, uint32_t *stack)
+#define ELF_MIN_ALIGN PAGE_SIZE
+#define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN-1))
+#define ELF_PAGEOFFSET(_v) ((_v) & (ELF_MIN_ALIGN-1))
+#define ELF_PAGEALIGN(_v) (((_v) + ELF_MIN_ALIGN - 1) & ~(ELF_MIN_ALIGN - 1))
+
+void elf_load_program2(Elf32_Ehdr *header, struct file *file)
 {
-	Elf32_Ehdr *header = kcalloc(sizeof(*header), 1);
+	Elf32_Phdr *phdr;
+	thread_t *cur = thread_current();
 
-	(void)stack;	
-	(void)header;
-	(void)fd;
-	(void)entry;
+   	phdr = kcalloc(sizeof(*phdr), header->e_phnum);
 
-	return 0;
+	file->offset = header->e_phoff;
+
+	printf("OFFSET %x\n", file->offset);
+
+	vfs_read(file, phdr, sizeof(*phdr)*header->e_phnum);
+
+	for(uint16_t i = 0; i < header->e_phnum; i++)
+	{
+		if(phdr->p_type != PT_LOAD)
+			continue;
+
+		elf_print_programs(phdr);
+
+		printf("Mem %x \n", phdr->p_memsz + phdr->p_vaddr);
+
+//			   eppnt->p_offset - ELF_PAGEOFFSET(eppnt->p_vaddr));
+	//	uintptr_t dif = 0;
+	//	if((phdr->p_vaddr & 0xFFF) != 0)
+	//	{
+	//		dif = phdr->p_vaddr & 0xfff;
+	//		phdr->p_vaddr &= ~0xFFF;
+	//		//phdr->p_vaddr += 0x1000;
+	//	}
+	//	if((phdr->p_memsz & 0xFFF) != 0)
+	//	{
+	//		printf("OLD MEMSIZE %x\n", phdr->p_memsz);
+	//		phdr->p_memsz &= ~0xFFF;
+	//		phdr->p_memsz += 0x1000;
+	//	}
+	//	if((phdr->p_offset & 0xFFF) != 0)
+	//	{
+	//	//	phdr->p_offset &= ~0xFFF;
+	//	//	phdr->p_offset += 0x1000;
+	//	}
+
+	//	file->offset = phdr->p_offset;
+	//	//file->offset = phdr->p_offset- ELF_PAGEOFFSET(phdr->p_vaddr);
+
+	//	//memregion_add(cur, phdr->p_vaddr, 
+	//	//		phdr->p_memsz, 0, 0, file, NULL);
+	//	void *data = pallocn((phdr->p_memsz / PAGE_SIZE) + 1);
+	//	data += dif;
+	////	vfs_read(file, data, phdr->p_filesz);
+	//	printf("DATA %X %X %X\n", ((int *)data)[0],   ((int *)data)[1], ((int *)data)[2] );
+		uint32_t offset = phdr->p_offset & ~0xFFF;
+		uint32_t vaddr = phdr->p_vaddr & ~0xFFF;
+		uint32_t memsz = phdr->p_memsz;
+		file->offset = offset;
+		//if(vaddr == 0x806a000)
+		//	memsz += 0x2000;
+		memregion_add(cur, vaddr, memsz, 0, 0, file, NULL);
+		
+
+	//	memregion_add(cur, phdr->p_vaddr, phdr->p_memsz + 0x1000, 0, 0, file, NULL);
+		printf("Vaddr %8x Memsize %x Offset %x\n", phdr->p_vaddr, phdr->p_memsz, phdr->p_offset); 
+		(void)cur;
+
+		phdr++;
+	}
+}
+
+void elf_load_program3(Elf32_Ehdr *header, struct file *file)
+{
+	Elf32_Phdr *program;
+	pagedir_t pd = thread_current()->mm->pd;
+	void *code;
+	int pages = 0;
+	thread_t *cur = thread_current();
+
+   	program = kcalloc(sizeof(*program), header->e_phnum);
+
+	//FIXME: hack so we don't allocate fd
+	file->offset = header->e_phoff;
+	vfs_read(file, program, sizeof(*program)*header->e_phnum);
+
+	for(int i = 0; i < header->e_phnum; i++)
+	{
+		if(program->p_type == PT_LOAD)
+		{
+			//elf_print_programs(program);
+			file->offset =program->p_offset;
+			pages = program->p_memsz/PAGE_SIZE + 1;
+
+			code = pallocn(pages);
+
+			void *old = code;	
+			if(program->p_filesz < program->p_memsz)
+			{
+				memset(code, 0, pages * PAGE_SIZE);
+				//memset((void *)(code + program->ph_filesize), 0x0, program->ph_memsize - program->ph_filesize);
+			}
+			if((program->p_offset & 0xFFF) != 0)
+			{
+				code = code + (program->p_offset & 0xfff) ;
+				//program->ph_virtaddr -= (program->ph_offset & 0xfff);
+				pages++;
+				//printf("code %p virtaddr %p\n", code,program->ph_virtaddr);
+			}
+			vfs_read(file, code, program->p_filesz);
+		//	printf("%p %p %p %p %i %i\n",
+		//			code,old, program->ph_virtaddr, program->ph_offset, 
+		//			program->ph_memsize/PAGE_SIZE,pages); 
+			//pagedir_insert_pagen(pd, (uintptr_t)old, program->p_vaddr, 0x7, pages+1);
+			memregion_add(cur, program->p_vaddr, 
+				program->p_memsz + 0x1000, 0, 0, NULL, old);
+
+
+		//	printf("insert %i pages\n",pages);
+		}	
+		program++;
+	}
+
+	pagedir_install(pd);
 }
 
 int load_elf(const char *path, uintptr_t *eip)
 {
-	int fd;
+	struct file *file;
 	int ret = 0;
-	elf_header_t *header;
+	Elf32_Ehdr *header;
 	header = kmalloc(sizeof(*header));
-
-	if((fd = sys_open(path, 0, 0)) < 0)
+	
+	file = vfs_open((char *)path, 0, 0);
+	if(file == NULL)
 	{
 		printf("Failed to open elf executable\n");
 		return -1;
 	}	
 		
-	if((ret = sys_read(fd, header, sizeof(*header))) != sizeof(*header))
+	if((ret = vfs_read(file, header, sizeof(*header))) != sizeof(*header))
 	{
 		printf("Error reading ELF header\nShould have read %x bytes, actually read %x bytes\n",
 				sizeof(*header), ret);
 		return -1;
 	}
-	if(memcmp(header->magic, ELFMAG, SELFMAG) != 0)
+	if(memcmp(header->e_ident, ELFMAG, SELFMAG) != 0)
 	{
 		printf("Missing or invalid ELF magic number!\n");
 		return -1;
 	}
 	
-	elf_load_program(header, fd);	
-	
-	*eip = header->entry;
+//	elf_load_program(header, file);	
+	//elf_load_program2(header, file);	
+	elf_load_program2(header, file);	
+//	while(1);	
+	*eip = header->e_entry;
 	kfree(header);
-	sys_close(fd);
+//	sys_close(fd);
 	
 	return 0;
 }
@@ -168,4 +243,3 @@ bool elf_check_magic(void *magic)
 
 	return false;
 }
-
