@@ -1,4 +1,4 @@
-ChickenOS v 0.01
+ChickenOS v 0.01 [![Build Status](https://travis-ci.org/blanham/ChickenOS.svg?branch=master)](https://travis-ci.org/blanham/ChickenOS)
 ===============================================================================
 A simple monolithic kernel, inspired by the Pintos teaching OS and Linux.
 
