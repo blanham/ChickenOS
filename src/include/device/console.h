@@ -39,7 +39,8 @@ void console_fs_init();
 /*
 void console_clear();
 void console_set_color(uint8_t bg_color, uint8_t fg_color);*/
-void console_putc(uint8_t c);
+void console_putc(int c);
+void console_putchar(int c);
 int console_puts(char *string);
 void console_switch(int num);
 void console_register(console_t *console);

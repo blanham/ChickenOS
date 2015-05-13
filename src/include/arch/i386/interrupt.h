@@ -1,7 +1,9 @@
 #ifndef C_OS_ARCH_I386_INTERRUPT_H
 #define C_OS_ARCH_I386_INTERRUPT_H
-
 #include <stdint.h>
+
+#define NUM_IRQS 16
+#define NUM_ISRS 32
 
 enum {
 	IRQ0 = 32, IRQ1, IRQ2, IRQ3,
@@ -27,4 +29,5 @@ typedef struct registers
 /*TODO:rename me to registers_dump*/
 void dump_regs(registers_t *regs);
 void arch_interrupt_init();
+void i386_syscall_handler(registers_t *regs);
 #endif

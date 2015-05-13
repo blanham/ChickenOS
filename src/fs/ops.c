@@ -38,7 +38,7 @@ int sys_open(const char *_path, int oflag, mode_t mode)
 	struct file * fp = vfs_open(path, oflag, mode);
 	
 	int td = 0;
-	printf("open %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
+//	printf("open %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
 	
 	if(fp == NULL)
 	{
@@ -55,7 +55,7 @@ int sys_open(const char *_path, int oflag, mode_t mode)
 		}
 	}
 	kfree(path);
-	printf("FD %i\n", td);
+///	printf("FD %i\n", td);
 	return td;
 fail:
 	kfree(path);
@@ -138,7 +138,7 @@ int sys_stat64(const char *filename, struct stat64 *statbuf)
 //	statbuf->st
 	
 //	kmemcpy(statbuf, stat_test, sizeof(struct stat));
-	printf("filename64 %s\n", filename);
+//	printf("filename64 %s\n", filename);
 	return vfs_stat64(filename, statbuf);
 }
 

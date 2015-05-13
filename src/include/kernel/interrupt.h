@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 
-enum intr_status {INTR_ENABLED, INTR_DISABLED};
+enum intr_status { INTR_DISABLED, INTR_ENABLED};
 
 
 typedef void intr_handler (registers_t *);

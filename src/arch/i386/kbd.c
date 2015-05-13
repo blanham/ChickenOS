@@ -12,7 +12,6 @@ void reboot()
 		test = inb(0x64);
 	outb(0x64, 0xFE);
 	asm volatile ("hlt");
-
 }
 
 uint8_t kbd_read()

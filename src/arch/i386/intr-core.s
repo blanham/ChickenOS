@@ -86,7 +86,7 @@ sysc:
 	jmp _isr_handler
 
 
-[GLOBAL intr_return]
+[global intr_return]
 [extern interrupt_handler]
 _isr_handler:
 	sti	;reenable interrupts
@@ -95,13 +95,13 @@ _isr_handler:
 	push es
 	push ds
 	pusha
-	;mov ax, ds
-	;push eax
-	;have to setup kernel environment
+
 	cld
-	mov eax, 0x10
-	mov ds, eax
-	mov es, eax
+
+	mov ax, 0x10
+	mov ds, ax
+	mov es, ax
+
 	lea ebp, [esp+52]	
 
 	mov eax, esp

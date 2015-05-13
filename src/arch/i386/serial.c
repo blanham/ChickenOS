@@ -3,7 +3,9 @@
 #include <kernel/hw.h>
 #include <interrupt.h>
 #include <arch/i386/serial.h>
+
 uint16_t com_port = COM1;
+
 //FIXME: Just polls for now, should really start as polling
 //		 once system is far enough along switch to interrupts
 void serial_interrupt(registers_t *regs UNUSED)
@@ -19,12 +21,14 @@ int serial_received()
 
 int serial_ready()
 {
-	return inb(com_port + 5) & 0x20;
+	return inb(com_port + LSR) & 0x20;
 }
 
 void serial_putc(char c)
 {
 	//FIXME: should be a line discipline thing probably?
+	//NOTE: From mentions online yes it is
+
 	if(c == '\n')
 	{
 		serial_putc('\r');
@@ -33,6 +37,7 @@ void serial_putc(char c)
 	while(serial_ready() == 0);
 	
 	outb(com_port, c);	
+	outb(0xE9, c);	
 }
 
 int serial_getc()
@@ -69,7 +74,8 @@ void serial_init()
 	}
 	outb(com_port + IER, 0x00); //disable interrupts
 	serial_set_baud(com_port, 0x3);
-	outb(com_port + FCR, 0xC7); //enable fifo, clear it, 14 bytes
+//outb(com_port + FCR, 0xC7); //enable fifo, clear it, 14 bytes
+	outb(com_port + FCR, 0x0); //enable fifo, clear it, 14 bytes
 	outb(com_port + LCR, 0x0c);
 	//interrupt_register(IRQ4, serial_interrupt);
 }

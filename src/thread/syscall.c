@@ -11,61 +11,6 @@
 #include <string.h>
 #include <errno.h>
 #include <thread/syscall-names2.h>
-//#include <kernel/vfs.h>
-//needs to be seperated into two files
-
-//define a couple of internal syscalls so
-//we can fork and exec in the kernel 
-
-int temp_stack[0x1000];
-int *__esp = temp_stack;
-int dummy()
-{
-//	static int ret = 0xdeadbeef;
-//	static int test;
-	
-//	asm volatile("mov %%esp, %0":"=m"(test));
-//	memset(__esp, 0, 4096);
-//	__esp += 1024;
-	
-//	ret = (int)thread_current() + STACK_SIZE;
-//	ret = test;
-//	asm volatile("mov %0,%%esp\n"	:: "r"(__esp)	);
-//	printf("top stack %x current pos %x\n",ret, test);
-
-//	for(int i = 0; i < 32; i++)
-	//	printf("stack %x %x\n", (ret - i*4), *(int *)(ret - i*4));
-
-//	for(int i = 0; i < 32; i++)
-	//	printf("stack %x %x\n", (test - 4*4 + i*4), *(int *)(test - 4*4 + i*4));
-	int ret = SYSCALL_0N(SYS_DUMMY);
-//	printf("top stack %x current pos %x\n",ret, test);
-//	printf("dummy return\n");
-	//asm volatile("mov %%esp, %0":"=m"(ret));
-
-
-
-//	for(int i = 0; i < 10; i++)
-	//	printf("stack %x %x\n", (ret - 8 + i*4), *(int *)(ret - 8 + i*4));
-//	while(1)
-//		printf("COCKS\n");
-	return ret;
-}
-int get_pid()
-{
-	return SYSCALL_0N(SYS_GETPID);
-}
-
-int fork()
-{
-	return SYSCALL_0N(SYS_FORK);
-}
-
-int execv(const char *path, char * const argv[])
-{
-	char *envp[] = {"PATH=/", NULL};
-	return SYSCALL_3N(SYS_EXECVE, path, argv, envp);
-}
 
 //FIXME: Old network stuff that should be moved or removed
 extern void send_packet();
@@ -81,11 +26,12 @@ int network_setup()
 	return SYSCALL_0N(SYS_NETWORK);
 }
 
-extern void test_signals();
-	typedef long * arg56;
+typedef long * arg56;
 #define DEBUG
+
 //TODO: need to verify pointers before letting functions dereference them
-void syscall_handler (struct registers *regs)
+void syscall_handler (registers_t *regs)
+//int syscall_handler (uint32_t call, void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5)
 {
 	int call = regs->eax;
 	struct vec {
@@ -101,6 +47,7 @@ void syscall_handler (struct registers *regs)
 	serial_printf("%s(%i): by %i @ %x\n",syscall_names[call], call, thread_current()->pid,
 			regs->eip);
 #endif
+//	asm volatile ("cli");
 	switch (call)
 	{
 		case SYS_READ:
@@ -118,11 +65,14 @@ void syscall_handler (struct registers *regs)
 		case SYS_GETPPID:
 			regs->eax = sys_getppid();
 			break;
+		case 162://nanosleep()
+			regs->eax = 0;
+			break;
 		case 142:
-			regs->eax = 7;
+			regs->eax = regs->ebx;
 			break;
 		case SYS_POLL:
-			regs->eax = 7;
+			regs->eax = 1;
 			break;
 		case SYS_READV:
 			ass = (void *)regs->ecx;
@@ -232,7 +182,7 @@ void syscall_handler (struct registers *regs)
 			dump_regs(regs);
 			regs->eax = sys_sigsuspend((void*)regs->ebx);
 			break; 
-		//case 173:
+		case 173:
 		case SYS_SIGRETURN:
 			regs->eax = sys_sigreturn(regs, regs->ebx);
 			break;
@@ -261,7 +211,7 @@ void syscall_handler (struct registers *regs)
 		case SYS_MMAP2:
 			arg = (void *)regs->useresp-8;
 			//printf("arg %x\n", regs->edi);
-			dump_regs(regs);
+			//dump_regs(regs);
 			regs->eax = (uint32_t)sys_mmap2((void *)regs->ebx, (size_t)regs->ecx, (int)regs->edx, 
 											(int)regs->esi, (int)arg[0], (off_t)arg[1]);
 			break;
@@ -290,9 +240,6 @@ void syscall_handler (struct registers *regs)
 #ifdef DEBUG
 	serial_printf("%8i/%.8x\n", regs->eax, regs->eax);
 #endif
-}
-
-void syscall_init()
-{
-	interrupt_register(0x80, &syscall_handler);
+#undef DEBUG
+//	asm volatile ("sti");
 }

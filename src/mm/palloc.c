@@ -12,14 +12,28 @@
 #include <string.h>
 #include <stdio.h>
 
+
 phys_addr_t palloc_start = 0;
 bitmap_t page_bitmap;
 
+/*
+ New page allocator:
+ 	Placement<->16MB - Bitmap
+   		Needs to be able to allocate contiguous pages
+	16MB->PCI - Linked List
+		Each free page contains pointer to next free page
+	PCI Space
+		Also bitmap
+	struct free_page {
+		uintptr_t next_page;
+	};
+ */
 //if i seperate user/kernel pages, might build a struct:
 /*struct page_arena{
 	phys_addr_t arena_start;
 	bitmap_t page_bitmap;
 };
+
 */
 void palloc_internal_free(void *addr, int pages)
 {
@@ -42,8 +56,7 @@ int pallocn_free(void *addr, int pages)
 	return 0;
 }
 
-
-void *palloc_internal(phys_addr_t *phys, int pages)
+void *palloc_internal(int pages)
 {
 	int32_t first;
 	virt_addr_t virt = 0xdeadbeef;
@@ -52,26 +65,31 @@ void *palloc_internal(phys_addr_t *phys, int pages)
 
 	bitmap_set_multiple(&page_bitmap, first,pages);
 	virt = palloc_start + (first * PAGE_SIZE);
-	if(phys != 0)
-		*phys = (phys_addr_t)(virt - PHYS_BASE);	
+	//XXX: This is just a test
+	memset((void *)virt, 0, PAGE_SIZE * pages);
 
 	return (void *)virt;
 }
 
 void *palloc()
 {
-	return palloc_internal(0, 1);
+	return palloc_internal(1);
 }
 
 void *pallocn(uint32_t count)
 {
-	return palloc_internal(0, count);
+	return palloc_internal(count);
 }
 
-void palloc_init(uint32_t page_count, uint32_t placement)
+void *palloc_len(size_t len)
+{
+	return pallocn(PAGE_COUNT(len));
+}
+
+void palloc_init(uint32_t page_count, uintptr_t placement)
 {
 	void *start = 0;
-	uint32_t bitmap_ptr = placement;
+	uintptr_t bitmap_ptr = placement;//+ 0x100000;
 	uint32_t bitmap_length = (page_count/32) * sizeof(uint32_t);
 	
 	start = (void *)(placement + bitmap_length);
@@ -83,4 +101,3 @@ void palloc_init(uint32_t page_count, uint32_t placement)
 	
 	palloc_start = (phys_addr_t)start;
 }
-

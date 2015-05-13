@@ -4,6 +4,7 @@
 #include <kernel/memory.h>
 #include <fs/vfs.h>
 #include <fs/initrd.h>
+//FIXME: Move this to /device/ and rewrite
 typedef struct initrd_struct {
 	uint8_t *ramdisk;
 	uint32_t size;

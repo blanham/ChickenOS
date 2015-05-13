@@ -4,17 +4,16 @@
 #include <mm/vm.h>
 #include <mm/liballoc.h>
 
-enum intr_status alloc_intr_status;
+enum intr_status alloc_intr_status = INTR_DISABLED;
 
 //FIXME: Add locks here
 int liballoc_lock() {
-
-    alloc_intr_status = interrupt_disable();
+   // alloc_intr_status = interrupt_disable();
     return 0;
 }
 
 int liballoc_unlock() {
-		interrupt_set(alloc_intr_status);
+	//	interrupt_set(alloc_intr_status);
         return 0;
 }
 

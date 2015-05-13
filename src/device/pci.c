@@ -80,19 +80,22 @@ void pci_device_install(uint32_t val, struct pci_conf_hdr *header)
 		iter->next = new;
 		new->next = NULL;
 	}
-
-//	printf("Found PCI device %X %X IRQ %i\n", new->header->vend_id,new->header->dev_id, new->header->int_line);
 }
+
 void pci_list()
 {
 	struct pci_device *iter = pci_device_list;
 	while(iter != NULL)
 	{
-		printf("Found PCI device %.2i %.4X %.4X IRQ %.2i\n",iter->device, iter->header->vend_id,iter->header->dev_id, iter->header->int_line);
+		printf("Found PCI device %.2i %.4X %.4X IRQ %2i Function %X MajMin %2X %2X %2X\n", 
+				iter->device, iter->header->vend_id,iter->header->dev_id, 
+				iter->header->int_line, iter->regs.function, iter->header->pci_major, 
+				iter->header->pci_minor, iter->header->pci_interface);
 		iter = iter->next;
 	}
 
 }
+
 void pci_handler(struct registers *regs)
 {
 	int int_no = regs->int_no - 32;
@@ -104,6 +107,7 @@ void pci_handler(struct registers *regs)
 	
 	}
 }
+
 void pci_register_irq(struct pci_device *pci, pci_intr_handler *handler, void *aux)
 {
 	int int_line = pci->header->int_line;
@@ -179,6 +183,7 @@ uint32_t pci_get_bar(struct pci_device *dev, uint8_t type)
 
 	return 0xFFFFFFFF;
 }
+
 uint32_t pci_get_barn(struct pci_device *dev, uint8_t type, uint8_t num)
 {
 	uint32_t bar = 0;

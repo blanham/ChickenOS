@@ -1,4 +1,5 @@
 /* PIT and RTC routines */
+//TODO: Move much of this to arch/i386/pit.c and device/time.c
 #include <kernel/timer.h>
 #include <kernel/interrupt.h>
 #include <kernel/common.h>
@@ -88,6 +89,8 @@ void rtc_init()
 	rtc_data[0] = read_rtc_reg(0);
 	rtc_data[1] = read_rtc_reg(2);
 	rtc_data[2] = read_rtc_reg(4);
+	//Should be Weekday, doesn't work correctly
+	//rtc_data[3] = read_rtc_reg(6);
 		
 	rtc_data[4] = read_rtc_reg(7);
 	rtc_data[5] = read_rtc_reg(8);
@@ -170,7 +173,10 @@ int sys_gettimeofday(struct timeval *tp, void *tzp UNUSED)
 int sys_clock_gettime(int type, struct timespec *tp)
 {
 	(void)type;
+	static int s = 0; 
 	tp->tv_sec = unix_time;
-	tp->tv_nsec = 0;
+	tp->tv_nsec = s;
+	s += 100;
+	unix_time++;
 	return 0;
 }

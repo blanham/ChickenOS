@@ -178,6 +178,7 @@ struct network_dev * rtl8139_init()
 	rtl->dev = device;
 	rtl->pci = pci_get_device(RTL8139_VEND, RTL8139_DEV);
 	rtl->rx_buffer = pallocn(2);//kmalloc(RX_BUF_LEN + RX_BUF_PAD);
+	//FIXME: Wat Wat Wat
 	rtl->tx_buffers = (void *)P2V(0x3380000);//kmalloc((8192+16+1500)*4);
 	if(rtl->pci != NULL)
 	{

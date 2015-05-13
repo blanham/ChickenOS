@@ -53,7 +53,7 @@ void device_register(uint16_t device_type, dev_t dev, void *read, void *write, v
 
 	}
 	
-	printf("Registered device %x:%x\n", MAJOR(dev),MINOR(dev));
+	//printf("Registered device %x:%x\n", MAJOR(dev),MINOR(dev));
 
 }
 
@@ -104,26 +104,24 @@ size_t block_device_writen(uint16_t dev, void *buf, uint32_t block, off_t offset
 }
 
 
-size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte)
+size_t char_device_read(dev_t dev, void *buf, off_t offset, size_t nbyte)
 {
 	size_t ret = 0;
 	struct char_device *device = &char_devices[MAJOR(dev)];
-	
-//	printf("READ %x %X\n", dev, device->read);
-	ret = device->read(dev, buf, offset, nbyte);
+	ret = device->read(dev, buf, nbyte, offset);
 
 	return ret;
 }
-size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte)
+size_t char_device_write(dev_t dev, void *buf, off_t offset, size_t nbyte)
 {
 	size_t ret = 0;
 	struct char_device *device = &char_devices[MAJOR(dev)];
-	ret = device->write(dev, buf, offset, nbyte);
+	ret = device->write(dev, buf, nbyte, offset);
 
 	return ret;
 }
 
-int char_device_ioctl(uint16_t dev, int request, char *args)
+int char_device_ioctl(dev_t dev, int request, char *args)
 {
 	size_t ret = 0;
 	struct char_device *device = &char_devices[MAJOR(dev)];

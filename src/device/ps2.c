@@ -4,7 +4,7 @@
 #include <kernel/memory.h>
 #include <device/input.h>
 #include <stdio.h>
-
+#include <thread.h>
 uint16_t shifts;
 #define L_CTRL  0x0001
 #define R_CTRL  0x0002
@@ -24,8 +24,8 @@ uint8_t gpos = 0;
 
 
 char kbd_map_unshifted[256] = {
-' ',ESC,'1','2','3','4','5','6','7','8','9','0','-','+',BKSPACE,TAB,
-'q','w','e','r','t','y','u','i','o','p',' ',' ',CR, ' ','a','s',
+' ',ESC,'1','2','3','4','5','6','7','8','9','0','-','=',BKSPACE,TAB,
+'q','w','e','r','t','y','u','i','o','p','[',']',CR, ' ','a','s',
 'd','f','g','h','j','k','l',';','\'',' ',' ', '\\', 'z','x','c',
 'v','b','n','m',',','.','/', ' ', ' ', ' ', ' '
 
@@ -33,7 +33,7 @@ char kbd_map_unshifted[256] = {
 };
 char kbd_map_shifted[256] = {
 ' ',ESC,'!','@','#','$','%','^','&','*','(',41,'_','+',BKSPACE,TAB,
-'Q','W','E','R','T','Y','U','I','O','P',' ',' ',CR, ' ','A','S',
+'Q','W','E','R','T','Y','U','I','O','P','{','}',CR, ' ','A','S',
 'D','F','G','H','J','K','L',':','"',' ',' ', '|', 'Z','X','C',
 'V','B','N','M','<','>','?'
 
@@ -76,6 +76,7 @@ extern void reboot();
 void ps2_intr(void)
 {
 	uint8_t c = kbd_read();
+	//printf("%x\n", c);
 	switch(c)
 	{
 		case 0x2A:
@@ -96,15 +97,21 @@ void ps2_intr(void)
 		case 0xB8:
 			shifts &= ~L_ALT;
 			break;
-		case 0x58:
+		case 0x1D:
 			shifts |= L_CTRL;
 			break;
-		case 0xD8:
+		case 0x9D:
 			shifts &= ~L_CTRL;
 			break;
 		case 0x3B ... 0x3D:
 			//if((shifts & (L_SHIFT | R_SHIFT)) && (shifts & (L_CTRL | R_CTRL)))
-				console_switch(c - 0x3B);
+			//	console_switch(c - 0x3B);
+			break;
+	//	case 0x01:
+	//		rbuf[pos++] = 0x1B;
+	//		break;
+		case 15:
+			sys_kill(2, SIGCHLD);
 			break;
 
 		case 0xe0:
@@ -122,15 +129,19 @@ void ps2_intr(void)
 		//	reboot();
 		//	shutdown();
 		//	break;
-	
 		default:
+			//TODO: This needs to be in the terminal driver
+			if((c == 'c') && (shifts & (L_CTRL)))
+			{
+				sys_kill(2, SIGINT);
+			}
 			if(c & 0x80)
 				return;
 			if(shifts & R_SHIFT)
 				c = kbd_map_shifted[c];
 			else
 				c = kbd_map_unshifted[c];
-			//console_putc(c);
+					//console_putc(c);
 			rbuf[pos++] = c;
 		//	input_queue_putc(c);
 	}

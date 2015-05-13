@@ -1,7 +1,12 @@
 megs: 128
+cpu: reset_on_triple_fault=0
 boot: disk 
-display_library: sdl
-ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14
-ata0-master: type=disk, path="disk.img", mode="flat", cylinders=2, heads=255, spt=63
+vga: extension=vbe
+ata0-master: type=disk, path="disk.img", mode="flat", cylinders=32, heads=15, spt=63
 
-usb_uhci: enabled=1, port1=mouse
+magic_break: enabled=1
+port_e9_hack: enabled=1
+
+com1: enabled=1, mode=file, dev=serial.txt
+
+#usb_uhci: enabled=1, port1=mouse

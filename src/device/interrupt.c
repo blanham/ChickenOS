@@ -6,10 +6,9 @@
 #include <kernel/thread.h>
 #include <device/console.h>
 #include <kernel/memory.h>
-#include <kernel/gdt.h>
 #include <kernel/hw.h>
 
-static enum intr_status interrupt_status;
+static enum intr_status interrupt_status = INTR_DISABLED;
 
 enum intr_status interrupt_get()
 {
@@ -19,6 +18,7 @@ enum intr_status interrupt_get()
 enum intr_status interrupt_disable()
 {
 	enum intr_status old = interrupt_get();
+
 	arch_interrupt_disable(); 
 	interrupt_status = INTR_DISABLED;
 	
@@ -28,6 +28,7 @@ enum intr_status interrupt_disable()
 enum intr_status interrupt_enable()
 {
 	enum intr_status old = interrupt_get();
+
 	arch_interrupt_enable();
 	interrupt_status = INTR_ENABLED;
 	
@@ -46,6 +47,4 @@ void interrupt_init()
 {
 	interrupt_status = INTR_DISABLED;
 	arch_interrupt_init();
-
-
 }

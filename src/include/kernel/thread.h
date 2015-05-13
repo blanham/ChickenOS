@@ -30,7 +30,7 @@ enum thread_stat {
 	THREAD_UNINTERRUPTIBLE
 };
 
-typedef struct thread thread_t;
+typedef struct thread_struct thread_t;
 
 struct thread_files {
 	struct inode *root;
@@ -49,12 +49,13 @@ struct thread_signals {
 
 //TODO: Priorities? Would really like to maybe implement the 4.3BSD scheduler
 // 		since we didn't get it working in pintos
-struct thread {
+struct thread_struct {
 	pid_t pid, ppid, pgid;
 	uid_t uid, euid;
 	gid_t gid;
 	mode_t umask;
 	char *name;
+	int ret_val;
 
 	//Scheduler hash
 	UT_hash_handle hh;
@@ -71,9 +72,6 @@ struct thread {
 	//saved kernel stack, user stack, and location of user stack
 	uint8_t *sp, *useresp, *user;
 	
-	//location of brk
-	void * brk;
-	uintptr_t sbrk;
 
 	//FIXME: Refactor this into a struct, takes up a fuckton of space
 	struct thread_signals *sig_info;
@@ -83,24 +81,7 @@ struct thread {
 	//for signal handling	
 	struct registers *regs, *signal_regs;
 	
-	/* pagedirectory for this thread */
-	pagedir_t pd;
-	/*
-		struct memory {
-			pagedir_t pd;
-			//memory region treet
-			tree_t memoory_regions;
-
-		};
-	*/
-/*	struct memory_region {
-		uintptr_t start_addr;
-		uintptr_t end_addr;
-		int flags;
-		union {
-			struct file *file;
-		};
-	};*/
+	struct mm *mm;
 	
 	/* status of thread (DEAD, READY, RUNNING, BLOCKED, ) */
 	enum thread_stat status;
@@ -133,14 +114,22 @@ uid_t sys_getuid();
 gid_t sys_getgid();
 int sys_setgid(gid_t gid);
 int 	sys_setpgid(pid_t pid, pid_t pgid);
-int 	sys_execve(const char *path, char *const argv[], char *const envp[]);
 int 	sys_brk(void *addr);
 void *	sys_sbrk(intptr_t ptr);
 void 	sys_exit(int exit);
 pid_t 	sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage);
 
-//we define this so kmain can call the first user process 
-int execv(const char *path, char *const argv[]);
+/* thread/exec.c */
+enum exe_type {
+	EXE_INVALID,
+	EXE_ELF,
+	EXE_SCRIPT
+};
+int 	sys_execve(const char *path, char *const argv[], char *const envp[]);
+
+/* thread/load_elf.c */
+int load_elf(const char *path, uintptr_t *eip);
+bool elf_check_magic(void *magic);
 
 /* thread/scheduler.c */
 void thread_scheduler_init(thread_t *kernel_thread);
@@ -160,8 +149,9 @@ int sys_sigsuspend(const sigset_t *mask);
 int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sys_sigreturn(registers_t *regs, unsigned long dunno);
 
-/* thread/load_elf.c */
-int load_elf(const char *path, uintptr_t *eip);
-bool elf_check_magic(void *magic); 
-#endif
+/* arch/ARCH/thread.c */
+void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax);
+void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp);
 
+
+#endif

@@ -43,7 +43,7 @@ int sigaddset(sigset_t *set, int sig)
 		printf("Sig %i %i %i\n", sig, s >= _NSIG-1, sig-32U < 3);
 		ASSERT(0, "Invalid signal number passed!");
 	}
-	set->__bits[s/8/sizeof *set->__bits] |= 1UL << ( s & 8 * sizeof(*set->__bits) - 1);	
+	set->__bits[s/8/sizeof *set->__bits] |= 1UL << ( s & (8 * sizeof(*set->__bits) - 1));	
 	return 0;
 }
 int sigdelset(sigset_t *set, int sig)
@@ -54,7 +54,7 @@ int sigdelset(sigset_t *set, int sig)
 		printf("Sig %i %i %i\n", sig, s >= _NSIG-1, sig-32U < 3);
 		ASSERT(0, "Invalid signal number passed!");
 	}
-	set->__bits[s/8/sizeof *set->__bits] &= ~(1UL << ( s & 8 * sizeof(*set->__bits) - 1));	
+	set->__bits[s/8/sizeof *set->__bits] &= ~(1UL << ( s & (8 * sizeof(*set->__bits) - 1)));	
 	return 0;
 }
 
@@ -74,13 +74,13 @@ int sigismember(const sigset_t *set, int sig)
 		ASSERT(0, "Invalid signal number passed!");
 	}
 
-	return !!(set->__bits[s/8/sizeof *set->__bits] & 1UL<<(s&8*sizeof *set->__bits-1));
+	return !!(set->__bits[s/8/sizeof *set->__bits] & 1UL<<(s&(8*sizeof *set->__bits-1)));
 }
 int sys_sigreturn(registers_t *regs, unsigned long dunno UNUSED)
 {
 	thread_t *cur = thread_current();
 	registers_t *regs_bottom = (void *)cur + STACK_SIZE - sizeof(registers_t);
-	printf("DUNON %i\n", dunno);
+//	printf("DUNON %i\n", dunno);
 	interrupt_disable();
 	ASSERT(regs_bottom == regs, "Tried to handle a signal inside interrupt context\n");
 //	dump_regs(regs);
@@ -88,11 +88,12 @@ int sys_sigreturn(registers_t *regs, unsigned long dunno UNUSED)
 
 	kmemcpy(regs_bottom, cur->signal_regs, sizeof(*regs_bottom));
 //
-	printf("eax %i\n", regs->eax);
+//	printf("eax %i\n", regs->eax);
 
 //	dump_regs(regs);
 	sigdelset(&cur->sig_info->pending, 17);
-//	thread_scheduler(regs_bottom);
+//	cur->status = THREAD_READY;
+	thread_scheduler(regs_bottom);
 	return -EINTR;//regs->eax;
 }
 
@@ -165,7 +166,8 @@ int sys_sigsuspend(const sigset_t *mask)
 	cur->status = THREAD_BLOCKED;
 //	thread_scheduler(sig_info->regs);
 //	thread_yield();
-//	printf("We woke up! pid %i\n", thread_sig_inforent()->pid);
+	while(cur->status == THREAD_BLOCKED);
+	printf("We woke up! pid %i\n", thread_current()->pid);
 //	printf("We woke up! pid %i\n", sig_info->pid);
 	kmemcpy(&sig_info->sigmask, &save, sizeof(sig_info->sigmask));
 //	registers_t *regs_bottom = (void *)sig_info + STACK_SIZE - sizeof(registers_t);

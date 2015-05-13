@@ -3,16 +3,12 @@
 #include <device/video/vga.h>
 #include <device/video/bochs_vga.h>
 
-
-int video_init()
+void video_init(struct kernel_boot_info *info)
 {
-	console_t *console = NULL;
-
+/*	console_t *console = NULL;
+	(void)info;
 //	console = bochs_vga_init();
 	if(console == NULL)
-		console = vga_init();
-	(void)console;
-
-	return 0;
-
+		console = vga_init();*/
+	new_vga_init(info);
 }

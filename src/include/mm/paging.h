@@ -1,6 +1,5 @@
 #ifndef C_OS_MM_PAGING_H
 #define C_OS_MM_PAGING_H
-#include <mm/vm.h>
 #define PDE_MASK	0xffc00000
 #define PDE_SHIFT 	22
 #define PDE_P		0x00000001
@@ -38,6 +37,8 @@ typedef uint32_t * pagedir_t;
 void paging_init(uint32_t mem_size);
 pagedir_t pagedir_new();
 pagedir_t pagedir_clone(pagedir_t pd);
+pagedir_t pagedir_copy(pagedir_t pd);
+void page_invalidate(uintptr_t page);
 
 void pagedir_install(uint32_t *pd);
 
@@ -51,5 +52,6 @@ void pagedir_insert_page_physical(pagedir_t pd, phys_addr_t kphys,
 void pagedir_insert_pagen_physical(pagedir_t pd, phys_addr_t kphys, 
 	virt_addr_t uvirt,uint8_t flags, int n);
 
+phys_addr_t pagedir_lookup(pagedir_t pd, virt_addr_t virtual);
 #endif
 

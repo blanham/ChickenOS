@@ -1,27 +1,31 @@
+#ChickenOS Makefile
+#Abandon all hope ye who enter here
 ARCH = i386
 ARMPRE	=		arm-none-gnueabi-
-CROSS	=		/usr/local/cross/bin
-CC		=		$(CROSS)/i586-elf-gcc
-CC		=		gcc -m32
-CC		=		clang -m32
+CROSS	=		~/opt/cross/bin
+CC		=		$(CROSS)/i686-elf-gcc
+#CC		=		gcc -m32
+CC		=		clang -m32 -target i686-pc-none-elf -mno-sse -mno-mmx
 #LINKER	=		$(CROSS)/i586-elf-ld
 CFLAGS	=		-g -Wall -Werror $(INCLUDES) \
-				-std=gnu99	\
+				-std=gnu11	\
 				-fno-stack-protector \
-				-ffreestanding -Wextra\
-				-nostdlib -nostdinc -fno-builtin -DARCH_I386
+				-Wextra\
+				-fno-builtin -DARCH_I386
 CFLAGS += 		-Wextra
-LINKER	=		ld -melf_i386 
+#LINKER	=		ld -melf_i386 
+LINKER	=		clang -m32 -target i686-pc-none-elf -nostdlib
 LDFLAGS	=		-T arch/$(ARCH)/linker.ld 
 ARMAS	=		$(ARMPRE)as	
 AS		=		nasm
 ASFLAGS	=		-felf
 #FIXME: this should only be one path
-INCLUDES=		-I./include -I./fs -I./include/kernel -I./rme2
+ARCH_INCLUDES=	-I./arch/$(ARCH)/include	
+INCLUDES=		-I./include -I./fs -I./include/kernel #-I./arch/i386/rme2/src
 
-ARCHSRCS=		$(patsubst %.c,%.o,$(wildcard arch/$(ARCH)/*.c))\
-				$(patsubst %.s,%.o,$(wildcard arch/$(ARCH)/*.s))
-
+ARCHSRCS=		$(patsubst %.s,%.o,$(wildcard arch/$(ARCH)/*.s))\
+				$(patsubst %.c,%.o,$(wildcard arch/$(ARCH)/*.c))\
+				$(patsubst %.S,%.o,$(wildcard arch/$(ARCH)/*.S))
 
 KLIBSRCS=		$(patsubst %.c,%.o,$(wildcard lib/*.c))
 
@@ -42,7 +46,7 @@ USBSRCS 	=	device/usb/usb.o device/usb/uhci.o
 
 AUDIOSRCS	=	#device/audio/ac97.o device/audio/intel_ac97.o
 
-VIDEOSRCS	=	device/video/vga.o device/video/bochs_vga.o
+VIDEOSRCS	=	$(patsubst %.c,%.o,$(wildcard device/video/*.c))
 
 DEVCORE		=	$(patsubst %.c,%.o,$(wildcard device/*.c))
 
@@ -50,9 +54,9 @@ DEVSRCS		=	$(DEVCORE) $(VIDEOSRCS) $(AUDIOSRCS) $(USBSRCS)
 
 THREAD	=		$(patsubst %.c,%.o,$(wildcard thread/*.c))
 
-CORE	=		init/kmain.o init/multiboot.o 
+CORE	=		init/kmain.o init/init.o 
 				
-SOURCES	=		$(CORE)  $(ARCHSRCS) $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
+SOURCES	=		$(CORE) $(ARCHSRCS) $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
 				$(FSSRCS) $(KLIBSRCS) 
 
 all: $(SOURCES) link
@@ -60,8 +64,8 @@ tftp: all
 	cp kernel.bin /tftpboot/chicken
 lib: $(LIBSRCS)
 test: all
-	cd .. && ./new_update.sh &&  qemu-system-i386  -vga std -soundhw ac97  -rtc base=localtime \
-	-m 64 -usb  -hda disk.img -serial file:log && cd src 
+	cd .. && ./new_update.sh &&  DISPLAY=:0.0 qemu-system-i386  -vga std -soundhw ac97  -rtc base=localtime \
+	-m 128 -usb  -hda disk.img -serial file:log && cd src 
 bochs: all
 	cd .. && ./new_update.sh &&  ./run_bochs.sh && cd src 
 test3: all
@@ -79,14 +83,22 @@ clean:
 	rm -f kernel.bin $(SOURCES)
 
 link:
-	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES) ./libgcc.a
+	$(LINKER) $(LDFLAGS) -o kernel.bin $(SOURCES) clangrt.a # ./libgcc.a #arch/i386/rme2/src/rme.a ./libgcc.a
 
+library: $(SOURCES)
+	$(LINKER) -shared -Wl,-soname,thisistest -o test.bin $(SOURCES) clangrt.a # ./libgcc.a #arch/i386/rme2/src/rme.a ./libgcc.a
 
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 .s.o:
+ifeq ($(ARCH), i386)
+	$(AS) $(ASFLAGS) $<
+else
+	$(ARMAS) $<
+endif
+.S.o:
 ifeq ($(ARCH), i386)
 	$(AS) $(ASFLAGS) $<
 else

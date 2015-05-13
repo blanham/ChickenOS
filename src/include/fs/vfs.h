@@ -154,9 +154,9 @@ int sys_stat64(const char *path, struct stat64 *buf);
 #define MAJOR(x) ((x & 0xFF00) >> 8)
 #define MINOR(x) (x & 0xFF)
 
-typedef size_t (*char_read_fn)(uint16_t dev, void *buf, off_t offset, size_t count);
-typedef size_t (*char_write_fn)(uint16_t dev, void *buf, off_t offset, size_t count);
-typedef int (*char_ioctl_fn)(uint16_t dev, int request, char *arg);
+typedef size_t (*char_read_fn)(dev_t dev, void *buf, size_t count, off_t offset);
+typedef size_t (*char_write_fn)(dev_t dev, void *buf, size_t count, off_t offset);
+typedef int (*char_ioctl_fn)(dev_t dev, int request, char *arg);
 
 struct char_device_ops {
 	char_read_fn read;
@@ -170,9 +170,9 @@ typedef size_t (*block_write_fn)(uint16_t dev, void *buf, int block);
 void  device_register(uint16_t type, dev_t dev, void *read, void *write, void *ioctl);
 typedef int(*block_access_fn)(void *aux, void *buf, int block);
 
-int char_device_ioctl(uint16_t dev, int request, char *args);
-size_t char_device_read(uint16_t dev, void *buf, off_t offset, size_t nbyte);
-size_t char_device_write(uint16_t dev, void *buf, off_t offset, size_t nbyte);
+int char_device_ioctl(dev_t dev, int request, char *args);
+size_t char_device_read(dev_t dev, void *buf, off_t offset, size_t nbyte);
+size_t char_device_write(dev_t dev, void *buf, off_t offset, size_t nbyte);
 size_t block_device_read(uint16_t dev, void *buf, uint32_t block);
 size_t block_device_readn(uint16_t dev, void *buf, uint32_t block, off_t offset, size_t nbyte);
 

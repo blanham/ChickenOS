@@ -3,6 +3,7 @@
 
 #ifdef ARCH_I386
 #include <arch/i386/syscall.h>
+#include <arch/i386/interrupt.h>
 #elif ARCH_ARM
 #include <arch/arm/syscall.h>
 #else
@@ -99,7 +100,8 @@ enum {
 };
 #define ERROR_RETURN(x) return (-x)
 
-void syscall_init();
+void syscall_handler (registers_t *regs);
+
 int fork();
 int dummy();
 int get_pid();

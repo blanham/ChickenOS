@@ -34,7 +34,7 @@ import ycm_core
 # These are the compilation flags that will be used in case there's no
 # compilation database set (by default, one is not set).
 # CHANGE THIS LIST OF FLAGS. YES, THIS IS THE DROID YOU HAVE BEEN LOOKING FOR.
-flags = ['-g', '-Wall', '-Werror', '-I./include', '-I./fs', '-I./include/kernel', '-std=gnu99', '-fno-stack-protector', '-ffreestanding', '-nostdlib', '-nostdinc', '-fno-builtin', '-DARCH_I386']
+flags = ['-g', '-Wall', '-Werror', '-I./include', '-I./fs', '-I./include/kernel', '-std=gnu11', '-fno-stack-protector', '-ffreestanding', '-nostdlib', '-nostdinc', '-fno-builtin', '-DARCH_I386']
  
 #[
 #'-Wall',

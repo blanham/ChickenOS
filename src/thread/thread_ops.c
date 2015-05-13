@@ -12,19 +12,23 @@ uid_t sys_geteuid()
 {
 	return thread_current()->euid;
 }
+
 int sys_setuid(uid_t uid)
 {
 	thread_current()->uid = uid;
 	return 0;
 }
+
 uid_t sys_getuid()
 {
 	return thread_current()->uid;
 }
+
 pid_t sys_getpid()
 {
 	return thread_current()->pid;
 }
+
 pid_t sys_getppid()
 {
 	return thread_current()->ppid;
@@ -45,26 +49,30 @@ int sys_setpgid(pid_t pid, pid_t pgid)
 	thread->pgid = pgid;
 	return 0;
 }
+
 gid_t sys_getgid()
 {
 	return thread_current()->gid;
 }
+
 int sys_setgid(gid_t gid)
 {
 	thread_t *cur = thread_current();
 	cur->gid = gid;
 	return 0;
 }
+
+//XXX: This and sbrk should be using the memregion interface
 int sys_brk(void *_addr)
 {
 	thread_t *cur = thread_current();
 	uintptr_t addr = (uintptr_t)_addr; 
 	if(addr == 0)
 	{
-		return (int)cur->brk;
+		return (int)cur->mm->brk;
 	}
 	
-	cur->brk = _addr;
+	cur->mm->brk = _addr;
 //	printf("addr %x cur %x\n", addr, cur->brk);
 //	cur->brk = (void *)((uintptr_t)0x8000000 + (uintptr_t)addr);
 	return (int)addr;
@@ -78,23 +86,29 @@ void *sys_sbrk(intptr_t ptr)
 
 	if(ptr == 0)
 	{
-		return cur->brk;
+		return cur->mm->brk;
 	}	
 	else
 	{
-		old = cur->brk;
-		cur->brk = cur->brk + ptr;
+		old = cur->mm->brk;
+		cur->mm->brk = cur->mm->brk + ptr;
 		return old;	
 	}
 }
 
-void sys_exit(int exit)
+void sys_exit(int exit_code)
 {
 
-	thread_exit(exit);
+	thread_exit(exit_code);
 }
 
+//TODO: For threading, exit()s all with the same tgid
+void sys_exit_group(int status)
+{
+	(void)status;
+}
 
+//FIXME: Busy waiting :c
 pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
 {
 	(void)pid; (void)status; (void)options; (void)rusage;
@@ -110,7 +124,7 @@ pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
 			ret = child->pid;
 			if(child->status == THREAD_DEAD)
 			{
-				//printf("Child %x %i\n", child, child->pid);
+				printf("Child %x %i\n", child, child->pid);
 				cur->children = NULL;
 				*status = 0x80;
 				return ret;

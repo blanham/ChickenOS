@@ -5,6 +5,7 @@
 #include <stddef.h>
 #include <ctype.h>
 void putc(char c);
+void putchar(int c);
 int puts(char *string);
 char *gets(char *str);
 char getchar();

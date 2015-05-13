@@ -37,6 +37,7 @@ struct kernel_boot_info {
 
 	void *framebuffer;
 	uint32_t x_res, y_res, bpp;
+	uint32_t x_chars, y_chars;
 	uint32_t mode;
 	void *aux;
 };

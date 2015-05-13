@@ -1,30 +1,3 @@
-/*
- * Copyright (c) 2000 Apple Computer, Inc. All rights reserved.
- *
- * @APPLE_OSREFERENCE_LICENSE_HEADER_START@
- * 
- * This file contains Original Code and/or Modifications of Original Code
- * as defined in and that are subject to the Apple Public Source License
- * Version 2.0 (the 'License'). You may not use this file except in
- * compliance with the License. The rights granted to you under the License
- * may not be used to create, or enable the creation or redistribution of,
- * unlawful or unlicensed copies of an Apple operating system, or to
- * circumvent, violate, or enable the circumvention or violation of, any
- * terms of an Apple operating system software license agreement.
- * 
- * Please obtain a copy of the License at
- * http://www.opensource.apple.com/apsl/ and read it before using this file.
- * 
- * The Original Code and all software distributed under the License are
- * distributed on an 'AS IS' basis, WITHOUT WARRANTY OF ANY KIND, EITHER
- * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
- * INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT OR NON-INFRINGEMENT.
- * Please see the License for the specific language governing rights and
- * limitations under the License.
- * 
- * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
- */
 /*-
  * Copyright (c) 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -54,14 +27,17 @@
  * SUCH DAMAGE.
  *
  *	@(#)queue.h	8.5 (Berkeley) 8/20/94
+ * $FreeBSD$
  */
 
 #ifndef _SYS_QUEUE_H_
 #define	_SYS_QUEUE_H_
 
+#include <sys/cdefs.h>
+
 /*
- * This file defines five types of data structures: singly-linked lists,
- * singly-linked tail queues, lists, tail queues, and circular queues.
+ * This file defines four types of data structures: singly-linked lists,
+ * singly-linked tail queues, lists and tail queues.
  *
  * A singly-linked list is headed by a single forward pointer. The elements
  * are singly linked for minimum space and pointer manipulation overhead at
@@ -89,7 +65,7 @@
  * so that an arbitrary element can be removed without a need to
  * traverse the list. New elements can be added to the list before
  * or after an existing element or at the head of the list. A list
- * may only be traversed in the forward direction.
+ * may be traversed in either direction.
  *
  * A tail queue is headed by a pair of pointers, one to the head of the
  * list and the other to the tail of the list. The elements are doubly
@@ -98,59 +74,51 @@
  * after an existing element, at the head of the list, or at the end of
  * the list. A tail queue may be traversed in either direction.
  *
- * A circle queue is headed by a pair of pointers, one to the head of the
- * list and the other to the tail of the list. The elements are doubly
- * linked so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before or after
- * an existing element, at the head of the list, or at the end of the list.
- * A circle queue may be traversed in either direction, but has a more
- * complex end of list detection.
- * Note that circle queues are deprecated, because, as the removal log
- * in FreeBSD states, "CIRCLEQs are a disgrace to everything Knuth taught
- * us in Volume 1 Chapter 2. [...] Use TAILQ instead, it provides the same
- * functionality." Code using them will continue to compile, but they
- * are no longer documented on the man page.
- *
  * For details on the use of these macros, see the queue(3) manual page.
  *
  *
- *				SLIST	LIST	STAILQ	TAILQ	CIRCLEQ
- * _HEAD			+	+	+	+	+
- * _HEAD_INITIALIZER		+	+	+	+	-
- * _ENTRY			+	+	+	+	+
- * _INIT			+	+	+	+	+
- * _EMPTY			+	+	+	+	+
- * _FIRST			+	+	+	+	+
- * _NEXT			+	+	+	+	+
- * _PREV			-	-	-	+	+
- * _LAST			-	-	+	+	+
- * _FOREACH			+	+	+	+	+
- * _FOREACH_SAFE		+	+	+	+	-
- * _FOREACH_REVERSE		-	-	-	+	-
- * _FOREACH_REVERSE_SAFE	-	-	-	+	-
- * _INSERT_HEAD			+	+	+	+	+
- * _INSERT_BEFORE		-	+	-	+	+
- * _INSERT_AFTER		+	+	+	+	+
- * _INSERT_TAIL			-	-	+	+	+
- * _CONCAT			-	-	+	+	-
- * _REMOVE_AFTER		+	-	+	-	-
- * _REMOVE_HEAD			+	-	+	-	-
- * _REMOVE_HEAD_UNTIL		-	-	+	-	-
- * _REMOVE			+	+	+	+	+
- * _SWAP			-	+	+	+	-
+ *				SLIST	LIST	STAILQ	TAILQ
+ * _HEAD			+	+	+	+
+ * _HEAD_INITIALIZER		+	+	+	+
+ * _ENTRY			+	+	+	+
+ * _INIT			+	+	+	+
+ * _EMPTY			+	+	+	+
+ * _FIRST			+	+	+	+
+ * _NEXT			+	+	+	+
+ * _PREV			-	+	-	+
+ * _LAST			-	-	+	+
+ * _FOREACH			+	+	+	+
+ * _FOREACH_FROM		+	+	+	+
+ * _FOREACH_SAFE		+	+	+	+
+ * _FOREACH_FROM_SAFE		+	+	+	+
+ * _FOREACH_REVERSE		-	-	-	+
+ * _FOREACH_REVERSE_FROM	-	-	-	+
+ * _FOREACH_REVERSE_SAFE	-	-	-	+
+ * _FOREACH_REVERSE_FROM_SAFE	-	-	-	+
+ * _INSERT_HEAD			+	+	+	+
+ * _INSERT_BEFORE		-	+	-	+
+ * _INSERT_AFTER		+	+	+	+
+ * _INSERT_TAIL			-	-	+	+
+ * _CONCAT			-	-	+	+
+ * _REMOVE_AFTER		+	-	+	-
+ * _REMOVE_HEAD			+	-	+	-
+ * _REMOVE			+	+	+	+
+ * _SWAP			+	+	+	+
  *
  */
 #ifdef QUEUE_MACRO_DEBUG
 /* Store the last 2 places the queue element or head was altered */
 struct qm_trace {
-	char * lastfile;
-	int lastline;
-	char * prevfile;
-	int prevline;
+	unsigned long	 lastline;
+	unsigned long	 prevline;
+	const char	*lastfile;
+	const char	*prevfile;
 };
 
 #define	TRACEBUF	struct qm_trace trace;
+#define	TRACEBUF_INITIALIZER	{ __FILE__, __LINE__, NULL, 0 } ,
 #define	TRASHIT(x)	do {(x) = (void *)-1;} while (0)
+#define	QMD_SAVELINK(name, link)	void **name = (void *)&(link)
 
 #define	QMD_TRACE_HEAD(head) do {					\
 	(head)->trace.prevline = (head)->trace.lastline;		\
@@ -169,7 +137,9 @@ struct qm_trace {
 #else
 #define	QMD_TRACE_ELEM(elem)
 #define	QMD_TRACE_HEAD(head)
+#define	QMD_SAVELINK(name, link)
 #define	TRACEBUF
+#define	TRACEBUF_INITIALIZER
 #define	TRASHIT(x)
 #endif	/* QUEUE_MACRO_DEBUG */
 
@@ -201,8 +171,18 @@ struct {								\
 	    (var);							\
 	    (var) = SLIST_NEXT((var), field))
 
+#define	SLIST_FOREACH_FROM(var, head, field)				\
+	for ((var) = ((var) ? (var) : SLIST_FIRST((head)));		\
+	    (var);							\
+	    (var) = SLIST_NEXT((var), field))
+
 #define	SLIST_FOREACH_SAFE(var, head, field, tvar)			\
 	for ((var) = SLIST_FIRST((head));				\
+	    (var) && ((tvar) = SLIST_NEXT((var), field), 1);		\
+	    (var) = (tvar))
+
+#define	SLIST_FOREACH_FROM_SAFE(var, head, field, tvar)			\
+	for ((var) = ((var) ? (var) : SLIST_FIRST((head)));		\
 	    (var) && ((tvar) = SLIST_NEXT((var), field), 1);		\
 	    (var) = (tvar))
 
@@ -228,6 +208,7 @@ struct {								\
 #define	SLIST_NEXT(elm, field)	((elm)->field.sle_next)
 
 #define	SLIST_REMOVE(head, elm, type, field) do {			\
+	QMD_SAVELINK(oldnext, (elm)->field.sle_next);			\
 	if (SLIST_FIRST((head)) == (elm)) {				\
 		SLIST_REMOVE_HEAD((head), field);			\
 	}								\
@@ -237,7 +218,7 @@ struct {								\
 			curelm = SLIST_NEXT(curelm, field);		\
 		SLIST_REMOVE_AFTER(curelm, field);			\
 	}								\
-	TRASHIT((elm)->field.sle_next);					\
+	TRASHIT(*oldnext);						\
 } while (0)
 
 #define SLIST_REMOVE_AFTER(elm, field) do {				\
@@ -247,6 +228,12 @@ struct {								\
 
 #define	SLIST_REMOVE_HEAD(head, field) do {				\
 	SLIST_FIRST((head)) = SLIST_NEXT(SLIST_FIRST((head)), field);	\
+} while (0)
+
+#define SLIST_SWAP(head1, head2, type) do {				\
+	struct type *swap_first = SLIST_FIRST(head1);			\
+	SLIST_FIRST(head1) = SLIST_FIRST(head2);			\
+	SLIST_FIRST(head2) = swap_first;				\
 } while (0)
 
 /*
@@ -286,9 +273,18 @@ struct {								\
 	   (var);							\
 	   (var) = STAILQ_NEXT((var), field))
 
+#define	STAILQ_FOREACH_FROM(var, head, field)				\
+	for ((var) = ((var) ? (var) : STAILQ_FIRST((head)));		\
+	   (var);							\
+	   (var) = STAILQ_NEXT((var), field))
 
 #define	STAILQ_FOREACH_SAFE(var, head, field, tvar)			\
 	for ((var) = STAILQ_FIRST((head));				\
+	    (var) && ((tvar) = STAILQ_NEXT((var), field), 1);		\
+	    (var) = (tvar))
+
+#define	STAILQ_FOREACH_FROM_SAFE(var, head, field, tvar)		\
+	for ((var) = ((var) ? (var) : STAILQ_FIRST((head)));		\
 	    (var) && ((tvar) = STAILQ_NEXT((var), field), 1);		\
 	    (var) = (tvar))
 
@@ -316,14 +312,13 @@ struct {								\
 } while (0)
 
 #define	STAILQ_LAST(head, type, field)					\
-	(STAILQ_EMPTY((head)) ?						\
-		NULL :							\
-	        ((struct type *)(void *)				\
-		((char *)((head)->stqh_last) - __offsetof(struct type, field))))
+	(STAILQ_EMPTY((head)) ? NULL :					\
+	    __containerof((head)->stqh_last, struct type, field.stqe_next))
 
 #define	STAILQ_NEXT(elm, field)	((elm)->field.stqe_next)
 
 #define	STAILQ_REMOVE(head, elm, type, field) do {			\
+	QMD_SAVELINK(oldnext, (elm)->field.stqe_next);			\
 	if (STAILQ_FIRST((head)) == (elm)) {				\
 		STAILQ_REMOVE_HEAD((head), field);			\
 	}								\
@@ -333,24 +328,19 @@ struct {								\
 			curelm = STAILQ_NEXT(curelm, field);		\
 		STAILQ_REMOVE_AFTER(head, curelm, field);		\
 	}								\
-	TRASHIT((elm)->field.stqe_next);				\
-} while (0)
-
-#define	STAILQ_REMOVE_HEAD(head, field) do {				\
-	if ((STAILQ_FIRST((head)) =					\
-	     STAILQ_NEXT(STAILQ_FIRST((head)), field)) == NULL)		\
-		(head)->stqh_last = &STAILQ_FIRST((head));		\
-} while (0)
-
-#define STAILQ_REMOVE_HEAD_UNTIL(head, elm, field) do {                 \
-       if ((STAILQ_FIRST((head)) = STAILQ_NEXT((elm), field)) == NULL) \
-               (head)->stqh_last = &STAILQ_FIRST((head));              \
+	TRASHIT(*oldnext);						\
 } while (0)
 
 #define STAILQ_REMOVE_AFTER(head, elm, field) do {			\
 	if ((STAILQ_NEXT(elm, field) =					\
 	     STAILQ_NEXT(STAILQ_NEXT(elm, field), field)) == NULL)	\
 		(head)->stqh_last = &STAILQ_NEXT((elm), field);		\
+} while (0)
+
+#define	STAILQ_REMOVE_HEAD(head, field) do {				\
+	if ((STAILQ_FIRST((head)) =					\
+	     STAILQ_NEXT(STAILQ_FIRST((head)), field)) == NULL)		\
+		(head)->stqh_last = &STAILQ_FIRST((head));		\
 } while (0)
 
 #define STAILQ_SWAP(head1, head2, type) do {				\
@@ -388,7 +378,7 @@ struct {								\
  * List functions.
  */
 
-#if (defined(_KERNEL) && defined(INVARIANTS)) || defined(QUEUE_MACRO_DEBUG)
+#if (defined(_KERNEL) && defined(INVARIANTS))
 #define	QMD_LIST_CHECK_HEAD(head, field) do {				\
 	if (LIST_FIRST((head)) != NULL &&				\
 	    LIST_FIRST((head))->field.le_prev !=			\
@@ -411,7 +401,7 @@ struct {								\
 #define	QMD_LIST_CHECK_HEAD(head, field)
 #define	QMD_LIST_CHECK_NEXT(elm, field)
 #define	QMD_LIST_CHECK_PREV(elm, field)
-#endif /* (_KERNEL && INVARIANTS) || QUEUE_MACRO_DEBUG */
+#endif /* (_KERNEL && INVARIANTS) */
 
 #define	LIST_EMPTY(head)	((head)->lh_first == NULL)
 
@@ -422,8 +412,18 @@ struct {								\
 	    (var);							\
 	    (var) = LIST_NEXT((var), field))
 
+#define	LIST_FOREACH_FROM(var, head, field)				\
+	for ((var) = ((var) ? (var) : LIST_FIRST((head)));		\
+	    (var);							\
+	    (var) = LIST_NEXT((var), field))
+
 #define	LIST_FOREACH_SAFE(var, head, field, tvar)			\
 	for ((var) = LIST_FIRST((head));				\
+	    (var) && ((tvar) = LIST_NEXT((var), field), 1);		\
+	    (var) = (tvar))
+
+#define	LIST_FOREACH_FROM_SAFE(var, head, field, tvar)			\
+	for ((var) = ((var) ? (var) : LIST_FIRST((head)));		\
 	    (var) && ((tvar) = LIST_NEXT((var), field), 1);		\
 	    (var) = (tvar))
 
@@ -458,15 +458,21 @@ struct {								\
 
 #define	LIST_NEXT(elm, field)	((elm)->field.le_next)
 
+#define	LIST_PREV(elm, head, type, field)				\
+	((elm)->field.le_prev == &LIST_FIRST((head)) ? NULL :		\
+	    __containerof((elm)->field.le_prev, struct type, field.le_next))
+
 #define	LIST_REMOVE(elm, field) do {					\
+	QMD_SAVELINK(oldnext, (elm)->field.le_next);			\
+	QMD_SAVELINK(oldprev, (elm)->field.le_prev);			\
 	QMD_LIST_CHECK_NEXT(elm, field);				\
 	QMD_LIST_CHECK_PREV(elm, field);				\
 	if (LIST_NEXT((elm), field) != NULL)				\
 		LIST_NEXT((elm), field)->field.le_prev = 		\
 		    (elm)->field.le_prev;				\
 	*(elm)->field.le_prev = LIST_NEXT((elm), field);		\
-	TRASHIT((elm)->field.le_next);					\
-	TRASHIT((elm)->field.le_prev);					\
+	TRASHIT(*oldnext);						\
+	TRASHIT(*oldprev);						\
 } while (0)
 
 #define LIST_SWAP(head1, head2, type, field) do {			\
@@ -490,7 +496,7 @@ struct name {								\
 }
 
 #define	TAILQ_HEAD_INITIALIZER(head)					\
-	{ NULL, &(head).tqh_first }
+	{ NULL, &(head).tqh_first, TRACEBUF_INITIALIZER }
 
 #define	TAILQ_ENTRY(type)						\
 struct {								\
@@ -502,6 +508,37 @@ struct {								\
 /*
  * Tail queue functions.
  */
+#if (defined(_KERNEL) && defined(INVARIANTS))
+#define	QMD_TAILQ_CHECK_HEAD(head, field) do {				\
+	if (!TAILQ_EMPTY(head) &&					\
+	    TAILQ_FIRST((head))->field.tqe_prev !=			\
+	     &TAILQ_FIRST((head)))					\
+		panic("Bad tailq head %p first->prev != head", (head));	\
+} while (0)
+
+#define	QMD_TAILQ_CHECK_TAIL(head, field) do {				\
+	if (*(head)->tqh_last != NULL)					\
+	    	panic("Bad tailq NEXT(%p->tqh_last) != NULL", (head)); 	\
+} while (0)
+
+#define	QMD_TAILQ_CHECK_NEXT(elm, field) do {				\
+	if (TAILQ_NEXT((elm), field) != NULL &&				\
+	    TAILQ_NEXT((elm), field)->field.tqe_prev !=			\
+	     &((elm)->field.tqe_next))					\
+		panic("Bad link elm %p next->prev != elm", (elm));	\
+} while (0)
+
+#define	QMD_TAILQ_CHECK_PREV(elm, field) do {				\
+	if (*(elm)->field.tqe_prev != (elm))				\
+		panic("Bad link elm %p prev->next != elm", (elm));	\
+} while (0)
+#else
+#define	QMD_TAILQ_CHECK_HEAD(head, field)
+#define	QMD_TAILQ_CHECK_TAIL(head, headname)
+#define	QMD_TAILQ_CHECK_NEXT(elm, field)
+#define	QMD_TAILQ_CHECK_PREV(elm, field)
+#endif /* (_KERNEL && INVARIANTS) */
+
 #define	TAILQ_CONCAT(head1, head2, field) do {				\
 	if (!TAILQ_EMPTY(head2)) {					\
 		*(head1)->tqh_last = (head2)->tqh_first;		\
@@ -522,8 +559,18 @@ struct {								\
 	    (var);							\
 	    (var) = TAILQ_NEXT((var), field))
 
+#define	TAILQ_FOREACH_FROM(var, head, field)				\
+	for ((var) = ((var) ? (var) : TAILQ_FIRST((head)));		\
+	    (var);							\
+	    (var) = TAILQ_NEXT((var), field))
+
 #define	TAILQ_FOREACH_SAFE(var, head, field, tvar)			\
 	for ((var) = TAILQ_FIRST((head));				\
+	    (var) && ((tvar) = TAILQ_NEXT((var), field), 1);		\
+	    (var) = (tvar))
+
+#define	TAILQ_FOREACH_FROM_SAFE(var, head, field, tvar)			\
+	for ((var) = ((var) ? (var) : TAILQ_FIRST((head)));		\
 	    (var) && ((tvar) = TAILQ_NEXT((var), field), 1);		\
 	    (var) = (tvar))
 
@@ -532,8 +579,18 @@ struct {								\
 	    (var);							\
 	    (var) = TAILQ_PREV((var), headname, field))
 
+#define	TAILQ_FOREACH_REVERSE_FROM(var, head, headname, field)		\
+	for ((var) = ((var) ? (var) : TAILQ_LAST((head), headname));	\
+	    (var);							\
+	    (var) = TAILQ_PREV((var), headname, field))
+
 #define	TAILQ_FOREACH_REVERSE_SAFE(var, head, headname, field, tvar)	\
 	for ((var) = TAILQ_LAST((head), headname);			\
+	    (var) && ((tvar) = TAILQ_PREV((var), headname, field), 1);	\
+	    (var) = (tvar))
+
+#define	TAILQ_FOREACH_REVERSE_FROM_SAFE(var, head, headname, field, tvar) \
+	for ((var) = ((var) ? (var) : TAILQ_LAST((head), headname));	\
 	    (var) && ((tvar) = TAILQ_PREV((var), headname, field), 1);	\
 	    (var) = (tvar))
 
@@ -544,6 +601,7 @@ struct {								\
 } while (0)
 
 #define	TAILQ_INSERT_AFTER(head, listelm, elm, field) do {		\
+	QMD_TAILQ_CHECK_NEXT(listelm, field);				\
 	if ((TAILQ_NEXT((elm), field) = TAILQ_NEXT((listelm), field)) != NULL)\
 		TAILQ_NEXT((elm), field)->field.tqe_prev = 		\
 		    &TAILQ_NEXT((elm), field);				\
@@ -558,6 +616,7 @@ struct {								\
 } while (0)
 
 #define	TAILQ_INSERT_BEFORE(listelm, elm, field) do {			\
+	QMD_TAILQ_CHECK_PREV(listelm, field);				\
 	(elm)->field.tqe_prev = (listelm)->field.tqe_prev;		\
 	TAILQ_NEXT((elm), field) = (listelm);				\
 	*(listelm)->field.tqe_prev = (elm);				\
@@ -567,6 +626,7 @@ struct {								\
 } while (0)
 
 #define	TAILQ_INSERT_HEAD(head, elm, field) do {			\
+	QMD_TAILQ_CHECK_HEAD(head, field);				\
 	if ((TAILQ_NEXT((elm), field) = TAILQ_FIRST((head))) != NULL)	\
 		TAILQ_FIRST((head))->field.tqe_prev =			\
 		    &TAILQ_NEXT((elm), field);				\
@@ -579,6 +639,7 @@ struct {								\
 } while (0)
 
 #define	TAILQ_INSERT_TAIL(head, elm, field) do {			\
+	QMD_TAILQ_CHECK_TAIL(head, field);				\
 	TAILQ_NEXT((elm), field) = NULL;				\
 	(elm)->field.tqe_prev = (head)->tqh_last;			\
 	*(head)->tqh_last = (elm);					\
@@ -596,6 +657,10 @@ struct {								\
 	(*(((struct headname *)((elm)->field.tqe_prev))->tqh_last))
 
 #define	TAILQ_REMOVE(head, elm, field) do {				\
+	QMD_SAVELINK(oldnext, (elm)->field.tqe_next);			\
+	QMD_SAVELINK(oldprev, (elm)->field.tqe_prev);			\
+	QMD_TAILQ_CHECK_NEXT(elm, field);				\
+	QMD_TAILQ_CHECK_PREV(elm, field);				\
 	if ((TAILQ_NEXT((elm), field)) != NULL)				\
 		TAILQ_NEXT((elm), field)->field.tqe_prev = 		\
 		    (elm)->field.tqe_prev;				\
@@ -604,165 +669,26 @@ struct {								\
 		QMD_TRACE_HEAD(head);					\
 	}								\
 	*(elm)->field.tqe_prev = TAILQ_NEXT((elm), field);		\
-	TRASHIT((elm)->field.tqe_next);					\
-	TRASHIT((elm)->field.tqe_prev);					\
+	TRASHIT(*oldnext);						\
+	TRASHIT(*oldprev);						\
 	QMD_TRACE_ELEM(&(elm)->field);					\
 } while (0)
 
-#define TAILQ_SWAP(head1, head2, type, field) do {                      \
-	struct type *swap_first = (head1)->tqh_first;                   \
-	struct type **swap_last = (head1)->tqh_last;                    \
-	(head1)->tqh_first = (head2)->tqh_first;                        \
-	(head1)->tqh_last = (head2)->tqh_last;                          \
-	(head2)->tqh_first = swap_first;                                \
-	(head2)->tqh_last = swap_last;                                  \
-	if ((swap_first = (head1)->tqh_first) != NULL)                  \
-		swap_first->field.tqe_prev = &(head1)->tqh_first;       \
-	else                                                            \
-		(head1)->tqh_last = &(head1)->tqh_first;                \
-	if ((swap_first = (head2)->tqh_first) != NULL)                  \
-		swap_first->field.tqe_prev = &(head2)->tqh_first;       \
-	else                                                            \
-		(head2)->tqh_last = &(head2)->tqh_first;                \
-} while (0)
-
-/*
- * Circular queue definitions.
- */
-#define CIRCLEQ_HEAD(name, type)					\
-struct name {								\
-	struct type *cqh_first;		/* first element */		\
-	struct type *cqh_last;		/* last element */		\
-}
-
-#define CIRCLEQ_ENTRY(type)						\
-struct {								\
-	struct type *cqe_next;		/* next element */		\
-	struct type *cqe_prev;		/* previous element */		\
-}
-
-/*
- * Circular queue functions.
- */
-#define CIRCLEQ_EMPTY(head) ((head)->cqh_first == (void *)(head))
-
-#define CIRCLEQ_FIRST(head) ((head)->cqh_first)
-
-#define CIRCLEQ_FOREACH(var, head, field)				\
-	for((var) = (head)->cqh_first;					\
-	    (var) != (void *)(head);					\
-	    (var) = (var)->field.cqe_next)
-
-#define	CIRCLEQ_INIT(head) do {						\
-	(head)->cqh_first = (void *)(head);				\
-	(head)->cqh_last = (void *)(head);				\
-} while (0)
-
-#define CIRCLEQ_INSERT_AFTER(head, listelm, elm, field) do {		\
-	(elm)->field.cqe_next = (listelm)->field.cqe_next;		\
-	(elm)->field.cqe_prev = (listelm);				\
-	if ((listelm)->field.cqe_next == (void *)(head))		\
-		(head)->cqh_last = (elm);				\
+#define TAILQ_SWAP(head1, head2, type, field) do {			\
+	struct type *swap_first = (head1)->tqh_first;			\
+	struct type **swap_last = (head1)->tqh_last;			\
+	(head1)->tqh_first = (head2)->tqh_first;			\
+	(head1)->tqh_last = (head2)->tqh_last;				\
+	(head2)->tqh_first = swap_first;				\
+	(head2)->tqh_last = swap_last;					\
+	if ((swap_first = (head1)->tqh_first) != NULL)			\
+		swap_first->field.tqe_prev = &(head1)->tqh_first;	\
 	else								\
-		(listelm)->field.cqe_next->field.cqe_prev = (elm);	\
-	(listelm)->field.cqe_next = (elm);				\
-} while (0)
-
-#define CIRCLEQ_INSERT_BEFORE(head, listelm, elm, field) do {		\
-	(elm)->field.cqe_next = (listelm);				\
-	(elm)->field.cqe_prev = (listelm)->field.cqe_prev;		\
-	if ((listelm)->field.cqe_prev == (void *)(head))		\
-		(head)->cqh_first = (elm);				\
+		(head1)->tqh_last = &(head1)->tqh_first;		\
+	if ((swap_first = (head2)->tqh_first) != NULL)			\
+		swap_first->field.tqe_prev = &(head2)->tqh_first;	\
 	else								\
-		(listelm)->field.cqe_prev->field.cqe_next = (elm);	\
-	(listelm)->field.cqe_prev = (elm);				\
+		(head2)->tqh_last = &(head2)->tqh_first;		\
 } while (0)
-
-#define CIRCLEQ_INSERT_HEAD(head, elm, field) do {			\
-	(elm)->field.cqe_next = (head)->cqh_first;			\
-	(elm)->field.cqe_prev = (void *)(head);				\
-	if ((head)->cqh_last == (void *)(head))				\
-		(head)->cqh_last = (elm);				\
-	else								\
-		(head)->cqh_first->field.cqe_prev = (elm);		\
-	(head)->cqh_first = (elm);					\
-} while (0)
-
-#define CIRCLEQ_INSERT_TAIL(head, elm, field) do {			\
-	(elm)->field.cqe_next = (void *)(head);				\
-	(elm)->field.cqe_prev = (head)->cqh_last;			\
-	if ((head)->cqh_first == (void *)(head))			\
-		(head)->cqh_first = (elm);				\
-	else								\
-		(head)->cqh_last->field.cqe_next = (elm);		\
-	(head)->cqh_last = (elm);					\
-} while (0)
-
-#define CIRCLEQ_LAST(head) ((head)->cqh_last)
-
-#define CIRCLEQ_NEXT(elm,field) ((elm)->field.cqe_next)
-
-#define CIRCLEQ_PREV(elm,field) ((elm)->field.cqe_prev)
-
-#define	CIRCLEQ_REMOVE(head, elm, field) do {				\
-	if ((elm)->field.cqe_next == (void *)(head))			\
-		(head)->cqh_last = (elm)->field.cqe_prev;		\
-	else								\
-		(elm)->field.cqe_next->field.cqe_prev =			\
-		    (elm)->field.cqe_prev;				\
-	if ((elm)->field.cqe_prev == (void *)(head))			\
-		(head)->cqh_first = (elm)->field.cqe_next;		\
-	else								\
-		(elm)->field.cqe_prev->field.cqe_next =			\
-		    (elm)->field.cqe_next;				\
-} while (0)
-
-#ifdef _KERNEL
-
-#if NOTFB31
-
-/*
- * XXX insque() and remque() are an old way of handling certain queues.
- * They bogusly assumes that all queue heads look alike.
- */
-
-struct quehead {
-	struct quehead *qh_link;
-	struct quehead *qh_rlink;
-};
-
-#ifdef __GNUC__
-
-static __inline void
-insque(void *a, void *b)
-{
-	struct quehead *element = (struct quehead *)a,
-		 *head = (struct quehead *)b;
-
-	element->qh_link = head->qh_link;
-	element->qh_rlink = head;
-	head->qh_link = element;
-	element->qh_link->qh_rlink = element;
-}
-
-static __inline void
-remque(void *a)
-{
-	struct quehead *element = (struct quehead *)a;
-
-	element->qh_link->qh_rlink = element->qh_rlink;
-	element->qh_rlink->qh_link = element->qh_link;
-	element->qh_rlink = 0;
-}
-
-#else /* !__GNUC__ */
-
-void	insque(void *a, void *b);
-void	remque(void *a);
-
-#endif /* __GNUC__ */
-
-#endif
-#endif /* _KERNEL */
 
 #endif /* !_SYS_QUEUE_H_ */

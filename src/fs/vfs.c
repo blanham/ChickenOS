@@ -100,7 +100,7 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	strcpy(filename, tok);
 	while((tok = (char *)strtok_r(NULL, "/", &saveptr)) != NULL)
 	{
-		printf("TOk %s\n", tok);
+		//printf("TOk %s\n", tok);
 		strcpy(filename, tok);
 		if((res = vfs_namei(res, tok)) == NULL)
 		{
@@ -143,6 +143,7 @@ void vfs_mount_root(uint16_t dev, char *type)
 {
 	vfs_fs_t *fs;
 	int ret = 0;
+	dev = 0x301;
 	if((fs = vfs_find_fs(type)) == NULL)
 		goto error;
 	ret++;
@@ -274,7 +275,7 @@ struct file *vfs_open(char *path, int oflags, mode_t mode)
 	{
 		if((oflags & O_CREAT) != 0)
 		{
-			printf("need to create file\n");
+	//		printf("need to create file\n");
 		}
 		return NULL;
 	}
@@ -288,7 +289,7 @@ int vfs_close(struct file *file)
 	if(file == NULL)
 		return -1;
 	
-	vfs_file_free(file);
+	//vfs_file_free(file);
 
 	return 0;
 }
@@ -305,7 +306,8 @@ size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 		ret = block_device_readn(file->inode->info.st_rdev, 
 			buf, 0, file->offset, nbyte);
 	}else if((file->inode->info.st_mode & S_IFREG) != 0){
-		if(file->fs == NULL || file->fs->ops->read == NULL)
+		//printf("READ OFF %x\n", file->offset);
+		if(file->fs == NULL || file->fs->ops == NULL || file->fs->ops->read == NULL)
 			return -1;
 		ret = file->fs->ops->read(file->inode, buf,
 			nbyte, file->offset);
@@ -399,7 +401,7 @@ int vfs_chdir(const char *_path)
 	struct file *file;
 	int ret = -1;
 	char *path = strdup(_path);
-	file  = vfs_open(path, 0, NULL);
+	file  = vfs_open(path, 0, 0);
 	if(file != NULL)
 	{
 		//vfs_close(thread_current()->cur_dir);

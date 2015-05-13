@@ -1,5 +1,5 @@
 
-static char *syscall_names[] = {
+char *syscall_names[] = {
 	"sys_restart_syscall",
 	"sys_exit",
 	"sys_fork",

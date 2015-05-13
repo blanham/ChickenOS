@@ -1,36 +1,39 @@
 #ifndef C_OS_BITMAP_H
 #define C_OS_BITMAP_H
 #include <stdint.h>
+#include <limits.h>
+#include <string.h>
 //TODO: needs housekeeping
 
 typedef struct bitmap {
 	uint32_t *data;
 	uint32_t size;
+	uint32_t cache;
 } bitmap_t;
 
 #define BIT_HIGH (uint32_t)(1 << 31)
 #define BITMAP_ERROR -1
+#define BITMAP_BITS (sizeof(uint32_t)*CHAR_BIT)
+#define BITMAP_MASK (BITMAP_BITS -1)
 /*inline int bitmap_init(bitmap_t *bitmap, uint32_t size)
 {
 
 
 }*/
+
 static inline void bitmap_init_phys(bitmap_t *bitmap, uint32_t size, uint32_t *ptr)
 {
 	bitmap->size = size;
 	bitmap->data = ptr;
-	size = size/32;
-	while(size--)
-	{
-		*ptr++ = 0;
-		
-	}
+	size = size / BITMAP_BITS;
+
+	memset(ptr, 0, size * sizeof(*ptr));
 }
 
 static inline int bitmap_test(bitmap_t *bitmap, uint32_t index)
 {
 	int array_offset = index / 32;
-	int offset = index % 32;
+	int offset = index & BITMAP_MASK;
 	
 	if((bitmap->data[array_offset] & (BIT_HIGH >> offset)) != 0)
 		return 1;
@@ -42,7 +45,7 @@ static inline int bitmap_test(bitmap_t *bitmap, uint32_t index)
 static inline int bitmap_set(bitmap_t *bitmap, uint32_t index)
 {
 	int array = index / 32;
-	int offset = index % 32;
+	int offset = index & BITMAP_MASK;
 //	if(bitmap[array] & (BIT_HIGH >>  offset))
 //		return -1;
 //	else{

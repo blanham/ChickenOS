@@ -5,7 +5,6 @@
 #include <common.h>
 #include <hw.h>
 #include <device/video/bochs_vga.h>
-#include <device/video/font.h>
 #include <device/pci.h>
 #include <stdio.h>
 #include <mm/vm.h>
@@ -143,7 +142,8 @@ uint32_t * bochs_vga_init_internal(int w, int h, int bpp)
 	struct pci_device *pci;
 	uint32_t *ptr;
 	uint32_t bar;
-	thread_t *cur = thread_current();
+//	thread_t *cur = thread_current();
+
 	if((pci = pci_get_device(0x1234, 0x1111)) != NULL)
 	{
 			bar = pci_get_bar(pci, 0);
@@ -153,9 +153,9 @@ uint32_t * bochs_vga_init_internal(int w, int h, int bpp)
 			ptr = framebuffer = (uint32_t *)(0xe0000000 & ~0xfff);
 	//	return NULL;
 	}
-	uint32_t size = w*h*(bpp / 4)*10 / 4096;
-	pagedir_insert_pagen_physical(cur->pd, (uintptr_t)framebuffer, (uintptr_t)framebuffer, 0x7, size);
-	pagedir_install(cur->pd);
+//	uint32_t size = w*h*(bpp / 4)*10 / 4096;
+//	pagedir_insert_pagen_physical(cur->pd, (uintptr_t)framebuffer, (uintptr_t)framebuffer, 0x7, size);
+//	pagedir_install(cur->pd);
 	bochs_vga_setmode(w, h, bpp, true, true);
 	kmemset(framebuffer, 0x0, h*w*(bpp/4));
 
@@ -221,7 +221,7 @@ console_t * bochs_vga_init()
 		new[i].switch_fn = &bochs_vga_switch;	
 		kmemcpy(framebuffer + 640*480*i, test_ptr, 640*480*4);
 
-		console_register(&new[i]);	
+	//	console_register(&new[i]);	
 
 
 	}

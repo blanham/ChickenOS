@@ -9,6 +9,7 @@
 #include <device/ata.h>
 
 struct ata_drive drives[4];
+
 //XXX: Why is this switch statement like this?
 void ata_write(struct ata_drive *dev, uint16_t port, uint16_t value)
 {
@@ -20,7 +21,7 @@ void ata_write(struct ata_drive *dev, uint16_t port, uint16_t value)
 		case 1 ... 7:
 			outb(dev->io_base + port, value);
 			break;
-		case 0x3f6:
+		default:
 			outb(port, value);
 			break;	
 	}
@@ -34,11 +35,12 @@ uint16_t ata_read(struct ata_drive *dev, uint16_t port)
 			return inw(dev->io_base + port);
 		case 1 ... 7:
 			return inb(dev->io_base + port);
-		case 0x3f6:
+		default:
 			return inb(port);
 }
 	return 0;
 }
+
 size_t ata_sector_read(struct ata_drive *dev, void *buf, unsigned long long lba, uint32_t count UNUSED)
 {
 	uint16_t *data = buf;
@@ -53,12 +55,20 @@ size_t ata_sector_read(struct ata_drive *dev, void *buf, unsigned long long lba,
 	ata_write(dev, ATA_LBAHI,  (uint8_t)((lba >> 16) & 0xff));
 	
 	ata_write(dev, ATA_CMDSTAT, ATA_CMD_READ_PIO);
-	
+	int t = 1;
+	while(t)
+	{
+		int a = ata_read(dev, ATA_CMDSTAT);
+
+		if(((a & 0x80) == 0) && ((a & 8) == 8))
+			break;
+	}
 	for(int i = 0; i < 256; i++)
 		data[i] = ata_read(dev, ATA_DATA);
 
 	return 512;
 }
+
 size_t ata_sector_write(struct ata_drive *dev, void *buf, unsigned long long lba, uint32_t count UNUSED)
 {
 	uint16_t *data = buf;
@@ -184,7 +194,7 @@ void ata_identify(int drive)
 void ata_init()
 {
 	device_register(FILE_BLOCK, 0x300, ata_read_block, ata_write_block, ata_ioctl);
-	interrupt_register(32 + 14, &ata_intr);
+	interrupt_register(IRQ14, &ata_intr);
 	ata_identify(0);
 //	printf("test %i\n",sizeof(struct partition_entry));
 }

@@ -30,6 +30,11 @@ void putc(char c)
 	console_putc(c);
 }
 
+void putchar(int c)
+{
+	console_putc(c);
+}
+
 char getchar()
 {
 	return kbd_getc();
@@ -55,7 +60,7 @@ int puts(char *string)
 	{
 		return puts("(null)");
 	}
-	while(*string != NULL)
+	while(*string != '\0')
 	{
 		putc(*string++);
 		cnt++;
@@ -308,9 +313,34 @@ kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_lis
 void testc(int c, void *aux UNUSED)
 {
 	putc(c);
+	serial_putc(c);
 }
+#include <mm/vm.h>
+uint16_t *vidya = (void *)P2V(0xB8000);
+extern void vga_putchar(int c, int x, int y);
+extern void vga_scroll();
 void serial_testc(int c, void *aux UNUSED)
 {
+/*	static int x = 0, y = 0;
+	if(c == '\n')
+	{
+		y++;
+		x=0;
+	}
+	else{
+		vga_putchar(c, x, y);
+		x++; 
+	}*/
+/*	if(x > 80)
+	{
+		x = 0; y++;
+	}
+	if(y >24)
+	{
+		vga_scroll();
+		y = 24;
+	}*/
+//	*vidya++ = 0xA000 | (c & 0xFF);
 	serial_putc(c);
 }
 

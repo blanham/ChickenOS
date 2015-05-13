@@ -4,8 +4,11 @@ ChickenOS TODO
 Core
 ===============================================================================
 -Improve quality of comments and commit messages
--Need to implement synchronization primitives
-	-Can use gcc/clang provide test and set primitives
+-Need to implement synchronization primitives - In Progress
+	-Can use gcc/clang provided test and set primitives
+-Add proper Virtual address management - In Progress
+	-Add copy on write
+	-Memory mapped files
 -Build a testing infrastructure
 	-probably start with fs first (well defined i/o API)
 	-some parts will have to be built in
@@ -19,43 +22,46 @@ Core
 		http://www.cs.rutgers.edu/~pxk/416/notes/09a-paging.html
 		http://ftp.netbsd.org/pub/NetBSD/NetBSD-current/src/sys/arch/arm/include/arm32/pte.h	
 -General fix of build process
+-Restructure some things to use weak functions:
+	-http://www.valvers.com/programming/c/gcc-weak-function-attributes
 
 Console
 ===============================================================================
 -Modify the kernel's printf to output info separately from tty0
 	-printf ->stderr probably
 	-kprintf ->fb console, serial
--Improve keyboard support (Seem to run into issues with Newlib's getc)
+-Improve keyboard support
 -Actually queue keycodes
--Implement line disciplines (raw and cooked mode)
--Proper blocking I/O
+-Implement line disciplines (raw and cooked mode) - In Progress
+-Proper blocking I/O - In Progress
 -Take stb_ttf and write a small app that takes a TTF font and generates
  either a bitmap or a c header
--Proper serial support, separate back end from character i/o
+-Proper serial support, separate back end from character i/o - Done?
 	-necesary for ARM
 
 Threads
 ===============================================================================
--Fuck it, lets rewrite the whole thing
--Fix fork()
--Implement passing open files to child threads
+-Implement passing open files to child threads - Done
 -Implement wait queue
 -May have to change/rewrite the scheduler
 -Start factoring out platform specific code
+	-Thread setup, fork, syscall_handler, and exec/load_elf are the main ones 
+	 left
+-TLS: http://www.airs.com/blog/archives/44
 
 Userspace
 ===============================================================================
--Continue adding missing system calls to Newlib port
-	-Seriously considering using or writing an alternative
-	-Fork it?
-		-BSD, so not bad, but will have to include copyright chain
--Figure out why C++ binaries crash
 -Get dash working properly
+	-Worked for a bit, either signals, waiting, or both are fragile
 -Port coreutils or busybox
+	-Done
 -Port binutils/gcc/nasm
+	-Have nasm and gcc binaries
 -Port vim
+	-Running, input is broken
 -Port links/lynx
 -Implement dynamic loading of libraries
+	-Just have to implement stuff for the musl ldso to work
 
 Syscalls
 ===============================================================================
@@ -64,32 +70,32 @@ Syscalls
 -termios stuff
 -various fs calls
 -GCC:
-	wait4
-	read
-	write
-	open
-	close
-	stat
-	fstat
-	lstat
-	lseek
-	mmap
+	wait4 - in progress
+	read - done
+	write - done
+	open - done
+	close - done
+	stat - done
+	fstat - done
+	lstat - done
+	lseek - done
+	mmap - in progress
 	mprotect
 	munmap
-	brk
-	rt_sigaction
-	ioctl
-	access
-	dup2
-	getpid
-	vfork
-	execve
+	brk - done
+	rt_sigaction - in progress
+	ioctl - in progress?
+	access - done?
+	dup2 
+	getpid - done
+	vfork - sorta done, fork works,
+	execve - done, could use improving
 	fcntl
-	unlink
-	readlink
-	chmod
+	unlink - in progress
+	readlink - in progress
+	chmod - in progress
 	umask
-	getrlimit
+	getrlimit 
 	getrusage
 	arch_prctl
 	setrlimit
@@ -106,15 +112,16 @@ Network
  can use the driver)
  and then port wpa_supplicant 
  (trivial: http://hostap.epitest.fi/wpa_supplicant/devel/porting.html) 
+-Use dropbear for remote access
 
 Filesystem
 ===============================================================================
 -Implement ext2 write support - actually done, just needs new/extensible 
- file/directory support
--Implement fat12/16/32 support
+ file/directory support -in progress
+-Implement fat12/16/32 support - in progress
 -Need to add support for select()
 -Maybe implement ISO9660 support for reading CDs
--Add a block cache (can likely use pintos code for reference)
+-Add a block cache (can likely use pintos code for reference) -in progress
 -Continue work on the network filesystem, and maybe add NFS support
 -Compartmentalize VFS, filesystems, block cache, and disk i/o from each other
 
@@ -129,5 +136,7 @@ Video
 -Somehow get VBE/VESA to work so we can have something better than a simple 80
  column terminal (partially done)
 -Get linear framebuffer to work so we can do video (partially done)
--get X11 working (EXTREMELY AMBITIOUS)
+-get X11 working (EXTREMELY AMBITIOUS?)
 -port SDL (has been done by other hobbiest OSes)
+
+vim: set syntax=markdown:

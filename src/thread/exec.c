@@ -7,127 +7,29 @@
 #include <mm/vm.h>
 #include <thread.h>
 #include <kernel/interrupt.h>
+#include <thread.h>
 #include <fs/vfs.h>
 #include <elf.h>
 #define MAX_ARGS 256
 #define MAX_ENVS 256
 
-enum exe_type {EXE_INVALID, EXE_ELF, EXE_SCRIPT};
 
-static uintptr_t stack_prepare(void *stack, char *path, char *const argv[], char *const envp[]);
-
+static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[]);
 static enum exe_type exec_type(const char *path);
-
-
-char *envpr[] = {"S"," ", "","","","","","","",""};
-
 static void duplicate_table(char * dest[], char *const source[]);
-void build_auxv(uint32_t **auxv)
-{
-	Elf32_auxv_t *entry = (void *)*auxv;
-	#define AT_COUNT 38
-	entry->a_type = AT_NULL;
-	entry--;
-	*auxv = (void *)entry;
-}
-//FIXME: Doesn't pass an auxv 
-int sys_execve(const char *_path, char *const _argv[], char *const _envp[]) 
-{
-	registers_t *regs;
-	thread_t *cur = thread_current();
-	uint32_t *user_stack;
-	char **argv = NULL, **envp = NULL;
-	char *path;
-	enum exe_type type;
-	int ret = -ENOEXEC;
-
-	if(_path == NULL || _argv == NULL)
-		goto failure;
-
-	type = exec_type(_path);
-
-	switch(type)
-	{
-		case EXE_SCRIPT:
-			printf("Hashbangs not yet supported\n");
-			return -ENOEXEC;
-		case EXE_ELF:
-			break;
-		default:
-			return -ENOEXEC;
-	}
-
-	{
-		argv = kcalloc(sizeof(char *), MAX_ARGS);
-		envp = kcalloc(sizeof(char *), MAX_ARGS);
-
-		path = strdup(_path);
-		duplicate_table(argv, _argv);
-
-		if(_envp != NULL)
-			duplicate_table(envp, _envp);
-
-		regs = (void *)cur + STACK_SIZE - sizeof(*regs);
-		
-		//FIXME: We already have a user stack?
-		user_stack = palloc();
-		kmemset(user_stack,0, 4096);
-
-		//FIXME: some things may carry over	
-		
-//		pagedir_insert_page(cur->mm->pd, (uintptr_t)user_stack, 
-//		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
-
-	cur->mm->pd = pagedir_new();
-		pagedir_install(cur->mm->pd);
-	cur->mm->regions = NULL;
-	memregion_add(cur, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN, 
-			MAP_GROWSDOWN | MAP_FIXED, NULL, user_stack); 
-	memregion_add(cur, HEAP_BASE, PAGE_SIZE, PROT_GROWSUP, MAP_PRIVATE | MAP_FIXED, NULL, NULL); 
-		pagedir_install(cur->mm->pd);
-
-		if((ret = load_elf(path, &regs->eip)) != 0)
-			goto failure;
-
-		kfree(cur->name);
-		cur->name = strdup(argv[0]);
-	
-		regs->useresp = stack_prepare(user_stack + 4096, cur->name, argv, envp);
-		/*uint32_t *auxv = (void *)regs->useresp + 4;
-		kmemset((void *)regs->useresp - 24, 0xff, 48);
-	//	build_auxv(&auxv);
-		regs->useresp = (uintptr_t)auxv;/// */
 
 
-		printf("execve starting at %x with stack %x\n", regs->eip, regs->useresp);	
-		//FIXME: probably not the best address for break
-		//should be right above the code segment of the
-		//executable, 
-		cur->mm->brk = (void *)HEAP_BASE;
 
-	//	cur->mm->pd = pagedir_new();
-	//	pagedir_insert_pagen(cur->mm->pd, (uintptr_t)pallocn(100), (uintptr_t)cur->mm->brk, 0x7, 100);
-	//	pagedir_install(cur->mm->pd);
-
-	}
-
-	//if we return, then something is wrong	
-failure:
-	kfree(argv);
-	kfree(envp);
-	return ret;
-}
 
 static void push_arg(char *arg, uint8_t **sp);
 static int build_table(char **table, char * const source[], uint8_t **stack);
-static uintptr_t stack_prepare(void * stackp, char *path, char *const argv[], char *const envp[])
+static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[])
 {
-	uint8_t *stack = (uint8_t *)PHYS_BASE;(void)stackp;
-	char **arg_table;//[MAX_ARGS];
-	char **envp_table;//[MAX_ENVS];
+	uint8_t *stack = (uint8_t *)PHYS_BASE;
+	char **arg_table, **envp_table;
 	int argc = 0, envc = 0;	
 
-	//alocate these so we doun't blow the stack	
+	//alocate these so we don't blow the stack
 	arg_table = kcalloc(MAX_ARGS, sizeof(uint32_t *));
 	envp_table = kcalloc(MAX_ENVS, sizeof(uint32_t *));
 
@@ -145,19 +47,19 @@ static uintptr_t stack_prepare(void * stackp, char *path, char *const argv[], ch
 	//the environment, and then arguments
 	envc = build_table(envp_table, envp, &stack);
 	argc = build_table(arg_table, argv, &stack);
-	
+
 	//align stackpointer to 4 byte boundary
 	stack -= ( ((uintptr_t)stack %4));
-	
+
 	//copy tables into stack
 	stack -= 4;
 	stack -= envc*4;
 	memcpy(stack, envp_table, envc*4);
-	
+
 	stack -= 4;
 	stack -= argc*4;
 	memcpy(stack, arg_table, argc*4);
-	
+
 	//put argc at top of stack
 	stack -= 4;
 	*(uint32_t *)stack = argc;
@@ -167,32 +69,39 @@ static uintptr_t stack_prepare(void * stackp, char *path, char *const argv[], ch
 	kfree(arg_table);
 	kfree(envp_table);
 
-	
-	return (uintptr_t)stack;	
+	//TODO: auxv setup should be here
+	/*uint32_t *auxv = (void *)regs->useresp + 4;
+	kmemset((void *)regs->useresp - 24, 0xff, 48);
+//	build_auxv(&auxv);
+	regs->useresp = (uintptr_t)auxv;/// */
+
+	return (uintptr_t)stack;
 }
 
+//FIXME This should not being using sys_* for file ops
 static enum exe_type exec_type(const char *path)
 {
 	int fd;
 	void *magic;
 	enum exe_type ret = EXE_INVALID;
-	
+
 	magic = kcalloc(512,1);
-	
+
 	if((fd = sys_open(path, 0, 0)) < 0)
-		return -1;
-	
+		return ret;
+	//FIXME: check if file is executable or not
+	//       and error if so,probably with fstat
 	sys_read(fd, magic, 512);
-	
+
 	if(elf_check_magic(magic))
 		ret = EXE_ELF;
 	else if(memcmp(magic, "#!",2) == 0)
 		ret = EXE_SCRIPT;
-		
+
 	sys_close(fd);
-	
-	kfree(magic);	
-	
+
+	kfree(magic);
+
 	return ret;
 }
 
@@ -200,15 +109,15 @@ static void duplicate_table(char * dest[], char *const source[])
 {
 	char **p;
 	int count =0;
-	
+
 	for(p = (char **)source; *p != NULL; p++)
-	{	
+	{
 		dest[count] = strdup(*p);
 		count++;
 	}
-	
+
 	dest[count] = 0;
-}  
+} 
 
 static void push_arg(char *arg, uint8_t **sp)
 {
@@ -229,5 +138,107 @@ static int build_table(char **table, char * const source[], uint8_t **stack)
 	}
 
 	return arg_count;
+}
+
+void build_auxv(uint32_t **auxv)
+{
+	Elf32_auxv_t *entry = (void *)*auxv;
+	#define AT_COUNT 38
+	entry->a_type = AT_NULL;
+	entry--;
+	*auxv = (void *)entry;
+}
+
+int load_executable(enum exe_type type UNUSED, const char *_path,
+					char *const _argv[], char *const _envp[])
+{
+	registers_t *regs;
+	thread_t *cur = thread_current();
+	char **argv = NULL, **envp = NULL;
+	char *path;
+	int ret = -ENOEXEC;
+
+	printf("derp\n");
+	argv = kcalloc(sizeof(char *), MAX_ARGS);
+	envp = kcalloc(sizeof(char *), MAX_ARGS);
+
+	//Copy the path into kernel space
+	path = strdup(_path);
+
+	//duplicate the arg and env tables
+	duplicate_table(argv, _argv);
+	if(_envp != NULL)
+		duplicate_table(envp, _envp);
+
+	//NOTE: After this point all pointers passed in will be invalid, as
+	//      the old user stack is cleared
+	//mm_clear(cur->mm);
+	mm_init(cur->mm);
+	//XXX: kinda hacky, wish we could just have a member in the thread struct
+	regs = (void *)cur + STACK_SIZE - sizeof(*regs);
+
+	if((ret = load_elf(path, &regs->eip)) != 0)
+	{
+		//NOTE: If this happens this process is fucked as there's nothing to
+		//      return to. This should segfault, which I'm fine with
+		//      We really shouldn't get here anyway, since all checks that
+		//      would result in failure should be covered by exec_type,
+		//      including file existence, and ELF header, though if someone
+		//      somehow deleted the file between then and here it would fail
+		goto failure;
+	}
+
+	kfree(cur->name);
+	cur->name = strdup(argv[0]);
+
+	regs->useresp = stack_prepare(cur->name, argv, envp);
+
+	printf("execve starting at %x with stack %x\n", regs->eip, regs->useresp);
+	//FIXME: probably not the best address for break
+	//should be right above the code segment of the
+	//executable
+	cur->mm->brk = (void *)HEAP_BASE;
+
+failure:
+	kfree(path);
+	kfree(argv);
+	kfree(envp);
+	return ret;
+}
+
+int sys_execve(const char *_path, char *const _argv[], char *const _envp[])
+{
+	enum exe_type type = EXE_INVALID;
+	int ret = -ENOEXEC;
+
+	//FIXME: verify pointers here
+	//verify_pointer(_path)
+	//verify_pointer(_argv)
+	//verify_pointer(_envp)
+
+	if(_path == NULL || _argv == NULL)
+	{
+		ret = -EFAULT;
+		goto failure;
+	}
+
+	type = exec_type(_path);
+
+	switch(type)
+	{
+		case EXE_SCRIPT:
+			printf("Hashbangs not yet supported\n");
+			ret = -ENOEXEC;
+			break;
+		case EXE_ELF:
+			ret = load_executable(type, _path, _argv, _envp);
+			break;
+		case EXE_INVALID:
+		default:
+			ret = -ENOEXEC;
+	}
+
+failure:
+	return ret;
 }
 

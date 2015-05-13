@@ -27,7 +27,7 @@ struct thread_files *thread_files_alloc(struct thread_files *old)
 		//FIXME: increment ref count on root and cur_dir inodes
 		for(int i = 0; i < old->files_count; i++)
 		{
-			//new->files[i] = vfs_reopen(olf->files[i]);
+			//new->files[i] = vfs_reopen(old->files[i]);
 			new->files[i] = old->files[i];
 			//new->files_flags[i] = 0;
 		}
@@ -55,11 +55,17 @@ void thread_init()
 	kmemset(kernel_thread,0, sizeof(thread_t));	
 	kernel_thread->magic = THREAD_MAGIC;
 
-	kernel_thread->pd = pagedir_new();
+	kernel_thread->mm = mm_alloc();
 	kernel_thread->file_info = thread_files_alloc(NULL); 
 	kernel_thread->sig_info = kcalloc(sizeof(struct thread_signals), 1);
 
 	kernel_thread->name = strdup("idle");
+
+	//HACK: This wastes a page, but in exchange for cleaner code on fork()
+//	memregion_add(kernel_thread, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN, 
+//			MAP_GROWSDOWN | MAP_FIXED, NULL, NULL); 
+//	memregion_add(kernel_thread, HEAP_BASE, PAGE_SIZE, PROT_GROWSUP, 
+//			MAP_PRIVATE | MAP_FIXED, NULL, NULL); 
 
 	thread_scheduler_init(kernel_thread);
 	arch_thread_init();
@@ -85,13 +91,15 @@ thread_clone(thread_t *cur)
 {
 	thread_t *new = thread_new();
 
-	//FIXME: Just manually move things over
+	//FIXME: Assign things instead of copying the struct
 	kmemcpy(new, cur, sizeof(thread_t));
 
 	new->ppid = cur->pid;
 	new->pgid = cur->pgid;
 	new->pid = pid_allocate();
 	
+	new->magic = THREAD_MAGIC;
+	new->mm = mm_clone(cur->mm);
 	new->file_info = thread_files_alloc(cur->file_info);
 	new->sig_info = kcalloc(sizeof(struct thread_signals), 1);
 
@@ -99,25 +107,21 @@ thread_clone(thread_t *cur)
 			sizeof(struct k_sigaction) * NUM_SIGNALS);
 
 	new->name = strdup(cur->name);
-	new->magic = THREAD_MAGIC;
 
 	thread_add_child(cur, new);
-
 	return new;
 }
 
 //The lazy way of copying most shit from a passed in regs, works
 //but better to just always build a stack
 pid_t 
-thread_create(registers_t *regs, void (*eip)(void *), void * esp)
+thread_create(registers_t *_regs, void (*eip)(void *), void * esp UNUSED)
+//thread_create(void (*eip)(void *), void *aux, int flags)
 {
+	enum intr_status old_level = interrupt_disable();
 	thread_t *new, *cur;
-	enum intr_status old_level;
-	registers_t *reg_frame;
-	uint8_t *kernel_stack, *user_stack;//, *signal_stack;
+	uint8_t *kernel_stack;
 	uintptr_t new_sp;
-	uint32_t *usersp;	
-	old_level = interrupt_disable();
 	
 	cur = thread_current();
 	new = thread_clone(cur);
@@ -125,47 +129,24 @@ thread_create(registers_t *regs, void (*eip)(void *), void * esp)
 	kernel_stack = (uint8_t *)new;
 	cur->children = new;
 	
-	//Allocates one page, if we page fault under the stack pointer we add more
-	user_stack = palloc();
-	kmemset(user_stack,0, 4096);
-
-	usersp = (uint32_t *)(user_stack + 4096);
 	new_sp = (uintptr_t)kernel_stack + STACK_SIZE;
 
-
-	new->pd = pagedir_clone(cur->pd);
-	//FIXME: what if user stack is bigger?
-	pagedir_insert_page(new->pd, (uintptr_t)user_stack, 
-		(uintptr_t)PHYS_BASE - 0x1000, 0x7);
-
-	reg_frame = (void *)((kernel_stack + STACK_SIZE) - sizeof(*reg_frame));
-	new->regs = (struct registers *)reg_frame;
-	
-	if(regs != NULL)
+	if(_regs != NULL)
 	{
-		//FIXME: what if user stack is bigger?
-		kmemcpy(user_stack, (void *)(PHYS_BASE - 0x1000), 0x1000);
-		kmemcpy(reg_frame, regs, sizeof(registers_t));		
-		//this is a fork, so we want to be 0
-		reg_frame->eax = 0;	
-		new->user = (void *)(PHYS_BASE - 0x1000);
+		thread_copy_stackframe(cur, kernel_stack, 0);
 	}
 	else
 	{
-		usersp--;
-		*usersp = (uint32_t)esp;
+		uint32_t *usersp = palloc();
+		memregion_map_data(new->mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN, 
+			MAP_GROWSDOWN | MAP_FIXED, usersp); 
 
-		//Build new register frame
-		reg_frame->eip = (uintptr_t)eip;
-		reg_frame->ebp = PHYS_BASE - 16;	
-		reg_frame->useresp = PHYS_BASE - 8;
-		reg_frame->cs = 0x1b;
-		reg_frame->ds = reg_frame->es = reg_frame->fs = 
-		reg_frame->gs = reg_frame->ss = 0x23;
-		reg_frame->eflags = 0x200;
+		usersp += 1024;
+		*--usersp = (uint32_t)esp;
+		
+		thread_build_stackframe(kernel_stack, (uintptr_t)eip, PHYS_BASE);
 	}
 	
-//	dump_regs(reg_frame);	
 
 	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4));
 	
@@ -176,11 +157,8 @@ thread_create(registers_t *regs, void (*eip)(void *), void * esp)
 
 	return new->pid;	
 }
-/*
-void thread_add_child(thread_t *thread, thread_t *child)
-{
-}
-*/
+
+//TODO: Array? Bitmap?
 pid_t pid_allocate()
 {
 	static pid_t pid_count = 0;
@@ -204,5 +182,3 @@ thread_t * thread_current()
 	}
 	return ret;
 }
-
-

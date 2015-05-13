@@ -58,7 +58,7 @@ jumpg:
 section .txt
 oldgdt:
 	dd 0
-entry:
+entry16:
 	cli
 	sgdt [oldgdt]
 	lgdt [realgdt]

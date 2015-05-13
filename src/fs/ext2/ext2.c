@@ -134,9 +134,16 @@ struct inode * ext2_load_inode(ext2_fs_t *fs, int inode)
 	struct inode *read = kcalloc(sizeof(*read), 1);
 	ext2_inode_t *ext2_ino = kcalloc(sizeof(*ext2_ino),1);
 	ext2_inode_t *inode_block = kcalloc(sizeof(*ext2_ino),8);
-	ext2_superblock_t *sb = fs->superblock->sb;
+	ext2_superblock_t *sb;
 	int ind;
-	
+	if(fs == NULL)
+		return NULL;
+	if(fs->superblock == NULL)
+	return NULL;
+		
+	sb = fs->superblock->sb;
+	if(sb == NULL)
+		return NULL;
 	int group = ((inode - 1)/sb->s_inodes_per_group);
 	
 	ext2_group_descriptor_t * gd = &fs->aux->gd_table[group];
@@ -158,7 +165,7 @@ struct inode * ext2_load_inode(ext2_fs_t *fs, int inode)
 struct inode * ext2_namei(struct inode *dir, char *file)
 {
 	ext2_fs_t *fs = (ext2_fs_t *)dir->fs;
-	struct inode *inode = ext2_load_inode((ext2_fs_t *)dir->fs, dir->info.st_ino);
+	struct inode *inode = dir;//ext2_load_inode((ext2_fs_t *)dir->fs, dir->info.st_ino);
 	ext2_inode_t * in = (ext2_inode_t *)(inode->storage);
 	int len = 0;	
 	ext2_directory_t *free,*ext2_dir= kmalloc(inode->info.st_size);
@@ -166,7 +173,6 @@ struct inode * ext2_namei(struct inode *dir, char *file)
 	int count =inode->info.st_size;
 	void *fdir = ext2_dir;
 	int ino_num;
-	
 	
 //	inode_print(*in);
 	ext2_read_block(fs, ext2_dir, in->i_block[0]);

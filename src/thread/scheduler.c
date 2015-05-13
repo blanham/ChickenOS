@@ -12,7 +12,14 @@
 #include <util/utlist.h>
 
 thread_t *thread_list = NULL;
+
 extern void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next);
+
+void exit(int i)
+{
+	printf("Exit %i\n", i);
+	PANIC("exit() called!");
+}
 
 void thread_scheduler_init(thread_t *kernel_thread)
 {
@@ -27,6 +34,7 @@ void thread_scheduler(registers_t *regs)
 	
 	if(cur->status == THREAD_UNINTERRUPTIBLE)
 	{
+		thread_reschedule(regs, cur, cur);
 	}
 	next = thread_next();
 
@@ -35,7 +43,7 @@ void thread_scheduler(registers_t *regs)
 
 	//save position of regs on stack for signal handling
 	cur->regs = regs;
-
+	//serial_printf("next %X %X %X\n", regs, cur, next);
 	thread_reschedule(regs, cur, next);
 }
 
@@ -91,26 +99,25 @@ void thread_exit(int status)
 {
 	thread_t *cur = thread_current();
 	thread_t *next = thread_next();
-	thread_t *parent;
+//	thread_t *parent;
 
 	interrupt_disable();
 
-	parent = thread_by_pid(cur->ppid);
+//	parent = thread_by_pid(cur->ppid);
 	
 	HASH_DEL(thread_list, cur);	
 
-	printf("exit (%i)\n",status);
+	//printf("exit (%i)\n",status);
 
-	//Check if parent exists
-	//
-	//if not, give it to root
-	//
-	//
-
+	//Check if we have children
+	//if we do
+	//	re parent them
+	
 	sys_kill(cur->ppid, SIGCHLD);
 
 	//Will need to reap eventually
 	cur->status = THREAD_DEAD;
+	cur->ret_val = status;
 	thread_reschedule(cur->regs, cur, next);
 }
 
