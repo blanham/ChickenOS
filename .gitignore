@@ -1,7 +1,6 @@
 *.sw*
 bochsout.txt
 log
+info/
+disk/
 tmp/
-utils/
-./util/
-compile/
