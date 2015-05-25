@@ -9,6 +9,7 @@ CC		=		clang -m32 -target i686-pc-none-elf -mno-sse -mno-mmx
 #LINKER	=		$(CROSS)/i586-elf-ld
 CFLAGS	=		-g -Wall -Werror $(INCLUDES) \
 				-std=gnu11	\
+				-ffreestanding \
 				-fno-stack-protector \
 				-Wextra\
 				-fno-builtin -DARCH_I386
@@ -21,7 +22,7 @@ AS		=		nasm
 ASFLAGS	=		-felf
 #FIXME: this should only be one path
 ARCH_INCLUDES=	-I./arch/$(ARCH)/include	
-INCLUDES=		-I./include -I./fs -I./include/kernel #-I./arch/i386/rme2/src
+INCLUDES=		-I./include -I./fs -I./include/kernel
 
 ARCHSRCS=		$(patsubst %.s,%.o,$(wildcard arch/$(ARCH)/*.s))\
 				$(patsubst %.c,%.o,$(wildcard arch/$(ARCH)/*.c))\

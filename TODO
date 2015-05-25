@@ -28,8 +28,9 @@ Core
 Console
 ===============================================================================
 -Modify the kernel's printf to output info separately from tty0
-	-printf ->stderr probably
-	-kprintf ->fb console, serial
+	-printf -> stderr probably
+	-kprintf -> fb console, serial
+-TTY support is crap, is tied into VGA text mode
 -Improve keyboard support
 -Actually queue keycodes
 -Implement line disciplines (raw and cooked mode) - In Progress
