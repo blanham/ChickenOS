@@ -1,4 +1,7 @@
 kernel.bin
 cscope.out
+types_c.taghl
+types_py.taghl
+tags
 *.sw*
 *.o
