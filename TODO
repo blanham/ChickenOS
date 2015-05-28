@@ -31,6 +31,8 @@ Console
 	-printf -> stderr probably
 	-kprintf -> fb console, serial
 -TTY support is crap, is tied into VGA text mode
+-Good references
+	-https://blog.nelhage.com/2009/12/a-brief-introduction-to-termios-termios3-and-stty/
 -Improve keyboard support
 -Actually queue keycodes
 -Implement line disciplines (raw and cooked mode) - In Progress

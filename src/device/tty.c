@@ -7,6 +7,8 @@
 #include <memory.h>
 #include <mm/liballoc.h>
 
+//FIXME: This should be console.c, tty should handle the termios stuff
+
 //XXX MUST BE POWER OF TWO!
 #define TTY_HISTORY_SIZE 128
 #define TTY_HISTORY_MASK (TTY_HISTORY_SIZE - 1)
