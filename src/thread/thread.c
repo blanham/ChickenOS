@@ -4,6 +4,7 @@
  */
 #include <common.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <string.h>
 #include <mm/vm.h>
 #include <mm/paging.h>
@@ -12,6 +13,8 @@
 #include <kernel/interrupt.h>
 #include <mm/liballoc.h>
 #include <util/utlist.h>
+
+int thread_stack_offset = offsetof(thread_t, sp);
 
 //XXX: Remove this when we reintegrate fs code
 extern struct file *root;
