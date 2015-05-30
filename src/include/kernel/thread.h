@@ -160,4 +160,6 @@ int sys_sigreturn(registers_t *regs, unsigned long dunno);
 void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax);
 void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp);
 
+/* arch/ARCH/switch.s */
+void switch_threads(thread_t *cur, thread_t *new);
 #endif
