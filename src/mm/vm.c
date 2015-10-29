@@ -8,7 +8,6 @@
 #include <kernel/hw.h>
 #include <kernel/thread.h>
 #include <stdio.h>
-#include <multiboot.h>
 
 uint32_t mem_size;
 
@@ -16,11 +15,11 @@ void vm_page_fault_dump(registers_t *regs, uintptr_t addr, int flags)
 {
 	thread_t *cur = thread_current();
 	printf("Page fault in %s space @ %X PID %i eip %x\n",
-	 	(flags & PAGE_USER) ? "user" : "kernel",
-	 	addr, cur->pid, regs->eip);
+		(flags & PAGE_USER) ? "user" : "kernel",
+		addr, cur->pid, regs->eip);
 	printf("%s\t", (flags & PAGE_WRITE) ? "write" : "read");
 	printf("%s\n", (flags & PAGE_VIOLATION) ? "protection violation" :
-	 									"page not present");
+												"page not present");
 	printf("\nREGS:\n");
 	dump_regs(regs);
 	printf("\n");
@@ -37,7 +36,7 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 
 	if(flags & PAGE_USER)
 	{
-		vm_page_fault_dump(regs, addr, flags);	
+		vm_page_fault_dump(regs, addr, flags);
 
 		//TODO: send sigsegv to thread
 		//signal(cur, SIGSEGV);
@@ -63,41 +62,6 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 	PANIC("Unhandled page fault");
 }
 
-//FIXME Taken from linux, only applicable to i386?
-#define TASK_UNMAPPED_BASE (PHYS_BASE/3)
-
-void *mmap_base = (void *)0x5000000;
-//Move this to the region code?
-void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset)
-{
-	(void)addr;
-	(void)length;
-	(void)prot;
-	(void)flags;
-	(void)fd;
-	(void)pgoffset;
-	PANIC("FUCKING THING SUCKS\n");
-	printf("Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n",
-					addr, length, prot, flags, fd, pgoffset);
-
-	if(addr == NULL)
-	{
-		//Starting with mmap base
-		//look through threads memregions
-		//if
-		addr = mmap_base;
-
-	}
-//	void *new = palloc(length / PAGE_SIZE);
-//	pagedir_t pd = thread_current()->pd;
-//	pagedir_insert_pagen(pd, (uintptr_t)new, (uintptr_t)mmap_base, 0x7, length/PAGE_SIZE);
-
-	addr = mmap_base;
-	mmap_base += length;
-
-	return addr;//(void*)-1;//NULL;
-}
-
 struct mm *mm_alloc()
 {
 	struct mm *new = kcalloc(sizeof(*new), 1);
@@ -105,51 +69,6 @@ struct mm *mm_alloc()
 	new->pd = pagedir_new();
 
 	return new;
-}
-
-struct mm *mm_clone(struct mm *old)
-{
-	struct mm *new = kcalloc(sizeof(*new), 1);
-//	new->pd = pagedir_new();
-	new->pd = pagedir_copy(old->pd);
-	new->regions = region_clone(old->regions);
-
-	return new;
-}
-
-void mm_clear(struct mm *mm)
-{
-	(void)mm;
-	//Iterate through regions and remove them
-	//	reduce reference counts for physical pages
-	//swap to a new pagedirectory and throw away everything else
-}
-
-void mm_free(struct mm *mm)
-{
-	(void)mm;
-}
-
-//Currently used in execve()
-void mm_init(struct mm *mm)
-{
-	//This initial allocation is probably not needed,
-	//but saves a page fault on initial stack setup
-	void *user_stack = palloc();
-	memset(user_stack, 0, 4096);
-
-	mm->pd = pagedir_new();
-	mm->regions = NULL;
-	//XXX: Don't call this here
-	pagedir_install(mm->pd);
-
-	memregion_map_data(mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE,
-			PROT_GROWSDOWN, MAP_GROWSDOWN | MAP_FIXED, user_stack);
-	memregion_map_data(mm, HEAP_BASE, PAGE_SIZE,
-			PROT_GROWSUP, MAP_PRIVATE | MAP_FIXED, NULL);
-
-	//XXX: Don't call it here either
-	pagedir_install(mm->pd);
 }
 
 void vm_init(struct kernel_boot_info *info)

@@ -14,14 +14,14 @@ CFLAGS	=		-g -Wall -Werror $(INCLUDES) \
 				-Wextra\
 				-fno-builtin -DARCH_I386
 CFLAGS += 		-Wextra
-#LINKER	=		ld -melf_i386 
+#LINKER	=		ld -melf_i386
 LINKER	=		clang -m32 -target i686-pc-none-elf -nostdlib
-LDFLAGS	=		-T arch/$(ARCH)/linker.ld 
-ARMAS	=		$(ARMPRE)as	
+LDFLAGS	=		-T arch/$(ARCH)/linker.ld
+ARMAS	=		$(ARMPRE)as
 AS		=		nasm
 ASFLAGS	=		-felf
 #FIXME: this should only be one path
-ARCH_INCLUDES=	-I./arch/$(ARCH)/include	
+ARCH_INCLUDES=	-I./arch/$(ARCH)/include
 INCLUDES=		-I./include -I./fs -I./include/kernel
 
 ARCHSRCS=		$(patsubst %.s,%.o,$(wildcard arch/$(ARCH)/*.s))\
@@ -55,10 +55,10 @@ DEVSRCS		=	$(DEVCORE) $(VIDEOSRCS) $(AUDIOSRCS) $(USBSRCS)
 
 THREAD	=		$(patsubst %.c,%.o,$(wildcard thread/*.c))
 
-CORE	=		init/kmain.o init/init.o 
-				
+CORE	=		init/kmain.o init/init.o
+
 SOURCES	=		$(CORE) $(ARCHSRCS) $(THREAD) $(DEVSRCS) $(NETSRCS) $(MEMSRCS) \
-				$(FSSRCS) $(KLIBSRCS) 
+				$(FSSRCS) $(KLIBSRCS)
 
 all: $(SOURCES) link
 tftp: all
@@ -66,19 +66,19 @@ tftp: all
 lib: $(LIBSRCS)
 test: all
 	cd .. && ./new_update.sh &&  DISPLAY=:0.0 qemu-system-i386  -vga std -soundhw ac97  -rtc base=localtime \
-	-m 128 -usb  -hda disk.img -serial file:log && cd src 
+	-m 128 -usb  -hda disk.img -serial file:log && cd src
 bochs: all
-	cd .. && ./new_update.sh &&  ./run_bochs.sh && cd src 
+	cd .. && ./new_update.sh &&  ./run_bochs.sh && cd src
 test3: all
 	cd .. &&  qemu -rtc base=localtime \
-	-m 64 -hda disk.img -serial file:log && cd src 
+	-m 64 -hda disk.img -serial file:log && cd src
 
 network: all
 	cd .. && ./new_update.sh &&  qemu -rtc base=localtime \
-	-m 64 -hda disk.img -serial file:log -net nic,vlan=0,model=e1000,macaddr=00:00:00:00:00:00 -net tap,vlan=0,ifname=tap0,script=no  && cd src 
+	-m 64 -hda disk.img -serial file:log -net nic,vlan=0,model=e1000,macaddr=00:00:00:00:00:00 -net tap,vlan=0,ifname=tap0,script=no  && cd src
 debug: all
 	cd .. && ./new_update.sh &&  qemu-system-i386 -rtc base=localtime \
-	-m 64 -usb -hda disk.img -s -S -serial file:log && cd src 
+	-m 64 -usb -hda disk.img -s -S -serial file:log && cd src
 
 clean:
 	rm -f kernel.bin $(SOURCES)

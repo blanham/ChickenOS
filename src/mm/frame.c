@@ -35,6 +35,11 @@ void frame_put(struct frame *frame)
 	}
 }
 
+int frame_refs(struct frame *frame)
+{
+	return atomic_load(&frame->ref_count);
+}
+
 void *palloc_user()
 {
 	struct frame *new = frame_get(palloc());

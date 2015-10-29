@@ -1,6 +1,6 @@
 /*	ChickenOS Intel Pro/1000 Network Card Driver
  *  Based on a driver by Joshua Cornutt
- *  Found here: http://www.randomaccessit.com/osdev/i825xx.c 
+ *  Found here: http://www.randomaccessit.com/osdev/i825xx.c
  *
  */
 
@@ -20,7 +20,7 @@
 struct e1000 *e1000_global;
 #define E1000_DEV 0x100E
 extern pagedir_t kernel_pd;
-void pagedir_insert_page(pagedir_t pd, 
+void pagedir_insert_page(pagedir_t pd,
 	virt_addr_t phys, virt_addr_t virt,uint8_t flags);
 
 #define REG_CTRL 		0x0000
@@ -55,16 +55,16 @@ void e1000_outl(struct e1000 *e, uint16_t addr, uint32_t val)
 {
 	outl(e->io_base, addr);
 	outl(e->io_base + 4, val);
-} 
+}
 void e1000_outb(struct e1000 *e, uint16_t addr, uint32_t val)
 {
 	outl(e->io_base, addr);
 	outb(e->io_base + 4, val);
-} 
+}
 uint32_t e1000_inl(struct e1000 *e, uint16_t addr)
 {
 	outl(e->io_base, addr);
-	return inl(e->io_base + 4); 
+	return inl(e->io_base + 4);
 }
 uint32_t e1000_eeprom_read(struct e1000 *e, uint8_t addr)
 {
@@ -132,12 +132,12 @@ void e1000_received(struct e1000 *e)
 	{
 		uint8_t *buf = (void *)(uintptr_t)P2V(e->rx_descs[e->rx_cur]->addr);
 		uint16_t len = e->rx_descs[e->rx_cur]->length;
-			
+
 		sb = sockbuf_alloc(e->dev, len);
 		kmemcpy(sb->data, buf, len);
-		network_received(sb); 
+		network_received(sb);
 		e->rx_descs[e->rx_cur]->status = 0;
-		old_cur = e->rx_cur; 
+		old_cur = e->rx_cur;
 		e->rx_cur = (e->rx_cur + 1) % NUM_RX_DESC;
 		e1000_outl(e, REG_RXDESCTAIL, old_cur ) ;
 	}
@@ -146,22 +146,22 @@ void e1000_received(struct e1000 *e)
 void e1000_eeprom_gettype(struct e1000 *e)
 {
 	uint32_t val = 0;
-	e1000_outl(e, REG_EEPROM, 0x1); 
-	
+	e1000_outl(e, REG_EEPROM, 0x1);
+
 	for(int i = 0; i < 1000; i++)///while( val & 0x2 || val & 0x10)
 	{
 		val = e1000_inl(e, REG_EEPROM);
 		if(val & 0x10)
 			e->is_e = 0;
 		else
-			e->is_e = 1;	
+			e->is_e = 1;
 	}
 }
 void e1000_handler(void *aux)
 {
 	struct e1000 *e = aux;
 	uint32_t status = e1000_inl(e, 0xc0);
-	
+
 	if(status & 0x04)
 	{
 		e1000_linkup(e);
@@ -196,8 +196,8 @@ void e1000_rxinit(struct e1000 *e)
 		e->rx_descs[i] = (struct e1000_rx_desc *)((uintptr_t)descs + i*16);
 		e->rx_descs[i]->addr = (uint64_t)(uintptr_t)V2P(kmalloc(8192 + 16));
 		e->rx_descs[i]->status = 0;
-	}	
-	
+	}
+
 	//give the card the pointer to the descriptors
 	e1000_outl(e, REG_RXDESCLO, V2P(ptr));
 	e1000_outl(e, REG_RXDESCHI, 0);
@@ -209,7 +209,7 @@ void e1000_rxinit(struct e1000 *e)
 	e1000_outl(e, REG_RXDESCHEAD, 0);
 	e1000_outl(e, REG_RXDESCTAIL, NUM_RX_DESC);
 	e->rx_cur = 0;
-	
+
 	//enable receiving
 	//uint32_t flags = (2 << 16) | (1 << 25) | (1 << 26) | (1 << 15) | (1 << 5) | (0 << 8) | (1 << 4) | (1 << 3) | ( 1 << 2);
 uint32_t flags = (2 << 16) | (1 << 25) | (1 << 26) | (1 << 15) | (1 << 5) | (0 << 8) | (0 << 4) | (0 << 3) | ( 1 << 2);
@@ -231,8 +231,8 @@ void e1000_txinit(struct e1000 *e)
 		e->tx_descs[i] = (struct e1000_tx_desc *)((uintptr_t)descs + i*16);
 		e->tx_descs[i]->addr = 0;
 		e->tx_descs[i]->cmd = 0;
-	}	
-	
+	}
+
 	//give the card the pointer to the descriptors
 	e1000_outl(e, REG_TXDESCLO, V2P(ptr));
 	e1000_outl(e, REG_TXDESCHI, 0);
@@ -244,7 +244,7 @@ void e1000_txinit(struct e1000 *e)
 	e1000_outl(e, REG_TXDESCHEAD, 0);
 	e1000_outl(e, REG_TXDESCTAIL, NUM_TX_DESC);
 	e->tx_cur = 0;
-	
+
 	e1000_outl(e, REG_TCTRL, (1 << 1) | (1 << 3));
 }
 
@@ -269,7 +269,7 @@ struct network_dev *e1000_init()
 	e1000_global = e;
 	device->device = e;
 	e->dev = device;
-	
+
 	e->pci = pci_get_device(INTEL_VEND, E1000_DEV);
 	if(e->pci == NULL){
 		e->pci = pci_get_device(INTEL_VEND, 0x109a);
@@ -282,29 +282,29 @@ struct network_dev *e1000_init()
 	{
 		e->pci_hdr = e->pci->header;
 		printf("Intel Pro/1000 Ethernet adapter Rev %i found at ", e->pci_hdr->rev);
-		
+
 		e->io_base = pci_get_bar(e->pci, PCI_BAR_IO) & ~1;
 		printf("I/O base address %x\n",e->io_base);
-		
+
 		//e->mem_base = (uint8_t *)(pci_get_bar(e->pci, PCI_BAR_MEM) & ~3);
 		//printf("mem base %x\n",e->mem_base);
-		
-		printf("IRQ %i PIN %i\n",e->pci_hdr->int_line, e->pci_hdr->int_pin);	
+
+		printf("IRQ %i PIN %i\n",e->pci_hdr->int_line, e->pci_hdr->int_pin);
 
 		e1000_eeprom_gettype(e);
 		e1000_getmac(e, (char *)device->mac);
 		print_mac((char *)&device->mac);
-	
+
 	//	for(int i = 0; i < 6; i++)
-	//	e1000_outb(e,0x5400 + i, device->mac[i]);	
-	
+	//	e1000_outb(e,0x5400 + i, device->mac[i]);
+
 		pci_register_irq(e->pci, &e1000_handler, e);
-		
+
 		e1000_start(e);
-		
+
 		device->send = e1000_send;
 	//	device->receive = e1000_receive;
-		
+
 		uint32_t flags = e1000_inl(e, REG_RCTRL);
 		e1000_outl(e, REG_RCTRL, flags | RCTRL_EN);//RCTRL_8192 | RCTRL_MPE | RCTRL_UPE |RCTRL_EN);
 	}

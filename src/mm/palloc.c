@@ -1,5 +1,5 @@
 /*	ChickenOS - mm/palloc.c
- *	Page Allocator 
+ *	Page Allocator
  *	Similar in design to the allocator in Pintos
  *	FIXME: Seems to deadlock after allocating 225MB worth
  *	of pages
@@ -91,13 +91,13 @@ void palloc_init(uint32_t page_count, uintptr_t placement)
 	void *start = 0;
 	uintptr_t bitmap_ptr = placement;//+ 0x100000;
 	uint32_t bitmap_length = (page_count/32) * sizeof(uint32_t);
-	
+
 	start = (void *)(placement + bitmap_length);
 
 	if(((uint32_t)start & ~PAGE_MASK) != 0)
 		start = (void *)(((uint32_t)start & PAGE_MASK) + PAGE_SIZE);
-	
+
 	bitmap_init_phys(&page_bitmap, page_count, (uint32_t *)bitmap_ptr);
-	
+
 	palloc_start = (phys_addr_t)start;
 }
