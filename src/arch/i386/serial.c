@@ -33,11 +33,11 @@ void serial_putc(char c)
 	{
 		serial_putc('\r');
 	}
-	
+
 	while(serial_ready() == 0);
-	
-	outb(com_port, c);	
-	outb(0xE9, c);	
+
+	outb(com_port, c);
+	outb(0xE9, c);
 }
 
 int serial_getc()
@@ -64,7 +64,7 @@ void serial_init()
 	for (int i = 0; i < 4; i++)
 	{
 		if(com[i] != 0)
-		{	
+		{
 			count++;
 			//FIXME: log serial probing
 			//log/printf("Found COM port @ 0x%X\n", com[i]);

@@ -1,4 +1,5 @@
 #include <kernel/hw.h>
+
 /* taken from: http://www.jamesmolloy.co.uk/ */
 void outb(uint16_t port, uint8_t value)
 {
@@ -27,6 +28,7 @@ uint16_t inw(uint16_t port)
 	asm volatile ("inw %1, %0" : "=a" (ret) : "dN" (port));
 	return ret;
 }
+
 uint32_t inl(uint16_t port)
 {
 	uint32_t ret;
@@ -40,7 +42,7 @@ void shutdown()
 	const char s[] = "Shutdown";
 	const char *p;
 	for (p = s; *p != '\0'; p++)
-    	outb (0x8900, *p);
+		outb (0x8900, *p);
 	asm volatile ("hlt");
+}
 
-} 

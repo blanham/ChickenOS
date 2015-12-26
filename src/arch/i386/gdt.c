@@ -31,7 +31,7 @@ void gdt_install(void)
 
 	kmemset(&tss, 0, 104);
 	tss.ss0  = 0x10;
-	tss.io_bmap = sizeof(tss);	
+	tss.io_bmap = sizeof(tss);
 	tss.cs = 0xb;
 	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13;
 

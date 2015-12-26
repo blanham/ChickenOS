@@ -11,7 +11,7 @@ void pic_init()
 
 	/* starts init */
 	outb(PIC1_CMD, 0x11);
- 	outb(PIC2_CMD, 0x11);
+	outb(PIC2_CMD, 0x11);
 
 	/* set offsets */
 	outb(PIC1_DATA, 0x20);
@@ -50,9 +50,9 @@ void pic_mask(int irq)
 	uint8_t val;
 	uint16_t port;
 
-	if(irq < 8)
+	if(irq < 8) {
 		port = PIC1_DATA;
-	else{
+	} else {
 		port = PIC2_DATA;
 		irq -= 8;
 	}
@@ -65,10 +65,10 @@ void pic_unmask(int irq)
 {
 	uint8_t val;
 	uint16_t port;
-	
-	if(irq < 8)
+
+	if(irq < 8) {
 		port = PIC1_DATA;
-	else{
+	} else {
 		port = PIC2_DATA;
 		irq -= 8;
 	}

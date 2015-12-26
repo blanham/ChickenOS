@@ -21,7 +21,6 @@ uint8_t kbd_read()
 
 void kbd_intr(struct registers * regs UNUSED)
 {
-
 	extern void ps2_intr(void);
 	ps2_intr();
 }

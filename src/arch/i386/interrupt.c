@@ -19,7 +19,7 @@ extern idt_entry_t idt_table[NUM_INTRS];
 idt_ptr_t	idt_ptr;
 intr_handler *intr_handlers[NUM_INTRS];
 
-extern void sysc();	
+extern void sysc();
 
 void dump_regs(struct registers *regs)
 {
@@ -95,6 +95,7 @@ static void stack_fault(struct registers * regs)
 	printf("Error %x\n",error_code);
 	dump_regs(regs);
 	//triggers debugger in BOCHS
+	asm volatile("xchg %bx, %bx");
 	PANIC("STACK FAULT!");
 }
 
@@ -102,14 +103,15 @@ static void page_fault(struct registers * regs)
 {
 	uintptr_t faulting_addr;
 
-	asm volatile ("mov %%cr2, %0"
-				  : "=r" (faulting_addr)
-				 );
+	asm volatile (
+		"mov %%cr2, %0"
+		: "=r" (faulting_addr)
+	);
 
-	vm_page_fault(regs, faulting_addr, regs->err_code & 
+	vm_page_fault(regs, faulting_addr, regs->err_code &
 							(PAGE_USER | PAGE_WRITE | PAGE_VIOLATION));
-	//In theory we only return after setting things right	
-	return;	
+	//In theory we only return after setting things right
+	return;
 }
 
 static void other_fault(struct registers * regs)
@@ -125,7 +127,7 @@ static void other_fault(struct registers * regs)
 void interrupt_register(int irq, intr_handler *handler)
 {
 	intr_handlers[irq] = handler;
-	
+
 	if(irq >= NUM_ISRS && irq <= NUM_ISRS + NUM_IRQS)
 		pic_unmask(irq-0x20);
 }
@@ -134,8 +136,8 @@ void interrupt_handler(struct registers *regs)
 {
 	int irq = regs->int_no;
 	intr_handler *handler = intr_handlers[irq];
-	
-#ifdef DEBUG_INTR	
+
+#ifdef DEBUG_INTR
 	if(irq > 32 && irq < 32+32)
 		printf("irq %i\n",irq-32);
 #endif
@@ -165,25 +167,25 @@ static void idt_build_entry(idt_entry_t *entry, uint32_t func, uint16_t sel, uin
 	entry->always0 = 0;
 	entry->base_lo = ((uint32_t)func) & 0xFFFF;
 	entry->base_hi = (((uint32_t)func) >> 16) & 0xFFFF;
-} 
+}
 
 void arch_interrupt_init()
 {
 //	interrupt_disable();
-	
+
 	idt_init();
-	
+
 	pic_init();
 
 	for(int i = 0; i < NUM_ISRS + NUM_IRQS; i++)
 		idt_build_entry(&idt_table[i], (uint32_t)isrs[i], 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
-	
+
 	for(int i = 0; i < NUM_INTRS; i++)
 		interrupt_register(i, void_handler);
 
 	/* needs to be in a seperate function or something */
 	idt_build_entry(&idt_table[0x80], (uint32_t)sysc, 0x08, IDT_FLAG_BASE | IDT_FLAG_PRESENT);
-	
+
 	/* load idt into processor */
 	asm volatile ("lidt (%0)" :: "r"((uintptr_t)&idt_ptr) );
 
@@ -206,7 +208,7 @@ void arch_interrupt_init()
 	interrupt_register(15, &other_fault);	//Reserved
 	interrupt_register(16, &other_fault);	//Floating-point error	fault
 	interrupt_register(17, &other_fault);	//Alignment Check	fault
-	interrupt_register(18, &other_fault);	//Machine Check	abort                                   
+	interrupt_register(18, &other_fault);	//Machine Check	abort
 
 	interrupt_register(0x80, &i386_syscall_handler);
 }

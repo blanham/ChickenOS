@@ -90,11 +90,11 @@ failure:
 	jmp failure
 
 section .data
-align 4096 
+align 4096
 initial_pagedirectory:
-	dd PDE_PS + PDE_RW + PDE_P	
+	dd PDE_PS + PDE_RW + PDE_P
 	times (767) dd 0
-	dd PDE_PS + PDE_RW + PDE_P	
+	dd PDE_PS + PDE_RW + PDE_P
 	times (1024 - 767) dd 0
 
 section .bss
@@ -102,4 +102,4 @@ initial_stack:
 	resb STACK_SIZE
 initial_stack_start:
 
-; vim: set syntax=nasm: 
+; vim: set syntax=nasm:

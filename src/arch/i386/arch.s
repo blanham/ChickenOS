@@ -1,9 +1,9 @@
-[global gdt_flush] 
+[global gdt_flush]
 [global tss_flush]
-[extern gp]      
+[extern gp]
 
 section .text
-align 4 
+align 4
 gdt_flush:
 	mov eax, [esp+4]
 	lgdt [eax]
@@ -16,9 +16,9 @@ gdt_flush:
 	mov ax, 0x2b
 	ltr ax
 	jmp 0x08:flush2
- 
+
 flush2:
-	ret 
+	ret
 
 tss_flush:
 	mov ax, 0x2b

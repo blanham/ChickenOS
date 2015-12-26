@@ -23,7 +23,7 @@ typedef uint32_t * page_table_t;
 pagedir_t pagedir_new()
 {
 	pagedir_t new = palloc();
-	
+
 	kmemcpy(new, kernel_pd, PD_SIZE);
 
 	return new;
@@ -32,7 +32,7 @@ pagedir_t pagedir_new()
 //FIXME: doesn't do anything for now
 void pagedir_delete(pagedir_t pd UNUSED)
 {
-	
+
 }
 
 void page_invalidate(uintptr_t page)
@@ -47,7 +47,7 @@ void pagedir_install(uint32_t *pd)
 				"mov %%eax, %%cr3\n"
 				"mov %%cr0, %%eax\n"
 				"orl $0x80000000, %%eax\n"
-				"mov %%eax, %%cr0\n" :: "r" 
+				"mov %%eax, %%cr0\n" :: "r"
 				V2P(pd));
 }
 
@@ -60,33 +60,33 @@ pagedir_t pagedir_get()
 	return (pagedir_t)P2V(pd);
 }
 
-void pagedir_insert_page_internel(pagedir_t pd, virt_addr_t kaddr, 
+void pagedir_insert_page_internel(pagedir_t pd, virt_addr_t kaddr,
 	virt_addr_t uvirt,uint8_t flags, bool phys)
 {
 	page_table_t pde, pte;
 	uint32_t pd_idx = uvirt >> PDE_SHIFT;
 	uint32_t pt_idx = (uvirt & PTE_MASK) >> PTE_SHIFT;
-	
+
 	pde = &pd[pd_idx];
 
 	if((*pde & PDE_P) == 0)
 	{
-		*pde = V2P(palloc()) | flags | PDE_P;	
+		*pde = V2P(palloc()) | flags | PDE_P;
 	}
-	
+
 	pte = (page_table_t)P2V(*pde & ~0xFFF) + pt_idx;
-	
+
 	if(!phys)
 		kaddr = V2P(kaddr);
 
 	*pte = kaddr | flags | PTE_P;
-}	
+}
 
 page_table_t pagetable_clone(page_table_t pt)
 {
 	page_table_t new = palloc();
 	page_table_t p = NULL;
-//	pt = (void*)((uintptr_t)pt & (PDE_MASK | PTE_MASK));	
+//	pt = (void*)((uintptr_t)pt & (PDE_MASK | PTE_MASK));
 //	ASSERT_PAGE_ALIGNED(pt);
 	p = (void *)pt;//P2V(pt);
 	for(int i = 0; i < 1024; i++)
@@ -100,8 +100,8 @@ page_table_t pagetable_clone(page_table_t pt)
 			kmemcpy((void*)new[i], (void*)P2V(*p & ~0x3ff), PAGE_SIZE);
 			new[i] = V2P(new[i]) | (*p & 0x3ff);*/
 		}
-	}	
-	
+	}
+
 	return (page_table_t)V2P(new);
 }
 //FIXME: Inefficient
@@ -111,7 +111,7 @@ pagedir_t pagedir_clone(pagedir_t pd)
 {
 	pagedir_t new = palloc();
 	uint32_t *new_pt;
-	page_table_t cur;	
+	page_table_t cur;
 
 	for(int i = 0; i < 1024; i++)
 	{
@@ -120,7 +120,7 @@ pagedir_t pagedir_clone(pagedir_t pd)
 			new_pt = palloc();
 			cur = (page_table_t)((uintptr_t)P2V(pd[i]) & ~0xfff);
 			if(i < 768)
-			{	
+			{
 				for(int i = 0; i < 1024; i++)
 				{
 					new_pt[i] = (uintptr_t)palloc();
@@ -133,17 +133,17 @@ pagedir_t pagedir_clone(pagedir_t pd)
 					kmemcpy(new_pt, (void *)cur, 4096);
 			}
 			new[i] = V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
-		} 
+		}
 	}
 
-	return new;	
+	return new;
 }
 
 pagedir_t pagedir_copy(pagedir_t pd)
 {
 	pagedir_t new = palloc();
 	uint32_t *new_pt;
-	page_table_t cur;	
+	page_table_t cur;
 
 	for(int i = 0; i < 1024; i++)
 	{
@@ -152,15 +152,15 @@ pagedir_t pagedir_copy(pagedir_t pd)
 			new_pt = palloc();
 			cur = (page_table_t)((uintptr_t)P2V(pd[i]) & ~0xfff);
 			if(i < 768)
-			{	
+			{
 				for(int i = 0; i < 1024; i++)
 				{
 					if((cur[i] & PTE_P) == 0)
 						continue;
 					//printf("cur %x\n", cur[i]);
-				   	cur[i] &= ~PTE_RW;
+					cur[i] &= ~PTE_RW;
 					new_pt[i] = cur[i];
-					
+
 				}
 			}
 			else
@@ -168,32 +168,32 @@ pagedir_t pagedir_copy(pagedir_t pd)
 					kmemcpy(new_pt, (void *)cur, 4096);
 			}
 			new[i] = V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
-		} 
+		}
 	}
 
-	return new;	
+	return new;
 }
 
-void pagedir_insert_page(pagedir_t pd, virt_addr_t kvirt, 
+void pagedir_insert_page(pagedir_t pd, virt_addr_t kvirt,
 	virt_addr_t uvirt,uint8_t flags)
 {
 	pagedir_insert_page_internel(pd, kvirt, uvirt,flags, false);
-}	
+}
 
-void pagedir_insert_page_physical(pagedir_t pd, phys_addr_t kphys, 
+void pagedir_insert_page_physical(pagedir_t pd, phys_addr_t kphys,
 	virt_addr_t uvirt,uint8_t flags)
 {
 	pagedir_insert_page_internel(pd, kphys, uvirt,flags, true);
 }
 
-void pagedir_insert_pagen(pagedir_t pd, virt_addr_t kvirt, 
+void pagedir_insert_pagen(pagedir_t pd, virt_addr_t kvirt,
 	virt_addr_t uvirt,uint8_t flags, int n)
 {
 	for(int i = 0; i < n; i++)
 		pagedir_insert_page(pd, kvirt + PAGE_SIZE*i, uvirt + PAGE_SIZE*i, flags);
 }
 
-void pagedir_insert_pagen_physical(pagedir_t pd, phys_addr_t kphys, 
+void pagedir_insert_pagen_physical(pagedir_t pd, phys_addr_t kphys,
 	virt_addr_t uvirt, uint8_t flags, int n)
 {
 	for(int i = 0; i < n; i++)
@@ -207,13 +207,13 @@ static phys_addr_t pagetable_init(int pt, uint8_t flags)
 
 	kmemset(new, 0, PTE_SIZE);
 
-	offset = (PTE_COUNT*PTE_SIZE) * pt; 
-	
+	offset = (PTE_COUNT*PTE_SIZE) * pt;
+
 	for(int i = 0; i < PTE_COUNT; i++)
 	{
 		new[i] = offset | (i * PAGE_SIZE) | flags;
 	}
-	
+
 	return V2P(new) | flags;
 }
 
@@ -222,16 +222,16 @@ void pagedir_remove_page(pagedir_t pd, virt_addr_t virtual)
 	page_table_t pde, pte;
 	uint32_t pd_idx = virtual >> PDE_SHIFT;
 	uint32_t pt_idx = (virtual & PTE_MASK) >> PTE_SHIFT;
-	
+
 	pde = &pd[pd_idx];
 
 	if((*pde & PDE_P) == 0)
 	{
 		PANIC("Trying to remove nonmapped page");
 	}
-	
+
 	pte = (page_table_t)P2V(*pde & ~0xFFF) + pt_idx;
-	
+
 
 	*pte = 0;
 }
@@ -241,16 +241,16 @@ phys_addr_t pagedir_lookup(pagedir_t pd, virt_addr_t virtual)
 	page_table_t pde, pte;
 	uint32_t pd_idx = virtual >> PDE_SHIFT;
 	uint32_t pt_idx = (virtual & PTE_MASK) >> PTE_SHIFT;
-	
+
 	pde = &pd[pd_idx];
 
 	if((*pde & PDE_P) == 0)
 	{
 		return 0;
 	}
-	
+
 	pte = (page_table_t)P2V(*pde & ~0xFFF) + pt_idx;
-	
+
 
 	return *pte & PAGE_MASK;
 }
@@ -269,11 +269,9 @@ void paging_init(uint32_t mem_size UNUSED)
 	//FIXME: instead of 880, i believe it should be mem_size / (1024*1024)
 	for(int i = KERNEL_PDE_START; i < 880; i++)
 		kernel_pd[i] = pagetable_init(i - KERNEL_PDE_START, PTE_USER | PTE_RW | PTE_P);
-	 
+
 	pagedir_install(kernel_pd);
-	
+
 	gdt_install();
 }
-
-
 

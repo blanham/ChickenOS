@@ -102,7 +102,7 @@ _isr_handler:
 	mov ds, ax
 	mov es, ax
 
-	lea ebp, [esp+52]	
+	lea ebp, [esp+52]
 
 	mov eax, esp
 	sub eax, 8
@@ -113,14 +113,14 @@ _isr_handler:
 ;	push format
 ;	call printf
 ;	add esp, 8
-	
+
 
 	push esp
-	
 
-	call interrupt_handler 
+
+	call interrupt_handler
 	pop eax
-	
+
 	add esp,4
 	popa
 	pop ds
@@ -129,19 +129,19 @@ _isr_handler:
 	pop gs
 	add esp,8;jump ahead of error code/interrupt number
 	;sti
-	iret	
+	iret
 [extern dump_regs]
 
 format db "out %X",10,0
 [extern printf]
 
 intr_return:
-	
-	add esp,4	
 
 	add esp,4
 
-	
+	add esp,4
+
+
 	popa
 	pop ds
 	pop es
@@ -157,7 +157,7 @@ intr_return:
 	;
 
 
-	iretd	
+	iretd
 
 
 [GLOBAL get_eip]
@@ -181,10 +181,10 @@ idt_flush:
 syscall_isr:
 	push eax
 	call syscall_handler
-	pop eax	
-	iret	
+	pop eax
+	iret
 
- 
+
 ;align 4096
 [global idt_table]
 idt_table:
