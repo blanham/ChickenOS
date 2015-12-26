@@ -11,7 +11,7 @@
 void usb_init()
 {
 	struct uhci_controller *uhci;
-	uhci = uhci_init();	
+	uhci = uhci_init();
 	(void)uhci;
 
 }

@@ -47,7 +47,7 @@ int audio_read(uint16_t dev UNUSED, void *buf UNUSED, off_t off UNUSED, size_t c
 {
 
 	return 0;
-} 
+}
 
 int audio_write(uint16_t dev UNUSED, void *buf UNUSED, off_t off UNUSED, size_t count UNUSED)
 {
@@ -83,9 +83,9 @@ int audio_init()
 		e->mixer_base = pci_get_barn(e->pci, PCI_BAR_IO, 0) & ~1;
 		e->dma_base = pci_get_barn(e->pci, PCI_BAR_IO, 1) & ~1;
 	//	printf("Mixer base address %x DMA base address %x\n", e->mixer_base, e->dma_base);
-		temp = intel_ac97_mixer_inw(e,AC97_REG_VENDOR_ID1);	
+		temp = intel_ac97_mixer_inw(e,AC97_REG_VENDOR_ID1);
 		vendor_id = temp << 16;
-		temp = intel_ac97_mixer_inw(e,AC97_REG_VENDOR_ID2);	
+		temp = intel_ac97_mixer_inw(e,AC97_REG_VENDOR_ID2);
 		vendor_id |= temp;
 		if(vendor_id == ac97_vendors[0].id)
 		{

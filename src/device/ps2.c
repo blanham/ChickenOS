@@ -5,7 +5,7 @@
 #include <device/input.h>
 #include <stdio.h>
 #include <thread.h>
-uint16_t shifts;
+
 #define L_CTRL  0x0001
 #define R_CTRL  0x0002
 #define L_SHIFT 0x0004
@@ -17,27 +17,25 @@ uint16_t shifts;
 #define ESC 0x1B
 #define CR 0xa
 
+uint16_t shifts;
+
 #define BUF_SIZE 256
 char rbuf[BUF_SIZE];
 uint8_t pos = 0;
 uint8_t gpos = 0;
 
-
 char kbd_map_unshifted[256] = {
-' ',ESC,'1','2','3','4','5','6','7','8','9','0','-','=',BKSPACE,TAB,
-'q','w','e','r','t','y','u','i','o','p','[',']',CR, ' ','a','s',
-'d','f','g','h','j','k','l',';','\'',' ',' ', '\\', 'z','x','c',
-'v','b','n','m',',','.','/', ' ', ' ', ' ', ' '
-
-
+	' ',ESC,'1','2','3','4','5','6','7','8','9','0','-','=',BKSPACE,TAB,
+	'q','w','e','r','t','y','u','i','o','p','[',']',CR, ' ','a','s',
+	'd','f','g','h','j','k','l',';','\'',' ',' ', '\\', 'z','x','c',
+	'v','b','n','m',',','.','/', ' ', ' ', ' ', ' '
 };
+
 char kbd_map_shifted[256] = {
-' ',ESC,'!','@','#','$','%','^','&','*','(',41,'_','+',BKSPACE,TAB,
-'Q','W','E','R','T','Y','U','I','O','P','{','}',CR, ' ','A','S',
-'D','F','G','H','J','K','L',':','"',' ',' ', '|', 'Z','X','C',
-'V','B','N','M','<','>','?'
-
-
+	' ',ESC,'!','@','#','$','%','^','&','*','(',41,'_','+',BKSPACE,TAB,
+	'Q','W','E','R','T','Y','U','I','O','P','{','}',CR, ' ','A','S',
+	'D','F','G','H','J','K','L',':','"',' ',' ', '|', 'Z','X','C',
+	'V','B','N','M','<','>','?'
 };
 
 char kbd_getc()
@@ -53,7 +51,7 @@ void kbd_e5(uint8_t c)
 		case 0x53:
 			if((shifts & (L_SHIFT | R_SHIFT)) && (shifts & (L_CTRL | R_CTRL)))
 				shutdown();
-			
+
 		case 0x2A:
 			shifts |= R_CTRL;
 			break;
@@ -66,7 +64,6 @@ void kbd_e5(uint8_t c)
 		case 0xB8:
 			shifts &= ~R_ALT;
 			break;
-
 	}
 }
 

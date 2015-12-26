@@ -56,7 +56,7 @@ void tty_clear_rows(tty_t *tty, int row, int count)
 	(void)count;(void)row;
 	for(int i = row; i < count; i++)
 		kmemset(tty->ringbuf[(tty->r_top + i) & 0x7F], 0, tty->x_res);
-		
+
 	vga_clear_rows(0, 25);//tty->y_res);
 
 }
@@ -73,7 +73,7 @@ void tty_escape(tty_t *tty, int c)
 				tty->escape = 2;
 			else
 				tty->escape = 0;
-			return;			
+			return;
 		case 2:
 			switch(c)
 			{
@@ -123,7 +123,7 @@ void tty_escape(tty_t *tty, int c)
 						p++;
 						int y = strtol(p, &d, 10);
 						tty->x = y-1;
-						tty->y = x-1;	
+						tty->y = x-1;
 					}
 					vga_set_cursor_position(tty->x, tty->y);
 					//HACK
@@ -150,7 +150,7 @@ void tty_escape(tty_t *tty, int c)
 				case 'K':
 				//	kmemset(tty->cur->line, 0, 80);
 				//	vga_put_line(tty->y, tty->cur->line);
-					
+
 					//kmemsetw(&tty->videoram[tty->x*80], BLANK, 80);
 					break;
 				case 'm':
@@ -173,7 +173,7 @@ void tty_escape(tty_t *tty, int c)
 void tty_scroll(tty_t *tty)
 {
 	kmemset(tty->ringbuf[tty->r_top & 0x7f], 0, 80);
-	tty->r_top++;	
+	tty->r_top++;
 	for(unsigned i = 0; i < tty->y; i++)
 	{
 		vga_put_line(i, tty->ringbuf[(tty->r_top + i) & 0x7F]);// & TTY_HISTORY_MASK]);
@@ -183,13 +183,13 @@ void tty_scroll(tty_t *tty)
 void tty_putc(int c)
 {
 	tty_t *tty = ttys[0];
-	tty_putchar(tty, c);	
+	tty_putchar(tty, c);
 
 }
 #define TTY_INSERT_BUF(tty, c) ((tty)->ringbuf[((tty)->r_top + (tty)->y) & 0x7f][(tty)->x] = c)
 void tty_putchar(tty_t *tty, int c)
 {
-	if(tty->x >= tty->x_res) 
+	if(tty->x >= tty->x_res)
 	{
 		tty->x = 0;
 		tty->y++;
@@ -215,7 +215,7 @@ void tty_putchar(tty_t *tty, int c)
 				tty->x--;
 			else if(tty->y > 0)
 				tty->y--;
-			TTY_INSERT_BUF(tty, ' '); 
+			TTY_INSERT_BUF(tty, ' ');
 			vga_putchar(' ', tty->x, tty->y);
 			break;
 		case '\t':
@@ -232,10 +232,10 @@ void tty_putchar(tty_t *tty, int c)
 			break;
 		case 0x1b://ESC
 			tty->escape = 1;
-			break;	
+			break;
 
 		default:
-			TTY_INSERT_BUF(tty, c); 
+			TTY_INSERT_BUF(tty, c);
 			vga_putchar(c, tty->x, tty->y);
 			tty->x++;
 	}
@@ -294,7 +294,7 @@ int tty_read(dev_t dev, void *_buf, size_t count, off_t offset UNUSED)
 	size_t ret = 0;
 	int tty_num = MINOR(dev);
 	tty_t *tty = ttys[tty_num];
-	
+
 	if (tty->termios.c_lflag & ICANON)
 		ret = tty_getline(tty, _buf, count);
 	else
@@ -414,21 +414,21 @@ void termios_init(struct termios *termios)
 #include <mm/vm.h>
 void tty_init(struct kernel_boot_info *info)
 {
-//	struct tty_buffer *p;	
+//	struct tty_buffer *p;
 
 	for(int i = 0; i < 1; i++)
 	{
 		ttys[i] = kcalloc(sizeof(tty_t), 1);
 
-		ttys[i]->winsize.ws_col = info->x_res; 
-		ttys[i]->winsize.ws_row = info->y_res; 
-		
-		ttys[i]->x_res = info->x_res; 
-		ttys[i]->y_res = info->y_res; 
+		ttys[i]->winsize.ws_col = info->x_res;
+		ttys[i]->winsize.ws_row = info->y_res;
+
+		ttys[i]->x_res = info->x_res;
+		ttys[i]->y_res = info->y_res;
 
 		ttys[i]->ringbuf = kcalloc(TTY_HISTORY_SIZE, sizeof(char *));
 		for(unsigned j = 0; j < TTY_HISTORY_SIZE; j++)
-		   ttys[i]->ringbuf[j] = &tty_history[i][0][j][0];//[80];
+			ttys[i]->ringbuf[j] = &tty_history[i][0][j][0];//[80];
 
 		//FIXME Remove all the old linked list stuff
 /*		ttys[i]->buffer = kcalloc(sizeof *p, 1);
@@ -438,22 +438,22 @@ void tty_init(struct kernel_boot_info *info)
 
 		for(int j = 0; j < 100; j++)
 		{
-			p->line = kcalloc(info->x_res, 1);	
+			p->line = kcalloc(info->x_res, 1);
 			p->next = kcalloc(sizeof *p, 1);
 			p = p->next;
 		}
 
-		p->line = kcalloc(info->x_res, 1);	
+		p->line = kcalloc(info->x_res, 1);
 		p->next = ttys[i]->top;
 */
-	
+
 		ttys[i]->pgrp = 0;
 
 		termios_init(&ttys[i]->termios);
 	}
 
 	ttys[0]->foreground = true;
-	
+
 	device_register(FILE_CHAR, 0x500, tty_read, tty_write, tty_ioctl);
 	device_register(FILE_CHAR, 0x800, tty_read, tty_write, tty_ioctl);
 	//device_register(FILE_CHAR, 0x500, console_read, console_write, console_ioctl);

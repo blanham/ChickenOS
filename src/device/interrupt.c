@@ -19,9 +19,9 @@ enum intr_status interrupt_disable()
 {
 	enum intr_status old = interrupt_get();
 
-	arch_interrupt_disable(); 
+	arch_interrupt_disable();
 	interrupt_status = INTR_DISABLED;
-	
+
 	return old;
 }
 
@@ -31,7 +31,7 @@ enum intr_status interrupt_enable()
 
 	arch_interrupt_enable();
 	interrupt_status = INTR_ENABLED;
-	
+
 	return old;
 }
 

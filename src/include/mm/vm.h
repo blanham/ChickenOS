@@ -35,7 +35,7 @@ typedef uintptr_t virt_addr_t;
 #define V2P(p) ((virt_addr_t)((phys_addr_t)(p) - PHYS_BASE))
 #define P2V(p) ((phys_addr_t)((virt_addr_t)(p) + PHYS_BASE))
 
-//If we implement joining memregions, we just decrease refcounts on 
+//If we implement joining memregions, we just decrease refcounts on
 struct memregion {
 	uintptr_t addr_start, addr_end;
 	uintptr_t requested_start, requested_end;
@@ -56,7 +56,7 @@ struct memregion {
 	struct inode *inode;
 	off_t file_offset;
 	size_t file_size;
-	
+
 	struct memregion *next;
 	struct memregion *prev;
 };
@@ -91,7 +91,7 @@ void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pg
 
 /* mm/regions.c */
 struct memregion *region_clone(struct memregion *original);
-//int memregion_add(struct mm *mm, uintptr_t address, size_t len, int prot, 
+//int memregion_add(struct mm *mm, uintptr_t address, size_t len, int prot,
 //						int flags, struct inode *inode, off_t offset, size_t file_len, void *data);
 int memregion_fault(struct mm *mm, uintptr_t address, int prot);
 int memregion_map_data(struct mm *mm, uintptr_t address, size_t len, int prot, int flags,

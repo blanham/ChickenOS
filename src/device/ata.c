@@ -23,7 +23,7 @@ void ata_write(struct ata_drive *dev, uint16_t port, uint16_t value)
 			break;
 		default:
 			outb(port, value);
-			break;	
+			break;
 	}
 }
 
@@ -44,16 +44,16 @@ uint16_t ata_read(struct ata_drive *dev, uint16_t port)
 size_t ata_sector_read(struct ata_drive *dev, void *buf, unsigned long long lba, uint32_t count UNUSED)
 {
 	uint16_t *data = buf;
-	
+
 	ata_write(dev, ATA_DRVHD, 0xe0 | ((lba >> 24) & 0xf));
 	ata_write(dev, ATA_FEATURES, 0);
 
 	ata_write(dev, ATA_SEC_CNT, 1);
-	
+
 	ata_write(dev, ATA_LBALO,  (uint8_t)(lba & 0xff));
 	ata_write(dev, ATA_LBAMID, (uint8_t)((lba >> 8) & 0xff));
 	ata_write(dev, ATA_LBAHI,  (uint8_t)((lba >> 16) & 0xff));
-	
+
 	ata_write(dev, ATA_CMDSTAT, ATA_CMD_READ_PIO);
 	int t = 1;
 	while(t)
@@ -72,10 +72,10 @@ size_t ata_sector_read(struct ata_drive *dev, void *buf, unsigned long long lba,
 size_t ata_sector_write(struct ata_drive *dev, void *buf, unsigned long long lba, uint32_t count UNUSED)
 {
 	uint16_t *data = buf;
-	
+
 	ata_write(dev, ATA_DRVHD, 0xe0 | ((lba >> 24) & 0xf));
 	ata_write(dev, ATA_FEATURES, 0);
-	
+
 	ata_write(dev, ATA_SEC_CNT, 1);
 
 	ata_write(dev, ATA_LBALO,  (uint8_t)(lba & 0xff));
@@ -91,9 +91,9 @@ size_t ata_sector_write(struct ata_drive *dev, void *buf, unsigned long long lba
 		//time_msleep(1);
 		ata_write(dev, ATA_DATA, data[i]);
 	}
-	
+
 	ata_write(dev, ATA_CMDSTAT, ATA_CMD_CACHE_FLUSH);
-	
+
 	return 512;
 }
 
@@ -103,9 +103,9 @@ size_t ata_read_block(uint16_t dev, void *_buf, uint32_t block_num)
 	uint8_t drive_num = part/64;
 	struct ata_drive *drive = &drives[drive_num];
 	struct partition_entry *parti = &drive->mbr->partitions[part];
-	
+
 	ata_sector_read(drive, _buf,parti->rel_sector + block_num, 0);
-	
+
 	return 512;
 }
 
@@ -115,9 +115,9 @@ size_t ata_write_block(uint16_t dev, void *_buf, uint32_t block_num)
 	uint8_t drive_num = part/64;
 	struct ata_drive *drive = &drives[drive_num];
 	struct partition_entry *parti = &drive->mbr->partitions[part];
-	
+
 	ata_sector_write(drive, _buf, parti->rel_sector + block_num, 0);
-	
+
 	return 512;
 }
 
@@ -134,11 +134,11 @@ void ata_intr(struct registers * regs UNUSED)
 
 void ata_identify(int drive)
 {
-	uint16_t *data; 
+	uint16_t *data;
 	uint16_t io_base;
 	struct ata_drive *dev;
 	struct ata_identify *st;
-	
+
 	dev = &drives[drive];
 	st = dev->info = kcalloc(256, 2);
 	dev->name = kcalloc(41, 1);
@@ -169,27 +169,27 @@ void ata_identify(int drive)
 		printf("Error returned while trying to IDENTIFY\n");
 		return;
 	}
-	
+
 	while((ata_read(dev, ATA_CMDSTAT) & ATA_SR_BSY) != 0);
-	
+
 	for(int i = 0; i < 256; i++)
 		data[i] = ata_read(dev, ATA_DATA);
 
-	//have to byteswap the name	
+	//have to byteswap the name
 	for(int i = 27; i < 47; i++)
 	{
 		uint16_t temp = data[i];// & 0xff00) >> 8;
-		data[i] = ((temp >> 8) & 0xff) + ((temp << 8) & 0xff00);	
+		data[i] = ((temp >> 8) & 0xff) + ((temp << 8) & 0xff00);
 	}
 
 	kmemcpy(dev->name, dev->info->model_num, 40);
 	dev->capacity = st->bytes_per_sector*st->sectors_per_track*st->num_cylinders*st->num_heads;
 
 	printf("Detected HD: %.14s Capacity: %iMB\n", dev->name, dev->capacity/ (1024*1024));
-	
+
 	dev->mbr = kcalloc(sizeof(struct mbr),1);
 	ata_sector_read(dev, dev->mbr, 0, 1);
-	
+
 }
 void ata_init()
 {

@@ -2,7 +2,7 @@
 #include <device/usb.h>
 #include <device/usb/uhci.h>
 #include <device/pci.h>
-#include <timer.h> 
+#include <timer.h>
 #include <kernel/hw.h>
 #include <mm/vm.h>
 #include <stdio.h>
@@ -94,7 +94,7 @@ struct uhci_controller * uhci_init()
 	uint32_t ret;
 
 	new = (struct uhci_controller *)kcalloc(sizeof(*new),1);
-	
+
 	//frames need page aligned 4096 byte buffer
 	//so we just grab a page.
 	new->frames = palloc();
@@ -103,7 +103,7 @@ struct uhci_controller * uhci_init()
 	kmemset(new->tx_descs, 0, PAGE_SIZE);
 	new->q_heads = palloc();
 	kmemset(new->q_heads, 0, PAGE_SIZE);
-	
+
 	//will eventually want to search by PCI class, but be lazy for now
 	//as we are doing all testing in QEMU
 	new->pci = pci_get_device(INTEL_VEND, PIIX3_USB);
@@ -111,14 +111,14 @@ struct uhci_controller * uhci_init()
 	if(new->pci != NULL)
 	{
 		printf("Found Intel PIIX3 UHCI controller Rev %i found at ", new->pci->header->rev);
-		
+
 		new->io_base = pci_get_bar(new->pci, PCI_BAR_IO) & ~1;
 		printf("I/O base address %x\n",new->io_base);
-		
+
 		new->mem_base = (uint8_t *)(pci_get_bar(new->pci, PCI_BAR_MEM) & ~3);
 		printf("Mem base address %x\t",new->mem_base);
-		
-		printf("IRQ %i PIN %i\n",new->pci->header->int_line, new->pci->header->int_pin);	
+
+		printf("IRQ %i PIN %i\n",new->pci->header->int_line, new->pci->header->int_pin);
 
 
 		//get count of ports (8 is max ports)
@@ -129,7 +129,7 @@ struct uhci_controller * uhci_init()
 				break;
 			new->port_cnt++;
 		}
-		
+
 		printf("Found %i ports\n", new->port_cnt);
 
 		//initialize frame list
@@ -141,19 +141,19 @@ struct uhci_controller * uhci_init()
 		/* first we need to write to the legacy register in
 		 * the PCI config space
 		 */
-		pci_reg_outw(new->pci, UHCI_PCI_LEGACY/4, 0x8f00);	
-	
+		pci_reg_outw(new->pci, UHCI_PCI_LEGACY/4, 0x8f00);
+
 		//Issue a HCRESET
-		uhci_outw(new, UHCI_IO_USBCMD, UHCI_USBCMD_HCRESET); 
-	//	asm volatile("mfence":::"memory");	
+		uhci_outw(new, UHCI_IO_USBCMD, UHCI_USBCMD_HCRESET);
+	//	asm volatile("mfence":::"memory");
 		//might need a memory fence and 5us delay here
 		//?
-	
+
 		//check if we reset successfully
 		ret = uhci_inw(new, UHCI_IO_USBCMD);
 		if((ret & UHCI_USBCMD_HCRESET) != 0)
-			printf("UHCI reset failed\n");	
-		
+			printf("UHCI reset failed\n");
+
 		//zero out registers
 		uhci_outw(new, UHCI_IO_USBINTR, 0);
 		uhci_outw(new, UHCI_IO_USBCMD, 0);
@@ -162,27 +162,27 @@ struct uhci_controller * uhci_init()
 
 		//init SOFMOD - register determines timing
 		uhci_outb(new, UHCI_IO_SOFMOD, 64);
-	
+
 		//initialize frame base pointer and count
-		uhci_outl(new, UHCI_IO_FLBASEADD, V2P(new->frames));	
+		uhci_outl(new, UHCI_IO_FLBASEADD, V2P(new->frames));
 		uhci_outw(new, UHCI_IO_FRNUM, 0);
-	
+
 		//fence?
-	
-	//	asm volatile("mfence":::"memory");	
+
+	//	asm volatile("mfence":::"memory");
 		//might need this
-		pci_reg_outw(new->pci, UHCI_PCI_LEGACY/4, 0x200);	
-		//fence?	
+		pci_reg_outw(new->pci, UHCI_PCI_LEGACY/4, 0x200);
+		//fence?
 
-	//	asm volatile("mfence":::"memory");	
+	//	asm volatile("mfence":::"memory");
 		uhci_outw(new, UHCI_IO_USBCMD, 1);//UHCI_USBCMD_RS | UHCI_USBCMD_CF | UHCI_USBCMD_MAXP);
-		uhci_outw(new, UHCI_IO_USBINTR,0xf);// 
+		uhci_outw(new, UHCI_IO_USBINTR,0xf);//
 			//UHCI_USBINTR_SPIE | UHCI_USBINTR_IOCEN | UHCI_USBINTR_REINEN | UHCI_USBINTR_CRCOUT);
-		
-	
-	//	asm volatile("mfence":::"memory");	
 
-		
+
+	//	asm volatile("mfence":::"memory");
+
+
 		//now we need to enable ports
 		ret = 0xffff;
 		for(int i = 0; i < new->port_cnt; i++)
@@ -197,15 +197,15 @@ struct uhci_controller * uhci_init()
 
 				}
 				ret = stat;
-			
+
 			}
-			
+
 		//	printf("Status %x\n", ret);
 
 			ret  = uhci_inw(new, UHCI_IO_PORTSC1 + i*2);
 			ret |= 1 << 9;
 			uhci_outw(new, UHCI_IO_PORTSC1 + i*2, ret);
-		//	time_msleep(50);	
+		//	time_msleep(50);
 			//printf("cock\n");
 			ret  = uhci_inw(new, UHCI_IO_PORTSC1 + i*2);
 			ret &= ~((1 < 9) | (1 << 12));
@@ -216,8 +216,8 @@ struct uhci_controller * uhci_init()
 			ret  = uhci_inw(new, UHCI_IO_PORTSC1 + i*2);
 			ret |= 0x4;
 			uhci_outw(new, UHCI_IO_PORTSC1 + i*2, ret);
-			
-			
+
+
 			ret  = uhci_inw(new, UHCI_IO_PORTSC1 + i*2);
 		//	printf("Status %x\n", ret);
 		}
@@ -226,7 +226,7 @@ struct uhci_controller * uhci_init()
 		pci_register_irq(new->pci, &uhci_handler, new);
 
 		//will want to register callbacks up to usb core here
-		
+
 	}
 
 

@@ -64,11 +64,11 @@ void pci_device_install(uint32_t val, struct pci_conf_hdr *header)
 {
 	struct pci_device *iter = NULL;
 	struct pci_device *new = (struct pci_device *)kmalloc(sizeof(*new));
-	
+
 	new->header = header;
 	new->regs.val = val;
 	new->device = ((union cfg_addr2)val).function;
-	
+
 	if(pci_device_list == NULL)
 	{
 		pci_device_list = new;
@@ -87,9 +87,9 @@ void pci_list()
 	struct pci_device *iter = pci_device_list;
 	while(iter != NULL)
 	{
-		printf("Found PCI device %.2i %.4X %.4X IRQ %2i Function %X MajMin %2X %2X %2X\n", 
-				iter->device, iter->header->vend_id,iter->header->dev_id, 
-				iter->header->int_line, iter->regs.function, iter->header->pci_major, 
+		printf("Found PCI device %.2i %.4X %.4X IRQ %2i Function %X MajMin %2X %2X %2X\n",
+				iter->device, iter->header->vend_id,iter->header->dev_id,
+				iter->header->int_line, iter->regs.function, iter->header->pci_major,
 				iter->header->pci_minor, iter->header->pci_interface);
 		iter = iter->next;
 	}
@@ -99,12 +99,12 @@ void pci_list()
 void pci_handler(struct registers *regs)
 {
 	int int_no = regs->int_no - 32;
-	
+
 	for(int i = 0; i < 4; i++)
 	{
 		if(	pci_irqs[int_no][i].handler != NULL)
 			pci_irqs[int_no][i].handler(pci_irqs[int_no][i].aux);
-	
+
 	}
 }
 
@@ -126,19 +126,19 @@ void pci_bus_scan(int bus)
 
 	uint32_t ret;
 	struct pci_conf_hdr *hdr;
-	
+
 	//printf("Scanning PCI bus %i\n",bus);
-	
+
 	for(int i = 0; i <  0x20; i++)
 	{
 		ret =  pci_device_read_config(&hdr, bus, i, 0);
-		
+
 		if(hdr->vend_id == 0xFFFF)
 		{
 			kfree(hdr);
 			continue;
-		}	
-	
+		}
+
 		pci_device_install(ret, hdr);
 
 		if((hdr->header & 0x80) != 0)
@@ -146,17 +146,17 @@ void pci_bus_scan(int bus)
 			for(int j = 1; j < 8; j++)
 			{
 				ret =  pci_device_read_config(&hdr, bus, i, j);
-				
+
 				if(hdr->vend_id == 0xFFFF)
 				{
 					kfree(hdr);
 					continue;
-				}	
-	
+				}
+
 				pci_device_install(ret, hdr);
 
 			}
-		}		
+		}
 	}
 }
 

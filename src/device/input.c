@@ -5,16 +5,14 @@
 char input_buf[256];
 int queue_pos = 0;
 
-
 char input_queue_getc()
 {
 	char c;
 	while(queue_pos == 0);
-		
+
 //	enum intr_status old = interrupt_disable();
 	c = input_buf[queue_pos];
 	queue_pos--;
-
 
 //	interrupt_set(old);
 
@@ -23,8 +21,6 @@ char input_queue_getc()
 
 void input_queue_putc(char c)
 {
-
 	input_buf[queue_pos] = c;
 	queue_pos++;
-
 }

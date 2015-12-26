@@ -16,10 +16,10 @@
 size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 {
 	uintptr_t ptr = off;
-	ASSERT(MAJOR(dev) == 1, "Bad device passed"); 
+	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{
-		case 1: //mem (Physical) 
+		case 1: //mem (Physical)
 			ptr = P2V(ptr);
 		case 2: //kmem (Virtual)
 			kmemcpy(buf, (void *)ptr, count);
@@ -29,7 +29,7 @@ size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 		case 4: //port
 			return -EINVAL;
 		case 7: //full
-		case 5: //zero 
+		case 5: //zero
 			kmemset(buf, 0x00, count);
 			return count;
 		//FIXME: Add random numbers
@@ -38,16 +38,16 @@ size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 			return count;
 	}
 	printf("Invalid read of character device 0x1%.2X\n", MINOR(dev));
-	return -EINVAL;	
+	return -EINVAL;
 }
 
 size_t chardevs_write(dev_t dev, void *buf, size_t count, off_t off)
 {
 	uintptr_t ptr = off;
-	ASSERT(MAJOR(dev) == 1, "Bad device passed"); 
+	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{
-		case 1: //mem (Physical) 
+		case 1: //mem (Physical)
 			ptr = P2V(ptr);
 		case 2: //kmem (Virtual)
 			kmemcpy((void *)ptr, buf, count);
@@ -65,7 +65,7 @@ size_t chardevs_write(dev_t dev, void *buf, size_t count, off_t off)
 
 int chardevs_ioctl(dev_t dev, int request UNUSED, char *args UNUSED)
 {
-	ASSERT(MAJOR(dev) == 1, "Bad device passed"); 
+	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	printf("Invalid ioctl of character device 0x1%.2X\n", MINOR(dev));
 	return -EINVAL;
 }
