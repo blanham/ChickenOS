@@ -141,7 +141,7 @@ static int regiongrowth(struct mm *mm, struct memregion *p, uintptr_t address)
 		return memregion_insert(mm, NULL, address & PAGE_MASK, 0x7);
 	}
 
-	if((p->prot == PROT_GROWSUP) && (address - PAGE_SIZE <= p->addr_end) 
+	if((p->prot == PROT_GROWSUP) && (address - PAGE_SIZE <= p->addr_end)
 			&& (address >= p->addr_start))
 	{
 		//printf("Growing up %x %x end %x\n", address + PAGE_SIZE, address, p->addr_end);
@@ -162,7 +162,7 @@ int load_page_from_file(struct mm *mm, struct memregion *p, uintptr_t address)
 
 	void *new = palloc();
 	memset(new, 0, PAGE_SIZE);
-	
+
 	if (pages_from_start < p->file_size) {
 		size_t len = p->file_size - pages_from_start;
 		p->inode->fs->ops->read(p->inode, new, len, file_offset);
@@ -207,11 +207,11 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 			if(p->cow)
 				return memregion_cow(mm, p, address);
 
-   			if(p->flags & MAP_FIXED)
-   				return memregion_insert(mm, NULL, address, 0x7);
+			if(p->flags & MAP_FIXED)
+				return memregion_insert(mm, NULL, address, 0x7);
 
-   			if((p->flags & MAP_FILE) == 0)
-   				return load_page_from_file(mm, p, address);
+			if((p->flags & MAP_FILE) == 0)
+				return load_page_from_file(mm, p, address);
 
 			PANIC("Address fell within a mapping, but no match found\n");
 		}
@@ -223,7 +223,7 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 
 //FIXME: This is a dummy for now until we use a tree to lookup regions
 //TODO:  Can probably just have this call memregion_fault, since if it's
-//       valid but not loaded in we might as well load it in instead of 
+//       valid but not loaded in we might as well load it in instead of
 //       faulting it in
 int verify_pointer(const void *ptr, size_t len, int rw)
 {

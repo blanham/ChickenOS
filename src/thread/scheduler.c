@@ -1,5 +1,5 @@
 /*	ChickenOS - thread/scheduler.c
- *	Very basic scheduler, called on every timer interrupt  
+ *	Very basic scheduler, called on every timer interrupt
  */
 #include <common.h>
 #include <kernel/thread.h>
@@ -31,7 +31,7 @@ void thread_scheduler(registers_t *regs)
 {
 	thread_t *cur = thread_current();
 	thread_t *next;
-	
+
 	if(cur->status == THREAD_UNINTERRUPTIBLE)
 	{
 		thread_reschedule(regs, cur, cur);
@@ -75,7 +75,7 @@ thread_t *thread_next()
 
 	if(next == NULL)
 		next = thread_list;
-	
+
 	while(next->status != THREAD_READY)
 	{
 		next = next->hh.next;
@@ -91,7 +91,7 @@ thread_t *thread_by_pid(pid_t pid)
 {
 	thread_t *ret = NULL;
 	HASH_FIND_INT(thread_list, &pid, ret);
-	return ret;	
+	return ret;
 }
 
 
@@ -104,15 +104,15 @@ void thread_exit(int status)
 	interrupt_disable();
 
 //	parent = thread_by_pid(cur->ppid);
-	
-	HASH_DEL(thread_list, cur);	
+
+	HASH_DEL(thread_list, cur);
 
 	//printf("exit (%i)\n",status);
 
 	//Check if we have children
 	//if we do
 	//	re parent them
-	
+
 	sys_kill(cur->ppid, SIGCHLD);
 
 	//Will need to reap eventually

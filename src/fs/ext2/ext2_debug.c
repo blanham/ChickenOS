@@ -15,8 +15,8 @@ void inode_print(ext2_inode_t inode)
 	if(inode.i_size == 0 && inode.i_block[0] != 0)
 	{
 		uint32_t dev = inode.i_block[0];
-	  	unsigned major = (dev & 0xfff00) >> 8;
-	  	unsigned minor = (dev & 0xff) | ((dev >> 12) & 0xfff00);
+		unsigned major = (dev & 0xfff00) >> 8;
+		unsigned minor = (dev & 0xff) | ((dev >> 12) & 0xfff00);
 		major = (dev >> 8 ) & 255;
 		minor = dev & 255;
 		printf("major %i minor %i\n",major,minor);
@@ -38,7 +38,7 @@ void print_dir_entry(ext2_directory_t *dir)
 {
 	char buf[256];
 	memset(buf, 0, 256);
-	//strncpy(buf, dir[0].name, dir[0].name_len);	
+	//strncpy(buf, dir[0].name, dir[0].name_len);
 	strcpy(buf, dir[0].name);
 	printf("%s \t\tinode %i\n", buf, dir[0].inode);
 }

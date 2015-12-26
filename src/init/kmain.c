@@ -32,7 +32,7 @@ void kmain(struct kernel_boot_info *info)
 	interrupt_init();
 
 	pci_init();
-	
+
 	video_init(info);
 	tty_init(info);
 
@@ -42,25 +42,25 @@ void kmain(struct kernel_boot_info *info)
 //	console_set_color(BLUE,WHITE);
 	printf(BOOT_MSG);
 //	audio_init();
-	
-	extern void pci_list();
-//	pci_list();	
 
-	kbd_init();	
+	extern void pci_list();
+//	pci_list();
+
+	kbd_init();
 
 	time_init();
-	
+
 	interrupt_enable();
-	
+
 //	usb_init();
 
 	extern void ata_init();
-	ata_init();	
+	ata_init();
 
 	vfs_init();
 
 	//network_init();
-	
+
 	//TODO: move this to a mount_root() function
 	//		can take drive, but should autodetect
 	//		filesytem type from the partition table
@@ -70,12 +70,12 @@ void kmain(struct kernel_boot_info *info)
 	printf("Found %uMB RAM\n", mem_size / 1024/1024);
 
 	//init thread is started in user mode
-	//so we don't need to switch into user mode	
+	//so we don't need to switch into user mode
 	thread_create(NULL, init, "ass");
 
 	//TODO: We should probably use this thread to schedule
-	//		bottom halves 
-	
+	//		bottom halves
+
 	//should probably be a sleep() or something
 	kernel_halt();
 

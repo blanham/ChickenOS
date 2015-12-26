@@ -390,8 +390,7 @@ number:
 			if (neg)
 				tmp++;
 
-			if (!ladjust && padc != '0' && width
-			    && (width -= tmp) > 0)
+			if (!ladjust && padc != '0' && width && (width -= tmp) > 0)
 				while (width--)
 					PCHAR(padc);
 			if (neg)
@@ -419,12 +418,10 @@ number:
 		default:
 			while (percent < fmt)
 				PCHAR(*percent++);
-			/*
-			 * Since we ignore an formatting argument it is no
-			 * longer safe to obey the remaining formatting
-			 * arguments as the arguments will no longer match
-			 * the format specs.
-			 */
+			// Since we ignore an formatting argument it is no
+			// longer safe to obey the remaining formatting
+			// arguments as the arguments will no longer match
+			// the format specs.
 			stop = 1;
 			break;
 		}
@@ -435,7 +432,7 @@ number:
 static void
 putchar(int c, void *arg)
 {
-	// add your putchar here 
+	// add your putchar here
 }
 */
 void

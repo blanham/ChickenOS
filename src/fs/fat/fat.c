@@ -47,7 +47,7 @@ struct inode {
 	uint32_t flags;
 	void *storage;
 	//may need parent
-	vfs_fs_t *fs;	
+	vfs_fs_t *fs;
 };
 
 void print_mbr(mbr_t *mbr)
@@ -86,7 +86,7 @@ void ls_dir(directory_t *dir)
 {
 	int i = 0;
 	for(;i < 256; i++)
-	{	
+	{
 		if(((dir[i].attrib)== 0xf) || (dir[i].filename[0] == 0xe5))
 			continue;
 		if(dir[i].filename[0] == 0)
@@ -124,7 +124,7 @@ int main(int argc, char **argv)
 	//printf("VOL s\n", (char *)&bootblock.volume_label);
 	print_chars((char *)bootblock.volume_label,11, true);
 	printf("%X %lu\n", bootblock.signature, sizeof(fat12_bootblock_t));
-	printf("Cluster size %i sectors per fat%x reserved blocks: %u\n", bootblock.bytes_per_block, bootblock.fat_blocks*bootblock.bytes_per_block*bootblock.num_fats, bootblock.reserved_blocks);	
+	printf("Cluster size %i sectors per fat%x reserved blocks: %u\n", bootblock.bytes_per_block, bootblock.fat_blocks*bootblock.bytes_per_block*bootblock.num_fats, bootblock.reserved_blocks);
 //	directory_t root[100];
 	directory_t *root;
 	root = calloc(sizeof(directory_t),100);
@@ -138,12 +138,12 @@ int main(int argc, char **argv)
 
 //	fseek(fp,512, SEEK_CUR);
 	fseek(fp, bootblock.fat_blocks*bootblock.bytes_per_block*bootblock.num_fats + 512, SEEK_SET);
-	fseek(fp, 0x200, SEEK_CUR);	
+	fseek(fp, 0x200, SEEK_CUR);
 	fread(test, sizeof(directory_t), 100, fp);
 	ls_dir(test);
 //	int i = 0;
 //	for(;i < 244; i++)
-//		print_dir_entry(root[i]);	
+//		print_dir_entry(root[i]);
 	free(root);
 	free(test);
 	fclose(fp);

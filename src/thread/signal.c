@@ -1,10 +1,10 @@
 /*	ChickenOS - thread/signal.c
- *	Thread level support of signals  
+ *	Thread level support of signals
  */
 #include <common.h>
 #include <errno.h>
 #include <kernel/thread.h>
-#include <thread/tss.h> 
+#include <thread/tss.h>
 #include <kernel/memory.h>
 #include <device/console.h>
 #include <kernel/interrupt.h>
@@ -26,8 +26,8 @@
    */
 
 extern bool thread_start;
-void signal_test_user_func(int sig)  __attribute__((section(".user"))); 
-void signal_test_restore_func(long unknown)  __attribute__((section(".user"))); 
+void signal_test_user_func(int sig)  __attribute__((section(".user")));
+void signal_test_restore_func(long unknown)  __attribute__((section(".user")));
 
 int sigisemptyset(const sigset_t *set)
 {
@@ -43,7 +43,7 @@ int sigaddset(sigset_t *set, int sig)
 		printf("Sig %i %i %i\n", sig, s >= _NSIG-1, sig-32U < 3);
 		ASSERT(0, "Invalid signal number passed!");
 	}
-	set->__bits[s/8/sizeof *set->__bits] |= 1UL << ( s & (8 * sizeof(*set->__bits) - 1));	
+	set->__bits[s/8/sizeof *set->__bits] |= 1UL << ( s & (8 * sizeof(*set->__bits) - 1));
 	return 0;
 }
 int sigdelset(sigset_t *set, int sig)
@@ -54,7 +54,7 @@ int sigdelset(sigset_t *set, int sig)
 		printf("Sig %i %i %i\n", sig, s >= _NSIG-1, sig-32U < 3);
 		ASSERT(0, "Invalid signal number passed!");
 	}
-	set->__bits[s/8/sizeof *set->__bits] &= ~(1UL << ( s & (8 * sizeof(*set->__bits) - 1)));	
+	set->__bits[s/8/sizeof *set->__bits] &= ~(1UL << ( s & (8 * sizeof(*set->__bits) - 1)));
 	return 0;
 }
 
@@ -144,7 +144,7 @@ void signal_do(registers_t *regs, thread_t *next)
 	regs_bottom->useresp = (uintptr_t)push;
 	regs_bottom->eip = (uint32_t)new_eip;
 
-	next->sig_info->signal_pending = 0; 
+	next->sig_info->signal_pending = 0;
 //	next->status = THREAD_UNINTERRUPTIBLE;
 	interrupt_enable();
 
@@ -159,7 +159,7 @@ int sys_sigsuspend(const sigset_t *mask)
 
 	interrupt_disable();
 	//verify_pointer(mask, sizeof(*mask));
-	
+
 	kmemcpy(&save, &sig_info->sigmask, sizeof(sig_info->sigmask));
 	kmemcpy(&sig_info->sigmask, (void *)mask, sizeof(*mask));
 //	printf("Blocking! Esp ~= %x\n", &mask);
@@ -187,7 +187,7 @@ int sys_sigaction(int sig, const struct k_sigaction *act, struct k_sigaction *oa
 	interrupt_disable();
 
 //	printf("%i %x %x cur %x\n", sig, act, oact, cur);
-	
+
 	if(sig > NUM_SIGNALS -1 || sig == SIGKILL || sig == SIGSTOP)
 		return -EINVAL;
 
@@ -225,7 +225,7 @@ int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 //	printf(" HOW %i\n", how);
 	if(set != NULL)
 	switch(how)
-	{	
+	{
 		case SIG_BLOCK:
 			sig_info->sigmask.__bits[0] |= set->__bits[0];
 			sig_info->sigmask.__bits[1] |= set->__bits[1];
@@ -259,21 +259,21 @@ int sys_kill(pid_t pid, int sig)
 	//FIXME: Not right
 	if(p->status == THREAD_BLOCKED)
 		p->status = THREAD_READY;
-	
+
 	sigaddset(&p->sig_info->pending, sig);
 	p->sig_info->signal_pending = 1;
-	
+
 	return 0;
 }
 
-void signal_test_restore_func(long unknown) 
+void signal_test_restore_func(long unknown)
 {
 	//thread_t *cur = thread_current();
 	printf("Signal #%x Address %x\n", unknown, &unknown);
 	printf("Return address: %p\n",  __builtin_return_address (0));
 	printf("Frame address: %p\n",  (uint32_t *)__builtin_frame_address (0));
 }
-void signal_test_user_func(int sig) 
+void signal_test_user_func(int sig)
 {
 	printf("Signal #%x Address %x\n", sig, &sig);
 	printf("Return address: %p\n",  __builtin_return_address (0));

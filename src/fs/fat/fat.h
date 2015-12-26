@@ -16,7 +16,7 @@ struct fat16_bootblock {
 	uint16_t heads;
 	uint32_t hidden_blocks;
 	uint32_t sectors_per_partition;
-	
+
 	uint8_t logical_drive;
 	uint8_t unused;
 	uint8_t ext_sig;
@@ -24,7 +24,7 @@ struct fat16_bootblock {
 	uint8_t volume_label[11];
 	uint8_t  file_system[8];
 	uint8_t  boot[448];
-	uint16_t signature; 
+	uint16_t signature;
 } __attribute__ ((packed));
 struct fat_directory_entry {
 	uint8_t filename[11];
@@ -73,7 +73,7 @@ struct fat32_bootblock {
 	uint8_t volume_label[11];
 	uint8_t  file_system[8];
 	uint8_t  boot[420];
-	uint16_t signature; 
+	uint16_t signature;
 } __attribute__ ((packed));
 
 typedef struct fat32_bootblock fat32_bootblock_t;

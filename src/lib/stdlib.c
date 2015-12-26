@@ -27,13 +27,14 @@ long int strtol(const char* str, char **end, int base)
 	sign = (str[i] == '-' ? -1 : 1);
 	if(str[i] == '-' || str[i] == '+')
 		i++;
-	
+
 	for(ret = 0; isdigit(str[i]); i++)
 	{
 		ret = 10 * ret + (str[i] - '0');
 	}
 	if(end != NULL)
-	 *end = (char *)&str[i];
+		*end = (char *)&str[i];
+
 	return ret * sign;
 }
 

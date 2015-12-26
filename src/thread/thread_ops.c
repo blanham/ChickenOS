@@ -66,12 +66,12 @@ int sys_setgid(gid_t gid)
 int sys_brk(void *_addr)
 {
 	thread_t *cur = thread_current();
-	uintptr_t addr = (uintptr_t)_addr; 
+	uintptr_t addr = (uintptr_t)_addr;
 	if(addr == 0)
 	{
 		return (int)cur->mm->brk;
 	}
-	
+
 	cur->mm->brk = _addr;
 //	printf("addr %x cur %x\n", addr, cur->brk);
 //	cur->brk = (void *)((uintptr_t)0x8000000 + (uintptr_t)addr);
@@ -87,12 +87,12 @@ void *sys_sbrk(intptr_t ptr)
 	if(ptr == 0)
 	{
 		return cur->mm->brk;
-	}	
+	}
 	else
 	{
 		old = cur->mm->brk;
 		cur->mm->brk = cur->mm->brk + ptr;
-		return old;	
+		return old;
 	}
 }
 
@@ -119,7 +119,7 @@ pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
 
 	while(1)
 	{
-		LL_FOREACH2(cur->children, child, child_next) 
+		LL_FOREACH2(cur->children, child, child_next)
 		{
 			ret = child->pid;
 			if(child->status == THREAD_DEAD)
@@ -128,7 +128,7 @@ pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
 				cur->children = NULL;
 				*status = 0x80;
 				return ret;
-			}	
+			}
 
 		}
 		if(ret)
@@ -140,8 +140,8 @@ pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
 				continue;
 			else
 				return -EINTR;
-		}	
-		
+		}
+
 		return -ECHILD;
 	}
 	PANIC("lulz\n");

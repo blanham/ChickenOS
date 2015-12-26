@@ -15,36 +15,36 @@ char * strdup(const char *str)
 	char *new = kcalloc(strlen(str) + 1,1);
 	if(new != NULL)
 		strcpy(new,str);
-	return new;	
+	return new;
 }
 
 int strcmp ( const char * str1, const char * str2 )
 {
-	int i = 0;	
+	int i = 0;
 
 	for(; str1[i] == str2[i]; i++)
 		if(str1[i] == '\0')
-			return 0;	
+			return 0;
 
-	return str1[i] - str2[i]; 
+	return str1[i] - str2[i];
 }
 int strncmp ( const char * str1, const char * str2, size_t num)
 {
-	uint32_t i = 0;	
+	uint32_t i = 0;
 
 	for(; str1[i] == str2[i]; i++)
 	{
 		if(str1[i] == '\0')
-			return 0;	
+			return 0;
 		if(i == num)
 			return 0;
 	}
-	return str1[i] - str2[i]; 
+	return str1[i] - str2[i];
 }
 //FIXME: unimplemented
 char * strtok ( char * str UNUSED, const char * delimiters UNUSED)
 {
-	
+
 
 	return NULL;
 }
@@ -73,22 +73,22 @@ char * strtok_r ( char * str, const char * delimiters, char **save )
 
 	if(str == NULL)
 		str = *save;
-	
+
 	while(strchr(delimiters,*str) != NULL)
 	{
 		if(*str == '\0')
 		{
 			*save = str;
 			return NULL;
-		}	
+		}
 		str++;
 	}
-	
+
 	out = str;
-	
+
 	while(strchr(delimiters,*str) == NULL)
 		str++;
-	
+
 	if(*str != '\0')
 	{
 		*str = '\0';
@@ -101,7 +101,7 @@ char * strtok_r ( char * str, const char * delimiters, char **save )
 char *strcpy(char *dst, const char *src)
 {
 	char *_dst = dst;
-	
+
 	while((*_dst++ = *src++) != 0);
 
 	return dst;
@@ -110,7 +110,7 @@ char *strcpy(char *dst, const char *src)
 char *strncpy(char *dst, const char *src, size_t len)
 {
 	char *_dst = dst;
-	
+
 	while(((*_dst++ = *src++) != 0) && (--len != 0));
 
 	return dst;
@@ -165,12 +165,12 @@ void *memset(void *dest, int val, size_t count)
 int memcmp (const void *s1, const void *s2, size_t n)
 {
 	uint8_t *_s1 = (uint8_t *)s1;
-	uint8_t *_s2 = (uint8_t *)s2;	
+	uint8_t *_s2 = (uint8_t *)s2;
 	while(n--)
 	{
- 		if(*_s1 == *_s2)
+		if(*_s1 == *_s2)
 		{
-			return *_s1 - *_s2; 
+			return *_s1 - *_s2;
 		}
 		n--;
 		++_s1;

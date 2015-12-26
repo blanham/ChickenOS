@@ -1,6 +1,6 @@
 /*	ChickenOS - fs/vfs.c - virtual file system main
  *	Patterned after the Linux 2.4 vfs
- *	
+ *
  */
 #include <stdint.h>
 #include <stdio.h>
@@ -51,7 +51,7 @@ struct inode * vfs_namei(struct inode *dir, char *file)
 	if(dir->flags & I_MOUNT && dir != root->inode)
 	{
 		PANIC("traversing mounts not yet implemented");
-	} 
+	}
 
 	if((dir->info.st_mode & S_IFDIR) == 0)
 	{
@@ -59,7 +59,7 @@ struct inode * vfs_namei(struct inode *dir, char *file)
 	//	PANIC("calling vfs_namei on a non-directory inode");
 		return NULL;
 	}
-	
+
 	return dir->fs->ops->namei(dir, file);
 }
 
@@ -78,12 +78,12 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 //	{
 	//	return NULL;
 //	}
-	
+
 	if(path[0] == '/')
 		res = thread_current()->file_info->root;
 	else
 		res = thread_current()->file_info->cur;
-	
+
 	if((tok = (char *)strtok_r(path, "/", &saveptr)) == NULL)
 		return NULL;
 
@@ -93,7 +93,7 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 		//		but i've probably fixed the main bug
 		//		causing this
 		//printf("dir search or insert broken. path %s\n",path);
-		
+
 		return NULL;
 	}
 
@@ -147,17 +147,17 @@ void vfs_mount_root(uint16_t dev, char *type)
 	if((fs = vfs_find_fs(type)) == NULL)
 		goto error;
 	ret++;
-	
+
 	if(fs->ops->read_sb == NULL)
-		goto error;	
+		goto error;
 	ret++;
-	
+
 	if(fs->ops->read_sb(fs, dev) < 0)
 		goto error;
-	
-	//FIXME: needs to be a list	
+
+	//FIXME: needs to be a list
 	open_inodes[0] = fs->superblock->root;
-	
+
 	//root->inode = fs->superblock->root;
 
 	//FIXME: use vfs_new_file instead:
@@ -172,10 +172,10 @@ void vfs_mount_root(uint16_t dev, char *type)
 	root_fs = fs;
 
 	printf("Mounted %s fs @ dev %i:%i as root\n",type, MAJOR(dev),MINOR(dev));
-	return;	
+	return;
 
-error:	
-	printf("stage %i\n",ret);	
+error:
+	printf("stage %i\n",ret);
 	PANIC("mounting root filesystem failed");
 }
 
@@ -187,8 +187,8 @@ vfs_fs_t *vfs_alloc()
 }
 
 //TODO: Copy the Linux module setup
-//		Wherein we put everything in a 
-//		null-terminated array of function 
+//		Wherein we put everything in a
+//		null-terminated array of function
 //		pointers that we iterate over
 int vfs_register_fs(vfs_fs_t *fs)
 {
@@ -227,7 +227,7 @@ int vfs_mount(const char *device, struct file *dir, char *type)
 	struct file *block = vfs_open(device);
 	if(file->mode & S_IFBLK)
 	{
-		dev = block->rdev	
+		dev = block->rdev
 	}else{
 		//not a block device
 		vfs_close(block);
@@ -237,20 +237,20 @@ int vfs_mount(const char *device, struct file *dir, char *type)
 	if((fs = vfs_find_fs(type)) == NULL)
 		goto error;
 	ret++;
-	
+
 	if(fs->ops->read_sb == NULL)
 	{
 		printf("Invalid fs! No read_sb defined!\n");
 		return -1;
 	}
-	
+
 	if(fs->ops->read_sb(fs, dev) < 0)
 		goto error;
-	
+
 	//needs to be a list
-	//insert root inode	
+	//insert root inode
 //	open_inodes[0] = fs->superblock->root;
-	
+
 	strcpy(root->name, "/");
 	root->dev = dev;
 	root->offset = 0;
@@ -268,7 +268,7 @@ struct file *vfs_open(char *path, int oflags, mode_t mode)
 	(void)mode;
 	struct inode *cur = thread_current()->file_info->cur;
 	struct file *tmp = kcalloc(sizeof(*tmp), 1);
-	tmp->inode = cur;	
+	tmp->inode = cur;
 	struct inode *lookup = vfs_pathsearch(tmp, path);
 
 	if(lookup == NULL)
@@ -288,7 +288,7 @@ int vfs_close(struct file *file)
 {
 	if(file == NULL)
 		return -1;
-	
+
 	//vfs_file_free(file);
 
 	return 0;
@@ -300,10 +300,10 @@ size_t vfs_read(struct file *file, void *buf, size_t nbyte)
 	if(file == NULL || buf == NULL)
 		return -1;
 	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_read(file->inode->info.st_rdev, 
+		ret = char_device_read(file->inode->info.st_rdev,
 			buf, file->offset, nbyte);
 	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-		ret = block_device_readn(file->inode->info.st_rdev, 
+		ret = block_device_readn(file->inode->info.st_rdev,
 			buf, 0, file->offset, nbyte);
 	}else if((file->inode->info.st_mode & S_IFREG) != 0){
 		//printf("READ OFF %x\n", file->offset);
@@ -325,11 +325,11 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 	if(file == NULL || buf == NULL)
 		return -1;
 	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_write(file->inode->info.st_rdev, 
+		ret = char_device_write(file->inode->info.st_rdev,
 			buf, file->offset, nbyte);
 	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
 //FIXME: This returns -1 so we don't fuxxor our disk image accidentally
-	//	ret = block_device_readn(file->inode->rdev, 
+	//	ret = block_device_readn(file->inode->rdev,
 	//		buf, 0, file->offset, nbyte);
 		printf("Writing it currently disabled\n");
 		return -1;
@@ -339,7 +339,7 @@ off_t vfs_write(struct file *file, void *buf, size_t nbyte)
 		ret = file->fs->ops->write(file->inode, buf,
 			nbyte, file->offset);
 	}
-	file->offset += ret; 
+	file->offset += ret;
 	return ret;
 }
 
@@ -349,10 +349,10 @@ int  vfs_ioctl(struct file *file, int request, char * args)
 	if(file == NULL)
 		return -1;
 	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_ioctl(file->inode->info.st_rdev, 
+		ret = char_device_ioctl(file->inode->info.st_rdev,
 			request, args);
 	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-	//	ret = block_device_readn(file->inode->rdev, 
+	//	ret = block_device_readn(file->inode->rdev,
 	//		buf, 0, file->offset, nbyte);
 		return -1;
 	}else if((file->inode->info.st_mode & S_IFREG) != 0){
@@ -426,12 +426,12 @@ int vfs_stat64(const char *path, struct stat64 *buf)
 	struct file *tmp = kcalloc(sizeof(*tmp), 1);
 	tmp->inode = cur;
 	struct inode *lookup = vfs_pathsearch(tmp, (char *)path);
-	
+
 	if(lookup == NULL)
 		return -(ENOENT);
-	kfree(tmp);	
+	kfree(tmp);
 	memcpy(buf, &lookup->info, sizeof(struct stat));
-	
+
 	return 0;
 }/*
 struct inode {
@@ -452,7 +452,7 @@ struct inode {
 	uint32_t flags;
 	void *storage;
 	//may need parent
-	vfs_fs_t *fs;	
+	vfs_fs_t *fs;
 };
 
 struct stat64

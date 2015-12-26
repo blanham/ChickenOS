@@ -27,7 +27,7 @@ static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[
 {
 	uint8_t *stack = (uint8_t *)PHYS_BASE;
 	char **arg_table, **envp_table;
-	int argc = 0, envc = 0;	
+	int argc = 0, envc = 0;
 
 	//alocate these so we don't blow the stack
 	arg_table = kcalloc(MAX_ARGS, sizeof(uint32_t *));
@@ -117,7 +117,7 @@ static void duplicate_table(char * dest[], char *const source[])
 	}
 
 	dest[count] = 0;
-} 
+}
 
 static void push_arg(char *arg, uint8_t **sp)
 {

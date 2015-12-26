@@ -16,11 +16,10 @@ void vm_page_fault_dump(registers_t *regs, uintptr_t addr, int flags)
 {
 	thread_t *cur = thread_current();
 	printf("Page fault in %s space @ %X PID %i eip %x\n",
-	 	(flags & PAGE_USER) ? "user" : "kernel",
-	 	addr, cur->pid, regs->eip);
+			(flags & PAGE_USER) ? "user" : "kernel",
+			addr, cur->pid, regs->eip);
 	printf("%s\t", (flags & PAGE_WRITE) ? "write" : "read");
-	printf("%s\n", (flags & PAGE_VIOLATION) ? "protection violation" :
-	 									"page not present");
+	printf("%s\n", (flags & PAGE_VIOLATION) ? "protection violation" : "page not present");
 	printf("\nREGS:\n");
 	dump_regs(regs);
 	printf("\n");
@@ -37,7 +36,7 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 
 	if(flags & PAGE_USER)
 	{
-		vm_page_fault_dump(regs, addr, flags);	
+		vm_page_fault_dump(regs, addr, flags);
 
 		//TODO: send sigsegv to thread
 		//signal(cur, SIGSEGV);
