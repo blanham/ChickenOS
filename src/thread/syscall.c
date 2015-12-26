@@ -12,50 +12,24 @@
 #include <errno.h>
 #include <thread/syscall-names2.h>
 
-//FIXME: Old network stuff that should be moved or removed
-extern void send_packet();
-int sys_dummy()
-{
-//	PANIC("YAY!");
-	send_packet();
-//	printf("dummy syscall\n");
-	return 0xcafebabe;	
-}
-int network_setup()
-{
-	return SYSCALL_0N(SYS_NETWORK);
-}
-
-typedef long * arg56;
 #define DEBUG
 
-//TODO: need to verify pointers before letting functions dereference them
+typedef long * arg56;
+
 void syscall_handler (registers_t *regs)
 //int syscall_handler (uint32_t call, void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5)
 {
 	int call = regs->eax;
-	struct vec {
-				void *shit;
-		size_t len;
-			};
-	int count;
-	struct vec *ass; 
 	long *arg;
 
 #ifdef DEBUG
-	//printf("call %i %i\t", call, sizeof(syscall_names));
 	serial_printf("%s(%i): by %i @ %x\n",syscall_names[call], call, thread_current()->pid,
 			regs->eip);
 #endif
-//	asm volatile ("cli");
+
 	switch (call)
 	{
 		case SYS_READ:
-			if((int)regs->ebx == -1)
-			{
-				regs->eax = -1;
-				break;
-			}
 			regs->eax = sys_read((int)regs->ebx, (char *)regs->ecx, (int)regs->edx);
 			break;
 		case SYS_WRITE:
@@ -75,39 +49,10 @@ void syscall_handler (registers_t *regs)
 			regs->eax = 1;
 			break;
 		case SYS_READV:
-			ass = (void *)regs->ecx;
-			if((int)regs->edx < 0)
-			{
-				regs->eax = -1;
-				break;
-			}	
-			regs->eax = 0;
-			for(int i = 0; i < (int)regs->edx; i++)
-			{
-				if(ass[i].len == 0)
-					continue;
-
-				count = sys_read((int)regs->ebx, ass[i].shit, ass[i].len);
-				//if(count >= 0)
-				regs->eax += count;
-			}
+			regs->eax = sys_readv((int)regs->ebx, (const struct iovec *)regs->ecx, (int)regs->edx);
 			break;
-
 		case SYS_WRITEV:
-			ass = (void *)regs->ecx;
-			if((int)regs->edx < 0)
-			{
-				regs->eax = -1;
-				break;
-			}	
-			regs->eax = 0;
-			for(int i = 0; i < (int)regs->edx; i++)
-			{
-				count = sys_write((int)regs->ebx, ass[i].shit, ass[i].len);
-				//printf("len %i po %p fd %i\n", ass[0].len, ass[0].shit, regs->edx);
-				if(count >= 0)
-				regs->eax += count;
-			}
+			regs->eax = sys_writev((int)regs->ebx, (const struct iovec *)regs->ecx, (int)regs->edx);
 			break;
 		case SYS_OPEN:
 			regs->eax = sys_open((char *)regs->ebx, regs->ecx, (mode_t)regs->edx);
@@ -117,7 +62,7 @@ void syscall_handler (registers_t *regs)
 			break;
 		case 140:
 			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->edx, (int) regs->edi);
-			*(long *)regs->esi = regs->eax;
+			*(long *)regs->esi = regs->eax; //XXX: What is this for?
 			break;
 		case SYS_STAT64:
 			regs->eax = sys_stat64((char *)regs->ebx, (struct stat64 *)regs->ecx);
@@ -181,13 +126,13 @@ void syscall_handler (registers_t *regs)
 			printf("IN syscall\n");
 			dump_regs(regs);
 			regs->eax = sys_sigsuspend((void*)regs->ebx);
-			break; 
+			break;
 		case 173:
 		case SYS_SIGRETURN:
 			regs->eax = sys_sigreturn(regs, regs->ebx);
 			break;
 		case SYS_WAIT4:
-			regs->eax = sys_wait4((pid_t)regs->ebx, (int *)regs->ecx, (int)regs->edx, 
+			regs->eax = sys_wait4((pid_t)regs->ebx, (int *)regs->ecx, (int)regs->edx,
 											(struct rusage *)regs->esi);
 			//printf("REturn %i\n", regs->eax);
 			break;
@@ -212,12 +157,9 @@ void syscall_handler (registers_t *regs)
 			arg = (void *)regs->useresp-8;
 			//printf("arg %x\n", regs->edi);
 			//dump_regs(regs);
-			regs->eax = (uint32_t)sys_mmap2((void *)regs->ebx, (size_t)regs->ecx, (int)regs->edx, 
+			regs->eax = (uint32_t)sys_mmap2((void *)regs->ebx, (size_t)regs->ecx, (int)regs->edx,
 											(int)regs->esi, (int)arg[0], (off_t)arg[1]);
 			break;
-				//case SYS_NETWORK:
-			//regs->eax = sys_network_setup();
-			//break;
 		case SYS_DUMMY:
 			printf("DUMMY\n");
 			//regs->eax = sys_dummy();
@@ -234,12 +176,9 @@ void syscall_handler (registers_t *regs)
 #ifdef DEBUG
 			serial_printf("undefined system call\n");
 #endif
-//	printf("undefined system call %i!\n",call);
 			regs->eax = -ENOSYS;
 	}
 #ifdef DEBUG
 	serial_printf("%8i/%.8x\n", regs->eax, regs->eax);
 #endif
-#undef DEBUG
-//	asm volatile ("sti");
 }

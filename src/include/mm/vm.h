@@ -100,6 +100,7 @@ int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
 		int flags, struct inode *inode, off_t offset, size_t size);
 //struct memregion *memregion_new();
 void mm_clear(struct mm *mm);
+int verify_pointer(const void *ptr, size_t len, int rw);
 
 /* mm/frame.c */
 void frame_init(uintptr_t mem_size);

@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
+#include <sys/uio.h>
 typedef int64_t ino64_t;
 typedef int64_t off64_t;
 typedef uint64_t blkcnt64_t;
@@ -64,9 +65,9 @@ struct stat64
 #define S_IWOTH 	0x0002 	//write
 #define S_IXOTH 	0x0001 	//execute
 */
-enum file_type { FILE_CHAR  = 0x2000, 
-				 FILE_DIR   = 0x4000,
-				 FILE_BLOCK = 0x6000}; 
+enum file_type { FILE_CHAR  = 0x2000,
+	FILE_DIR   = 0x4000,
+	FILE_BLOCK = 0x6000};
 
 typedef struct vfs_fs vfs_fs_t;
 struct inode;
@@ -99,14 +100,13 @@ struct vfs_fs {
 	uint16_t dev;
 	vfs_ops_t *ops;
 };
-//FIXME: redo this to contain struct stat
 struct inode {
-	struct stat info; 
+	struct stat info;
 	//if part of mount point,keep in cache
 	uint32_t flags;
 	void *storage;
 	//may need parent
-	vfs_fs_t *fs;	
+	vfs_fs_t *fs;
 };
 #define I_MOUNT 0x1
 
@@ -114,7 +114,7 @@ struct file {
 	char name[256];
 	struct inode *inode;
 	uint32_t offset;
-	vfs_fs_t *fs;	
+	vfs_fs_t *fs;
 };
 
 
@@ -141,6 +141,8 @@ int sys_open(const char *path, int oflag, mode_t mode);
 int sys_close(int fd);
 ssize_t sys_read(int fildes, void *buf, size_t nbyte);
 ssize_t sys_write(int filedes, void *buf, size_t nbyte);
+ssize_t sys_readv(int fd, const struct iovec *iov, int iovcnt);
+ssize_t sys_writev(int fd, const struct iovec *iov, int iovcnt);
 char* sys_getcwd(char *buf, size_t size);
 
 int sys_creat(const char *path, mode_t mode);

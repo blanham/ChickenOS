@@ -225,7 +225,7 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 //TODO:  Can probably just have this call memregion_fault, since if it's
 //       valid but not loaded in we might as well load it in instead of 
 //       faulting it in
-int verify_pointer(void *ptr, size_t len, int rw)
+int verify_pointer(const void *ptr, size_t len, int rw)
 {
 //	thread_t *cur = thread_current();
 	size_t count = 0;
