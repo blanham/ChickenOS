@@ -11,5 +11,6 @@ struct tty_state;
 typedef struct tty_state tty_t;
 void tty_init(struct kernel_boot_info *info);
 void tty_putchar(tty_t *tty, int c);
+void tty_putc(int c);
 void tty_termios_print(struct termios *termios);
 #endif

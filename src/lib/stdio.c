@@ -1,38 +1,22 @@
+/* ChickenOS - Standard I/O functions
+ * TODO:
+ * Cleanup
+ */
 #include <common.h>
 #include <device/console.h>
+#include <device/tty.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-//FIXME Get rid of this
-/*#define ALLOCSIZE 10000
-static char allocbuf[ALLOCSIZE];
-static char *allocp = allocbuf;
-// temporary memory functions taken from K&R
 
-char *alloc(int n)
-{
-	if(allocbuf + ALLOCSIZE - allocp >= n) {
-		allocp += n;
-		return allocp -n;
-	}else{
-		return NULL;
-	}
-}
-
-void afree(char *p)
-{
-	if (p >= allocbuf && p < allocbuf + ALLOCSIZE)
-		allocp = p;
-}
-*/
 void putc(char c)
 {
-	console_putc(c);
+	tty_putc(c);
 }
 
 void putchar(int c)
 {
-	console_putc(c);
+	tty_putc(c);
 }
 
 char getchar()
@@ -93,9 +77,9 @@ static char *int_to_string(int num, int base, int size)
 	for(i = 0; i < 100; i++)
 		tmp[i] = 0;
 	char * ascii = {"0123456789ABCDEF"};
-	memset(dp, 0, 256);	
+	memset(dp, 0, 256);
 //	if(sign)
-//		tmp++;	
+//		tmp++;
 	/*int start = 0;
 	int temp = num;
 	if((num < 0) && (base == 10))
@@ -124,27 +108,27 @@ static char *int_to_string(int num, int base, int size)
 			for(i = size-1; i >= 0; i--)
 			{
 				tmp[i] = ascii[num & 0x1];
-				num >>= 1;	
+				num >>= 1;
 			}
 			break;
 		case 10:
 			for(i = size-1; i >= 0; i--)
-			{	
+			{
 				tmp[i] = ascii[num % 10];
-				num /= 10;	
+				num /= 10;
 			}
 			break;
 		case 16:
 			for(i = 7; i >= 0; i--)
 			{
 				tmp[i] = ascii[num & 0xF];
-				num >>= 4;	
+				num >>= 4;
 			}
 			break;
 		default:
 			puts("invalid base given to int_to_string");
-			
-			break;		
+
+			break;
 	}
 //	if(temp < 0)
 	//	tmp--;
@@ -158,7 +142,7 @@ static char *int_to_string(int num, int base, int size)
 void oprintf(char *fmt, ...)
 {
 	va_list ap;
- 	char *p;
+	char *p;
 	char *s_val;
 	char *strip;
 	char c_val;
@@ -203,7 +187,7 @@ void oprintf(char *fmt, ...)
 			//	afree(s_val);
 				break;
 			case 'X':
-				puts("0x");	
+				puts("0x");
 			case 'x':
 				i_val = va_arg(ap, int);
 				s_val = int_to_string(i_val, 16, 8);
@@ -211,7 +195,7 @@ void oprintf(char *fmt, ...)
 				puts(strip);
 			//	afree(s_val);
 				break;
-			
+
 			default:
 				putc(*p);
 				break;
@@ -219,7 +203,7 @@ void oprintf(char *fmt, ...)
 	//	for(int i= 0; i < 100; i++)
 	//		allocp[i] = 0;
 	}
-	
+
 	va_end(ap);
 
 
@@ -230,14 +214,14 @@ void oprintf(char *fmt, ...)
 int vsprintf(char *buf, const char *fmt, va_list args)
 {
 	va_list ap = args;
- 	char *p;
+	char *p;
 	char *s_val;
 	char *strip;
 	char c_val;
 	int i_val;
 	double d_val;
 	char cbuf[2] = {0,0};
-	(void)d_val;	
+	(void)d_val;
 	for(p = (char *)fmt; *p; p++)
 	{
 		if(*p != '%'){
@@ -287,7 +271,7 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 			//	afree(s_val);
 				break;
 			case 'X':
-				//puts("0x");	
+				//puts("0x");
 				strcat(buf,"0x");
 			case 'x':
 				i_val = va_arg(ap, int);
@@ -307,40 +291,17 @@ int vsprintf(char *buf, const char *fmt, va_list args)
 	}
 	return 0;//buf - _buf;
 }
-int
-kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap);
+
+int kvprintf(char const *fmt, void (*func)(int, void*), void *arg, int radix, va_list ap);
 
 void testc(int c, void *aux UNUSED)
 {
 	putc(c);
 	serial_putc(c);
 }
-#include <mm/vm.h>
-uint16_t *vidya = (void *)P2V(0xB8000);
-extern void vga_putchar(int c, int x, int y);
-extern void vga_scroll();
+
 void serial_testc(int c, void *aux UNUSED)
 {
-/*	static int x = 0, y = 0;
-	if(c == '\n')
-	{
-		y++;
-		x=0;
-	}
-	else{
-		vga_putchar(c, x, y);
-		x++; 
-	}*/
-/*	if(x > 80)
-	{
-		x = 0; y++;
-	}
-	if(y >24)
-	{
-		vga_scroll();
-		y = 24;
-	}*/
-//	*vidya++ = 0xA000 | (c & 0xFF);
 	serial_putc(c);
 }
 
@@ -387,7 +348,7 @@ int snprintf(char *buf, size_t size UNUSED, const char *fmt, ...)
 
 void hex_dump(void *ptr, int n)
 {
-	uint8_t *p = ptr;	
+	uint8_t *p = ptr;
 	for(int j =0; j < n; j++)
 	{
 		printf("%X ",p);
