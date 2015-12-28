@@ -39,7 +39,7 @@ struct thread_files {
 	int files_count;
 	struct file **files;
 	int *files_flags;
-};	
+};
 
 struct thread_signals {
 	int signal_pending;
@@ -63,7 +63,7 @@ struct thread_struct {
 	//wait list
 	thread_t *wait_next, *wait_prev;
 	//Would a tree work better for this?
-	//Children and children list	
+	//Children and children list
 	thread_t *children;
 	thread_t *child_next, *child_prev;
 
@@ -71,24 +71,30 @@ struct thread_struct {
 	struct thread_files *file_info;
 	//saved kernel stack, user stack, and location of user stack
 	uint8_t *sp, *useresp, *user;
-	
+
 
 	//FIXME: Refactor this into a struct, takes up a fuckton of space
 	struct thread_signals *sig_info;
-	
+
 	//this pointer to registers on kernel
 	//stack is used for manipulating the user stack
-	//for signal handling	
+	//for signal handling
 	struct registers *regs, *signal_regs;
-	
+
 	struct mm *mm;
-	
+
 	/* status of thread (DEAD, READY, RUNNING, BLOCKED, ) */
 	enum thread_stat status;
-	
+
 	/* magic number so we can detect if stack collided with thread info */
-	uint32_t magic;	
+	uint32_t magic;
 } __attribute__((packed));
+
+// Possible design for a thread queue
+struct thread_queue {
+	thread_t *next, *prev;
+};
+typedef struct thread_queue thq_t;
 
 //FIXME: split this stuff up?
 
@@ -96,12 +102,13 @@ struct thread_struct {
 void arch_thread_init();
 
 /* thread.c */
-void 		thread_init();
-void 		thread_usermode(void);
 thread_t * 	thread_current();
 thread_t *	thread_by_pid(pid_t pid);
-pid_t 		thread_create(registers_t *regs, void (*eip)(void *), void * esp);
-pid_t 		pid_allocate();
+void 	thread_init();
+void 	thread_usermode(void);
+pid_t	thread_create2(uintptr_t entry);
+pid_t 	thread_create(registers_t *regs, void (*eip)(void *), void * esp);
+pid_t 	pid_allocate();
 
 /* thread_ops.c - system calls */
 pid_t 	sys_fork(registers_t *regs);
@@ -109,10 +116,10 @@ uid_t 	sys_geteuid();
 pid_t 	sys_getpid();
 pid_t 	sys_getppid();
 pid_t 	sys_getpgrp();
-int sys_setuid(uid_t uid);
-uid_t sys_getuid();
-gid_t sys_getgid();
-int sys_setgid(gid_t gid);
+int		sys_setuid(uid_t uid);
+uid_t	sys_getuid();
+gid_t	sys_getgid();
+int		sys_setgid(gid_t gid);
 int 	sys_setpgid(pid_t pid, pid_t pgid);
 int 	sys_brk(void *addr);
 void *	sys_sbrk(intptr_t ptr);
@@ -125,7 +132,7 @@ enum exe_type {
 	EXE_ELF,
 	EXE_SCRIPT
 };
-int 	sys_execve(const char *path, char *const argv[], char *const envp[]);
+int	sys_execve(const char *path, char *const argv[], char *const envp[]);
 
 /* thread/load_elf.c */
 int load_elf(const char *path, uintptr_t *eip);
@@ -152,6 +159,5 @@ int sys_sigreturn(registers_t *regs, unsigned long dunno);
 /* arch/ARCH/thread.c */
 void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax);
 void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp);
-
 
 #endif
