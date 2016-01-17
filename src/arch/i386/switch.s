@@ -2,7 +2,7 @@
 ;
 ;  According to the SysV i386 ABI:
 ; "Registers %ebp, %ebx, %edi, %esi, and %esp 'belong' to the calling function.
-;  In other words, a called function must preserve these registers' values for 
+;  In other words, a called function must preserve these registers' values for
 ;  its caller."
 
 extern thread_stack_offset
@@ -14,13 +14,15 @@ switch_threads:
 ;push regs
 	mov eax, [esp + 4]
 	mov edx, [esp + 8]
+	add eax, [thread_stack_offset]
+	add edx, [thread_stack_offset]
 	push ebp
 	push ebx
 	push edi
 	push esi
 
-	mov [eax + thread_stack_offset], esp
-	mov esp, [edx + thread_stack_offset]
+	mov [eax], esp
+	mov esp, [edx]
 
 	pop esi
 	pop edi
@@ -29,4 +31,4 @@ switch_threads:
 
 	ret
 
-; vim: set syntax=nasm: 
+; vim: set syntax=nasm:

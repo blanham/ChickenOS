@@ -104,36 +104,27 @@ page_table_t pagetable_clone(page_table_t pt)
 
 	return (page_table_t)V2P(new);
 }
-//FIXME: Inefficient
-//Once we have memory regions we can just
-//Directly map what we need instead of scanning and copying
+
+//XXX: These names are confusing
 pagedir_t pagedir_clone(pagedir_t pd)
 {
 	pagedir_t new = palloc();
 	uint32_t *new_pt;
 	page_table_t cur;
 
-	for(int i = 0; i < 1024; i++)
-	{
-		if((pd[i] & PTE_P) != 0)
-		{
-			new_pt = palloc();
-			cur = (page_table_t)((uintptr_t)P2V(pd[i]) & ~0xfff);
-			if(i < 768)
-			{
-				for(int i = 0; i < 1024; i++)
-				{
-					new_pt[i] = (uintptr_t)palloc();
-					kmemcpy((void *)new_pt[i], (void *)P2V(cur[i] & ~0x3FF), 4096);
-					new_pt[i] = V2P(new_pt[i]) | PTE_RW | PTE_USER | PDE_P;
-				}
-			}
-			else
-			{
-					kmemcpy(new_pt, (void *)cur, 4096);
-			}
-			new[i] = V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
+	kmemcpy(&new[768], &pd[768], (1024-768)*4);
+
+	for(int i = 0; i < 768; i++) {
+		if (!(pd[i] & PTE_P))
+			continue;
+		new_pt = palloc();
+		cur = (page_table_t)((uintptr_t)P2V(pd[i]) & ~0xfff);
+		for(int i = 0; i < 1024; i++) {
+			new_pt[i] = (uintptr_t)palloc();
+			kmemcpy((void *)new_pt[i], (void *)P2V(cur[i] & ~0x3FF), 4096);
+			new_pt[i] = V2P(new_pt[i]) | PTE_RW | PTE_USER | PDE_P;
 		}
+		new[i] = V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
 	}
 
 	return new;
@@ -145,30 +136,22 @@ pagedir_t pagedir_copy(pagedir_t pd)
 	uint32_t *new_pt;
 	page_table_t cur;
 
-	for(int i = 0; i < 1024; i++)
-	{
-		if((pd[i] & PTE_P) != 0)
-		{
-			new_pt = palloc();
-			cur = (page_table_t)((uintptr_t)P2V(pd[i]) & ~0xfff);
-			if(i < 768)
-			{
-				for(int i = 0; i < 1024; i++)
-				{
-					if((cur[i] & PTE_P) == 0)
-						continue;
-					//printf("cur %x\n", cur[i]);
-					cur[i] &= ~PTE_RW;
-					new_pt[i] = cur[i];
+	kmemcpy(&new[768], &pd[768], 1024);
 
-				}
-			}
-			else
-			{
-					kmemcpy(new_pt, (void *)cur, 4096);
-			}
-			new[i] = V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
+	for(int i = 0; i < 768; i++) {
+		if (!(pd[i] & PTE_P))
+			continue;
+		cur = (page_table_t)((uintptr_t)P2V(pd[i]) & ~0xfff);
+		new_pt = palloc();
+		for(int i = 0; i < 1024; i++) {
+			if((cur[i] & PTE_P) == 0)
+				continue;
+			printf("cur %x\n", cur[i]);
+			//cur[i] &= ~PTE_RW;
+			new_pt[i] = cur[i];
+
 		}
+		new[i] = V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
 	}
 
 	return new;
@@ -243,6 +226,7 @@ phys_addr_t pagedir_lookup(pagedir_t pd, virt_addr_t virtual)
 	uint32_t pt_idx = (virtual & PTE_MASK) >> PTE_SHIFT;
 
 	pde = &pd[pd_idx];
+	printf("PDE: %X\n", pde);
 
 	if((*pde & PDE_P) == 0)
 	{

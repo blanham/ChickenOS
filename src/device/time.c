@@ -7,7 +7,6 @@
 #include <sys/time.h>
 #include <stdio.h>
 
-
 struct c_os_time system_datetime;
 uint32_t ticks = 0;
 uint32_t unix_time;
@@ -52,15 +51,13 @@ void rtc_init()
 	time_set_from_rtc(&system_datetime);
 }
 
-void timer_intr(struct registers * regs)
+void timer_intr(struct registers * regs UNUSED)
 {
-	(void)regs;
 	ticks++;
-	if(ticks % 100 == 0)
-	{
+	if (ticks % 100 == 0)
 		unix_time++;
-	}
-	thread_scheduler(regs);
+	if (!(ticks & 3))
+		scheduler_run(regs);
 }
 
 

@@ -24,7 +24,7 @@
 void kprintf(char *fmt, ...);
 
 #define BACK(x) case x: ret = __builtin_return_address(x);break;
-//horrible, horrible abuse of GCC's builtin return_address 
+//horrible, horrible abuse of GCC's builtin return_address
 //funtion, needs to print to serial so output can be pasted
 //into addr2line -e kernel.bin -a -f [BACKTRACE]
 extern int StartInHigherHalf;
@@ -50,7 +50,7 @@ static inline void backtrace(unsigned int level)
 			default:
 				printf("too many levels\n");
 				return;
-		}	
+		}
 		printf("%i [%X] %x\n",i, ret, (StartInHigherHalf));
 		if((uintptr_t)ret == (uintptr_t)((StartInHigherHalf& 0xFFF) + 0xc0000000))
 			return;
@@ -77,11 +77,11 @@ kassert(char *file, int line, bool condition, char *msg, const char *function)
 {
 	if(condition == true)
 		return;
-	
+
 	//console_set_color(GREEN,WHITE);
 	printf("%s(): ",function);
 	printf("%s\n",msg);
-		
+
 	panic(file, line, "ASSERTION FAILED!");
 }
 #endif

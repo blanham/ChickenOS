@@ -1,8 +1,8 @@
 megs: 128
 cpu: reset_on_triple_fault=0
-boot: disk 
+boot: disk
 vga: extension=vbe
-ata0-master: type=disk, path="disk.img", mode="flat", cylinders=32, heads=15, spt=63
+ata0-master: type=disk, path="../disk.img", mode="flat", cylinders=32, heads=15, spt=63
 
 magic_break: enabled=1
 port_e9_hack: enabled=1

@@ -87,8 +87,10 @@ static enum exe_type exec_type(const char *path)
 
 	magic = kcalloc(512,1);
 
-	if((fd = sys_open(path, 0, 0)) < 0)
+	if((fd = sys_open(path, 0, 0)) < 0) {
+		printf("exec_type: failed to open file: %s with error: %i\n", path, fd);
 		return ret;
+	}
 	//FIXME: check if file is executable or not
 	//       and error if so,probably with fstat
 	sys_read(fd, magic, 512);
@@ -158,7 +160,7 @@ int load_executable(enum exe_type type UNUSED, const char *_path,
 	char *path;
 	int ret = -ENOEXEC;
 
-	printf("derp\n");
+	serial_printf("derp\n");
 	argv = kcalloc(sizeof(char *), MAX_ARGS);
 	envp = kcalloc(sizeof(char *), MAX_ARGS);
 
@@ -176,9 +178,11 @@ int load_executable(enum exe_type type UNUSED, const char *_path,
 	mm_init(cur->mm);
 	//XXX: kinda hacky, wish we could just have a member in the thread struct
 	regs = (void *)cur + STACK_SIZE - sizeof(*regs);
+	serial_printf("REGS %x\n", regs);
 
 	if((ret = load_elf(path, &regs->eip)) != 0)
 	{
+		serial_printf("Failed loading file: %i\n", ret);
 		//NOTE: If this happens this process is fucked as there's nothing to
 		//      return to. This should segfault, which I'm fine with
 		//      We really shouldn't get here anyway, since all checks that
@@ -193,7 +197,7 @@ int load_executable(enum exe_type type UNUSED, const char *_path,
 
 	regs->useresp = stack_prepare(cur->name, argv, envp);
 
-	printf("execve starting at %x with stack %x\n", regs->eip, regs->useresp);
+	serial_printf("execve starting at %x with stack %x\n", regs->eip, regs->useresp);
 	//FIXME: probably not the best address for break
 	//should be right above the code segment of the
 	//executable
@@ -211,6 +215,10 @@ int sys_execve(const char *_path, char *const _argv[], char *const _envp[])
 	enum exe_type type = EXE_INVALID;
 	int ret = -ENOEXEC;
 
+	hex_dump((void*)PHYS_BASE-128, 8);
+
+	printf("EXECVE: PATH %p:%x, %x %x\n", &_path, _path,  _argv, _envp);
+
 	//FIXME: verify pointers here
 	//verify_pointer(_path)
 	//verify_pointer(_argv)
@@ -219,10 +227,12 @@ int sys_execve(const char *_path, char *const _argv[], char *const _envp[])
 	if(_path == NULL || _argv == NULL)
 	{
 		ret = -EFAULT;
+		serial_printf("path or argv null\n");
 		goto failure;
 	}
 
 	type = exec_type(_path);
+	serial_printf("TYPE %i\n", type);
 
 	switch(type)
 	{

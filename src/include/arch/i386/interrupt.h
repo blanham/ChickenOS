@@ -10,7 +10,7 @@ enum {
 	IRQ4, IRQ5, IRQ6, IRQ7,
 	IRQ8, IRQ9, IRQ10, IRQ11,
 	IRQ12, IRQ13, IRQ14, IRQ15
-}; 
+};
 
 enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};
 

@@ -27,7 +27,7 @@ void kmain(struct kernel_boot_info *info)
 
 	vm_init(info);
 
-	thread_init();
+	threading_init();
 
 	interrupt_init();
 
@@ -71,10 +71,13 @@ void kmain(struct kernel_boot_info *info)
 
 	//init thread is started in user mode
 	//so we don't need to switch into user mode
-	thread_create(NULL, init, "ass");
+	//thread_create(NULL, init, "ass");
+	thread_create2((uintptr_t)init, 0, "Argument");
 
 	//TODO: We should probably use this thread to schedule
 	//		bottom halves
+	//while(1)
+	//	printf("SHIT\n");
 
 	//should probably be a sleep() or something
 	kernel_halt();

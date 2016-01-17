@@ -1,5 +1,6 @@
 /*	ChickenOS - thread/signal.c
  *	Thread level support of signals
+ *	XXX: This is hot garbage
  */
 #include <common.h>
 #include <errno.h>
@@ -78,6 +79,8 @@ int sigismember(const sigset_t *set, int sig)
 }
 int sys_sigreturn(registers_t *regs, unsigned long dunno UNUSED)
 {
+	(void)regs;
+	/*
 	thread_t *cur = thread_current();
 	registers_t *regs_bottom = (void *)cur + STACK_SIZE - sizeof(registers_t);
 //	printf("DUNON %i\n", dunno);
@@ -95,12 +98,17 @@ int sys_sigreturn(registers_t *regs, unsigned long dunno UNUSED)
 //	cur->status = THREAD_READY;
 	thread_scheduler(regs_bottom);
 	return -EINTR;//regs->eax;
+	*/
+	return 0;
 }
 
 
 //#define SIGNAL_TEST
 void signal_do(registers_t *regs, thread_t *next)
 {
+	(void)regs;
+	(void)next;
+	/*
 	volatile registers_t *regs_bottom = (void *)next + STACK_SIZE - sizeof(registers_t);
 	int sig_num;// = next->sig_info->signal_pending;
 	struct k_sigaction *sig;
@@ -147,7 +155,7 @@ void signal_do(registers_t *regs, thread_t *next)
 	next->sig_info->signal_pending = 0;
 //	next->status = THREAD_UNINTERRUPTIBLE;
 	interrupt_enable();
-
+*/
 }
 
 //TODO: Doesn't return EINTR if we were interrupted by a signal
