@@ -1,10 +1,10 @@
 #include <common.h>
+#include <chicken/time.h>
 #include <mm/liballoc.h>
 #include <string.h>
 #include <kernel/interrupt.h>
 #include <device/console.h>
 #include <kernel/thread.h>
-#include <kernel/timer.h>
 #include <net/net_core.h>
 #include <thread/syscall.h>
 #include <stdio.h>

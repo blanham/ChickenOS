@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <chicken/boot.h>
 #include <chicken/init.h>
+#include <chicken/time.h>
 #include <kernel/interrupt.h>
 #include <kernel/thread.h>
 #include <device/pci.h>
@@ -9,7 +10,6 @@
 #include <device/video.h>
 #include <device/tty.h>
 #include <device/audio.h>
-#include <kernel/timer.h>
 #include <mm/vm.h>
 #include <fs/vfs.h>
 #include <net/net_core.h>

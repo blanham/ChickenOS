@@ -1,53 +1,20 @@
-/* ChickenOS PIT and RTC routines
- *
- * TODO: Move much of this to arch/i386/pit.c and device/time.c
- *
+/*	ChickenOS time routines
  */
-#include <kernel/timer.h>
-#include <kernel/interrupt.h>
 #include <kernel/common.h>
+#include <chicken/time.h>
 #include <kernel/thread.h>
 #include <kernel/hw.h>
 #include <sys/time.h>
 #include <stdio.h>
 
-#define PIT0_DATA 0x40
-#define PIT1_DATA 0x41
-#define PIT2_DATA 0x42
-#define PIT_CMD   0x43
-
-#define RTC_REG    0x70
-#define RTC_DATA   0x71
-#define RTC_UPDATE 0x80
-
-#define BCD_TO_DEC(x) (((x / 16) * 10) + (x & 0xf))
 
 struct c_os_time system_datetime;
-int rtc_format = 0;
 uint32_t ticks = 0;
 uint32_t unix_time;
 
 char * days[7] = {
 	"Sunday", "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"
 };
-
-uint8_t read_rtc_reg(uint8_t reg)
-{
-/*
-	int chk = 0;
-start:
-	outb(RTC_REG, 0xA);
-	chk = inb(RTC_REG);
-	if(!(chk&RTC_UPDATE))
-		goto start;
-*/
-	outb(RTC_REG, reg);
-
-	uint8_t ret = inb(RTC_DATA);
-	if (rtc_format == 2)
-		return BCD_TO_DEC(ret);
-	return ret;
-}
 
 // Gregorian date to Julian day function
 // taken from:http://www.hermetic.ch/cal_stud/jdn.htm#comp
@@ -80,21 +47,7 @@ void time_set_from_rtc(struct c_os_time *time)
 
 void rtc_init()
 {
-	rtc_format = read_rtc_reg(0xB);
-
-	system_datetime.second = read_rtc_reg(0);
-	system_datetime.minute = read_rtc_reg(2);
-	system_datetime.hour = read_rtc_reg(4);
-	//Should be Weekday, doesn't work correctly
-	system_datetime.weekday = read_rtc_reg(6);
-
-	system_datetime.day = read_rtc_reg(7);
-	system_datetime.month = read_rtc_reg(8);
-	system_datetime.year = read_rtc_reg(9);
-	system_datetime.century = read_rtc_reg(0x32);
-	//XXX: Is this right?
-	if(system_datetime.hour == 0) system_datetime.hour = 12;
-	if(system_datetime.hour > 12) system_datetime.hour -= 12;
+	arch_rtc_init(&system_datetime);
 
 	time_set_from_rtc(&system_datetime);
 }
@@ -110,17 +63,9 @@ void timer_intr(struct registers * regs)
 	thread_scheduler(regs);
 }
 
-void timer_init(uint32_t frequency)
-{
-	int div = 1193180 / frequency;
 
-	outb(PIT_CMD, 0x36);
-	outb(PIT0_DATA, div & 0xFF);
-	outb(PIT0_DATA, div >> 8);
-
-	interrupt_register(IRQ0, &timer_intr);
-}
-
+//XXX: These sleep functions are shit, should be done as a priority queue,
+//		where the priority is the time the thread should be rescheduled
 void time_sleep(int seconds)
 {
 	uint32_t wait = seconds + unix_time;
@@ -145,7 +90,7 @@ void time_usleep(int useconds)
 void time_init()
 {
 	rtc_init();
-	timer_init(100);
+	arch_timer_init(100);
 }
 
 int sys_gettimeofday(struct timeval *tp, void *tzp UNUSED)

@@ -1,9 +1,9 @@
 #include <kernel/common.h>
+#include <chicken/time.h>
 #include <kernel/memory.h>
 #include <kernel/hw.h>
 #include <kernel/interrupt.h>
 #include <mm/vm.h>
-#include <kernel/timer.h>
 #include <mm/liballoc.h>
 #include <fs/vfs.h>
 #include <device/ata.h>

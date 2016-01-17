@@ -2,7 +2,7 @@
 #include <device/usb.h>
 #include <device/usb/uhci.h>
 #include <device/pci.h>
-#include <timer.h>
+#include <chicken/time.h>
 #include <kernel/hw.h>
 #include <mm/vm.h>
 #include <stdio.h>

@@ -1,5 +1,5 @@
-#ifndef C_OS_TIMER_H
-#define C_OS_TIMER_H
+#ifndef C_OS_TIME_H
+#define C_OS_TIME_H
 #include <stdint.h>
 #include <sys/time.h>
 
@@ -14,10 +14,17 @@ struct c_os_time {
 	uint8_t century;
 };
 
+/* arch/$ARCH/time.c */
+
+void arch_timer_init(uint32_t frequency);
+void arch_rtc_init(struct c_os_time *time);
+
+/* device/time.c */
 void time_init();
 int sys_gettimeofday(struct timeval *tp, void *tzp);
 void time_sleep(int seconds);
 void time_msleep(int mseconds);
 void time_usleep(int useconds);
 int sys_clock_gettime(int, struct timespec *);
+
 #endif
