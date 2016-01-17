@@ -48,6 +48,7 @@ int vfs_file_free(struct file *file)
 //		 Some kind of cache would probably be a good idea
 struct inode * vfs_namei(struct inode *dir, char *file)
 {
+	printf("%X %X\n", dir, root);
 	if(dir->flags & I_MOUNT && dir != root->inode)
 	{
 		PANIC("traversing mounts not yet implemented");
@@ -143,6 +144,7 @@ void vfs_mount_root(uint16_t dev, char *type)
 {
 	vfs_fs_t *fs;
 	int ret = 0;
+	thread_t *cur = thread_current();
 	dev = 0x301;
 	if((fs = vfs_find_fs(type)) == NULL)
 		goto error;
@@ -160,7 +162,9 @@ void vfs_mount_root(uint16_t dev, char *type)
 
 	//root->inode = fs->superblock->root;
 
-	//FIXME: use vfs_new_file instead:
+	cur->file_info->root = fs->superblock->root;
+	cur->file_info->cur = cur->file_info->root;
+	//XXX: Wipe out this
 	root = vfs_file_new(fs->superblock->root, "/");
 //	strcpy(root->name, "/");
 //	root->dev = dev;

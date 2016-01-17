@@ -30,6 +30,7 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 	thread_t *cur = thread_current();
 	enum intr_status status = interrupt_disable();
 
+	//vm_page_fault_dump(regs, addr, flags);
 	//TODO: Check if this is a swapped out or mmaped or COW etc
 	if(memregion_fault(cur->mm, addr, flags) == 0)
 		return;

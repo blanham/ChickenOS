@@ -23,6 +23,7 @@
 #define THREAD_ASSERT(x) ASSERT(x->magic == THREAD_MAGIC, "Thread's kernel stack overflowed")
 
 enum thread_stat {
+	THREAD_NEW,
 	THREAD_DEAD,
 	THREAD_READY,
 	THREAD_RUNNING,
@@ -99,14 +100,14 @@ typedef struct thread_queue thq_t;
 //FIXME: split this stuff up?
 
 /* arch/$ARCH/thread.c */
-void arch_thread_init();
+void arch_threading_init();
+void arch_thread_reschedule(thread_t *cur, thread_t *next);
 
 /* thread.c */
 thread_t * 	thread_current();
 thread_t *	thread_by_pid(pid_t pid);
-void 	thread_init();
-void 	thread_usermode(void);
-pid_t	thread_create2(uintptr_t entry);
+void 	threading_init();
+pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux);
 pid_t 	thread_create(registers_t *regs, void (*eip)(void *), void * esp);
 pid_t 	pid_allocate();
 
@@ -139,12 +140,13 @@ int load_elf(const char *path, uintptr_t *eip);
 bool elf_check_magic(void *magic);
 
 /* thread/scheduler.c */
-void thread_scheduler_init(thread_t *kernel_thread);
+void scheduler_init(thread_t *kernel_thread);
 void thread_scheduler(registers_t *regs);
 void thread_yield();
 void thread_exit(int exit);
 void thread_set_ready(thread_t *thread);
 void thread_queue(thread_t *thread);
+void scheduler_run(registers_t *regs);
 thread_t *thread_next();
 
 /* thread/signal.c */
@@ -158,7 +160,7 @@ int sys_sigreturn(registers_t *regs, unsigned long dunno);
 
 /* arch/ARCH/thread.c */
 void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax);
-void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp);
+void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp, uintptr_t eax);
 
 /* arch/ARCH/switch.s */
 void switch_threads(thread_t *cur, thread_t *new);

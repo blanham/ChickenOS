@@ -5,7 +5,7 @@
 
 pid_t sys_fork(registers_t *regs)
 {
-	return thread_create(regs, NULL, NULL);
+	return thread_create2(regs->eip, regs->useresp, NULL);
 }
 
 uid_t sys_geteuid()

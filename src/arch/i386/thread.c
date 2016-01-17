@@ -17,15 +17,25 @@ in_kernel(void)
 	return false;
 }
 
-void arch_thread_init()
+void arch_threading_init()
 {
 }
 
-void thread_yield()
+void switch_threads(thread_t *, thread_t *);
+void arch_thread_reschedule(thread_t *cur, thread_t *next)
 {
-	asm volatile("int $32");
+	(void)cur;
+	(void)next;
+	//this could be done with a straight assignment, instead of having
+	//to call a function
+	tss_update((uintptr_t)next + STACK_SIZE);
+
+	printf("RES %p %p\n", cur, next);
+
+	switch_threads(cur, next);
 }
 
+/*
 void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next)
 {
 	extern void pic_send_end(int irq);
@@ -53,7 +63,7 @@ void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next)
 		:: "r"(_esp)
 	);
 }
-
+*/
 void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax)
 {
 	registers_t *src, *dst;
@@ -66,7 +76,21 @@ void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax)
 	dst->eax = eax;
 }
 
-void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp)
+void thread_build_signal_stackframe(void *stack, int sig_num, void * restore)
+{
+	uint32_t *s = stack;
+	*s-- = sig_num;
+	*s-- = (uintptr_t)restore;
+	//I might switch to the linux/bsd method of actually copying a short bit of
+	//code, written in assembly, to the user stack, though that also depends on
+	//libc
+
+}
+
+
+extern uintptr_t THIS_IS_A_TEST;
+//This should be interrupt_stackframe or something
+void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp, uintptr_t eax)
 {
 	registers_t *reg_frame;
 
@@ -74,12 +98,22 @@ void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp)
 
 	reg_frame->eip = (uintptr_t)eip;
 	reg_frame->ebp = esp;
+	reg_frame->eax = eax;
 	reg_frame->useresp = esp;
 	reg_frame->cs = 0x1b;
 	reg_frame->ds = reg_frame->es =  reg_frame->ss = 0x23;
 	//Thread local storage here
 	reg_frame->fs = reg_frame->gs =	0x23;
 	reg_frame->eflags = 0x200;
+
+	uint32_t *test = (void *)reg_frame;
+	printf("TEST %x\n", &THIS_IS_A_TEST);
+	*test = (uintptr_t)5;test--;
+	*test = (uintptr_t)&THIS_IS_A_TEST;test--;
+	*test = (uintptr_t)4;test--;
+	*test = (uintptr_t)3;test--;
+	*test = (uintptr_t)2;test--;
+	*test = (uintptr_t)1;test--;
 
 }
 

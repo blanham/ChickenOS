@@ -14,38 +14,19 @@
 #include <mm/liballoc.h>
 #include <util/utlist.h>
 
-int thread_stack_offset = offsetof(thread_t, sp);
+//struct process_tree_node {
+//	struct process_tree_node *sibling;
+//	struct process_tree_node *children;
+//};
+//struct process_tree_node process_tree_root;
 
-//XXX: Remove this when we reintegrate fs code
 extern struct file *root;
 
-struct thread_files *thread_files_alloc(struct thread_files *old)
-{
-	struct thread_files * new = kcalloc(sizeof(struct thread_files), 1);
-	if(old)
-	{
-		kmemcpy(new, old, sizeof(struct thread_files));
-		new->files = kcalloc(sizeof(struct file *), 32);
-		new->files_flags = kcalloc(sizeof(int), 32);
-		//FIXME: increment ref count on root and cur_dir inodes
-		for(int i = 0; i < old->files_count; i++)
-		{
-			//new->files[i] = vfs_reopen(old->files[i]);
-			new->files[i] = old->files[i];
-			//new->files_flags[i] = 0;
-		}
-	}
-	else
-	{
-	//	new->root = new->cur = root->inode;
-		new->files_count = 32;
-		new->files = kcalloc(sizeof(struct file *), 32);
-		new->files_flags = kcalloc(sizeof(int), 32);
-	}
-	return new;
-}
+int thread_stack_offset = offsetof(thread_t, sp);
 
-void thread_init()
+static struct thread_files *thread_files_alloc(struct thread_files *old);
+
+void threading_init()
 {
 	thread_t *kernel_thread;
 
@@ -55,7 +36,7 @@ void thread_init()
 	stackpointer_get(kernel_thread);
 	kernel_thread = (thread_t *) ((uintptr_t)kernel_thread & ~(STACK_SIZE -1));
 
-	kmemset(kernel_thread,0, sizeof(thread_t));
+	kmemset(kernel_thread, 0, sizeof(thread_t));
 	kernel_thread->magic = THREAD_MAGIC;
 
 	kernel_thread->mm = mm_alloc();
@@ -64,18 +45,17 @@ void thread_init()
 
 	kernel_thread->name = strdup("idle");
 
-	//HACK: This wastes a page, but in exchange for cleaner code on fork()
-//	memregion_add(kernel_thread, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN,
-//			MAP_GROWSDOWN | MAP_FIXED, NULL, NULL);
-//	memregion_add(kernel_thread, HEAP_BASE, PAGE_SIZE, PROT_GROWSUP,
-//			MAP_PRIVATE | MAP_FIXED, NULL, NULL);
-
-	thread_scheduler_init(kernel_thread);
-	arch_thread_init();
+	scheduler_init(kernel_thread);
+	arch_threading_init();
 }
 
-thread_t *
-thread_new()
+void thread_add_child(thread_t *parent, thread_t *child)
+{
+	LL_APPEND2(parent->children, child, child_next);
+}
+
+//I think this should be thread_alloc, should put it on some not ready to run list?
+thread_t *thread_alloc()
 {
 	thread_t *new = pallocn(STACK_PAGES);
 	kmemset(new, 0, STACK_SIZE);
@@ -83,78 +63,116 @@ thread_new()
 	return new;
 }
 
-void
-thread_add_child(thread_t *parent, thread_t *child)
+void thread_free(thread_t *dead UNUSED)
 {
-	LL_APPEND2(parent->children, child, child_next);
+	//Some of this can possibly handled in thread_exit()
+	//close files
+	//lower ref counts on root and cur directory inodes
+	//decrease ref counts on address spaces
+	//reap/reparent children (forgot how this is supposed to work in unix-likes)
+	//other cleanup
+	//dead->magic = 0xDEADBEEF;
+	//kfree(dead->sig_info);
+	//kfree(dead->file_info->files);
+	//kfree(dead->file_info->file_flags);
+	//kfree(dead->file_info);
+	//palloc_free(dead);
+	//
 }
 
-thread_t *
-thread_clone(thread_t *cur)
+
+//Write a new thread_new that sets up a thread, similar to thread_clone,
+//but without the signals, mm, and file copy overs
+thread_t *thread_new()
 {
-	thread_t *new = thread_new();
-
-	//FIXME: Assign things instead of copying the struct
-	kmemcpy(new, cur, sizeof(thread_t));
-
+	thread_t *new = thread_alloc();
+	thread_t *cur = thread_current();
 	new->ppid = cur->pid;
 	new->pgid = cur->pgid;
 	new->pid = pid_allocate();
-
-	new->magic = THREAD_MAGIC;
-	new->mm = mm_clone(cur->mm);
-	new->file_info = thread_files_alloc(cur->file_info);
+	new->status = THREAD_NEW;
+	new->sp = (void*)new;
+	new->sp += PAGE_SIZE;
+/*	uint32_t *test = (uint32_t *)new->sp;
+	*test = 0;//(uint32_t)new->sp;
+	*test-- = 1;
+	*test-- = 2;
+	*test-- = 3;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	*test-- = 4;
+	new->sp = (void *)test;
+	printf("NEW SP %p\n", new->sp);*/
 	new->sig_info = kcalloc(sizeof(struct thread_signals), 1);
-
-	kmemcpy(new->sig_info->signals, cur->sig_info->signals,
-			sizeof(struct k_sigaction) * NUM_SIGNALS);
-
-	new->name = strdup(cur->name);
-
+	//FIXME: It might make sense to do the file allocation here
 	thread_add_child(cur, new);
 	return new;
 }
 
-//The lazy way of copying most shit from a passed in regs, works
-//but better to just always build a stack
-pid_t
-thread_create(registers_t *_regs, void (*eip)(void *), void * esp UNUSED)
-//thread_create(void (*eip)(void *), void *aux, int flags)
+//Write a new thread_clone, that uses thread_new + bullshit
+thread_t * thread_clone2(thread_t *parent)
+{
+	thread_t *new = thread_new();
+	new->mm = mm_clone(parent->mm);
+	new->file_info = thread_files_alloc(parent->file_info);
+
+	kmemcpy(new->sig_info->signals, parent->sig_info->signals,
+			sizeof(struct k_sigaction) * NUM_SIGNALS);
+	return new;
+}
+
+void user_thread_exited(void) __attribute__((section(".user")));
+void user_thread_exited(void)
+{
+	//Should probably call SYSCALL_1N(SYS_EXIT, current_value_of_eax);
+	PANIC("User thread exited!");
+}
+
+pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
 {
 	enum intr_status old_level = interrupt_disable();
-	thread_t *new, *cur;
-	uint8_t *kernel_stack;
-	uintptr_t new_sp;
+	thread_t *new;
+	uintptr_t esp;
 
-	cur = thread_current();
-	new = thread_clone(cur);
+	printf("Creating thread with eip: %x _esp: %x\n", eip, _esp);
 
-	kernel_stack = (uint8_t *)new;
-	cur->children = new;
+	if(_esp) {
+		thread_t *cur = thread_current();
+		new = thread_clone2(cur);
 
-	new_sp = (uintptr_t)kernel_stack + STACK_SIZE;
-
-	if(_regs != NULL)
-	{
-		thread_copy_stackframe(cur, kernel_stack, 0);
-	}
-	else
-	{
+		esp = _esp;
+	} else {
+		new = thread_new();
+		new->mm = mm_alloc();
+		new->file_info = thread_files_alloc(NULL);
+		new->file_info->cur = root->inode;
+		new->file_info->root = root->inode;
+		//
 		uint32_t *usersp = palloc();
 		memregion_map_data(new->mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN,
 			MAP_GROWSDOWN | MAP_FIXED, usersp);
 
 		usersp += 1024;
-		*--usersp = (uint32_t)esp;
-
-		thread_build_stackframe(kernel_stack, (uintptr_t)eip, PHYS_BASE);
+		*--usersp = (uintptr_t)user_thread_exited;
+		*--usersp = (uintptr_t)aux;
+		esp = PHYS_BASE-8;
+		printf("ESP %X USERSP %X\n", esp, usersp);
 	}
+	//XXX: Doesn't handle fork returning new pid
+	thread_build_stackframe((void *)new, eip, esp, 0);
 
-
-	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4));
+	uint8_t *new_sp = (void*)((uintptr_t)new + STACK_SIZE);
+	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4 + 16));
 
 	thread_set_ready(new);
-	thread_queue(new);
 
 	interrupt_set(old_level);
 
@@ -171,6 +189,11 @@ pid_t pid_allocate()
 	return pid_count;
 }
 
+void thread_yield()
+{
+	PANIC("Don't call thread_yield()!");
+}
+
 thread_t * thread_current()
 {
 	thread_t *ret;
@@ -184,4 +207,33 @@ thread_t * thread_current()
 		THREAD_ASSERT(ret);
 	}
 	return ret;
+}
+
+static struct thread_files *thread_files_alloc(struct thread_files *old)
+{
+	struct thread_files * new = kcalloc(sizeof(struct thread_files), 1);
+	//thread_t *cur = thread_current();
+	if(old)
+	{
+		kmemcpy(new, old, sizeof(struct thread_files));
+		new->files = kcalloc(sizeof(struct file *), 32);
+		new->files_flags = kcalloc(sizeof(int), 32);
+		//FIXME: increment ref count on root and cur_dir inodes
+		for(int i = 0; i < old->files_count; i++)
+		{
+			//new->files[i] = vfs_reopen(old->files[i]);
+			new->files[i] = old->files[i];
+			//new->files_flags[i] = 0;
+		}
+	}
+	else
+	{
+		//new->root = cur->file_info->root;
+		//new->cur = cur->file_info->cur;
+	//	new->root = new->cur = root->inode;
+		new->files_count = 32;
+		new->files = kcalloc(sizeof(struct file *), 32);
+		new->files_flags = kcalloc(sizeof(int), 32);
+	}
+	return new;
 }

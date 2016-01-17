@@ -22,6 +22,10 @@ void syscall_handler (registers_t *regs)
 	int call = regs->eax;
 	long *arg;
 
+	//printf("\n\n");
+	//dump_regs(regs);
+	//printf("\n\n");
+
 #ifdef DEBUG
 	serial_printf("%s(%i): by %i @ %x\n",syscall_names[call], call, thread_current()->pid,
 			regs->eip);

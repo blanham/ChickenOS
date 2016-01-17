@@ -33,6 +33,7 @@ int fd_new()
 
 int sys_open(const char *_path, int oflag, mode_t mode)
 {
+	printf("PATH: %s %c\n", _path, _path[1]);
 	thread_t *cur = thread_current();
 	char *path = strdup(_path);
 	struct file * fp = vfs_open(path, oflag, mode);

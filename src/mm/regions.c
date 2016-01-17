@@ -56,7 +56,7 @@ struct memregion *region_clone(struct memregion *original)
 	{
 		new = kcalloc(sizeof(*new), 1);
 		memcpy(new, p, sizeof(*new));
-		//printf("Cloning %x %x\n", p->addr_start, p->addr_end);
+		printf("Cloning %x %x\n", p->addr_start, p->addr_end);
 		if(ret == NULL)
 			ret = new;
 		else

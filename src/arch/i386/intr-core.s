@@ -87,7 +87,9 @@ sysc:
 
 
 [global intr_return]
+[global THIS_IS_A_TEST]
 [extern interrupt_handler]
+[extern dump_regs]
 _isr_handler:
 	sti	;reenable interrupts
 	push gs
@@ -120,6 +122,18 @@ _isr_handler:
 
 	call interrupt_handler
 	pop eax
+
+	add esp,4
+	popa
+	pop ds
+	pop es
+	pop fs
+	pop gs
+	add esp,8;jump ahead of error code/interrupt number
+	;sti
+	iret
+
+THIS_IS_A_TEST:
 
 	add esp,4
 	popa
