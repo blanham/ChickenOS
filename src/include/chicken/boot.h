@@ -10,13 +10,11 @@ struct hardware_mem_region {
 	uint32_t type;
 } __attribute__((packed));
 
-struct boot_module 
-{
- 	uint32_t mod_start;
+struct boot_module {
+ 	uintptr_t start;
 	//First byte after end of module
- 	uint32_t mod_end;
-  	char* cmdline;
- 	uint32_t pad;
+ 	uintptr_t end;
+  	char cmdline[256];
 } __attribute__((packed));
 
 struct kernel_boot_info {
