@@ -32,8 +32,8 @@ typedef uintptr_t virt_addr_t;
 
 #define PHYS_BASE 0xC0000000
 #define HEAP_BASE 0x09000000
-#define V2P(p) ((virt_addr_t)((phys_addr_t)(p) - PHYS_BASE))
-#define P2V(p) ((phys_addr_t)((virt_addr_t)(p) + PHYS_BASE))
+#define V2P(p) ((void *)((char *)(p) - PHYS_BASE))
+#define P2V(p) ((void *)((char *)(p) + PHYS_BASE))
 
 //If we implement joining memregions, we just decrease refcounts on
 struct memregion {
@@ -62,7 +62,7 @@ struct memregion {
 };
 
 struct mm {
-	pagedir_t pd;
+	void *pd;
 	struct memregion *regions;
 	//Tree here
 	void * brk;

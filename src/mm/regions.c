@@ -19,6 +19,12 @@ enum {
 	REGION_COW
 };
 
+
+//XXX: Do the following in mm/regions.c:
+//iterate through entries less than PHYS_BASE
+//reduce reference counts
+//(the frame allocator, will free pages that only had one reference)
+
 void memregion_free(struct memregion *region)
 {
 	(void)region;
@@ -108,8 +114,17 @@ int memregion_map_data(struct mm *mm, uintptr_t address, size_t len, int prot, i
 
 	if(data != NULL)
 	{
-		pagedir_insert_pagen(mm->pd, (uintptr_t)data, address, 0x7, new->pages);
-		pagedir_install(mm->pd);
+		for (int i = 0; i < new->pages; i++) {
+			uintptr_t offset = PAGE_SIZE*i;
+
+	//XXX: This doesn't support setting protection levels at the moment, might have to
+	//re-add flags to pagedir_mapa?
+	//XXX: Nah, just don't bother to support PROT_EXEC, just PROT_READ/PROT_WRITE
+	//		will still be POSIX compliant
+			pagedir_map(mm->pd, (uintptr_t)data + offset, address + offset, true);
+		}
+		//pagedir_insert_pagen(mm->pd, (uintptr_t)data, address, 0x7, new->pages);
+		pagedir_activate(mm->pd);
 	}
 
 	return 0;
@@ -122,8 +137,12 @@ int memregion_insert(struct mm *mm, void *data, uintptr_t address, uint8_t prot)
 		data = palloc();
 	address &= PAGE_MASK;
 
-	pagedir_insert_page(mm->pd, (uintptr_t)data, address, prot);
-	pagedir_install(mm->pd);
+	//XXX: This doesn't support setting protection levels at the moment, might have to
+	//re-add flags to pagedir_map
+	(void)prot;
+	pagedir_map(mm->pd, (uintptr_t)data, address, true);
+	//pagedir_insert_page(mm->pd, (uintptr_t)data, address, prot);
+	pagedir_activate(mm->pd);
 
 	return 0;
 }

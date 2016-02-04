@@ -86,6 +86,7 @@ void *palloc_len(size_t len)
 	return pallocn(PAGE_COUNT(len));
 }
 
+//XXX: WTF?
 void palloc_init(uint32_t page_count, uintptr_t placement)
 {
 	void *start = 0;

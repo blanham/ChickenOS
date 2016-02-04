@@ -4,7 +4,6 @@
 #include <common.h>
 #include <errno.h>
 #include <kernel/thread.h>
-#include <thread/tss.h>
 #include <kernel/memory.h>
 #include <device/console.h>
 #include <kernel/interrupt.h>
@@ -12,7 +11,6 @@
 #include <thread/syscall.h>
 #include <stdio.h>
 #include <mm/liballoc.h>
-#include <thread/tss.h>
 
 /*
 	Signal control flow:

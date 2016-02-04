@@ -3,8 +3,8 @@
 #include <kernel/thread.h>
 #include <kernel/memory.h>
 #include <kernel/interrupt.h>
-#include <thread/tss.h>
 #include <kernel/interrupt.h>
+#include "i386_defs.h"
 
 bool
 in_kernel(void)
@@ -19,7 +19,6 @@ in_kernel(void)
 
 void arch_thread_init()
 {
-	tss_init();
 }
 
 void thread_yield()
@@ -33,7 +32,7 @@ void thread_reschedule(registers_t *regs, thread_t *cur, thread_t *next)
 	uint32_t _esp = 0;
 	cur->sp = (uint8_t *)regs->ESP;
 
-	pagedir_install(next->mm->pd);
+	pagedir_activate(next->mm->pd);
 //	printf("dfaddfafds\n");
 //	dump_regs((void *)_esp + 4);
 	tss_update((uintptr_t)next + STACK_SIZE);

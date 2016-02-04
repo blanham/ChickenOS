@@ -101,7 +101,7 @@ struct mm *mm_alloc()
 {
 	struct mm *new = kcalloc(sizeof(*new), 1);
 
-	new->pd = pagedir_new();
+	new->pd = pagedir_alloc();
 
 	return new;
 }
@@ -109,8 +109,7 @@ struct mm *mm_alloc()
 struct mm *mm_clone(struct mm *old)
 {
 	struct mm *new = kcalloc(sizeof(*new), 1);
-//	new->pd = pagedir_new();
-	new->pd = pagedir_copy(old->pd);
+	new->pd = pagedir_clone(old->pd);
 	new->regions = region_clone(old->regions);
 
 	return new;
@@ -122,6 +121,7 @@ void mm_clear(struct mm *mm)
 	//Iterate through regions and remove them
 	//	reduce reference counts for physical pages
 	//swap to a new pagedirectory and throw away everything else
+	//pagedir_free(mm->pd);
 }
 
 void mm_free(struct mm *mm)
@@ -137,10 +137,10 @@ void mm_init(struct mm *mm)
 	void *user_stack = palloc();
 	memset(user_stack, 0, 4096);
 
-	mm->pd = pagedir_new();
+	mm->pd = pagedir_alloc();
 	mm->regions = NULL;
 	//XXX: Don't call this here
-	pagedir_install(mm->pd);
+	pagedir_activate(mm->pd);
 
 	memregion_map_data(mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE,
 			PROT_GROWSDOWN, MAP_GROWSDOWN | MAP_FIXED, user_stack);
@@ -148,7 +148,7 @@ void mm_init(struct mm *mm)
 			PROT_GROWSUP, MAP_PRIVATE | MAP_FIXED, NULL);
 
 	//XXX: Don't call it here either
-	pagedir_install(mm->pd);
+	pagedir_activate(mm->pd);
 }
 
 void vm_init(struct kernel_boot_info *info)

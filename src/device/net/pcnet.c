@@ -181,7 +181,7 @@ void pcnet_receive(struct pcnet *l)
 
 
 		}	
-		l->rx_descs[l->cur_rx].addr = V2P(l->rx_buffers[l->cur_rx]);
+		l->rx_descs[l->cur_rx].addr = (uint32_t)V2P(l->rx_buffers[l->cur_rx]);
 		l->rx_descs[l->cur_rx].status = 0x8000;
 		l->rx_descs[l->cur_rx].len = -2048;
 		l->rx_descs[l->cur_rx].flags2 = 0;
@@ -264,7 +264,7 @@ void pcnet_start2(struct pcnet *l)
 	{
 		buf = palloc();//kmalloc(2048);
 		l->rx_buffers[i] = buf;
-		l->rx_descs[i].addr = V2P(buf);
+		l->rx_descs[i].addr = (uint32_t)V2P(buf);
 		l->rx_descs[i].len = -2048;//0x7FF | 0xf000;
 		l->rx_descs[i].status = 0x8000;
 		l->rx_descs[i].flags2 = 0;
@@ -282,12 +282,12 @@ void pcnet_start2(struct pcnet *l)
 	l->init->tx_len = 3;
 	for(int i =0; i < 6; i++)
 		l->init->mac[i] = mac[i];
-	l->init->rx_desc = V2P(l->rx_descs);
-	l->init->tx_desc = V2P(l->tx_descs);
+	l->init->rx_desc = (uint32_t)V2P(l->rx_descs);
+	l->init->tx_desc = (uint32_t)V2P(l->tx_descs);
 //	l->init->filter = 0xffffffff;
 //	l->init->filter2 = 0xffffffff;
 	//9) install init pointer
-	uintptr_t initptr = V2P(l->init);
+	uintptr_t initptr = (uintptr_t)V2P(l->init);
 	pcnet_csr_outl(l, 1, initptr & 0xFFFF);
 	pcnet_csr_outl(l, 2, initptr >> 16);
 	//10) final setup

@@ -15,14 +15,14 @@
 
 size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 {
-	uintptr_t ptr = off;
+	void *ptr = (void *)off;
 	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{
 		case 1: //mem (Physical)
 			ptr = P2V(ptr);
 		case 2: //kmem (Virtual)
-			kmemcpy(buf, (void *)ptr, count);
+			kmemcpy(buf, ptr, count);
 			return count;
 		case 3: //null
 			return 0;
@@ -43,14 +43,14 @@ size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 
 size_t chardevs_write(dev_t dev, void *buf, size_t count, off_t off)
 {
-	uintptr_t ptr = off;
+	void *ptr = (void *)off;
 	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{
 		case 1: //mem (Physical)
 			ptr = P2V(ptr);
 		case 2: //kmem (Virtual)
-			kmemcpy((void *)ptr, buf, count);
+			kmemcpy(ptr, buf, count);
 			return count;
 		case 4: //port
 			return -EINVAL;

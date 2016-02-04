@@ -22,7 +22,7 @@ struct frame *frame_get(void *ptr)
 
 	if(atomic_fetch_add(&ret->ref_count, 1) == 0) {
 		ret->virt_ptr = ptr;
-		ret->phys_addr = V2P(ptr);
+		ret->phys_addr = (uintptr_t)V2P(ptr);
 	}
 
 	return ret;
