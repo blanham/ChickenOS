@@ -164,7 +164,7 @@ struct uhci_controller * uhci_init()
 		uhci_outb(new, UHCI_IO_SOFMOD, 64);
 
 		//initialize frame base pointer and count
-		uhci_outl(new, UHCI_IO_FLBASEADD, V2P(new->frames));
+		uhci_outl(new, UHCI_IO_FLBASEADD, (uint32_t)V2P(new->frames));
 		uhci_outw(new, UHCI_IO_FRNUM, 0);
 
 		//fence?

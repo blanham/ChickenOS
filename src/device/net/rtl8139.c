@@ -105,7 +105,7 @@ size_t rtl8139_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 	if(length < 60)
 		length = 60;
 	
-	rtl_outl(rtl, 0x20 + rtl->tx_cur*4, V2P(tx_buffer));
+	rtl_outl(rtl, 0x20 + rtl->tx_cur*4, (uint32_t)V2P(tx_buffer));
 	rtl_outl(rtl, 0x10 + rtl->tx_cur*4, length | (48 << 16)); 
 	rtl->tx_cur++;
 	rtl->tx_cur %= 4;
