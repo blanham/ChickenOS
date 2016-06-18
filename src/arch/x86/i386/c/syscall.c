@@ -1,6 +1,6 @@
 #include <common.h>
 #include <thread/syscall.h>
-#include <arch/i386/interrupt.h>
+#include <i386_interrupt.h>
 
 void i386_syscall_handler(registers_t *regs)
 {

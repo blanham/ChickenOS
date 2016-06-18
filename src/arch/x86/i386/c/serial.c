@@ -2,7 +2,7 @@
 #include <device/console.h>
 #include <kernel/hw.h>
 #include <interrupt.h>
-#include <arch/i386/serial.h>
+#include "serial.h"
 
 uint16_t com_port = COM1;
 

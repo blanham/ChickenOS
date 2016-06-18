@@ -1,8 +1,8 @@
 #include <common.h>
 #include <memory.h>
 #include <mm/vm.h>
-#include <thread/tss.h>
-#include <arch/i386/gdt.h>
+#include "tss.h"
+#include "gdt.h"
 
 gdt_seg_t gdt_entries[6];
 struct gdt_descriptor gdt_desc;

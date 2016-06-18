@@ -9,9 +9,9 @@
 #include <device/console.h>
 #include <kernel/memory.h>
 #include <kernel/hw.h>
-#include <arch/i386/interrupt.h>
-#include <arch/i386/pic.h>
-#include <arch/i386/idt.h>
+#include <i386_interrupt.h>
+#include "pic.h"
+#include "idt.h"
 
 //#define DEBUG_INTR
 

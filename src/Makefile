@@ -1,6 +1,6 @@
 #ChickenOS Makefile
 #Abandon all hope ye who enter here
-ARCH = i386
+ARCH = x86/i386
 ARMPRE	=		arm-none-gnueabi-
 CROSS	=		~/opt/cross/bin
 CC		=		$(CROSS)/i686-elf-gcc
@@ -21,8 +21,8 @@ ARMAS	=		$(ARMPRE)as
 AS		=		nasm
 ASFLAGS	=		-felf
 #FIXME: this should only be one path
-ARCH_INCLUDES=	-I./arch/$(ARCH)/include
-INCLUDES=		-I./include -I./fs -I./include/kernel
+ARCH_INCLUDES=	-I./arch/$(ARCH)/c
+INCLUDES=		-I./include -I./fs -I./include/kernel $(ARCH_INCLUDES)
 
 ARCHSRCS=		$(patsubst %.s,%.o,$(wildcard arch/$(ARCH)/*.s))\
 				$(patsubst %.c,%.o,$(wildcard arch/$(ARCH)/*.c))\
@@ -94,13 +94,13 @@ library: $(SOURCES)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 .s.o:
-ifeq ($(ARCH), i386)
+ifeq ($(ARCH), x86/i386)
 	$(AS) $(ASFLAGS) $<
 else
 	$(ARMAS) $<
 endif
 .S.o:
-ifeq ($(ARCH), i386)
+ifeq ($(ARCH), x86/i386)
 	$(AS) $(ASFLAGS) $<
 else
 	$(ARMAS) $<

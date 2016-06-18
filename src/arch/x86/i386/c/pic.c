@@ -1,7 +1,7 @@
 #include <common.h>
 #include <hw.h>
-#include <arch/i386/pic.h>
-#include <arch/i386/interrupt.h>
+#include <pic.h>
+#include <i386_interrupt.h>
 
 void pic_init()
 {

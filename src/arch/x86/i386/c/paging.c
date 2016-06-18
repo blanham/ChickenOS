@@ -10,7 +10,7 @@
 #include <mm/vm.h>
 #include <kernel/interrupt.h>
 #include <kernel/memory.h>
-#include <arch/i386/gdt.h>
+#include "gdt.h"
 
 //TODO: Cleanup, and add a pagedir_lookup function to see if an
 //		address is valid

@@ -1,5 +1,5 @@
 #include <common.h>
-#include <thread/tss.h>
+#include "tss.h"
 #include <mm/vm.h>
 #include <kernel/thread.h>
 #include <memory.h>

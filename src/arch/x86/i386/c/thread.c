@@ -3,7 +3,7 @@
 #include <kernel/thread.h>
 #include <kernel/memory.h>
 #include <kernel/interrupt.h>
-#include <thread/tss.h>
+#include "tss.h"
 #include <kernel/interrupt.h>
 
 bool
