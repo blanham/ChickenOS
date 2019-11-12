@@ -42,7 +42,7 @@ static void multiboot_detect_video_mode(struct multiboot_info *mb, struct kernel
 static uint32_t multiboot_parse_modules(struct multiboot_info *mb, struct kernel_boot_info *info)
 {
 	uint32_t last_address = 0;
-	extern uint32_t *background_image;
+	//extern uint32_t *background_image;
 
 	if (!(mb->flags & MULTIBOOT_INFO_MODS))
 		goto no_modules;
