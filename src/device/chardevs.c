@@ -15,7 +15,7 @@
 
 size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 {
-	void *ptr = (void *)off;
+	void *ptr = (void *)(uintptr_t)off;
 	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{
@@ -43,7 +43,7 @@ size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 
 size_t chardevs_write(dev_t dev, void *buf, size_t count, off_t off)
 {
-	void *ptr = (void *)off;
+	void *ptr = (void *)(uintptr_t)off;
 	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{

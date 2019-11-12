@@ -97,6 +97,7 @@ int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
 	ASSERT(inode != NULL, "NULL inode passed in");
 	struct memregion *new = memregion_new(mm, address, len, prot, flags);
 	if ((address & PAGE_MASK) == 0x0823e000) {
+	//if ((address & PAGE_MASK) == 0x08063000) {
 		new->pages++;
 		new->addr_end += PAGE_SIZE;
 	}
@@ -118,7 +119,7 @@ int memregion_map_data(struct mm *mm, uintptr_t address, size_t len, int prot, i
 			uintptr_t offset = PAGE_SIZE*i;
 
 	//XXX: This doesn't support setting protection levels at the moment, might have to
-	//re-add flags to pagedir_mapa?
+	//re-add flags to pagedir_map?
 	//XXX: Nah, just don't bother to support PROT_EXEC, just PROT_READ/PROT_WRITE
 	//		will still be POSIX compliant
 			pagedir_map(mm->pd, (uintptr_t)data + offset, address + offset, true);

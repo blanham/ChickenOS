@@ -8,7 +8,7 @@
 //		care of zombie processes)
 void init(void *aux UNUSED)
 {
-	char *argv[] = {"/dash", NULL};
+	char *argv[] = {"/dash2", NULL};
 	char *envp[] = {"PATH=/", NULL};
 	char *path = "/dash";
 
