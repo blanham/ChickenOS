@@ -65,7 +65,8 @@ tftp: all
 	cp kernel.bin /tftpboot/chicken
 lib: $(LIBSRCS)
 test: all
-	cd .. && ./new_update.sh &&  DISPLAY=:0.0 qemu-system-i386  -vga std -soundhw ac97  -rtc base=localtime \
+	#cd .. && ./new_update.sh &&  DISPLAY=:0.0 qemu-system-i386 -vga std -soundhw ac97  -rtc base=localtime
+	cd .. && ./new_update.sh &&  DISPLAY=:0 qemu-system-i386 -vga std -rtc base=localtime \
 	-m 128 -usb  -hda disk.img -serial file:log && cd src
 bochs: all
 	cd .. && ./new_update.sh &&  ./run_bochs.sh && cd src
