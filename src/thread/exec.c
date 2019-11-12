@@ -78,7 +78,7 @@ static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[
 	return (uintptr_t)stack;
 }
 
-//FIXME This should not being using sys_* for file ops
+//FIXME This should not be using sys_* for file ops
 static enum exe_type exec_type(const char *path)
 {
 	int fd;
