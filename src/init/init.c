@@ -16,11 +16,11 @@ void init(void *aux UNUSED)
 		SYSCALL_3N(SYS_OPEN, "/dev/tty0", 0, NULL);
 		SYSCALL_3N(SYS_OPEN, "/dev/tty0", 0, NULL);
 
-//XXX: Fix this
-if(!SYSCALL_0N(SYS_FORK))
+	//XXX: Fix this
+	if(!SYSCALL_0N(SYS_FORK))
 	{
-//		while(1)
-//			printf("you\n");
+		//while(1)
+		//	printf("you\n");
 		//uintptr_t p = 0;
 		//stackpointer_get(p);
 		//

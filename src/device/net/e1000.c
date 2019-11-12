@@ -127,7 +127,7 @@ void e1000_received(struct e1000 *e)
 	uint16_t old_cur;
 	while((e->rx_descs[e->rx_cur]->status & 0x1))
 	{
-		uint8_t *buf = (void *)(uintptr_t)P2V(e->rx_descs[e->rx_cur]->addr);
+		uint8_t *buf = P2V((uintptr_t)e->rx_descs[e->rx_cur]->addr);
 		uint16_t len = e->rx_descs[e->rx_cur]->length;
 
 		sb = sockbuf_alloc(e->dev, len);

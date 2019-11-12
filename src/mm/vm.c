@@ -138,18 +138,15 @@ void mm_init(struct mm *mm)
 	void *user_stack = palloc();
 	memset(user_stack, 0, 4096);
 
+	//XXX: This is wrong, we should unmap everything mapped using regions,
+	//instead of just blanking the regions and adding a new pagedirectory
 	mm->pd = pagedir_alloc();
 	mm->regions = NULL;
-	//XXX: Don't call this here
-	pagedir_activate(mm->pd);
 
 	memregion_map_data(mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE,
 			PROT_GROWSDOWN, MAP_GROWSDOWN | MAP_FIXED, user_stack);
 	memregion_map_data(mm, HEAP_BASE, PAGE_SIZE,
 			PROT_GROWSUP, MAP_PRIVATE | MAP_FIXED, NULL);
-
-	//XXX: Don't call it here either
-	pagedir_activate(mm->pd);
 }
 
 void vm_init(struct kernel_boot_info *info)
@@ -157,7 +154,11 @@ void vm_init(struct kernel_boot_info *info)
 	uint32_t page_count = info->mem_size/PAGE_SIZE;
 	mem_size = info->mem_size;
 
+	//palloc_init should take the info struct
 	palloc_init(page_count, (uintptr_t)info->placement);
+	//paging_init should take the info struct
 	paging_init(mem_size);
+
+	//frame_init should take the info struct
 	frame_init(info->mem_size);
 }

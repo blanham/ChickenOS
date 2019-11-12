@@ -112,6 +112,11 @@ uintptr_t pagedir_lookup(uint32_t *pd, uintptr_t addr)
 
 //XXX: Don't use this, but commit it first so that I have a backup of the cleaned up version
 //Not even sure I need this, it may be more efficient to remap + change flags
+//If I remove this make a function pagedir_page_clone(old_pd, new_pd, virtual_addr)?
+//Nah, probably still faster overall to only copy/mark the pages we need
+//
+//Basically, boils down to if I want to mess with the frame allocator here (as in increase
+//the refcounts for physical pages)
 uint32_t *pagedir_clone(uint32_t *pd)
 {
 	uint32_t *new = pagedir_alloc();
