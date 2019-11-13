@@ -1,0 +1,1314 @@
+[INFO ]  Performing some trivial sanity checks
+[DEBUG]  Testing '! ( -n  )'
+[DEBUG]  Testing '! ( -n  )'
+[DEBUG]  Testing '! ( -n  )'
+[DEBUG]  Testing '! ( -n  )'
+[DEBUG]  Testing '! ( -n  )'
+[DEBUG]  Testing '! ( -n  )'
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build' 
+[DEBUG]  ==> Executing: 'rm' '-f' '/home/blanham/projects/ChickenOS/cross/.build/backtrace' 
+[DEBUG]  ==> Executing: 'touch' '/home/blanham/projects/ChickenOS/cross/.build/foo' 
+[DEBUG]  Testing '! ( -f /home/blanham/projects/ChickenOS/cross/.build/FOO )'
+[DEBUG]  ==> Executing: 'rm' '-f' '/home/blanham/projects/ChickenOS/cross/.build/foo' 
+[DEBUG]  Testing '-f /usr/bin/bash -a -x /usr/bin/bash'
+[DEBUG]  Creating bin-override for tools in '/home/blanham/projects/ChickenOS/cross/.build/tools'
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin' 
+[DEBUG]  Creating script-override for 'install' -> '"/usr/bin/install -c"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/install' 
+[DEBUG]  Creating script-override for 'bash' -> '"/usr/bin/bash"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/bash' 
+[DEBUG]  Creating script-override for 'awk' -> '"/usr/bin/gawk"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/awk' 
+[DEBUG]  Creating script-override for 'grep' -> '"/usr/bin/grep"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/grep' 
+[DEBUG]  Creating script-override for 'make' -> '"/usr/bin/make"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/make' 
+[DEBUG]  Creating script-override for 'sed' -> '"/usr/bin/sed"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/sed' 
+[DEBUG]  Creating script-override for 'libtool' -> '"/usr/bin/libtool"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/libtool' 
+[DEBUG]  Creating script-override for 'libtoolize' -> '"/usr/bin/libtoolize"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/libtoolize' 
+[DEBUG]  Creating script-override for 'objcopy' -> '"/usr/bin/objcopy"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/objcopy' 
+[DEBUG]  Creating script-override for 'objdump' -> '"/usr/bin/objdump"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/objdump' 
+[DEBUG]  Creating script-override for 'readelf' -> '"/usr/bin/readelf"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/readelf' 
+[DEBUG]  Creating script-override for 'patch' -> '"/usr/bin/patch"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/patch' 
+[DEBUG]  Creating script-override for 'gperf' -> '"/usr/bin/gperf"'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/gperf' 
+[INFO ]  Build started 20160117.172950
+[DEBUG]  =================================================================
+[DEBUG]  Dumping user-supplied crosstool-NG configuration
+[DEBUG]    ==> Executing: '/usr/bin/grep' '-E' '^(# )?CT_' '.config' 
+[DEBUG]    CT_CONFIGURE_has_xz=y
+[DEBUG]    CT_MODULES=y
+[DEBUG]    # CT_OBSOLETE is not set
+[DEBUG]    # CT_EXPERIMENTAL is not set
+[DEBUG]    # CT_DEBUG_CT is not set
+[DEBUG]    CT_LOCAL_TARBALLS_DIR="${HOME}/src"
+[DEBUG]    CT_SAVE_TARBALLS=y
+[DEBUG]    CT_WORK_DIR="${CT_TOP_DIR}/.build"
+[DEBUG]    CT_PREFIX_DIR="${HOME}/x-tools/${CT_TARGET}"
+[DEBUG]    CT_INSTALL_DIR="${CT_PREFIX_DIR}"
+[DEBUG]    CT_RM_RF_PREFIX_DIR=y
+[DEBUG]    CT_REMOVE_DOCS=y
+[DEBUG]    CT_INSTALL_DIR_RO=y
+[DEBUG]    CT_STRIP_HOST_TOOLCHAIN_EXECUTABLES=y
+[DEBUG]    # CT_STRIP_TARGET_TOOLCHAIN_EXECUTABLES is not set
+[DEBUG]    # CT_FORBID_DOWNLOAD is not set
+[DEBUG]    # CT_FORCE_DOWNLOAD is not set
+[DEBUG]    CT_CONNECT_TIMEOUT=10
+[DEBUG]    # CT_ONLY_DOWNLOAD is not set
+[DEBUG]    # CT_USE_MIRROR is not set
+[DEBUG]    # CT_FORCE_EXTRACT is not set
+[DEBUG]    CT_OVERIDE_CONFIG_GUESS_SUB=y
+[DEBUG]    # CT_ONLY_EXTRACT is not set
+[DEBUG]    CT_PATCH_BUNDLED=y
+[DEBUG]    # CT_PATCH_LOCAL is not set
+[DEBUG]    # CT_PATCH_BUNDLED_LOCAL is not set
+[DEBUG]    # CT_PATCH_LOCAL_BUNDLED is not set
+[DEBUG]    # CT_PATCH_BUNDLED_FALLBACK_LOCAL is not set
+[DEBUG]    # CT_PATCH_LOCAL_FALLBACK_BUNDLED is not set
+[DEBUG]    # CT_PATCH_NONE is not set
+[DEBUG]    CT_PATCH_ORDER="bundled"
+[DEBUG]    CT_PARALLEL_JOBS=0
+[DEBUG]    CT_LOAD=""
+[DEBUG]    CT_USE_PIPES=y
+[DEBUG]    CT_EXTRA_CFLAGS_FOR_BUILD=""
+[DEBUG]    CT_EXTRA_LDFLAGS_FOR_BUILD=""
+[DEBUG]    CT_EXTRA_CFLAGS_FOR_HOST=""
+[DEBUG]    CT_EXTRA_LDFLAGS_FOR_HOST=""
+[DEBUG]    # CT_CONFIG_SHELL_SH is not set
+[DEBUG]    # CT_CONFIG_SHELL_ASH is not set
+[DEBUG]    CT_CONFIG_SHELL_BASH=y
+[DEBUG]    # CT_CONFIG_SHELL_CUSTOM is not set
+[DEBUG]    CT_CONFIG_SHELL="${bash}"
+[DEBUG]    # CT_LOG_ERROR is not set
+[DEBUG]    # CT_LOG_WARN is not set
+[DEBUG]    # CT_LOG_INFO is not set
+[DEBUG]    CT_LOG_EXTRA=y
+[DEBUG]    # CT_LOG_ALL is not set
+[DEBUG]    # CT_LOG_DEBUG is not set
+[DEBUG]    CT_LOG_LEVEL_MAX="EXTRA"
+[DEBUG]    # CT_LOG_SEE_TOOLS_WARN is not set
+[DEBUG]    CT_LOG_PROGRESS_BAR=y
+[DEBUG]    CT_LOG_TO_FILE=y
+[DEBUG]    CT_LOG_FILE_COMPRESS=y
+[DEBUG]    CT_ARCH="x86"
+[DEBUG]    CT_ARCH_SUPPORTS_32=y
+[DEBUG]    CT_ARCH_SUPPORTS_64=y
+[DEBUG]    CT_ARCH_SUPPORTS_WITH_ARCH=y
+[DEBUG]    CT_ARCH_SUPPORTS_WITH_CPU=y
+[DEBUG]    CT_ARCH_SUPPORTS_WITH_TUNE=y
+[DEBUG]    CT_ARCH_DEFAULT_32=y
+[DEBUG]    CT_ARCH_ARCH="i686"
+[DEBUG]    CT_ARCH_CPU=""
+[DEBUG]    CT_ARCH_TUNE=""
+[DEBUG]    CT_ARCH_32=y
+[DEBUG]    # CT_ARCH_64 is not set
+[DEBUG]    CT_ARCH_BITNESS=32
+[DEBUG]    CT_TARGET_CFLAGS=""
+[DEBUG]    CT_TARGET_LDFLAGS=""
+[DEBUG]    # CT_ARCH_alpha is not set
+[DEBUG]    # CT_ARCH_arm is not set
+[DEBUG]    # CT_ARCH_avr is not set
+[DEBUG]    # CT_ARCH_m68k is not set
+[DEBUG]    # CT_ARCH_mips is not set
+[DEBUG]    # CT_ARCH_nios2 is not set
+[DEBUG]    # CT_ARCH_powerpc is not set
+[DEBUG]    # CT_ARCH_s390 is not set
+[DEBUG]    # CT_ARCH_sh is not set
+[DEBUG]    # CT_ARCH_sparc is not set
+[DEBUG]    CT_ARCH_x86=y
+[DEBUG]    # CT_ARCH_xtensa is not set
+[DEBUG]    CT_ARCH_alpha_AVAILABLE=y
+[DEBUG]    CT_ARCH_arm_AVAILABLE=y
+[DEBUG]    CT_ARCH_avr_AVAILABLE=y
+[DEBUG]    CT_ARCH_m68k_AVAILABLE=y
+[DEBUG]    CT_ARCH_microblaze_AVAILABLE=y
+[DEBUG]    CT_ARCH_mips_AVAILABLE=y
+[DEBUG]    CT_ARCH_nios2_AVAILABLE=y
+[DEBUG]    CT_ARCH_powerpc_AVAILABLE=y
+[DEBUG]    CT_ARCH_s390_AVAILABLE=y
+[DEBUG]    CT_ARCH_sh_AVAILABLE=y
+[DEBUG]    CT_ARCH_sparc_AVAILABLE=y
+[DEBUG]    CT_ARCH_x86_AVAILABLE=y
+[DEBUG]    CT_ARCH_xtensa_AVAILABLE=y
+[DEBUG]    CT_ARCH_SUFFIX=""
+[DEBUG]    # CT_MULTILIB is not set
+[DEBUG]    CT_ARCH_USE_MMU=y
+[DEBUG]    CT_ARCH_FLOAT=""
+[DEBUG]    CT_FORCE_SYSROOT=y
+[DEBUG]    CT_USE_SYSROOT=y
+[DEBUG]    CT_SYSROOT_NAME="sysroot"
+[DEBUG]    CT_SYSROOT_DIR_PREFIX=""
+[DEBUG]    CT_WANTS_STATIC_LINK=y
+[DEBUG]    # CT_STATIC_TOOLCHAIN is not set
+[DEBUG]    CT_TOOLCHAIN_PKGVERSION=""
+[DEBUG]    CT_TOOLCHAIN_BUGURL=""
+[DEBUG]    CT_TARGET_VENDOR="pc"
+[DEBUG]    CT_TARGET_ALIAS_SED_EXPR=""
+[DEBUG]    CT_TARGET_ALIAS=""
+[DEBUG]    CT_CROSS=y
+[DEBUG]    # CT_CANADIAN is not set
+[DEBUG]    CT_TOOLCHAIN_TYPE="cross"
+[DEBUG]    CT_BUILD=""
+[DEBUG]    CT_BUILD_PREFIX=""
+[DEBUG]    CT_BUILD_SUFFIX=""
+[DEBUG]    # CT_TOOLCHAIN_ENABLE_NLS is not set
+[DEBUG]    CT_BARE_METAL=y
+[DEBUG]    CT_KERNEL="bare-metal"
+[DEBUG]    CT_KERNEL_bare_metal=y
+[DEBUG]    # CT_KERNEL_linux is not set
+[DEBUG]    CT_KERNEL_bare_metal_AVAILABLE=y
+[DEBUG]    CT_KERNEL_linux_AVAILABLE=y
+[DEBUG]    # CT_KERNEL_V_4_3 is not set
+[DEBUG]    # CT_KERNEL_V_4_2 is not set
+[DEBUG]    # CT_KERNEL_V_4_1 is not set
+[DEBUG]    # CT_KERNEL_V_3_18 is not set
+[DEBUG]    # CT_KERNEL_V_3_14 is not set
+[DEBUG]    # CT_KERNEL_V_3_12 is not set
+[DEBUG]    # CT_KERNEL_V_3_10 is not set
+[DEBUG]    # CT_KERNEL_V_3_4 is not set
+[DEBUG]    # CT_KERNEL_V_3_2 is not set
+[DEBUG]    # CT_KERNEL_V_2_6_32 is not set
+[DEBUG]    # CT_KERNEL_LINUX_CUSTOM is not set
+[DEBUG]    CT_KERNEL_windows_AVAILABLE=y
+[DEBUG]    # CT_KERNEL_LINUX_VERBOSITY_0 is not set
+[DEBUG]    # CT_KERNEL_LINUX_VERBOSITY_1 is not set
+[DEBUG]    # CT_KERNEL_LINUX_VERBOSITY_2 is not set
+[DEBUG]    CT_ARCH_BINFMT_ELF=y
+[DEBUG]    CT_BINUTILS="binutils"
+[DEBUG]    CT_BINUTILS_binutils=y
+[DEBUG]    # CT_CC_BINUTILS_SHOW_LINARO is not set
+[DEBUG]    CT_BINUTILS_V_2_25_1=y
+[DEBUG]    # CT_BINUTILS_V_2_25 is not set
+[DEBUG]    # CT_BINUTILS_V_2_24 is not set
+[DEBUG]    # CT_BINUTILS_V_2_23_2 is not set
+[DEBUG]    # CT_BINUTILS_V_2_23_1 is not set
+[DEBUG]    # CT_BINUTILS_V_2_22 is not set
+[DEBUG]    # CT_BINUTILS_V_2_21_53 is not set
+[DEBUG]    # CT_BINUTILS_V_2_21_1a is not set
+[DEBUG]    # CT_BINUTILS_V_2_20_1a is not set
+[DEBUG]    # CT_BINUTILS_V_2_19_1a is not set
+[DEBUG]    # CT_BINUTILS_V_2_18a is not set
+[DEBUG]    CT_BINUTILS_VERSION="2.25.1"
+[DEBUG]    CT_BINUTILS_2_25_1_or_later=y
+[DEBUG]    CT_BINUTILS_2_25_or_later=y
+[DEBUG]    CT_BINUTILS_2_24_or_later=y
+[DEBUG]    CT_BINUTILS_2_23_or_later=y
+[DEBUG]    CT_BINUTILS_2_22_or_later=y
+[DEBUG]    CT_BINUTILS_2_21_or_later=y
+[DEBUG]    CT_BINUTILS_2_20_or_later=y
+[DEBUG]    CT_BINUTILS_2_19_or_later=y
+[DEBUG]    CT_BINUTILS_2_18_or_later=y
+[DEBUG]    CT_BINUTILS_HAS_HASH_STYLE=y
+[DEBUG]    CT_BINUTILS_HAS_GOLD=y
+[DEBUG]    CT_BINUTILS_GOLD_SUPPORTS_ARCH=y
+[DEBUG]    CT_BINUTILS_GOLD_SUPPORT=y
+[DEBUG]    CT_BINUTILS_HAS_PLUGINS=y
+[DEBUG]    CT_BINUTILS_HAS_PKGVERSION_BUGURL=y
+[DEBUG]    # CT_BINUTILS_LINKER_LD is not set
+[DEBUG]    # CT_BINUTILS_LINKER_GOLD is not set
+[DEBUG]    CT_BINUTILS_LINKER_LD_GOLD=y
+[DEBUG]    # CT_BINUTILS_LINKER_GOLD_LD is not set
+[DEBUG]    CT_BINUTILS_GOLD_INSTALLED=y
+[DEBUG]    CT_BINUTILS_GOLD_THREADS=y
+[DEBUG]    CT_BINUTILS_LINKER_BOTH=y
+[DEBUG]    CT_BINUTILS_LINKERS_LIST="ld,gold"
+[DEBUG]    CT_BINUTILS_LD_WRAPPER=y
+[DEBUG]    CT_BINUTILS_LINKER_DEFAULT="bfd"
+[DEBUG]    CT_BINUTILS_PLUGINS=y
+[DEBUG]    CT_BINUTILS_EXTRA_CONFIG_ARRAY=""
+[DEBUG]    CT_LIBC="none"
+[DEBUG]    # CT_LIBC_glibc is not set
+[DEBUG]    # CT_LIBC_musl is not set
+[DEBUG]    # CT_LIBC_newlib is not set
+[DEBUG]    CT_LIBC_none=y
+[DEBUG]    # CT_LIBC_uClibc is not set
+[DEBUG]    CT_LIBC_avr_libc_AVAILABLE=y
+[DEBUG]    CT_LIBC_glibc_AVAILABLE=y
+[DEBUG]    CT_THREADS="none"
+[DEBUG]    # CT_LIBC_GLIBC_V_2_22 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_21 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_20 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_19 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_18 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_17 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_16_0 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_15 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_14_1 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_14 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_13 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_12_2 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_12_1 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_11_1 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_11 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_10_1 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_9 is not set
+[DEBUG]    # CT_LIBC_GLIBC_V_2_8 is not set
+[DEBUG]    CT_LIBC_mingw_AVAILABLE=y
+[DEBUG]    CT_LIBC_musl_AVAILABLE=y
+[DEBUG]    CT_LIBC_newlib_AVAILABLE=y
+[DEBUG]    # CT_LIBC_NEWLIB_V_2_2_0 is not set
+[DEBUG]    # CT_LIBC_NEWLIB_V_2_1_0 is not set
+[DEBUG]    # CT_LIBC_NEWLIB_V_2_0_0 is not set
+[DEBUG]    # CT_LIBC_NEWLIB_V_1_20_0 is not set
+[DEBUG]    # CT_LIBC_NEWLIB_V_1_19_0 is not set
+[DEBUG]    # CT_LIBC_NEWLIB_V_1_18_0 is not set
+[DEBUG]    # CT_LIBC_NEWLIB_V_1_17_0 is not set
+[DEBUG]    CT_LIBC_none_AVAILABLE=y
+[DEBUG]    CT_LIBC_uClibc_AVAILABLE=y
+[DEBUG]    # CT_THREADS_NATIVE is not set
+[DEBUG]    # CT_THREADS_NONE is not set
+[DEBUG]    # CT_LIBC_GLIBC_KERNEL_VERSION_NONE is not set
+[DEBUG]    # CT_LIBC_GLIBC_KERNEL_VERSION_AS_HEADERS is not set
+[DEBUG]    # CT_LIBC_GLIBC_KERNEL_VERSION_CHOSEN is not set
+[DEBUG]    CT_CC="gcc"
+[DEBUG]    CT_CC_gcc=y
+[DEBUG]    # CT_CC_GCC_SHOW_LINARO is not set
+[DEBUG]    CT_CC_GCC_V_5_2_0=y
+[DEBUG]    # CT_CC_GCC_V_4_9_3 is not set
+[DEBUG]    # CT_CC_GCC_V_4_8_5 is not set
+[DEBUG]    # CT_CC_GCC_V_4_7_4 is not set
+[DEBUG]    # CT_CC_GCC_V_4_6_4 is not set
+[DEBUG]    # CT_CC_GCC_V_4_5_4 is not set
+[DEBUG]    # CT_CC_GCC_V_4_4_7 is not set
+[DEBUG]    # CT_CC_GCC_V_4_3_6 is not set
+[DEBUG]    # CT_CC_GCC_V_4_2_4 is not set
+[DEBUG]    CT_CC_GCC_4_2_or_later=y
+[DEBUG]    CT_CC_GCC_4_3_or_later=y
+[DEBUG]    CT_CC_GCC_4_4_or_later=y
+[DEBUG]    CT_CC_GCC_4_5_or_later=y
+[DEBUG]    CT_CC_GCC_4_6_or_later=y
+[DEBUG]    CT_CC_GCC_4_7_or_later=y
+[DEBUG]    CT_CC_GCC_4_8_or_later=y
+[DEBUG]    CT_CC_GCC_4_9_or_later=y
+[DEBUG]    CT_CC_GCC_5=y
+[DEBUG]    CT_CC_GCC_5_or_later=y
+[DEBUG]    CT_CC_GCC_HAS_GRAPHITE=y
+[DEBUG]    CT_CC_GCC_USE_GRAPHITE=y
+[DEBUG]    CT_CC_GCC_HAS_LTO=y
+[DEBUG]    CT_CC_GCC_USE_LTO=y
+[DEBUG]    CT_CC_GCC_HAS_PKGVERSION_BUGURL=y
+[DEBUG]    CT_CC_GCC_HAS_BUILD_ID=y
+[DEBUG]    CT_CC_GCC_HAS_LNK_HASH_STYLE=y
+[DEBUG]    CT_CC_GCC_ENABLE_PLUGINS=y
+[DEBUG]    CT_CC_GCC_GOLD=y
+[DEBUG]    CT_CC_GCC_USE_GMP_MPFR=y
+[DEBUG]    CT_CC_GCC_USE_MPC=y
+[DEBUG]    CT_CC_GCC_HAS_LIBQUADMATH=y
+[DEBUG]    CT_CC_GCC_HAS_LIBSANITIZER=y
+[DEBUG]    CT_CC_GCC_VERSION="5.2.0"
+[DEBUG]    # CT_CC_LANG_FORTRAN is not set
+[DEBUG]    CT_CC_GCC_ENABLE_CXX_FLAGS=""
+[DEBUG]    CT_CC_GCC_EXTRA_CONFIG_ARRAY=""
+[DEBUG]    CT_CC_GCC_EXTRA_ENV_ARRAY=""
+[DEBUG]    # CT_CC_GCC_TARGET_FINAL is not set
+[DEBUG]    CT_CC_GCC_STATIC_LIBSTDCXX=y
+[DEBUG]    # CT_CC_GCC_SYSTEM_ZLIB is not set
+[DEBUG]    CT_CC_GCC_ENABLE_TARGET_OPTSPACE=y
+[DEBUG]    # CT_CC_GCC_LIBMUDFLAP is not set
+[DEBUG]    # CT_CC_GCC_LIBGOMP is not set
+[DEBUG]    # CT_CC_GCC_LIBSSP is not set
+[DEBUG]    # CT_CC_GCC_LIBQUADMATH is not set
+[DEBUG]    # CT_CC_GCC_DISABLE_PCH is not set
+[DEBUG]    # CT_CC_GCC_LDBL_128 is not set
+[DEBUG]    # CT_CC_GCC_BUILD_ID is not set
+[DEBUG]    CT_CC_GCC_LNK_HASH_STYLE_DEFAULT=y
+[DEBUG]    # CT_CC_GCC_LNK_HASH_STYLE_SYSV is not set
+[DEBUG]    # CT_CC_GCC_LNK_HASH_STYLE_GNU is not set
+[DEBUG]    # CT_CC_GCC_LNK_HASH_STYLE_BOTH is not set
+[DEBUG]    CT_CC_GCC_LNK_HASH_STYLE=""
+[DEBUG]    CT_CC_GCC_DEC_FLOAT_AUTO=y
+[DEBUG]    # CT_CC_GCC_DEC_FLOAT_BID is not set
+[DEBUG]    # CT_CC_GCC_DEC_FLOAT_DPD is not set
+[DEBUG]    # CT_CC_GCC_DEC_FLOATS_NO is not set
+[DEBUG]    CT_CC_SUPPORT_CXX=y
+[DEBUG]    CT_CC_SUPPORT_FORTRAN=y
+[DEBUG]    CT_CC_SUPPORT_JAVA=y
+[DEBUG]    CT_CC_SUPPORT_ADA=y
+[DEBUG]    CT_CC_SUPPORT_OBJC=y
+[DEBUG]    CT_CC_SUPPORT_OBJCXX=y
+[DEBUG]    CT_CC_SUPPORT_GOLANG=y
+[DEBUG]    # CT_CC_LANG_CXX is not set
+[DEBUG]    CT_DEBUG_dmalloc=y
+[DEBUG]    CT_DMALLOC_V_5_5_2=y
+[DEBUG]    CT_DMALLOC_VERSION="5.5.2"
+[DEBUG]    CT_DEBUG_duma=y
+[DEBUG]    CT_DUMA_A=y
+[DEBUG]    CT_DUMA_SO=y
+[DEBUG]    CT_DUMA_V_2_5_15=y
+[DEBUG]    CT_DUMA_VERSION="2_5_15"
+[DEBUG]    CT_DEBUG_gdb=y
+[DEBUG]    CT_GDB_CROSS=y
+[DEBUG]    # CT_GDB_CROSS_STATIC is not set
+[DEBUG]    # CT_GDB_CROSS_SIM is not set
+[DEBUG]    # CT_GDB_CROSS_PYTHON is not set
+[DEBUG]    CT_GDB_CROSS_EXTRA_CONFIG_ARRAY=""
+[DEBUG]    # CT_DEBUG_GDB_SHOW_LINARO is not set
+[DEBUG]    CT_GDB_V_7_10=y
+[DEBUG]    # CT_GDB_V_7_9_1 is not set
+[DEBUG]    # CT_GDB_V_7_9 is not set
+[DEBUG]    # CT_GDB_V_7_8_2 is not set
+[DEBUG]    # CT_GDB_V_7_8_1 is not set
+[DEBUG]    # CT_GDB_V_7_8 is not set
+[DEBUG]    # CT_GDB_V_7_7_1 is not set
+[DEBUG]    # CT_GDB_V_7_7 is not set
+[DEBUG]    # CT_GDB_V_7_6_1 is not set
+[DEBUG]    # CT_GDB_V_7_5_1 is not set
+[DEBUG]    # CT_GDB_V_7_4_1 is not set
+[DEBUG]    # CT_GDB_V_7_4 is not set
+[DEBUG]    # CT_GDB_V_7_3_1 is not set
+[DEBUG]    # CT_GDB_V_7_3a is not set
+[DEBUG]    # CT_GDB_V_7_2a is not set
+[DEBUG]    # CT_GDB_V_7_1a is not set
+[DEBUG]    # CT_GDB_V_7_0_1a is not set
+[DEBUG]    # CT_GDB_V_7_0a is not set
+[DEBUG]    # CT_GDB_V_6_8a is not set
+[DEBUG]    CT_GDB_7_2_or_later=y
+[DEBUG]    CT_GDB_7_0_or_later=y
+[DEBUG]    CT_GDB_HAS_PKGVERSION_BUGURL=y
+[DEBUG]    CT_GDB_HAS_PYTHON=y
+[DEBUG]    CT_GDB_INSTALL_GDBINIT=y
+[DEBUG]    CT_GDB_VERSION="7.10"
+[DEBUG]    CT_DEBUG_ltrace=y
+[DEBUG]    CT_LTRACE_V_0_7_3=y
+[DEBUG]    # CT_LTRACE_V_0_5_3 is not set
+[DEBUG]    # CT_LTRACE_V_0_5_2 is not set
+[DEBUG]    CT_LTRACE_VERSION="0.7.3"
+[DEBUG]    CT_DEBUG_strace=y
+[DEBUG]    CT_STRACE_V_4_10=y
+[DEBUG]    # CT_STRACE_V_4_9 is not set
+[DEBUG]    # CT_STRACE_V_4_8 is not set
+[DEBUG]    # CT_STRACE_V_4_7 is not set
+[DEBUG]    # CT_STRACE_V_4_6 is not set
+[DEBUG]    # CT_STRACE_V_4_5_20 is not set
+[DEBUG]    # CT_STRACE_V_4_5_19 is not set
+[DEBUG]    # CT_STRACE_V_4_5_18 is not set
+[DEBUG]    CT_STRACE_VERSION="4.10"
+[DEBUG]    CT_COMPLIBS_NEEDED=y
+[DEBUG]    CT_GMP_NEEDED=y
+[DEBUG]    CT_MPFR_NEEDED=y
+[DEBUG]    CT_ISL_NEEDED=y
+[DEBUG]    CT_MPC_NEEDED=y
+[DEBUG]    CT_EXPAT_NEEDED=y
+[DEBUG]    CT_NCURSES_NEEDED=y
+[DEBUG]    CT_COMPLIBS=y
+[DEBUG]    CT_GMP=y
+[DEBUG]    CT_MPFR=y
+[DEBUG]    CT_ISL=y
+[DEBUG]    CT_MPC=y
+[DEBUG]    CT_LIBELF_TARGET=y
+[DEBUG]    CT_EXPAT=y
+[DEBUG]    CT_NCURSES=y
+[DEBUG]    # CT_LIBICONV_V_1_14 is not set
+[DEBUG]    # CT_GETTEXT_V_0_19_6 is not set
+[DEBUG]    CT_GMP_V_6_0_0=y
+[DEBUG]    # CT_GMP_V_5_1_3 is not set
+[DEBUG]    # CT_GMP_V_5_1_1 is not set
+[DEBUG]    # CT_GMP_V_5_0_2 is not set
+[DEBUG]    # CT_GMP_V_5_0_1 is not set
+[DEBUG]    # CT_GMP_V_4_3_2 is not set
+[DEBUG]    # CT_GMP_V_4_3_1 is not set
+[DEBUG]    # CT_GMP_V_4_3_0 is not set
+[DEBUG]    CT_GMP_5_0_2_or_later=y
+[DEBUG]    CT_GMP_VERSION="6.0.0a"
+[DEBUG]    CT_MPFR_V_3_1_3=y
+[DEBUG]    # CT_MPFR_V_3_1_2 is not set
+[DEBUG]    # CT_MPFR_V_3_1_0 is not set
+[DEBUG]    # CT_MPFR_V_3_0_1 is not set
+[DEBUG]    # CT_MPFR_V_3_0_0 is not set
+[DEBUG]    # CT_MPFR_V_2_4_2 is not set
+[DEBUG]    # CT_MPFR_V_2_4_1 is not set
+[DEBUG]    # CT_MPFR_V_2_4_0 is not set
+[DEBUG]    CT_MPFR_VERSION="3.1.3"
+[DEBUG]    CT_ISL_V_0_14=y
+[DEBUG]    # CT_ISL_V_0_12_2 is not set
+[DEBUG]    CT_ISL_V_0_14_or_later=y
+[DEBUG]    CT_ISL_V_0_12_or_later=y
+[DEBUG]    CT_ISL_VERSION="0.14"
+[DEBUG]    CT_MPC_V_1_0_3=y
+[DEBUG]    # CT_MPC_V_1_0_2 is not set
+[DEBUG]    # CT_MPC_V_1_0_1 is not set
+[DEBUG]    # CT_MPC_V_1_0 is not set
+[DEBUG]    # CT_MPC_V_0_9 is not set
+[DEBUG]    # CT_MPC_V_0_8_2 is not set
+[DEBUG]    # CT_MPC_V_0_8_1 is not set
+[DEBUG]    # CT_MPC_V_0_7 is not set
+[DEBUG]    CT_MPC_VERSION="1.0.3"
+[DEBUG]    CT_LIBELF_V_0_8_13=y
+[DEBUG]    # CT_LIBELF_V_0_8_12 is not set
+[DEBUG]    CT_LIBELF_VERSION="0.8.13"
+[DEBUG]    CT_EXPAT_V_2_1_0=y
+[DEBUG]    CT_EXPAT_VERSION="2.1.0"
+[DEBUG]    CT_NCURSES_V_6_0=y
+[DEBUG]    CT_NCURSES_VERSION="6.0"
+[DEBUG]    # CT_COMPLIBS_CHECK is not set
+[DEBUG]    # CT_COMP_TOOLS is not set
+[DEBUG]  Dumping user-supplied crosstool-NG configuration: done in 0.07s (at 00:00)
+[DEBUG]  Unsetting and unexporting MAKEFLAGS
+[INFO ]  Building environment variables
+[DEBUG]  Disabling companion tools 'make'
+[DEBUG]  Disabling companion tools 'm4'
+[DEBUG]  Disabling companion tools 'autoconf'
+[DEBUG]  Disabling companion tools 'automake'
+[DEBUG]  Disabling companion tools 'libtool'
+[DEBUG]  Enabling cc 'gcc'
+[DEBUG]  Disabling debug 'template'
+[DEBUG]  Enabling debug 'dmalloc'
+[DEBUG]  Enabling debug 'duma'
+[DEBUG]  Enabling debug 'gdb'
+[DEBUG]  Enabling debug 'ltrace'
+[DEBUG]  Enabling debug 'strace'
+[DEBUG]  Disabling test suite 'gcc'
+[DEBUG]  Testing '! ( -z /home/blanham/x-tools/i686-pc-elf )'
+[DEBUG]  Testing '! ( ! -w /home/blanham/x-tools )'
+[EXTRA]  Preparing working directories
+[DEBUG]  ==> Executing: 'chmod' 'u+w' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'chmod' '-R' 'u+w' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build' 
+[DEBUG]  ==> Executing: 'rm' '-rf' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build' 
+[DEBUG]  ==> Executing: 'chmod' '755' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'chmod' 'u+w' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'chmod' '-R' 'u+w' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools' 
+[DEBUG]  ==> Executing: 'rm' '-rf' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools' 
+[DEBUG]  ==> Executing: 'chmod' '755' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'chmod' 'u+w' '/home/blanham/x-tools' 
+[DEBUG]  ==> Executing: 'chmod' '-R' 'u+w' '/home/blanham/x-tools/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'rm' '-rf' '/home/blanham/x-tools/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'chmod' '755' '/home/blanham/x-tools' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build/tarballs' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build/src' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/configs' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools' 
+[DEBUG]  ==> Executing: 'touch' '/home/blanham/x-tools/i686-pc-elf/foo' 
+[DEBUG]  Testing '! ( -f /home/blanham/x-tools/i686-pc-elf/FOO )'
+[DEBUG]  ==> Executing: 'rm' '-f' '/home/blanham/x-tools/i686-pc-elf/foo' 
+[DEBUG]  ==> Executing: 'chmod' '-R' 'u+w' '/home/blanham/x-tools/i686-pc-elf' '/home/blanham/x-tools/i686-pc-elf' 
+[DEBUG]  Sanitised 'CT_SYSROOT_REL_DIR': 'sysroot' -> 'sysroot'
+[DEBUG]  Sanitised 'CT_SYSROOT_DIR': '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot' -> '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot'
+[DEBUG]  Sanitised 'CT_DEBUGROOT_DIR': '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf//debug-root' -> '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/debug-root'
+[DEBUG]  Sanitised 'CT_HEADERS_DIR': '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/usr/include' -> '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/usr/include'
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/debug-root' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf/lib' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/lib' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/usr/lib' 
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/usr/include' 
+[DEBUG]  Entering '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf'
+[DEBUG]  ==> Executing: 'ln' '-sf' 'sysroot/lib' 'lib' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/lib32' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/lib64' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/lib32' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/lib64' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/usr/lib32' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/usr/lib64' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/lib32' 
+[DEBUG]  ==> Executing: 'ln' '-sf' 'lib' '/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/lib64' 
+[DEBUG]  Making build system tools available
+[DEBUG]    'i686-build_pc-linux-gnu-ar' -> '/usr/bin/ar'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-ar' 
+[DEBUG]    'i686-build_pc-linux-gnu-as' -> '/usr/bin/as'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-as' 
+[DEBUG]    Missing: 'i686-pc-linux-gnu-dlltool' or 'i686-pc-linux-gnu-dlltool' or 'dlltool' : not required.
+[DEBUG]    'i686-build_pc-linux-gnu-gcc' -> '/usr/bin/i686-pc-linux-gnu-gcc'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-gcc' 
+[DEBUG]    'i686-build_pc-linux-gnu-g++' -> '/usr/bin/i686-pc-linux-gnu-g++'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-g++' 
+[DEBUG]  Testing '! (  = y )'
+[DEBUG]    Missing: 'i686-pc-linux-gnu-gnatbind' or 'i686-pc-linux-gnu-gnatbind' or 'gnatbind' : not required.
+[DEBUG]    Missing: 'i686-pc-linux-gnu-gnatmake' or 'i686-pc-linux-gnu-gnatmake' or 'gnatmake' : not required.
+[DEBUG]    'i686-build_pc-linux-gnu-ld' -> '/usr/bin/ld'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-ld' 
+[DEBUG]    'i686-build_pc-linux-gnu-nm' -> '/usr/bin/nm'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-nm' 
+[DEBUG]    'i686-build_pc-linux-gnu-objcopy' -> '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/objcopy'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-objcopy' 
+[DEBUG]    'i686-build_pc-linux-gnu-objdump' -> '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/objdump'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-objdump' 
+[DEBUG]    'i686-build_pc-linux-gnu-ranlib' -> '/usr/bin/ranlib'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-ranlib' 
+[DEBUG]    'i686-build_pc-linux-gnu-strip' -> '/usr/bin/strip'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-strip' 
+[DEBUG]    Missing: 'i686-pc-linux-gnu-windres' or 'i686-pc-linux-gnu-windres' or 'windres' : not required.
+[DEBUG]    'i686-build_pc-linux-gnu-ar' -> '/usr/bin/ar'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-ar' 
+[DEBUG]    'i686-build_pc-linux-gnu-as' -> '/usr/bin/as'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-as' 
+[DEBUG]    Missing: 'i686-pc-linux-gnu-dlltool' or 'i686-pc-linux-gnu-dlltool' or 'dlltool' : not required.
+[DEBUG]    'i686-build_pc-linux-gnu-gcc' -> '/usr/bin/i686-pc-linux-gnu-gcc'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-gcc' 
+[DEBUG]    'i686-build_pc-linux-gnu-g++' -> '/usr/bin/i686-pc-linux-gnu-g++'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-g++' 
+[DEBUG]  Testing '! (  = y )'
+[DEBUG]    Missing: 'i686-pc-linux-gnu-gnatbind' or 'i686-pc-linux-gnu-gnatbind' or 'gnatbind' : not required.
+[DEBUG]    Missing: 'i686-pc-linux-gnu-gnatmake' or 'i686-pc-linux-gnu-gnatmake' or 'gnatmake' : not required.
+[DEBUG]    'i686-build_pc-linux-gnu-ld' -> '/usr/bin/ld'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-ld' 
+[DEBUG]    'i686-build_pc-linux-gnu-nm' -> '/usr/bin/nm'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-nm' 
+[DEBUG]    'i686-build_pc-linux-gnu-objcopy' -> '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/objcopy'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-objcopy' 
+[DEBUG]    'i686-build_pc-linux-gnu-objdump' -> '/home/blanham/projects/ChickenOS/cross/.build/tools/bin/objdump'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-objdump' 
+[DEBUG]    'i686-build_pc-linux-gnu-ranlib' -> '/usr/bin/ranlib'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-ranlib' 
+[DEBUG]    'i686-build_pc-linux-gnu-strip' -> '/usr/bin/strip'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/i686-build_pc-linux-gnu-strip' 
+[DEBUG]    Missing: 'i686-pc-linux-gnu-windres' or 'i686-pc-linux-gnu-windres' or 'windres' : not required.
+[DEBUG]    'makeinfo' -> '/usr/bin/makeinfo'
+[DEBUG]  ==> Executing: 'chmod' '700' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin/makeinfo' 
+[DEBUG]  CFLAGS for host compiler: '-O2 -g -pipe '
+[DEBUG]  LDFLAGS for host compiler: ' '
+[DEBUG]  =================================================================
+[DEBUG]  Checking that we can run gcc -v
+[DEBUG]    ==> Executing: 'i686-build_pc-linux-gnu-gcc' '-v' 
+[DEBUG]    Using built-in specs.
+[DEBUG]    COLLECT_GCC=/usr/bin/i686-pc-linux-gnu-gcc
+[DEBUG]    COLLECT_LTO_WRAPPER=/usr/lib/gcc/i686-pc-linux-gnu/5.3.0/lto-wrapper
+[DEBUG]    Target: i686-pc-linux-gnu
+[DEBUG]    Configured with: /build/gcc/src/gcc-5.3.0/configure --prefix=/usr --libdir=/usr/lib --libexecdir=/usr/lib --mandir=/usr/share/man --infodir=/usr/share/info --with-bugurl=https://bugs.archlinux.org/ --enable-languages=c,c++,ada,fortran,go,lto,objc,obj-c++ --enable-shared --enable-threads=posix --enable-libmpx --with-system-zlib --with-isl --enable-__cxa_atexit --disable-libunwind-exceptions --enable-clocale=gnu --disable-libstdcxx-pch --disable-libssp --enable-gnu-unique-object --enable-linker-build-id --enable-lto --enable-plugin --enable-install-libiberty --with-linker-hash-style=gnu --enable-gnu-indirect-function --disable-multilib --disable-werror --enable-checking=release
+[DEBUG]    Thread model: posix
+[DEBUG]    gcc version 5.3.0 (GCC) 
+[DEBUG]  Checking that we can run gcc -v: done in 0.01s (at 00:01)
+[DEBUG]  =================================================================
+[DEBUG]  Checking that gcc can compile a trivial program
+[DEBUG]    ==> Executing: 'i686-build_pc-linux-gnu-gcc' '-O2' '-g' '-pipe' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/test.c' '-o' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/.gccout' 
+[DEBUG]  Checking that gcc can compile a trivial program: done in 0.06s (at 00:01)
+[DEBUG]  =================================================================
+[DEBUG]  Checking that gcc can compile a trivial statically linked program (CT_WANTS_STATIC_LINK)
+[DEBUG]    You may need to ensure that static libraries such as libc.a are installed on your system
+[DEBUG]    ==> Executing: 'i686-build_pc-linux-gnu-gcc' '-O2' '-g' '-pipe' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/test.c' '-static' '-o' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/.gccout' 
+[DEBUG]  Checking that gcc can compile a trivial statically linked program (CT_WANTS_STATIC_LINK): done in 0.09s (at 00:01)
+[DEBUG]  =================================================================
+[DEBUG]  Checking that gcc can statically link libstdc++ (CT_CC_GCC_STATIC_LIBSTDCXX)
+[DEBUG]    You may need to ensure that libstdc++.a is installed on your system
+[DEBUG]    ==> Executing: 'i686-build_pc-linux-gnu-gcc' '-O2' '-g' '-pipe' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/test.c' '-static' '-lstdc++' '-o' '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/.gccout' 
+[DEBUG]  Checking that gcc can statically link libstdc++ (CT_CC_GCC_STATIC_LIBSTDCXX): done in 0.06s (at 00:01)
+[EXTRA]  Installing user-supplied crosstool-NG configuration
+[DEBUG]  ==> Executing: 'mkdir' '-p' '/home/blanham/x-tools/i686-pc-elf/bin' 
+[DEBUG]  ==> Executing: '/usr/bin/install' '-c' '-m' '0755' '/usr/lib/crosstool-ng-1.22.0/scripts/toolchain-config.in' '/home/blanham/x-tools/i686-pc-elf/bin/i686-pc-elf-ct-ng.config' 
+[DEBUG]  ==> Executing: '/usr/bin/sed' '-i' '-e' 's,@@grep@@,"/usr/bin/grep",;' '/home/blanham/x-tools/i686-pc-elf/bin/i686-pc-elf-ct-ng.config' 
+[EXTRA]  =================================================================
+[EXTRA]  Dumping internal crosstool-NG configuration
+[EXTRA]    Building a toolchain for:
+[EXTRA]      build  = i686-pc-linux-gnu
+[EXTRA]      host   = i686-pc-linux-gnu
+[EXTRA]      target = i686-pc-elf
+[DEBUG]    CT_ARCH=x86
+[DEBUG]    CT_ARCH_32=y
+[DEBUG]    CT_ARCH_ARCH=i686
+[DEBUG]    CT_ARCH_ARCH_CFLAG=-march=i686
+[DEBUG]    CT_ARCH_BINFMT_ELF=y
+[DEBUG]    CT_ARCH_BITNESS=32
+[DEBUG]    CT_ARCH_CPU=
+[DEBUG]    CT_ARCH_DEFAULT_32=y
+[DEBUG]    CT_ARCH_FLOAT=
+[DEBUG]    CT_ARCH_SUFFIX=
+[DEBUG]    CT_ARCH_SUPPORTS_32=y
+[DEBUG]    CT_ARCH_SUPPORTS_64=y
+[DEBUG]    CT_ARCH_SUPPORTS_WITH_ARCH=y
+[DEBUG]    CT_ARCH_SUPPORTS_WITH_CPU=y
+[DEBUG]    CT_ARCH_SUPPORTS_WITH_TUNE=y
+[DEBUG]    CT_ARCH_TARGET_CFLAGS='  -march=i686     '
+[DEBUG]    CT_ARCH_TARGET_LDFLAGS=' '
+[DEBUG]    CT_ARCH_TUNE=
+[DEBUG]    CT_ARCH_USE_MMU=y
+[DEBUG]    CT_ARCH_WITH_ARCH=--with-arch=i686
+[DEBUG]    CT_ARCH_alpha_AVAILABLE=y
+[DEBUG]    CT_ARCH_arm_AVAILABLE=y
+[DEBUG]    CT_ARCH_avr_AVAILABLE=y
+[DEBUG]    CT_ARCH_m68k_AVAILABLE=y
+[DEBUG]    CT_ARCH_microblaze_AVAILABLE=y
+[DEBUG]    CT_ARCH_mips_AVAILABLE=y
+[DEBUG]    CT_ARCH_nios2_AVAILABLE=y
+[DEBUG]    CT_ARCH_powerpc_AVAILABLE=y
+[DEBUG]    CT_ARCH_s390_AVAILABLE=y
+[DEBUG]    CT_ARCH_sh_AVAILABLE=y
+[DEBUG]    CT_ARCH_sparc_AVAILABLE=y
+[DEBUG]    CT_ARCH_x86=y
+[DEBUG]    CT_ARCH_x86_AVAILABLE=y
+[DEBUG]    CT_ARCH_xtensa_AVAILABLE=y
+[DEBUG]    CT_BACKEND_ARCH=
+[DEBUG]    CT_BACKEND_KERNEL=
+[DEBUG]    CT_BACKEND_LIBC=
+[DEBUG]    CT_BARE_METAL=y
+[DEBUG]    CT_BINUTILS=binutils
+[DEBUG]    CT_BINUTILS_2_18_or_later=y
+[DEBUG]    CT_BINUTILS_2_19_or_later=y
+[DEBUG]    CT_BINUTILS_2_20_or_later=y
+[DEBUG]    CT_BINUTILS_2_21_or_later=y
+[DEBUG]    CT_BINUTILS_2_22_or_later=y
+[DEBUG]    CT_BINUTILS_2_23_or_later=y
+[DEBUG]    CT_BINUTILS_2_24_or_later=y
+[DEBUG]    CT_BINUTILS_2_25_1_or_later=y
+[DEBUG]    CT_BINUTILS_2_25_or_later=y
+[DEBUG]    CT_BINUTILS_EXTRA_CONFIG_ARRAY=()
+[DEBUG]    CT_BINUTILS_GOLD_INSTALLED=y
+[DEBUG]    CT_BINUTILS_GOLD_SUPPORT=y
+[DEBUG]    CT_BINUTILS_GOLD_SUPPORTS_ARCH=y
+[DEBUG]    CT_BINUTILS_GOLD_THREADS=y
+[DEBUG]    CT_BINUTILS_HAS_GOLD=y
+[DEBUG]    CT_BINUTILS_HAS_HASH_STYLE=y
+[DEBUG]    CT_BINUTILS_HAS_PKGVERSION_BUGURL=y
+[DEBUG]    CT_BINUTILS_HAS_PLUGINS=y
+[DEBUG]    CT_BINUTILS_LD_WRAPPER=y
+[DEBUG]    CT_BINUTILS_LINKERS_LIST=ld,gold
+[DEBUG]    CT_BINUTILS_LINKER_BOTH=y
+[DEBUG]    CT_BINUTILS_LINKER_DEFAULT=bfd
+[DEBUG]    CT_BINUTILS_LINKER_LD_GOLD=y
+[DEBUG]    CT_BINUTILS_PLUGINS=y
+[DEBUG]    CT_BINUTILS_VERSION=2.25.1
+[DEBUG]    CT_BINUTILS_V_2_25_1=y
+[DEBUG]    CT_BINUTILS_binutils=y
+[DEBUG]    CT_BUILD=i686-build_pc-linux-gnu
+[DEBUG]    CT_BUILDTOOLS_PREFIX_DIR=/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools
+[DEBUG]    CT_BUILD_DIR=/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build
+[DEBUG]    CT_BUILD_PREFIX=
+[DEBUG]    CT_BUILD_SUFFIX=
+[DEBUG]    CT_CC=gcc
+[DEBUG]    CT_CC_FACILITY_LIST=' gcc'
+[DEBUG]    CT_CC_GCC_4_2_or_later=y
+[DEBUG]    CT_CC_GCC_4_3_or_later=y
+[DEBUG]    CT_CC_GCC_4_4_or_later=y
+[DEBUG]    CT_CC_GCC_4_5_or_later=y
+[DEBUG]    CT_CC_GCC_4_6_or_later=y
+[DEBUG]    CT_CC_GCC_4_7_or_later=y
+[DEBUG]    CT_CC_GCC_4_8_or_later=y
+[DEBUG]    CT_CC_GCC_4_9_or_later=y
+[DEBUG]    CT_CC_GCC_5=y
+[DEBUG]    CT_CC_GCC_5_or_later=y
+[DEBUG]    CT_CC_GCC_CORE_EXTRA_CONFIG_ARRAY=()
+[DEBUG]    CT_CC_GCC_DEC_FLOAT_AUTO=y
+[DEBUG]    CT_CC_GCC_ENABLE_CXX_FLAGS=
+[DEBUG]    CT_CC_GCC_ENABLE_PLUGINS=y
+[DEBUG]    CT_CC_GCC_ENABLE_TARGET_OPTSPACE=y
+[DEBUG]    CT_CC_GCC_EXTRA_CONFIG_ARRAY=()
+[DEBUG]    CT_CC_GCC_EXTRA_ENV_ARRAY=()
+[DEBUG]    CT_CC_GCC_GOLD=y
+[DEBUG]    CT_CC_GCC_HAS_BUILD_ID=y
+[DEBUG]    CT_CC_GCC_HAS_GRAPHITE=y
+[DEBUG]    CT_CC_GCC_HAS_LIBQUADMATH=y
+[DEBUG]    CT_CC_GCC_HAS_LIBSANITIZER=y
+[DEBUG]    CT_CC_GCC_HAS_LNK_HASH_STYLE=y
+[DEBUG]    CT_CC_GCC_HAS_LTO=y
+[DEBUG]    CT_CC_GCC_HAS_PKGVERSION_BUGURL=y
+[DEBUG]    CT_CC_GCC_LNK_HASH_STYLE=
+[DEBUG]    CT_CC_GCC_LNK_HASH_STYLE_DEFAULT=y
+[DEBUG]    CT_CC_GCC_STATIC_LIBSTDCXX=y
+[DEBUG]    CT_CC_GCC_USE_GMP_MPFR=y
+[DEBUG]    CT_CC_GCC_USE_GRAPHITE=y
+[DEBUG]    CT_CC_GCC_USE_LTO=y
+[DEBUG]    CT_CC_GCC_USE_MPC=y
+[DEBUG]    CT_CC_GCC_VERSION=5.2.0
+[DEBUG]    CT_CC_GCC_V_5_2_0=y
+[DEBUG]    CT_CC_SUPPORT_ADA=y
+[DEBUG]    CT_CC_SUPPORT_CXX=y
+[DEBUG]    CT_CC_SUPPORT_FORTRAN=y
+[DEBUG]    CT_CC_SUPPORT_GOLANG=y
+[DEBUG]    CT_CC_SUPPORT_JAVA=y
+[DEBUG]    CT_CC_SUPPORT_OBJC=y
+[DEBUG]    CT_CC_SUPPORT_OBJCXX=y
+[DEBUG]    CT_CC_gcc=y
+[DEBUG]    CT_CFLAGS_FOR_BUILD='-O2 -g '
+[DEBUG]    CT_CFLAGS_FOR_HOST='-O2 -g -pipe '
+[DEBUG]    CT_COMPLIBS=y
+[DEBUG]    CT_COMPLIBS_NEEDED=y
+[DEBUG]    CT_COMP_LIBS_FACILITY_LIST=' gmp mpfr ppl isl cloog mpc libelf expat ncurses libiconv gettext'
+[DEBUG]    CT_COMP_TOOLS_FACILITY_LIST=
+[DEBUG]    CT_CONFIGURE_has_xz=y
+[DEBUG]    CT_CONFIG_DIR=/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/configs
+[DEBUG]    CT_CONFIG_SHELL=/usr/bin/bash
+[DEBUG]    CT_CONFIG_SHELL_BASH=y
+[DEBUG]    CT_CONNECT_TIMEOUT=10
+[DEBUG]    CT_CROSS=y
+[DEBUG]    CT_DEBUGROOT_DIR=/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/debug-root
+[DEBUG]    CT_DEBUG_FACILITY_LIST=' dmalloc duma gdb ltrace strace'
+[DEBUG]    CT_DEBUG_dmalloc=y
+[DEBUG]    CT_DEBUG_duma=y
+[DEBUG]    CT_DEBUG_gdb=y
+[DEBUG]    CT_DEBUG_ltrace=y
+[DEBUG]    CT_DEBUG_strace=y
+[DEBUG]    CT_DMALLOC_VERSION=5.5.2
+[DEBUG]    CT_DMALLOC_V_5_5_2=y
+[DEBUG]    CT_DOC_DIR=/usr/share/doc/crosstool-ng/crosstool-ng-1.22.0
+[DEBUG]    CT_DUMA_A=y
+[DEBUG]    CT_DUMA_SO=y
+[DEBUG]    CT_DUMA_VERSION=2_5_15
+[DEBUG]    CT_DUMA_V_2_5_15=y
+[DEBUG]    CT_ECHO=echo
+[DEBUG]    CT_EXPAT=y
+[DEBUG]    CT_EXPAT_NEEDED=y
+[DEBUG]    CT_EXPAT_VERSION=2.1.0
+[DEBUG]    CT_EXPAT_V_2_1_0=y
+[DEBUG]    CT_EXTRA_CFLAGS_FOR_BUILD=
+[DEBUG]    CT_EXTRA_CFLAGS_FOR_HOST=
+[DEBUG]    CT_EXTRA_LDFLAGS_FOR_BUILD=
+[DEBUG]    CT_EXTRA_LDFLAGS_FOR_HOST=
+[DEBUG]    CT_FORCE_SYSROOT=y
+[DEBUG]    CT_GDB_7_0_or_later=y
+[DEBUG]    CT_GDB_7_2_or_later=y
+[DEBUG]    CT_GDB_CROSS=y
+[DEBUG]    CT_GDB_CROSS_EXTRA_CONFIG_ARRAY=()
+[DEBUG]    CT_GDB_HAS_PKGVERSION_BUGURL=y
+[DEBUG]    CT_GDB_HAS_PYTHON=y
+[DEBUG]    CT_GDB_INSTALL_GDBINIT=y
+[DEBUG]    CT_GDB_VERSION=7.10
+[DEBUG]    CT_GDB_V_7_10=y
+[DEBUG]    CT_GMP=y
+[DEBUG]    CT_GMP_5_0_2_or_later=y
+[DEBUG]    CT_GMP_NEEDED=y
+[DEBUG]    CT_GMP_VERSION=6.0.0a
+[DEBUG]    CT_GMP_V_6_0_0=y
+[DEBUG]    CT_HEADERS_DIR=/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot/usr/include
+[DEBUG]    CT_HOST=i686-build_pc-linux-gnu
+[DEBUG]    CT_HOST_COMPLIBS_DIR=/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools
+[DEBUG]    CT_INSTALL_DIR=/home/blanham/x-tools/i686-pc-elf
+[DEBUG]    CT_INSTALL_DIR_RO=y
+[DEBUG]    CT_ISL=y
+[DEBUG]    CT_ISL_NEEDED=y
+[DEBUG]    CT_ISL_VERSION=0.14
+[DEBUG]    CT_ISL_V_0_12_or_later=y
+[DEBUG]    CT_ISL_V_0_14=y
+[DEBUG]    CT_ISL_V_0_14_or_later=y
+[DEBUG]    CT_IS_A_BACKEND=
+[DEBUG]    CT_KERNEL=bare-metal
+[DEBUG]    CT_KERNEL_bare_metal=y
+[DEBUG]    CT_KERNEL_bare_metal_AVAILABLE=y
+[DEBUG]    CT_KERNEL_linux_AVAILABLE=y
+[DEBUG]    CT_KERNEL_windows_AVAILABLE=y
+[DEBUG]    CT_LDFLAGS_FOR_BUILD=' '
+[DEBUG]    CT_LDFLAGS_FOR_HOST=' '
+[DEBUG]    CT_LIBC=none
+[DEBUG]    CT_LIBC_avr_libc_AVAILABLE=y
+[DEBUG]    CT_LIBC_glibc_AVAILABLE=y
+[DEBUG]    CT_LIBC_mingw_AVAILABLE=y
+[DEBUG]    CT_LIBC_musl_AVAILABLE=y
+[DEBUG]    CT_LIBC_newlib_AVAILABLE=y
+[DEBUG]    CT_LIBC_none=y
+[DEBUG]    CT_LIBC_none_AVAILABLE=y
+[DEBUG]    CT_LIBC_uClibc_AVAILABLE=y
+[DEBUG]    CT_LIBELF_TARGET=y
+[DEBUG]    CT_LIBELF_VERSION=0.8.13
+[DEBUG]    CT_LIBELF_V_0_8_13=y
+[DEBUG]    CT_LIB_DIR=/usr/lib/crosstool-ng-1.22.0
+[DEBUG]    CT_LOAD=
+[DEBUG]    CT_LOCAL_TARBALLS_DIR=/home/blanham/src
+[DEBUG]    CT_LOG_EXTRA=y
+[DEBUG]    CT_LOG_FILE_COMPRESS=y
+[DEBUG]    CT_LOG_LEVEL_ALL=7
+[DEBUG]    CT_LOG_LEVEL_CFG=4
+[DEBUG]    CT_LOG_LEVEL_DEBUG=8
+[DEBUG]    CT_LOG_LEVEL_ERROR=0
+[DEBUG]    CT_LOG_LEVEL_EXTRA=3
+[DEBUG]    CT_LOG_LEVEL_FILE=5
+[DEBUG]    CT_LOG_LEVEL_INFO=2
+[DEBUG]    CT_LOG_LEVEL_MAX=EXTRA
+[DEBUG]    CT_LOG_LEVEL_STATE=6
+[DEBUG]    CT_LOG_LEVEL_WARN=1
+[DEBUG]    CT_LOG_PROGRESS_BAR=y
+[DEBUG]    CT_LOG_TO_FILE=y
+[DEBUG]    CT_LTRACE_VERSION=0.7.3
+[DEBUG]    CT_LTRACE_V_0_7_3=y
+[DEBUG]    CT_MODULES=y
+[DEBUG]    CT_MPC=y
+[DEBUG]    CT_MPC_NEEDED=y
+[DEBUG]    CT_MPC_VERSION=1.0.3
+[DEBUG]    CT_MPC_V_1_0_3=y
+[DEBUG]    CT_MPFR=y
+[DEBUG]    CT_MPFR_NEEDED=y
+[DEBUG]    CT_MPFR_VERSION=3.1.3
+[DEBUG]    CT_MPFR_V_3_1_3=y
+[DEBUG]    CT_NCURSES=y
+[DEBUG]    CT_NCURSES_NEEDED=y
+[DEBUG]    CT_NCURSES_VERSION=6.0
+[DEBUG]    CT_NCURSES_V_6_0=y
+[DEBUG]    CT_NG=/usr/bin/ct-ng
+[DEBUG]    CT_OVERIDE_CONFIG_GUESS_SUB=y
+[DEBUG]    CT_PARALLEL_JOBS=0
+[DEBUG]    CT_PATCH_BUNDLED=y
+[DEBUG]    CT_PATCH_ORDER=bundled
+[DEBUG]    CT_PKGVERSION='crosstool-NG crosstool-ng-1.22.0'
+[DEBUG]    CT_PREFIX_DIR=/home/blanham/x-tools/i686-pc-elf
+[DEBUG]    CT_REAL_BUILD=i686-pc-linux-gnu
+[DEBUG]    CT_REAL_HOST=i686-pc-linux-gnu
+[DEBUG]    CT_REAL_TARGET=i686-pc-elf
+[DEBUG]    CT_REMOVE_DOCS=y
+[DEBUG]    CT_RESTART=
+[DEBUG]    CT_RM_RF_PREFIX_DIR=y
+[DEBUG]    CT_SAVE_TARBALLS=y
+[DEBUG]    CT_SRC_DIR=/home/blanham/projects/ChickenOS/cross/.build/src
+[DEBUG]    CT_STAR_DATE=1453073390304889064
+[DEBUG]    CT_STAR_DATE_HUMAN=20160117.172950
+[DEBUG]    CT_STATE_DIR=/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/state
+[DEBUG]    CT_STEPS='libc_check_config companion_libs_for_build binutils_for_build companion_libs_for_host binutils_for_host cc_core_pass_1 kernel_headers libc_start_files cc_core_pass_2 libc cc_for_build cc_for_host libc_post_cc companion_libs_for_target binutils_for_target debug test_suite finish '
+[DEBUG]    CT_STEP_COUNT=2
+[DEBUG]    CT_STEP_LEVEL=([2]="EXTRA")
+[DEBUG]    CT_STEP_MESSAGE=([1]="(top-level)" [2]="Dumping internal crosstool-NG configuration")
+[DEBUG]    CT_STEP_START=([2]="1453073391801666046")
+[DEBUG]    CT_STOP=
+[DEBUG]    CT_STRACE_VERSION=4.10
+[DEBUG]    CT_STRACE_V_4_10=y
+[DEBUG]    CT_STRIP_HOST_TOOLCHAIN_EXECUTABLES=y
+[DEBUG]    CT_SYSROOT_DIR=/home/blanham/x-tools/i686-pc-elf/i686-pc-elf/sysroot
+[DEBUG]    CT_SYSROOT_DIR_PREFIX=
+[DEBUG]    CT_SYSROOT_NAME=sysroot
+[DEBUG]    CT_SYSROOT_REL_DIR=sysroot
+[DEBUG]    CT_SYS_GCC=5.3.0
+[DEBUG]    CT_SYS_HOSTNAME=Eddie
+[DEBUG]    CT_SYS_KERNEL=Linux
+[DEBUG]    CT_SYS_MACHINE=i686
+[DEBUG]    CT_SYS_OS=Linux
+[DEBUG]    CT_SYS_PROCESSOR=unknown
+[DEBUG]    CT_SYS_REVISION=4.1.6-1-ARCH
+[DEBUG]    CT_SYS_TARGET=i686-pc-linux-gnu
+[DEBUG]    CT_SYS_USER=blanham
+[DEBUG]    CT_TARBALLS_DIR=/home/blanham/projects/ChickenOS/cross/.build/tarballs
+[DEBUG]    CT_TARGET=i686-pc-elf
+[DEBUG]    CT_TARGET_ALIAS=
+[DEBUG]    CT_TARGET_ALIAS_SED_EXPR=
+[DEBUG]    CT_TARGET_ARCH=i686
+[DEBUG]    CT_TARGET_CFLAGS='  -march=i686      '
+[DEBUG]    CT_TARGET_KERNEL=
+[DEBUG]    CT_TARGET_LDFLAGS='  '
+[DEBUG]    CT_TARGET_SYS=elf
+[DEBUG]    CT_TARGET_VENDOR=pc
+[DEBUG]    CT_TEST_SUITE_DIR=/home/blanham/x-tools/i686-pc-elf/test-suite
+[DEBUG]    CT_TEST_SUITE_FACILITY_LIST=
+[DEBUG]    CT_THREADS=none
+[DEBUG]    CT_TOOLCHAIN_BUGURL=
+[DEBUG]    CT_TOOLCHAIN_ID='crosstool-crosstool-ng-1.22.0 build 20160117.172950 by blanham@Eddie'
+[DEBUG]    CT_TOOLCHAIN_PKGVERSION=
+[DEBUG]    CT_TOOLCHAIN_TYPE=cross
+[DEBUG]    CT_TOOLS_OVERIDE_DIR=/home/blanham/projects/ChickenOS/cross/.build/tools
+[DEBUG]    CT_TOP_DIR=/home/blanham/projects/ChickenOS/cross
+[DEBUG]    CT_USE_PIPES=y
+[DEBUG]    CT_USE_SYSROOT=y
+[DEBUG]    CT_VERSION=crosstool-ng-1.22.0
+[DEBUG]    CT_WANTS_STATIC_LINK=y
+[DEBUG]    CT_WORK_DIR=/home/blanham/projects/ChickenOS/cross/.build
+[DEBUG]    Other environment:
+[DEBUG]    grep=/usr/bin/grep
+[DEBUG]    XDG_SESSION_ID=c2
+[DEBUG]    SHELL=/usr/bin/bash
+[DEBUG]    TERM=xterm-256color
+[DEBUG]    SSH_CLIENT=172.16.70.1 51675 22
+[DEBUG]    patch=/usr/bin/patch
+[DEBUG]    bash=/usr/bin/bash
+[DEBUG]    libtoolize=/usr/bin/libtoolize
+[DEBUG]    OLDPWD=/home/blanham/x-tools/i686-pc-elf/i686-pc-elf
+[DEBUG]    objcopy=/usr/bin/objcopy
+[DEBUG]    SSH_TTY=/dev/pts/0
+[DEBUG]    LC_ALL=C
+[DEBUG]    ZSH=/home/blanham/.oh-my-zsh
+[DEBUG]    USER=blanham
+[DEBUG]    install=/usr/bin/install -c
+[DEBUG]    MAKE_TERMOUT=/dev/pts/50
+[DEBUG]    V=
+[DEBUG]    TERMCAP=SC|screen.xterm-256color|VT 100/ANSI X3.64 virtual terminal:	:DO=E[%dB:LE=E[%dD:RI=E[%dC:UP=E[%dA:bs:bt=E[Z:	:cd=E[J:ce=E[K:cl=E[HE[J:cm=E[%i%d;%dH:ct=E[3g:	:do=^J:nd=E[C:pt:rc=E8:rs=Ec:sc=E7:st=EH:up=EM:	:le=^H:bl=^G:cr=^M:it#8:ho=E[H:nw=EE:ta=^I:is=E)0:	:li#52:co#204:am:xn:xv:LP:sr=EM:al=E[L:AL=E[%dL:	:cs=E[%i%d;%dr:dl=E[M:DL=E[%dM:dc=E[P:DC=E[%dP:	:im=E[4h:ei=E[4l:mi:IC=E[%d@:ks=E[?1hE=:	:ke=E[?1lE>:vi=E[?25l:ve=E[34hE[?25h:vs=E[34l:	:ti=E[?1049h:te=E[?1049l:us=E[4m:ue=E[24m:so=E[3m:	:se=E[23m:mb=E[5m:md=E[1m:mh=E[2m:mr=E[7m:	:me=E[m:ms:	:Co#8:pa#64:AF=E[3%dm:AB=E[4%dm:op=E[39;49m:AX:	:vb=Eg:G0:as=E(0:ae=E(B:	:ac=140140aaffggjjkkllmmnnooppqqrrssttuuvvwwxxyyzz{{||}}~~..--++,,hhII00:	:po=E[5i:pf=E[4i:Km=E[M:k0=E[10~:k1=EOP:k2=EOQ:	:k3=EOR:k4=EOS:k5=E[15~:k6=E[17~:k7=E[18~:	:k8=E[19~:k9=E[20~:k;=E[21~:F1=E[23~:F2=E[24~:	:F3=E[1;2P:F4=E[1;2Q:F5=E[1;2R:F6=E[1;2S:	:F7=E[15;2~:F8=E[17;2~:F9=E[18;2~:FA=E[19;2~:kb=^H:	:K2=EOE:kB=E[Z:kF=E[1;2B:kR=E[1;2A:*4=E[3;2~:	:*7=E[1;2F:#2=E[1;2H:#3=E[2;2~:#4=E[1;2D:%c=E[6;2~:	:%e=E[5;2~:%i=E[1;2C:kh=E[1~:@1=E[1~:kH=E[4~:	:@7=E[4~:kN=E[6~:kP=E[5~:kI=E[2~:kD=E[3~:ku=EOA:	:kd=EOB:kr=EOC:kl=EOD:km:
+[DEBUG]    CONFIG_SITE=
+[DEBUG]    MAKELEVEL=1
+[DEBUG]    PAGER=less
+[DEBUG]    MFLAGS=-r --no-print-directory
+[DEBUG]    readelf=/usr/bin/readelf
+[DEBUG]    LSCOLORS=Gxfxcxdxbxegedabagacad
+[DEBUG]    KCONFIG_TOP=config/config.in
+[DEBUG]    PATH=/home/blanham/x-tools/i686-pc-elf/bin:/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools/bin:/home/blanham/projects/ChickenOS/cross/.build/tools/bin:/Users/blanham/android/sdk/platform-tools:/usr/local/bin:/Users/blanham/src/pintos/src/utils:/Users/blanham/go/bin:/Users/blanham/utils/bin:/Users/blanham/src/pintos/src/utils:/Users/blanham/go/bin:/Users/blanham/utils/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/macports/bin:/opt/fink/bin:/opt/X11/bin
+[DEBUG]    objdump=/usr/bin/objdump
+[DEBUG]    MAIL=/var/spool/mail/blanham
+[DEBUG]    STY=3491.pts-0.Eddie
+[DEBUG]    sed=/usr/bin/sed
+[DEBUG]    PWD=/home/blanham/projects/ChickenOS/cross
+[DEBUG]    gperf=/usr/bin/gperf
+[DEBUG]    CONF=/usr/lib/crosstool-ng-1.22.0/kconfig/conf
+[DEBUG]    LANG=C
+[DEBUG]    awk=/usr/bin/gawk
+[DEBUG]    CONFIG_SHELL=/usr/bin/bash
+[DEBUG]    HOME=/home/blanham
+[DEBUG]    SHLVL=4
+[DEBUG]    make=/usr/bin/make
+[DEBUG]    GREP_OPTIONS=
+[DEBUG]    libtool=/usr/bin/libtool
+[DEBUG]    SILENT=@
+[DEBUG]    LOGNAME=blanham
+[DEBUG]    LESS=-R
+[DEBUG]    WINDOW=28
+[DEBUG]    MAKE_TERMERR=/dev/pts/50
+[DEBUG]    LC_CTYPE=en_US.UTF-8
+[DEBUG]    SSH_CONNECTION=172.16.70.1 51675 172.16.70.211 22
+[DEBUG]    DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+[DEBUG]    XDG_RUNTIME_DIR=/run/user/1000
+[DEBUG]    _=/usr/bin/printenv
+[EXTRA]  Dumping internal crosstool-NG configuration: done in 0.08s (at 00:01)
+[INFO ]  =================================================================
+[INFO ]  Retrieving needed toolchain components' tarballs
+[DEBUG]    Already have 'gmp-6.0.0a'
+[DEBUG]    Already have 'mpfr-3.1.3'
+[DEBUG]    Already have 'isl-0.14'
+[DEBUG]    Already have 'mpc-1.0.3'
+[DEBUG]    Already have 'libelf-0.8.13'
+[DEBUG]    Already have 'expat-2.1.0'
+[DEBUG]    Already have 'ncurses-6.0'
+[DEBUG]    Already have 'binutils-2.25.1'
+[DEBUG]    Already have 'gcc-5.2.0'
+[DEBUG]    Already have 'dmalloc-5.5.2'
+[DEBUG]    Already have 'duma_2_5_15'
+[DEBUG]    ==> Executing: 'rm' '-f' '/home/blanham/projects/ChickenOS/cross/.build/tarballs/showfiles.php*' 
+[DEBUG]    Already have 'gdb-7.10'
+[DEBUG]    Already have 'ltrace_0.7.3.orig'
+[DEBUG]    Entering '/home/blanham/projects/ChickenOS/cross/.build/tarballs'
+[DEBUG]    Already have 'strace-4.10'
+[DEBUG]    ==> Executing: 'rm' '-f' '/home/blanham/projects/ChickenOS/cross/.build/tarballs/showfiles.php*' 
+[INFO ]  Retrieving needed toolchain components' tarballs: done in 0.05s (at 00:01)
+[INFO ]  =================================================================
+[INFO ]  Extracting and patching toolchain components
+[DEBUG]    Already extracted 'gmp-6.0.0a'
+[DEBUG]    Already patched 'gmp-6.0.0a'
+[DEBUG]    Already extracted 'mpfr-3.1.3'
+[DEBUG]    Already patched 'mpfr-3.1.3'
+[DEBUG]    Already extracted 'isl-0.14'
+[DEBUG]    Already patched 'isl-0.14'
+[DEBUG]    Already extracted 'mpc-1.0.3'
+[DEBUG]    Already patched 'mpc-1.0.3'
+[DEBUG]    Already extracted 'libelf-0.8.13'
+[DEBUG]    Already patched 'libelf-0.8.13'
+[DEBUG]    Already extracted 'expat-2.1.0'
+[DEBUG]    Already patched 'expat-2.1.0'
+[DEBUG]    Already extracted 'ncurses-6.0'
+[DEBUG]    ==> Executing: 'chmod' '-R' 'u+w' '/home/blanham/projects/ChickenOS/cross/.build/src/ncurses-6.0' 
+[DEBUG]    Already patched 'ncurses-6.0'
+[DEBUG]    Already extracted 'binutils-2.25.1'
+[DEBUG]    Already patched 'binutils-2.25.1'
+[DEBUG]    Already extracted 'gcc-5.2.0'
+[DEBUG]    Already patched 'gcc-5.2.0'
+[DEBUG]    Already extracted 'dmalloc-5.5.2'
+[DEBUG]    Already patched 'dmalloc-5.5.2'
+[DEBUG]    Already extracted 'duma_2_5_15'
+[DEBUG]    Entering '/home/blanham/projects/ChickenOS/cross/.build/src/duma_2_5_15'
+[DEBUG]    Already patched 'duma-2_5_15'
+[DEBUG]    Already extracted 'gdb-7.10'
+[DEBUG]    Already patched 'gdb-7.10'
+[DEBUG]    Already extracted 'ltrace-0.7.3'
+[DEBUG]    Already patched 'ltrace-0.7.3'
+[DEBUG]    Already extracted 'strace-4.10'
+[DEBUG]    Already patched 'strace-4.10'
+[INFO ]  Extracting and patching toolchain components: done in 0.09s (at 00:02)
+[INFO ]  =================================================================
+[INFO ]  Installing ncurses for build
+[DEBUG]    Entering '/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/build/build-ncurses-build-i686-build_pc-linux-gnu'
+[EXTRA]    Configuring ncurses
+[DEBUG]    ==> Executing: 'CFLAGS=-O2 -g ' 'LDFLAGS= ' '/home/blanham/projects/ChickenOS/cross/.build/src/ncurses-6.0/configure' '--build=i686-build_pc-linux-gnu' '--host=i686-build_pc-linux-gnu' '--prefix=' '--with-install-prefix=/home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools' '--enable-termcap' '--enable-symlinks' '--without-manpages' '--without-tests' '--without-cxx' '--without-cxx-binding' '--without-ada' '--with-abi-version=5' 
+[CFG  ]    checking for egrep... grep -E
+[CFG  ]    Configuring NCURSES 6.0 ABI 6 (Sun Jan 17 17:29:52 CST 2016)
+[CFG  ]    checking for package version... 6.0
+[CFG  ]    checking for package patch date... 20151107
+[CFG  ]    configure: WARNING: overriding ABI version 6 to 5
+[CFG  ]    checking build system type... i686-build_pc-linux-gnu
+[CFG  ]    checking host system type... i686-build_pc-linux-gnu
+[CFG  ]    checking target system type... i686-build_pc-linux-gnu
+[CFG  ]    Configuring for linux-gnu
+[CFG  ]    checking for prefix... 
+[CFG  ]    checking for i686-build_pc-linux-gnu-gcc... i686-build_pc-linux-gnu-gcc
+[CFG  ]    checking for C compiler default output... a.out
+[CFG  ]    checking whether the C compiler works... yes
+[CFG  ]    checking whether we are cross compiling... no
+[CFG  ]    checking for executable suffix... 
+[CFG  ]    checking for object suffix... o
+[CFG  ]    checking whether we are using the GNU C compiler... yes
+[CFG  ]    checking whether i686-build_pc-linux-gnu-gcc accepts -g... yes
+[CFG  ]    checking version of i686-build_pc-linux-gnu-gcc... 5.3.0
+[CFG  ]    checking for i686-build_pc-linux-gnu-gcc option to accept ANSI C... none needed
+[CFG  ]    checking $CC variable... ok
+[CFG  ]    checking how to run the C preprocessor... i686-build_pc-linux-gnu-gcc -E
+[CFG  ]    checking whether i686-build_pc-linux-gnu-gcc needs -traditional... no
+[CFG  ]    checking whether i686-build_pc-linux-gnu-gcc understands -c and -o together... yes
+[CFG  ]    checking for ldconfig... /usr/bin/ldconfig
+[CFG  ]    checking if you want to ensure bool is consistent with C++... no
+[CFG  ]    checking if you want to build C++ binding and demo... no
+[CFG  ]    checking if you want to build with Ada95... no
+[CFG  ]    checking if you want to install terminal database... yes
+[CFG  ]    checking if you want to install manpages... no
+[CFG  ]    checking if you want to build programs such as tic... yes
+[CFG  ]    checking if you want to build test-programs... no
+[CFG  ]    checking if you wish to install curses.h... yes
+[CFG  ]    checking for mawk... no
+[CFG  ]    checking for gawk... gawk
+[CFG  ]    checking for egrep... (cached) grep -E
+[CFG  ]    checking for a BSD compatible install... /home/blanham/projects/ChickenOS/cross/.build/tools/bin/install -c
+[CFG  ]    checking for tdlint... no
+[CFG  ]    checking for lint... no
+[CFG  ]    checking for alint... no
+[CFG  ]    checking for splint... no
+[CFG  ]    checking for lclint... no
+[CFG  ]    checking whether ln -s works... yes
+[CFG  ]    checking if ln -s -f options work... yes
+[CFG  ]    checking for long file names... yes
+[CFG  ]    checking if you want to use pkg-config... yes
+[CFG  ]    checking for i686-build_pc-linux-gnu-pkg-config... no
+[CFG  ]    checking for pkg-config... /usr/bin/pkg-config
+[CFG  ]    checking for /usr/bin/pkg-config library directory... checking done... /usr/share/pkgconfig
+[CFG  ]    checking if we should install .pc files for /usr/bin/pkg-config... no
+[CFG  ]    checking if we should assume mixed-case filenames... auto
+[CFG  ]    checking if filesystem supports mixed-case filenames... yes
+[CFG  ]    checking whether make sets ${MAKE}... yes
+[CFG  ]    checking for exctags... no
+[CFG  ]    checking for ctags... no
+[CFG  ]    checking for exetags... no
+[CFG  ]    checking for etags... no
+[CFG  ]    checking for ctags... no
+[CFG  ]    checking for etags... no
+[CFG  ]    checking for makeflags variable... -${MAKEFLAGS}
+[CFG  ]    checking for i686-build_pc-linux-gnu-ranlib... i686-build_pc-linux-gnu-ranlib
+[CFG  ]    checking for i686-build_pc-linux-gnu-ld... i686-build_pc-linux-gnu-ld
+[CFG  ]    checking for i686-build_pc-linux-gnu-ar... i686-build_pc-linux-gnu-ar
+[CFG  ]    checking for i686-build_pc-linux-gnu-nm... i686-build_pc-linux-gnu-nm
+[CFG  ]    checking for i686-build_pc-linux-gnu-ar... (cached) i686-build_pc-linux-gnu-ar
+[CFG  ]    checking for options to update archives... -curvU
+[CFG  ]    checking if you have specified an install-prefix... /home/blanham/projects/ChickenOS/cross/.build/i686-pc-elf/buildtools
+[CFG  ]    checking if libtool -version-number should be used... yes
+[CFG  ]    checking if you want to build libraries with libtool... no
+[CFG  ]    checking if you want to build shared libraries... no
+[CFG  ]    checking if you want to build static libraries... yes
+[CFG  ]    checking if you want to build debug libraries... yes
+[CFG  ]    checking if you want to build profiling libraries... no
+[CFG  ]    checking for specified models...  normal debug
+[CFG  ]    checking for default model... normal
+[CFG  ]    checking if you want to have a library-prefix... auto
+[CFG  ]    checking for PATH separator... :
+[CFG  ]    checking if you want to build a separate terminfo library... no
+[CFG  ]    checking if you want to build a separate tic library... no
+[CFG  ]    checking if you want to link with the GPM mouse library... maybe
+[CFG  ]    checking for gpm.h... yes
+[CFG  ]    checking for Gpm_Open in -lgpm... yes
+[CFG  ]    checking if you want to load GPM dynamically... yes
+[CFG  ]    checking for dlsym... no
+[CFG  ]    checking for dlsym in -ldl... yes
+[CFG  ]    checking whether able to link to dl*() functions... ok
+[CFG  ]    checking for soname of gpm library... libgpm.so.2
+[CFG  ]    checking for Gpm_Wgetch in -lgpm... yes
+[CFG  ]    checking if GPM is weakly bound to curses library... unknown
+[CFG  ]    configure: WARNING: GPM library is already linked with curses - read the FAQ
+[CFG  ]    checking for default loader flags... 
+[CFG  ]    checking for an rpath option... -Wl,-rpath,
+[CFG  ]    checking if release/abi version should be used for shared libs... auto
+[CFG  ]    checking which i686-build_pc-linux-gnu-gcc option to use... -fPIC
+[CFG  ]    checking if you want to disable library suffixes... no
+[CFG  ]    checking if you wish to append extra suffix to header/library paths... 
+[CFG  ]    checking if you wish to install ncurses overwriting curses... no
+[CFG  ]    checking if external terminfo-database is used... yes
+[CFG  ]    checking which terminfo source-file will be installed... ${top_srcdir}/misc/terminfo.src
+[CFG  ]    checking whether to use hashed database instead of directory/tree... no
+[CFG  ]    checking for list of fallback descriptions... 
+[CFG  ]    checking if you want modern xterm or antique... xterm-new
+[CFG  ]    checking if xterm backspace sends BS or DEL... BS
+[CFG  ]    checking for list of terminfo directories... /share/terminfo
+[CFG  ]    checking for default terminfo directory... /share/terminfo
+[CFG  ]    checking if big-core option selected... yes
+[CFG  ]    checking if big-strings option selected... yes
+[CFG  ]    checking if you want termcap-fallback support... yes
+[CFG  ]    checking for list of termcap files... /etc/termcap:/usr/share/misc/termcap
+[CFG  ]    checking if fast termcap-loader is needed... no
+[CFG  ]    checking if translated termcaps will be cached in ~/.terminfo... no
+[CFG  ]    checking if ~/.terminfo is wanted... yes
+[CFG  ]    checking if you want to use restricted environment when running as root... yes
+[CFG  ]    checking for remove... yes
+[CFG  ]    checking for unlink... yes
+[CFG  ]    checking if link/symlink functions work...  link symlink
+[CFG  ]    checking if tic should use symbolic links... yes
+[CFG  ]    checking if you want broken-linker support code... no
+[CFG  ]    checking if tputs should process BSD-style prefix padding... no
+[CFG  ]    checking if we must define _GNU_SOURCE... yes
+[CFG  ]    checking if _XOPEN_SOURCE really is set... yes
+[CFG  ]    checking if SIGWINCH is defined... yes
+[CFG  ]    checking for nl_langinfo and CODESET... yes
+[CFG  ]    checking if you want wide-character code... no
+[CFG  ]    checking whether to enable _LP64 definition in curses.h... no
+[CFG  ]    checking for special C compiler options needed for large files... no
+[CFG  ]    checking for _FILE_OFFSET_BITS value needed for large files... 64
+[CFG  ]    checking for _LARGE_FILES value needed for large files... no
+[CFG  ]    checking for _LARGEFILE_SOURCE value needed for large files... no
+[CFG  ]    checking for fseeko... yes
+[CFG  ]    checking whether to use struct dirent64... no
+[CFG  ]    checking if you want tparm not to use X/Open fixed-parameter list... yes
+[CFG  ]    checking for type of bool... auto
+[CFG  ]    checking for alternate terminal capabilities file... Caps
+[CFG  ]    checking for type of chtype... auto
+[CFG  ]    checking for type of ospeed... short
+[CFG  ]    checking for type of mmask_t... auto
+[CFG  ]    checking for size CCHARW_MAX... 5
+[CFG  ]    checking for type of tparm args... long
+[CFG  ]    checking if RCS identifiers should be compiled-in... no
+[CFG  ]    checking format of man-pages...  gzip
+[CFG  ]    checking for manpage renaming... no
+[CFG  ]    checking if manpage aliases will be installed... yes
+[CFG  ]    checking if manpage symlinks should be used... yes
+[CFG  ]    checking for manpage tbl... no
+[CFG  ]    checking if you want to build with function extensions... yes
+[CFG  ]    checking if you want to build with SCREEN extensions... no
+[CFG  ]    checking if you want to build with terminal-driver... no
+[CFG  ]    checking for extended use of const keyword... no
+[CFG  ]    checking if you want to use extended colors... no
+[CFG  ]    checking if you want to use extended mouse encoding... no
+[CFG  ]    checking if you want to use extended putwin/screendump... no
+[CFG  ]    checking if you want $NCURSES_NO_PADDING code... yes
+[CFG  ]    checking for ANSI C header files... yes
+[CFG  ]    checking for sys/types.h... yes
+[CFG  ]    checking for sys/stat.h... yes
+[CFG  ]    checking for stdlib.h... yes
+[CFG  ]    checking for string.h... yes
+[CFG  ]    checking for memory.h... yes
+[CFG  ]    checking for strings.h... yes
+[CFG  ]    checking for inttypes.h... yes
+[CFG  ]    checking for stdint.h... yes
+[CFG  ]    checking for unistd.h... yes
+[CFG  ]    checking for signed char... yes
+[CFG  ]    checking size of signed char... 1
+[CFG  ]    checking if you want to use signed Boolean array in term.h... no
+[CFG  ]    checking if you want SIGWINCH handler... yes
+[CFG  ]    checking if you want user-definable terminal capabilities like termcap... yes
+[CFG  ]    checking if you want all development code... no
+[CFG  ]    checking if you want hard-tabs code... no
+[CFG  ]    checking if you want limited support for xmc... no
+[CFG  ]    checking if you do not want to assume colors are white-on-black... yes
+[CFG  ]    checking if you want hashmap scrolling-optimization code... yes
+[CFG  ]    checking if you want colorfgbg code... no
+[CFG  ]    checking if you want interop bindings... no
+[CFG  ]    checking if you want to link with the pthread library... no
+[CFG  ]    checking if you want reentrant code... no
+[CFG  ]    checking if you want experimental safe-sprintf code... no
+[CFG  ]    checking if you want wgetch-events code... no
+[CFG  ]    checking if you want to see long compiling messages... yes
+[CFG  ]    checking if you want to see compiler warnings... 
+[CFG  ]    configure: checking for i686-build_pc-linux-gnu-gcc __attribute__ directives...
+[CFG  ]    ... scanf
+[CFG  ]    ... printf
+[CFG  ]    ... unused
+[CFG  ]    ... noreturn
+[CFG  ]    checking if you want to work around bogus compiler/loader warnings... no
+[CFG  ]    checking if you want to enable runtime assertions... no
+[CFG  ]    checking if you want to use dmalloc for testing... no
+[CFG  ]    checking if you want to use dbmalloc for testing... no
+[CFG  ]    checking if you want to use valgrind for testing... no
+[CFG  ]    checking if you want to perform memory-leak testing... no
+[CFG  ]    checking whether to add trace feature to all models... no
+[CFG  ]    checking if we want to use GNAT projects... yes
+[CFG  ]    checking for gettimeofday... yes
+[CFG  ]    checking if -lm needed for math functions... yes
+[CFG  ]    checking for ANSI C header files... (cached) yes
+[CFG  ]    checking for dirent.h that defines DIR... yes
+[CFG  ]    checking for opendir in -ldir... no
+[CFG  ]    checking whether time.h and sys/time.h may both be included... yes
+[CFG  ]    checking for regcomp... yes
+[CFG  ]    checking for regular-expression headers... regex.h
+[CFG  ]    checking for fcntl.h... yes
+[CFG  ]    checking for getopt.h... yes
+[CFG  ]    checking for limits.h... yes
+[CFG  ]    checking for locale.h... yes
+[CFG  ]    checking for math.h... yes
+[CFG  ]    checking for poll.h... yes
+[CFG  ]    checking for sys/bsdtypes.h... no
+[CFG  ]    checking for sys/ioctl.h... yes
+[CFG  ]    checking for sys/param.h... yes
+[CFG  ]    checking for sys/poll.h... yes
+[CFG  ]    checking for sys/select.h... yes
+[CFG  ]    checking for sys/time.h... yes
+[CFG  ]    checking for sys/times.h... yes
+[CFG  ]    checking for ttyent.h... yes
+[CFG  ]    checking for unistd.h... (cached) yes
+[CFG  ]    checking for wctype.h... yes
+[CFG  ]    checking for unistd.h... (cached) yes
+[CFG  ]    checking for getopt.h... (cached) yes
+[CFG  ]    checking for header declaring getopt variables... unistd.h
+[CFG  ]    checking if sys/time.h works with sys/select.h... yes
+[CFG  ]    checking for an ANSI C-conforming const... yes
+[CFG  ]    checking for inline... inline
+[CFG  ]    checking if i686-build_pc-linux-gnu-gcc supports options to tune inlining... yes
+[CFG  ]    checking for signal global datatype... volatile sig_atomic_t
+[CFG  ]    checking for type of chtype... long
+[CFG  ]    checking if unsigned literals are legal... yes
+[CFG  ]    checking if external errno is declared... yes
+[CFG  ]    checking if external errno exists... no
+[CFG  ]    checking if data-only library module links... yes
+[CFG  ]    checking for getcwd... yes
+[CFG  ]    checking for getegid... yes
+[CFG  ]    checking for geteuid... yes
+[CFG  ]    checking for getopt... yes
+[CFG  ]    checking for getttynam... yes
+[CFG  ]    checking for issetugid... no
+[CFG  ]    checking for poll... yes
+[CFG  ]    checking for putenv... yes
+[CFG  ]    checking for remove... (cached) yes
+[CFG  ]    checking for select... yes
+[CFG  ]    checking for setbuf... yes
+[CFG  ]    checking for setbuffer... yes
+[CFG  ]    checking for setenv... yes
+[CFG  ]    checking for setvbuf... yes
+[CFG  ]    checking for sigaction... yes
+[CFG  ]    checking for sigvec... no
+[CFG  ]    checking for strdup... yes
+[CFG  ]    checking for strstr... yes
+[CFG  ]    checking for tcgetpgrp... yes
+[CFG  ]    checking for times... yes
+[CFG  ]    checking for vsnprintf... yes
+[CFG  ]    checking for isascii... yes
+[CFG  ]    checking whether sigaction needs _POSIX_SOURCE... no
+[CFG  ]    checking if nanosleep really works... yes
+[CFG  ]    checking for termio.h... yes
+[CFG  ]    checking for termios.h... yes
+[CFG  ]    checking for unistd.h... (cached) yes
+[CFG  ]    checking whether termios.h needs _POSIX_SOURCE... no
+[CFG  ]    checking for tcgetattr... yes
+[CFG  ]    checking for vsscanf function or workaround... vsscanf
+[CFG  ]    checking for working mkstemp... yes
+[CFG  ]    checking whether setvbuf arguments are reversed... no
+[CFG  ]    checking for intptr_t... yes
+[CFG  ]    checking for ssize_t... yes
+[CFG  ]    checking for type sigaction_t... no
+[CFG  ]    checking declaration of size-change... yes
+[CFG  ]    checking for memmove... yes
+[CFG  ]    checking if poll really works... yes
+[CFG  ]    checking for va_copy... yes
+[CFG  ]    checking for __va_copy... yes
+[CFG  ]    checking for pid_t... yes
+[CFG  ]    checking for unistd.h... (cached) yes
+[CFG  ]    checking for vfork.h... no
+[CFG  ]    checking for fork... yes
+[CFG  ]    checking for vfork... yes
+[CFG  ]    checking for working fork... (cached) yes
+[CFG  ]    checking for working vfork... (cached) yes
+[CFG  ]    checking for openpty in -lutil... yes
+[CFG  ]    checking for openpty header... pty.h
+[CFG  ]    checking if we should include stdbool.h... yes
+[CFG  ]    checking for builtin bool type... no
+[CFG  ]    checking for size of bool... unsigned char
+[CFG  ]    checking for library subsets... ticlib+termlib+ext_tinfo+base+ext_funcs
+[CFG  ]    checking default library suffix... 
+[CFG  ]    checking default library-dependency suffix... .a
+[CFG  ]    checking default object directory... objects
+[CFG  ]    checking if linker supports switching between static/dynamic... no
+[CFG  ]    checking where we will install curses.h... ${prefix}/include/ncurses
+[CFG  ]    checking for src modules... ncurses progs panel menu form
+[CFG  ]    checking for tic... /usr/bin/tic
+[CFG  ]    checking for defines to add to ncurses5-config script...  -D_GNU_SOURCE
+[CFG  ]    package: ncurses
+[CFG  ]    configure: creating ./config.status
+[CFG  ]    config.status: creating include/MKterm.h.awk
+[CFG  ]    config.status: creating include/curses.head
+[CFG  ]    config.status: creating include/ncurses_dll.h
+[CFG  ]    config.status: creating include/termcap.h
+[CFG  ]    config.status: creating include/unctrl.h
+[CFG  ]    config.status: creating include/Makefile
+[CFG  ]    config.status: creating ncurses/Makefile
+[CFG  ]    config.status: creating progs/Makefile
+[CFG  ]    config.status: creating panel/Makefile
+[CFG  ]    config.status: creating menu/Makefile
+[CFG  ]    config.status: creating form/Makefile
+[CFG  ]    config.status: creating misc/Makefile
+[CFG  ]    config.status: creating misc/run_tic.sh

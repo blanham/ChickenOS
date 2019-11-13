@@ -1,0 +1,17 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+IOPort	/home/blanham/projects/ChickenOS/src/arch/x86/mod.rs	/^struct IOPort {$/;"	s
+PAGE_SIZE	/home/blanham/projects/ChickenOS/src/arch/i386/mod.rs	/^pub const PAGE_SIZE: usize = 4096;$/;"	c
+arch_boot_info	/home/blanham/projects/ChickenOS/src/lib.rs	/^pub struct arch_boot_info;$/;"	s
+boot	/home/blanham/projects/ChickenOS/src/arch/i386/boot.rs	/^pub fn boot(mb: *const i32, info: *const i32) {}$/;"	f
+c_outb	/home/blanham/projects/ChickenOS/src/arch/i386/io.rs	/^    fn c_outb(port: uint16_t, value: u8);$/;"	f
+c_outl	/home/blanham/projects/ChickenOS/src/arch/i386/io.rs	/^    fn c_outl(port: uint16_t, value: u32);$/;"	f
+c_outw	/home/blanham/projects/ChickenOS/src/arch/i386/io.rs	/^    fn c_outw(port: uint16_t, value: u16);$/;"	f
+kmain	/home/blanham/projects/ChickenOS/src/lib.rs	/^    fn kmain(info: *const i32);$/;"	f
+multiboot_parse	/home/blanham/projects/ChickenOS/src/lib.rs	/^    fn multiboot_parse(mb: *const i32, info: *const i32) -> *const i32;$/;"	f
+outb	/home/blanham/projects/ChickenOS/src/arch/i386/io.rs	/^pub unsafe fn outb(port: u16, value: u8) {$/;"	f
+outl	/home/blanham/projects/ChickenOS/src/arch/i386/io.rs	/^pub unsafe fn outl(port: u16, value: u32) {$/;"	f
+outw	/home/blanham/projects/ChickenOS/src/arch/i386/io.rs	/^pub unsafe fn outw(port: u16, value: u16) {$/;"	f
+rust_entry	/home/blanham/projects/ChickenOS/src/lib.rs	/^pub extern fn rust_entry(boot_info: *const arch_boot_info) {$/;"	f
+rust_kmain	/home/blanham/projects/ChickenOS/src/lib.rs	/^pub extern fn rust_kmain(info: *const i32) {$/;"	f
+rust_multiboot	/home/blanham/projects/ChickenOS/src/lib.rs	/^pub extern fn rust_multiboot(mb: *const i32, info: *const i32) -> *const i32 {$/;"	f

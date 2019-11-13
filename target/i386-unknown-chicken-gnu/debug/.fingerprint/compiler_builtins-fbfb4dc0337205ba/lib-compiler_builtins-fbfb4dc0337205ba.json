@@ -1,0 +1,1 @@
+{"rustc":9838638473016830137,"features":"[\"compiler-builtins\", \"default\"]","target":14757365570657867246,"profile":4650336339042204414,"path":14679706879243203028,"deps":[],"local":[{"Precalculated":"0ba07e49264a54cb5bbd4856fcea083bb3fbec15"}],"rustflags":["--sysroot","/home/blanham/.xargo"]}

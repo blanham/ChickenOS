@@ -1,0 +1,4 @@
+{
+	"linker_script": "x86/i386/linker.ld",
+	""
+}

@@ -1,0 +1,17 @@
+[package]
+name = "chicken_os"
+version = "0.2.0"
+authors = ["Bryce Lanham <blanham@gmail.com>"]
+build = "build.rs"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+compiler_builtins = { git = "https://github.com/rust-lang-nursery/compiler-builtins"  }
+#bitflags = "0.7.0"
+#libc = { version = "0.2", default-features = false, git = "https://github.com/blanham/libc.git"}
+
+# [dependencies.core]
+# git = "https://github.com/phil-opp/nightly-libcore.git"
+# features = ["disable_float"] # optional

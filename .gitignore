@@ -4,5 +4,7 @@ log
 info/
 disk/
 tmp/
+*.img
+*.img.bak
 disk.img
 GOALS

@@ -1,0 +1,5 @@
+cd ..
+xargo build --target i386-unknown-none-gnu
+   Compiling core v0.1.0 (https://github.com/phil-opp/nightly-libcore.git#31552b2c)
+Makefile:91: recipe for target 'rust' failed
+make: *** [rust] Interrupt

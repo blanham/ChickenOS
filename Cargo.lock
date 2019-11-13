@@ -1,0 +1,14 @@
+[[package]]
+name = "chicken_os"
+version = "0.2.0"
+dependencies = [
+ "compiler_builtins 0.1.0 (git+https://github.com/rust-lang-nursery/compiler-builtins)",
+]
+
+[[package]]
+name = "compiler_builtins"
+version = "0.1.0"
+source = "git+https://github.com/rust-lang-nursery/compiler-builtins#0ba07e49264a54cb5bbd4856fcea083bb3fbec15"
+
+[metadata]
+"checksum compiler_builtins 0.1.0 (git+https://github.com/rust-lang-nursery/compiler-builtins)" = "<none>"
