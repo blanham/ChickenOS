@@ -30,7 +30,7 @@ void arch_thread_reschedule(thread_t *cur, thread_t *next)
 	//to call a function
 	tss_update((uintptr_t)next + STACK_SIZE);
 
-	printf("RES %p %p\n", cur, next);
+	//printf("RES %p %p\n", cur, next);
 
 	switch_threads(cur, next);
 }
