@@ -56,8 +56,10 @@ void elf_map_regions(Elf32_Ehdr *header, struct file *file)
 		//memregion_add(cur->mm, phdr->p_vaddr, phdr->p_memsz, PROT_READ | PROT_EXEC,
 		//		MAP_FILE, file->inode, phdr->p_offset, phdr->p_filesz, NULL);
 
-		memregion_map_file(cur->mm, phdr->p_vaddr, phdr->p_memsz, PROT_READ | PROT_EXEC,
-				MAP_FILE, file->inode, phdr->p_offset, phdr->p_filesz);
+		uint32_t mem_length = (phdr->p_vaddr & ~PAGE_MASK) + phdr->p_memsz;
+		uint32_t file_length = (phdr->p_offset & ~PAGE_MASK) + phdr->p_filesz;
+		memregion_map_file(cur->mm, phdr->p_vaddr, mem_length, PROT_READ | PROT_WRITE| PROT_EXEC,
+				MAP_FILE, file->inode, phdr->p_offset & PAGE_MASK, file_length);
 		printf("Vaddr %8x Filesize %x Memsize %x Offset %x\n", phdr->p_vaddr,
 				phdr->p_filesz, phdr->p_memsz, phdr->p_offset);
 	}

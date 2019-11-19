@@ -96,11 +96,6 @@ int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
 {
 	ASSERT(inode != NULL, "NULL inode passed in");
 	struct memregion *new = memregion_new(mm, address, len, prot, flags);
-	if ((address & PAGE_MASK) == 0x0823e000) {
-	//if ((address & PAGE_MASK) == 0x08063000) {
-		new->pages++;
-		new->addr_end += PAGE_SIZE;
-	}
 	new->inode = inode;
 	new->file_offset = offset;
 	new->file_size = size;
@@ -177,16 +172,24 @@ int load_page_from_file(struct mm *mm, struct memregion *p, uintptr_t address)
 {
 	ASSERT(p->inode != NULL, "Inode is a NULL pointer");
 
-	off_t pages_from_start = (address & PAGE_MASK)  - p->addr_start;
-	off_t file_offset = (p->file_offset & PAGE_MASK) + (pages_from_start & PAGE_MASK);
+	uint32_t page = address & PAGE_MASK;
+	uint32_t offset = (page - p->addr_start);
 
+	//FIXME: This should be a frame, not a bare page from palloc()
 	void *new = palloc();
-	memset(new, 0, PAGE_SIZE);
 
-	if (pages_from_start < p->file_size) {
-		size_t len = p->file_size - pages_from_start;
-		p->inode->fs->ops->read(p->inode, new, len, file_offset);
+	if (offset <= p->file_size) {
+		uint32_t off = p->file_offset + offset;
+		uint32_t len = p->file_size - offset;
+		printf("Loading from file %x %x %x %x\n",page, offset, len, off);
+		p->inode->fs->ops->read(p->inode, new, PAGE_SIZE, off);
+		if (len < PAGE_SIZE) {
+			memset(new + len, 0, PAGE_SIZE - len);
+		}
+	} else {
+		memset(new, 0, PAGE_SIZE);
 	}
+
 	memregion_insert(mm, new, address, 0x7);
 
 	return 0;
@@ -195,11 +198,10 @@ int load_page_from_file(struct mm *mm, struct memregion *p, uintptr_t address)
 int memregion_cow(struct mm *mm, struct memregion *p, uintptr_t address)
 {
 	(void)p;
-	printf("COW IS BROKEN\n");
+	PANIC("COW IS BROKEN\n");
 	{
 				phys_addr_t phys = pagedir_lookup(mm->pd, address);
 				//XXX: this is bad and I should feel bad
-				//PANIC("FUCK YOU PAST CHICKEN");
 				void *new = palloc();
 				if(phys == 0)
 					memset(new, 0, PAGE_SIZE);
