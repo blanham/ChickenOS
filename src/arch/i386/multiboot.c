@@ -73,14 +73,16 @@ no_modules:
 	return last_address;
 }
 
+//FIXME: This should be cleaned up
 static uint32_t multiboot_parse_memmap(struct multiboot_info *mb)
 {
 	multiboot_memory_map_t *mmap = (void *)P2V(mb->mmap_addr);
+	void *mmap_end = P2V(mb->mmap_addr + mb->mmap_length);
 	uint32_t last_address = 0;
-	int mmap_entries = mb->mmap_length / sizeof(multiboot_memory_map_t);
 	uint32_t mem_size = 0;
 
-	for (int i = 0; i < mmap_entries; i++) {
+	while((uintptr_t)mmap < (uintptr_t)mmap_end) {
+		mmap = (void *)((uintptr_t)mmap +mmap->size + sizeof(mmap->size));
 #ifdef BOOT_DEBUG
 		serial_printf (" size = 0x%x, base_addr = 0x%x, length = 0x%x, type = 0x%x\n",
 				(unsigned)mmap->size, (unsigned)mmap->addr,
@@ -94,12 +96,11 @@ static uint32_t multiboot_parse_memmap(struct multiboot_info *mb)
 		// Find the largest block, that will be the end of main memory for now
 		if (mmap->len > mem_size) {
 			mem_size = mmap->len;
-			last_address = mmap->addr - mmap->size;
+			last_address = mmap->addr + mmap->len;
 		}
-		mmap++;
 	}
 
-	return last_address;
+	return mem_size;
 }
 
 struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t magic)
@@ -143,7 +144,9 @@ struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t mag
 	placement = (placement & ~0xFFF) + PAGE_SIZE;
 
 	info->placement = (void *)placement;
-	info->mem_size = last_available_page - placement;
+	//FIXME: This isn't right, but it is less wrong than before :P
+	(void)last_available_page;
+	info->mem_size = last_available_page ;
 
 	multiboot_detect_video_mode(mb, info);
 

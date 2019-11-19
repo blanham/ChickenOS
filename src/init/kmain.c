@@ -67,7 +67,7 @@ void kmain(struct kernel_boot_info *info)
 	vfs_mount_root(ATA0_0_DEV, "ext2");
 
 	extern uint32_t mem_size;
-	printf("Found %uMB RAM\n", mem_size / 1024/1024);
+	printf("Found %uMB RAM\n", info->mem_size/1024/1024);
 
 	//init thread is started in user mode
 	//so we don't need to switch into user mode
