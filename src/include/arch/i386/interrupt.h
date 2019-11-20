@@ -12,22 +12,18 @@ enum {
 	IRQ12, IRQ13, IRQ14, IRQ15
 };
 
-enum { PIT_I = IRQ0, KBD_I, CASC_I, COM2_I, COM1_I, FD_I};
-
-typedef struct registers
-{
-  	uint32_t ESP; //try to get rid of this
+typedef struct registers {
+  	uint32_t ESP; // try to get rid of this
 	uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
-	uint16_t ds,:16;
+	uint16_t ds, :16;
 	uint16_t es, :16;
 	uint16_t fs, :16;
-	uint16_t gs, :16;                  // Data segment selectors
-	uint32_t int_no, err_code;    // Interrupt number and error code (if applicable)
+	uint16_t gs, :16;         	    // Data segment selectors
+	uint32_t int_no, err_code;		// Interrupt number and error code (if applicable)
 	uint32_t eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
 } __attribute__((packed)) registers_t;
 
-/*TODO:rename me to registers_dump*/
 void dump_regs(registers_t *regs);
 void arch_interrupt_init();
-void i386_syscall_handler(registers_t *regs);
+
 #endif

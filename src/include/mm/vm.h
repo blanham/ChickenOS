@@ -24,6 +24,7 @@ typedef uintptr_t virt_addr_t;
 #define PAGE_VIOLATION 0x01
 #define PAGE_WRITE	   0x02
 #define PAGE_USER	   0x04
+#define PAGE_ERR_MASK (PAGE_VIOLATION|PAGE_WRITE|PAGE_USER)
 
 //#define PTE_PRESENT 0x00000001
 

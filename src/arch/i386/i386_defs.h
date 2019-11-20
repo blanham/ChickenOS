@@ -1,5 +1,14 @@
+/*	ChickenOS - i386/i386_defs.h
+ */
+
+
+// TODO: Major cleanup
+
 #ifndef C_OS_I386_DEFS_H
 #define C_OS_I386_DEFS_H
+
+#define BOCHS_BREAK() asm volatile("xchg %bx, %bx")
+
 #define PDE_MASK	0xffc00000
 #define PDE_SHIFT 	22
 #define PDE_P		0x00000001
@@ -50,23 +59,23 @@ struct gdt_descriptor {
 	uint32_t location;
 } __attribute__((packed));
 
-#define GDTA_P		 0x80	//present
-#define GDTA_RING0 	 0x00
-#define GDTA_RING3 	 0x60
-#define GDTA_ALWAYS	 0x10	//always 1
-#define GDTA_EXE	 0x08
-#define GDTA_CANJUMP 0x04	//can jump to lower ring levels
-#define GDTA_RW		 0x02
+#define GDTA_P       0x80
+#define GDTA_RING0   0x00
+#define GDTA_RING3   0x60
+#define GDTA_ALWAYS  0x10
+#define GDTA_EXE     0x08
+#define GDTA_CANJUMP 0x04
+#define GDTA_RW      0x02
 #define GDTA_ACCESS  0x01
-#define GDTF_32BIT 	 0x40
-#define GDTF_4KB 	 0x80
+#define GDTF_32BIT   0x40
+#define GDTF_4KB 	   0x80
 
-#define GDTA_KERNEL 	 (GDTA_P | GDTA_RING0 | GDTA_ALWAYS | GDTA_EXE  | GDTA_RW)
-#define GDTA_KERNEL_DATA (GDTA_P | GDTA_RING0 | GDTA_ALWAYS | GDTA_RW)
-#define GDTA_USER 		 (GDTA_P | GDTA_RING3 | GDTA_ALWAYS | GDTA_EXE |  GDTA_RW)
-#define GDTA_USER_DATA 	 (GDTA_P | GDTA_RING3 | GDTA_ALWAYS | GDTA_RW)
-#define GDTA_TSS 	 	 (GDTA_P | GDTA_RING3 | GDTA_EXE | GDTA_ACCESS)
-#define GDTF_BOTH 		 (GDTF_32BIT | GDTF_4KB)
+#define GDTA_KERNEL        (GDTA_P | GDTA_RING0 | GDTA_ALWAYS | GDTA_EXE  | GDTA_RW)
+#define GDTA_KERNEL_DATA   (GDTA_P | GDTA_RING0 | GDTA_ALWAYS | GDTA_RW)
+#define GDTA_USER          (GDTA_P | GDTA_RING3 | GDTA_ALWAYS | GDTA_EXE |  GDTA_RW)
+#define GDTA_USER_DATA     (GDTA_P | GDTA_RING3 | GDTA_ALWAYS | GDTA_RW)
+#define GDTA_TSS           (GDTA_P | GDTA_RING3 | GDTA_EXE | GDTA_ACCESS)
+#define GDTF_BOTH          (GDTF_32BIT | GDTF_4KB)
 
 extern void gdt_flush(struct gdt_descriptor *ptr);
 
@@ -85,35 +94,30 @@ irq8 (), irq9 (), irq10(), irq11(),
 irq12(), irq13(), irq14(), irq15();
 
 #define NUM_INTRS 256
-/* IDT flags */
-#define IDT_FLAG_BASE 0x0E//always
+
+#define IDT_FLAG_BASE    0x0E
 #define IDT_FLAG_PRESENT 0x80
 #define IDT_FLAG_RING0   0x00
 #define IDT_FLAG_RING1   0x20
 #define IDT_FLAG_RING2   0x40
 #define IDT_FLAG_RING3	 0x60
 
-/* structs taken from James Molloy's kernel tutorial */
-struct idt_entry_struct
+typedef struct
 {
    uint16_t base_lo;             // The lower 16 bits of the address to jump to when this interrupt fires.
    uint16_t sel;                 // Kernel segment selector.
    uint8_t  always0;             // This must always be zero.
    uint8_t  flags;               // More flags. See documentation.
    uint16_t base_hi;             // The upper 16 bits of the address to jump to.
-} __attribute__((packed));
-typedef struct idt_entry_struct idt_entry_t;
+} __attribute__((packed)) idt_entry_t;
 
 // A struct describing a pointer to an array of interrupt handlers.
 // This is in a format suitable for giving to 'lidt'.
-struct idt_ptr_struct
+typedef struct 
 {
-   uint16_t limit : 16;
-   uint32_t base : 32;                // The address of the first element in our idt_entry_t array.
-} __attribute__((packed));
-typedef struct idt_ptr_struct idt_ptr_t;
-
-
+   uint16_t limit;
+   uint32_t base;                // The address of the first element in our idt_entry_t array.
+} __attribute__((packed)) idt_ptr_t;
 
 typedef uint32_t sel_t;
 typedef struct tss {
