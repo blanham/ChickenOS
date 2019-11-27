@@ -87,11 +87,11 @@ sysc:
 
 
 [global intr_return]
-[global THIS_IS_A_TEST]
 [extern interrupt_handler]
 [extern dump_regs]
 _isr_handler:
 	sti	;reenable interrupts
+
 	push gs
 	push fs
 	push es
@@ -106,73 +106,30 @@ _isr_handler:
 
 	lea ebp, [esp+52]
 
-	mov eax, esp
-	sub eax, 8
-	push eax
-
-;	mov eax, esp
-;	push eax
-;	push format
-;	call printf
-;	add esp, 8
-
-
+	;mov eax, esp
+	;sub eax, 8
+	;push eax
 	push esp
 
-
 	call interrupt_handler
-	pop eax
-
-	add esp,4
-	popa
-	pop ds
-	pop es
-	pop fs
-	pop gs
-	add esp,8;jump ahead of error code/interrupt number
-	;sti
-	iret
-
-THIS_IS_A_TEST:
-
-	add esp,4
-	popa
-	pop ds
-	pop es
-	pop fs
-	pop gs
-	add esp,8;jump ahead of error code/interrupt number
-	;sti
-	iret
-[extern dump_regs]
-
-format db "out %X",10,0
-[extern printf]
-
+	add esp, 4
 intr_return:
-
-	add esp,4
-
-	add esp,4
-
-
 	popa
 	pop ds
 	pop es
 	pop fs
 	pop gs
-	add esp,8;jump ahead of error code/interrupt number
-	;
-;	mov eax, esp
+	add esp, 8 ;jump ahead of error code/interrupt number
+;	mov eax, esp ; old debug stuff left in for now
 ;	push eax
 ;	push format
 ;	call printf
 ;	add esp, 8
-	;
-
-
 	iretd
 
+[extern dump_regs]
+format db "out %X",10,0
+[extern printf]
 
 [GLOBAL get_eip]
 get_eip:
@@ -199,7 +156,7 @@ syscall_isr:
 	iret
 
 
-;align 4096
+align 4096
 [global idt_table]
 idt_table:
 	resb 4096

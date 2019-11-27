@@ -23,17 +23,9 @@ void kmain(struct kernel_boot_info *info)
 	if(info == NULL)
 		kernel_halt(); //Something went wrong, hang
 
-//	console_init();
-
 	vm_init(info);
-
-	threading_init();
-
-	interrupt_init();
-
-	pci_init();
-
 	video_init(info);
+//	console_init();
 	tty_init(info);
 
 	//we start out with one color scheme
@@ -41,6 +33,13 @@ void kmain(struct kernel_boot_info *info)
 	//console working
 //	console_set_color(BLUE,WHITE);
 	printf(BOOT_MSG);
+
+	threading_init();
+
+	interrupt_init();
+
+	pci_init();
+
 //	audio_init();
 
 	extern void pci_list();
@@ -76,10 +75,6 @@ void kmain(struct kernel_boot_info *info)
 
 	//TODO: We should probably use this thread to schedule
 	//		bottom halves
-	//while(1)
-	//	printf("SHIT\n");
-
-	//should probably be a sleep() or something
 	kernel_halt();
 
 	//should never return, unless things get really fucked

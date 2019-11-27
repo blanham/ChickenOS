@@ -22,6 +22,51 @@
 
 #define THREAD_ASSERT(x) ASSERT(x->magic == THREAD_MAGIC, "Thread's kernel stack overflowed")
 
+enum thread_stat;
+struct thread_signals;
+struct thread_files;
+
+//TODO: Priorities? Would really like to maybe implement the 4.3BSD scheduler
+// 		since we didn't get it working in pintos
+typedef struct thread_struct {
+	pid_t pid, ppid, pgid;
+	uid_t uid, euid;
+	gid_t gid;
+	mode_t umask;
+	char *name;
+	int ret_val;
+
+	//Scheduler hash
+	UT_hash_handle hh;
+
+	//wait list
+	thread_t *wait_next, *wait_prev;
+	//Would a tree work better for this?
+	//Children and children list
+	thread_t *children; // Why not have a pointer to a master tree of processes?
+	thread_t *child_next, *child_prev;
+
+	//fs stuff
+	struct thread_files *file_info;
+	//saved kernel stack, user stack, and location of user stack
+	uint8_t *sp, *useresp, *user;
+
+	struct thread_signals *sig_info;
+
+	//this pointer to registers on kernel
+	//stack is used for manipulating the user stack
+	//for signal handling
+	struct registers *regs, *signal_regs;
+
+	struct mm *mm;
+
+	/* status of thread (DEAD, READY, RUNNING, BLOCKED, ) */
+	enum thread_stat status;
+
+	/* magic number so we can detect if stack collided with thread info */
+	uint32_t magic;
+} __attribute__((packed)) thread_t;
+
 enum thread_stat {
 	THREAD_NEW,
 	THREAD_DEAD,
@@ -30,8 +75,6 @@ enum thread_stat {
 	THREAD_BLOCKED,
 	THREAD_UNINTERRUPTIBLE
 };
-
-typedef struct thread_struct thread_t;
 
 struct thread_files {
 	struct inode *root;
@@ -48,49 +91,6 @@ struct thread_signals {
 	sigset_t sigmask, pending;
 };
 
-//TODO: Priorities? Would really like to maybe implement the 4.3BSD scheduler
-// 		since we didn't get it working in pintos
-struct thread_struct {
-	pid_t pid, ppid, pgid;
-	uid_t uid, euid;
-	gid_t gid;
-	mode_t umask;
-	char *name;
-	int ret_val;
-
-	//Scheduler hash
-	UT_hash_handle hh;
-
-	//wait list
-	thread_t *wait_next, *wait_prev;
-	//Would a tree work better for this?
-	//Children and children list
-	thread_t *children;
-	thread_t *child_next, *child_prev;
-
-	//fs stuff
-	struct thread_files *file_info;
-	//saved kernel stack, user stack, and location of user stack
-	uint8_t *sp, *useresp, *user;
-
-
-	//FIXME: Refactor this into a struct, takes up a fuckton of space
-	struct thread_signals *sig_info;
-
-	//this pointer to registers on kernel
-	//stack is used for manipulating the user stack
-	//for signal handling
-	struct registers *regs, *signal_regs;
-
-	struct mm *mm;
-
-	/* status of thread (DEAD, READY, RUNNING, BLOCKED, ) */
-	enum thread_stat status;
-
-	/* magic number so we can detect if stack collided with thread info */
-	uint32_t magic;
-} __attribute__((packed));
-
 // Possible design for a thread queue
 struct thread_queue {
 	thread_t *next, *prev;
@@ -100,14 +100,13 @@ typedef struct thread_queue thq_t;
 //FIXME: split this stuff up?
 
 /* arch/$ARCH/thread.c */
-void arch_threading_init();
 void arch_thread_reschedule(thread_t *cur, thread_t *next);
 
 /* thread.c */
 thread_t * 	thread_current();
 thread_t *	thread_by_pid(pid_t pid);
 void 	threading_init();
-pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux);
+pid_t	thread_create2(uintptr_t eip, uintptr_t _esp, void *aux);
 pid_t 	thread_create(registers_t *regs, void (*eip)(void *), void * esp);
 pid_t 	pid_allocate();
 

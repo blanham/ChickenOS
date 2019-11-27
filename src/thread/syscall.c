@@ -14,17 +14,11 @@
 
 #define DEBUG
 
-typedef long * arg56;
-
 void syscall_handler (registers_t *regs)
 //int syscall_handler (uint32_t call, void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5)
 {
 	int call = regs->eax;
 	long *arg;
-
-	//printf("\n\n");
-	//dump_regs(regs);
-	//printf("\n\n");
 
 #ifdef DEBUG
 	serial_printf("%s(%i): by %i @ %x\n",syscall_names[call], call, thread_current()->pid,

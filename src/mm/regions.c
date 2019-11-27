@@ -250,13 +250,16 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 int verify_pointer(const void *ptr, size_t len, int rw)
 {
 //	thread_t *cur = thread_current();
-	size_t count = 0;
-	struct memregion *p = NULL;
+	//size_t count = 0;
+	//struct memregion *p = NULL;
 	(void)rw;
+	(void)len;
 
 	if((uintptr_t)ptr > PHYS_BASE)
 		return -EFAULT;
 
+	return 0;
+	/*
 	while (count < len)
 	{
 		//lookup in tree
@@ -273,5 +276,5 @@ int verify_pointer(const void *ptr, size_t len, int rw)
 		ptr += count;
 	}
 
-	return 0;
+	return 0;*/
 }

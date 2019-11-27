@@ -182,7 +182,6 @@ void arch_interrupt_disable()
 
 void dump_regs(registers_t *regs)
 {
-	printf("ESP %X\n", regs->ESP);
 	printf("edi %X esi %X ebp %X esp %X\nebx %X edx %X ecx %X eax %X\n",
 		regs->edi,regs->esi,regs->ebp,regs->esp,regs->ebx,regs->edx,regs->ecx,regs->eax);
 	printf("ds %X es %X fs %X gs %X int_no %i err_code %i\n",

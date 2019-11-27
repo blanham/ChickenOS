@@ -20,6 +20,7 @@
 //};
 //struct process_tree_node process_tree_root;
 
+// XXX: This should be removed
 extern struct file *root;
 
 int thread_stack_offset = offsetof(thread_t, sp);
@@ -28,17 +29,11 @@ static struct thread_files *thread_files_alloc(struct thread_files *old);
 
 void threading_init()
 {
-	thread_t *kernel_thread;
-
 	interrupt_disable();
+	
+	extern thread_t *kernel_thread;
 
-	//do this inline, otherwise assertion fails in thread_current()
-	stackpointer_get(kernel_thread);
-	kernel_thread = (thread_t *) ((uintptr_t)kernel_thread & ~(STACK_SIZE -1));
-
-	kmemset(kernel_thread, 0, sizeof(thread_t));
 	kernel_thread->magic = THREAD_MAGIC;
-
 	kernel_thread->mm = mm_alloc();
 	kernel_thread->file_info = thread_files_alloc(NULL);
 	kernel_thread->sig_info = kcalloc(sizeof(struct thread_signals), 1);
@@ -46,7 +41,6 @@ void threading_init()
 	kernel_thread->name = strdup("idle");
 
 	scheduler_init(kernel_thread);
-	arch_threading_init();
 }
 
 void thread_add_child(thread_t *parent, thread_t *child)
@@ -92,25 +86,8 @@ thread_t *thread_new()
 	new->pid = pid_allocate();
 	new->status = THREAD_NEW;
 	new->sp = (void*)new;
-	new->sp += PAGE_SIZE;
-/*	uint32_t *test = (uint32_t *)new->sp;
-	*test = 0;//(uint32_t)new->sp;
-	*test-- = 1;
-	*test-- = 2;
-	*test-- = 3;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	*test-- = 4;
-	new->sp = (void *)test;
-	printf("NEW SP %p\n", new->sp);*/
+	new->sp += STACK_SIZE;
+
 	new->sig_info = kcalloc(sizeof(struct thread_signals), 1);
 	//FIXME: It might make sense to do the file allocation here
 	thread_add_child(cur, new);
@@ -170,7 +147,9 @@ pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
 	thread_build_stackframe((void *)new, eip, esp, 0);
 
 	uint8_t *new_sp = (void*)((uintptr_t)new + STACK_SIZE);
-	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + 4 + 16));
+	// XXX: This is platform specific, and the 5 uint32_t's are so that the stack
+	//		is ready for switch_thread()
+	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + sizeof(uint32_t)*5));
 
 	thread_set_ready(new);
 
@@ -191,6 +170,7 @@ pid_t pid_allocate()
 
 void thread_yield()
 {
+	// XXX: Why though?
 	PANIC("Don't call thread_yield()!");
 }
 

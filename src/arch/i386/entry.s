@@ -3,6 +3,7 @@
 
 
 global entry
+global kernel_thread
 extern kmain
 extern multiboot_parse
 
@@ -48,6 +49,8 @@ multiboot_header:
 
 section .text
 align 4
+kernel_thread:
+	dd kernel_thread_base
 entry:
 	;set up identity paging
 	;First put physical address of initial PD into cr3
@@ -71,7 +74,7 @@ higher_half:
     invlpg [0]
 	;invalidate that page
 	;Switch to known stack
-	mov esp, initial_stack_start
+	mov esp, kernel_thread_top
 	;push multiboot magic number
 	push eax
 	;ebx contains address of multiboot info
@@ -98,8 +101,9 @@ initial_pagedirectory:
 	times (1024 - 767) dd 0
 
 section .bss
-initial_stack:
+align 4096
+kernel_thread_base:
 	resb STACK_SIZE
-initial_stack_start:
+kernel_thread_top:
 
 ; vim: set syntax=nasm:

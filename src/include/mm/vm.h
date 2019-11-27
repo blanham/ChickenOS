@@ -42,21 +42,25 @@ struct memregion {
 	uintptr_t requested_start, requested_end;
 	int pages;
 	size_t len;
-	//if cow and page fault write, we memcpy and insert new physical page
-	//on region deallocation, if cow is still set we do nothing, otherwise
-	//palloc_free()
-	//TODO consolidate these into flags, writing them out now
 	atomic_int ref_count;
 
+	// XXX: These should be a bitfield
 	int present;
 	int cow;
 	int flags;
 	int prot;
 
-	struct file *file;
+	// XXX: This should be a struct
+	//struct file *file;
 	struct inode *inode;
 	off_t file_offset;
 	size_t file_size;
+	
+	// NOTE: Maybe we should represent all mapped memory as files?
+	// say, /dev/zero for zero pages
+	// could greatly simplify code paths
+	// literally use file offset and len of /dev/mem loaded as a struct inode?
+	// would make swapping easier too....
 
 	struct memregion *next;
 	struct memregion *prev;

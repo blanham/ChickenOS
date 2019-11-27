@@ -13,7 +13,6 @@ enum {
 };
 
 typedef struct registers {
-  	uint32_t ESP; // try to get rid of this
 	uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax; // Pushed by pusha.
 	uint16_t ds, :16;
 	uint16_t es, :16;

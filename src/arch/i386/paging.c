@@ -22,7 +22,6 @@ struct gdt_descriptor gdt_desc;
 uint32_t *pagedir_alloc()
 {
 	uint32_t *new = palloc();
-	kmemset(new, 0, PAGE_SIZE);
 	kmemcpy(new, kernel_pd, PAGE_SIZE);
 	return new;
 }
@@ -144,6 +143,7 @@ uint32_t *pagedir_clone(uint32_t *pd)
 	return new;
 }
 
+// XXX: Does this need to also reload the tss with ltr?
 void tss_update(uint32_t esp)
 {
 	tss.esp0 = esp;
@@ -159,6 +159,7 @@ static void gdt_fill(gdt_seg_t *sd, uint32_t base, uint32_t limit, uint8_t flags
 	sd->access 	= access;
 }
 
+// FIXME: Remove all magic numbers, enable GS use for TLS
 static void gdt_init(void)
 {
 	gdt_desc.size 	  = (sizeof(struct segment_descriptor)*6) - 1;

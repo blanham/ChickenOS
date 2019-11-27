@@ -4,6 +4,8 @@
 #include <kernel/interrupt.h>
 #include <kernel/hw.h>
 #include <chicken/time.h>
+#include <arch/i386/interrupt.h>
+#include "i386_defs.h"
 
 #define PIT0_DATA	0x40
 #define PIT1_DATA	0x41
@@ -20,6 +22,7 @@ int rtc_format = 0;
 
 uint8_t read_rtc_reg(uint8_t reg)
 {
+	// FIXME: This is supposed to wait, but I disabled it for some reason
 /*
 	int chk = 0;
 start:

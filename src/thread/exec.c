@@ -79,6 +79,7 @@ static uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[
 }
 
 //FIXME This should not be using sys_* for file ops
+//		Or maybe not? AT_EXECFD is a thing
 static enum exe_type exec_type(const char *path)
 {
 	int fd;
@@ -151,6 +152,9 @@ void build_auxv(uint32_t **auxv)
 	*auxv = (void *)entry;
 }
 
+// XXX: This shouldn't need to know about registers_t.
+//		One fix might be to have a function to set the current
+//		thread's user eip and esp
 int load_executable(enum exe_type type UNUSED, const char *_path,
 					char *const _argv[], char *const _envp[])
 {

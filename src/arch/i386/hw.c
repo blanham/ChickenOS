@@ -1,6 +1,7 @@
 #include <kernel/hw.h>
 
 /* taken from: http://www.jamesmolloy.co.uk/ */
+// FIXME: Shouldn't these be inlined?
 void outb(uint16_t port, uint8_t value)
 {
 	asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
