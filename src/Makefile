@@ -53,7 +53,7 @@ DEVCORE		=	$(patsubst %.c,%.o,$(wildcard device/*.c))
 
 DEVSRCS		=	$(DEVCORE) $(VIDEOSRCS) $(AUDIOSRCS) $(USBSRCS)
 
-THREAD	=		$(patsubst %.c,%.o,$(wildcard thread/*.c))
+THREAD	=		$(patsubst %.c,%.o,$(wildcard thread/*.c))	$(patsubst %.c,%.o,$(wildcard thread/exec/*.c))
 
 CORE	=		init/kmain.o init/init.o
 
@@ -68,6 +68,10 @@ test: all
 	#cd .. && ./new_update.sh &&  DISPLAY=:0.0 qemu-system-i386 -vga std -soundhw ac97  -rtc base=localtime
 	cd .. && ./new_update.sh &&  DISPLAY=:0 qemu-system-i386 -vga std -rtc base=localtime \
 	-m 128 -usb  -hda disk.img -serial file:log && cd src
+terminal: all
+	#cd .. && ./new_update.sh &&  DISPLAY=:0.0 qemu-system-i386 -vga std -soundhw ac97  -rtc base=localtime
+	cd .. && ./new_update.sh &&  DISPLAY=:0 qemu-system-i386 -nographic  -rtc base=localtime \
+	-m 128 -usb  -hda disk.img  && cd src
 bochs: all
 	cd .. && ./new_update.sh &&  ./run_bochs.sh && cd src
 test3: all
@@ -78,8 +82,8 @@ network: all
 	cd .. && ./new_update.sh &&  qemu -rtc base=localtime \
 	-m 64 -hda disk.img -serial file:log -net nic,vlan=0,model=e1000,macaddr=00:00:00:00:00:00 -net tap,vlan=0,ifname=tap0,script=no  && cd src
 debug: all
-	cd .. && ./new_update.sh &&  qemu-system-i386 -rtc base=localtime \
-	-m 64 -usb -hda disk.img -s -S -serial file:log && cd src
+	cd .. && ./new_update.sh &&  DISPLAY=:0 qemu-system-i386 -rtc base=localtime \
+	-m 64 -usb -hda disk.img -gdb tcp::1212 -S -serial file:log && cd src
 
 clean:
 	rm -f kernel.bin $(SOURCES)
