@@ -44,6 +44,10 @@ void shutdown()
 	const char *p;
 	for (p = s; *p != '\0'; p++)
 		outb (0x8900, *p);
+
+	// For QEMU
+	outw(0x604, 0x2000);
+	while(1)
 	asm volatile ("hlt");
 }
 

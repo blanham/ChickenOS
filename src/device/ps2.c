@@ -49,7 +49,7 @@ void kbd_e5(uint8_t c)
 	switch(c)
 	{
 		case 0x53:
-			if((shifts & (L_SHIFT | R_SHIFT)) && (shifts & (L_CTRL | R_CTRL)))
+			if((shifts & (L_SHIFT | R_SHIFT)) != 0 && (shifts & (L_CTRL | R_CTRL)) != 0)
 				shutdown();
 
 		case 0x2A:
@@ -142,7 +142,7 @@ void ps2_intr(void)
 			}
 			if(c == '\\')
 			{
-				outw(0x604, 0x2000);
+				shutdown();
 			}
 			rbuf[pos++] = c;
 		//	input_queue_putc(c);
