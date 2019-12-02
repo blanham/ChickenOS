@@ -7,8 +7,8 @@
 #include <stddef.h>
 #include <string.h>
 #include <stdio.h>
+#include <chicken/thread.h>
 #include <kernel/memory.h>
-#include <kernel/thread.h>
 #include <mm/vm.h>
 #include <fs/vfs.h>
 #include <fs/ext2/ext2.h>
@@ -28,8 +28,6 @@ int fd_new()
 
 	return fd++;
 }
-
-
 
 int sys_open(const char *_path, int oflag, mode_t mode)
 {

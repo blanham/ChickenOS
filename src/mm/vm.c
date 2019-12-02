@@ -4,11 +4,10 @@
  *  which uses pages from the page allocator
  */
 #include <common.h>
-#include <mm/vm.h>
-#include <kernel/hw.h>
-#include <kernel/thread.h>
 #include <stdio.h>
-#include <multiboot.h>
+#include <mm/vm.h>
+#include <chicken/thread.h>
+#include <kernel/hw.h>
 
 uint32_t mem_size;
 

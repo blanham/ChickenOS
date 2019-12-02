@@ -1,5 +1,5 @@
 #!/bin/bash
-e2cp src/kernel.bin ext2.img:kernel                                                 
+e2cp build/kernel.bin ext2.img:kernel                                                 
 cat partition.img ext2.img > disk.img                                             
 ##mkdir -p ./mnt
 ##sudo mount -o loop,offset=32256 disk.img ./mnt

@@ -1,10 +1,10 @@
 #include <common.h>
 #include <stdint.h>
+#include <chicken/thread.h>
 #include <sys/tree.h>
 #include <errno.h>
 #include <mm/vm.h>
 #include <fs/vfs.h>
-#include <kernel/thread.h>
 
 uint8_t zero_page[PAGE_SIZE] __attribute__ ((aligned (PAGE_SIZE))) = {0};
 

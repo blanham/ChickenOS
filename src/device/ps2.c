@@ -1,10 +1,10 @@
 #include <common.h>
-#include <device/console.h>
+#include <stdio.h>
+#include <chicken/thread.h>
 #include <kernel/hw.h>
 #include <kernel/memory.h>
+#include <device/console.h>
 #include <device/input.h>
-#include <stdio.h>
-#include <thread.h>
 
 #define L_CTRL  0x0001
 #define R_CTRL  0x0002
@@ -17,7 +17,7 @@
 #define ESC 0x1B
 #define CR 0xa
 
-uint16_t shifts;
+uint16_t shifts = 0;
 
 #define BUF_SIZE 256
 char rbuf[BUF_SIZE];
@@ -127,18 +127,23 @@ void ps2_intr(void)
 		//	shutdown();
 		//	break;
 		default:
-			//TODO: This needs to be in the terminal driver
-			if((c == 'c') && (shifts & (L_CTRL)))
-			{
-				sys_kill(2, SIGINT);
-			}
 			if(c & 0x80)
 				return;
-			if(shifts & R_SHIFT)
+			if(shifts & (L_SHIFT|R_SHIFT))
 				c = kbd_map_shifted[c];
 			else
 				c = kbd_map_unshifted[c];
 					//console_putc(c);
+			//TODO: This needs to be in the terminal driver
+			if((c == 'c') && (shifts & (L_CTRL)))
+			{
+				sys_kill(2, SIGINT);
+				return;
+			}
+			if(c == '\\')
+			{
+				outw(0x604, 0x2000);
+			}
 			rbuf[pos++] = c;
 		//	input_queue_putc(c);
 	}

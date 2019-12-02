@@ -4,7 +4,7 @@
  */
 #include <common.h>
 #include <errno.h>
-#include <kernel/thread.h>
+#include <chicken/thread.h>
 #include <kernel/memory.h>
 #include <device/console.h>
 #include <kernel/interrupt.h>

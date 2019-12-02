@@ -1,4 +1,6 @@
-
+#include <stdio.h>
+#include <string.h>
+#include <ext2/ext2fs_defs.h>
 
 void inode_print(ext2_inode_t inode)
 {

@@ -1,5 +1,6 @@
-/* time to actually use locks and semaphores */
-#include <thread.h>
+// FIXME: actually use locks and semaphores 
+#include <chicken/thread.h>
+
 struct semaphore {
 	int count; //this should only be accessed with atomic operations
 	thread_t *waiters;

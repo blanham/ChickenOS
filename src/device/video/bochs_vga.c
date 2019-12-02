@@ -3,12 +3,12 @@
  */
 
 #include <common.h>
+#include <stdio.h>
 #include <hw.h>
+#include <chicken/thread.h>
 #include <device/video/bochs_vga.h>
 #include <device/pci.h>
-#include <stdio.h>
 #include <mm/vm.h>
-#include <kernel/thread.h>
 #include <memory.h>
 #include <mm/paging.h>
 #include <mm/liballoc.h>

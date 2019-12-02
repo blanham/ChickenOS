@@ -5,9 +5,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <chicken/thread.h>
 #include <kernel/common.h>
 #include <kernel/memory.h>
-#include <kernel/thread.h>
 #include <mm/vm.h>
 #include <fs/vfs.h>
 #include <fs/ext2/ext2.h>

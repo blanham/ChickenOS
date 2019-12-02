@@ -3,8 +3,8 @@
 #include <chicken/boot.h>
 #include <chicken/init.h>
 #include <chicken/time.h>
+#include <chicken/thread.h>
 #include <kernel/interrupt.h>
-#include <kernel/thread.h>
 #include <device/pci.h>
 #include <device/usb.h>
 #include <device/video.h>

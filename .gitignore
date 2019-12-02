@@ -1,8 +1,9 @@
 *.sw*
 bochsout.txt
 log
-info/
+build/*
 disk/
+info/
 tmp/
 disk.img
 GOALS

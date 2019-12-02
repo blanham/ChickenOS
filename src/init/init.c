@@ -11,7 +11,7 @@ void init(void *aux UNUSED)
 {
 	char *argv[] = {"/sh", NULL};
 	char *envp[] = {"PATH=/", NULL};
-	char *path = "/toybox";
+	char *path = "/dash";
 
 	SYSCALL_3N(SYS_OPEN, "/dev/tty0", 0, NULL);
 	SYSCALL_3N(SYS_OPEN, "/dev/tty0", 0, NULL);

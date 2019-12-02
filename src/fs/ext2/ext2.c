@@ -16,8 +16,6 @@
 #define EXT2_INO_BLK_TPL 14
 
 
-//moved debug functions to seperate file
-#include "ext2_debug.c"
 
 //FIXME
 vfs_ops_t ext2_ops = {

@@ -1,3 +1,5 @@
+#ifndef C_OS_FS_EXT2FS_DEFS_H
+#define C_OS_FS_EXT2FS_DEFS_H
 /* inodes are indexed starting at 1 */
 #include <fs/vfs.h>
 #define INODE(x) (x-1)
@@ -117,3 +119,4 @@ size_t ext2_write_inode(struct inode *inode,
 	void *_buf, size_t length, 
 	off_t offset);
 
+#endif

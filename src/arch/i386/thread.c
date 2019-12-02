@@ -1,8 +1,7 @@
 #include <common.h>
 #include <stdint.h>
-#include <kernel/thread.h>
+#include <chicken/thread.h>
 #include <kernel/memory.h>
-#include <kernel/interrupt.h>
 #include <kernel/interrupt.h>
 #include <arch/i386/interrupt.h>
 #include "i386_defs.h"
@@ -14,6 +13,14 @@ void arch_thread_reschedule(thread_t *cur, thread_t *next)
 
 	extern void switch_threads(thread_t *, thread_t *);
 	switch_threads(cur, next);
+}
+
+void arch_thread_set_ip_and_usersp(uintptr_t ip, uintptr_t usersp)
+{
+	thread_t *cur = thread_current();
+	registers_t *regs = (void *)cur + STACK_SIZE - sizeof(*regs);
+	regs->eip = ip;
+	regs->useresp = usersp;
 }
 
 void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax)
@@ -43,7 +50,7 @@ void thread_build_stackframe(void *sp, uintptr_t eip, uintptr_t esp, uintptr_t e
 {
 	uint32_t *stack = (void *)((sp + STACK_SIZE) - sizeof(registers_t) - sizeof(int));
 
-	extern uintptr_t intr_return;
+	extern uintptr_t intr_return; // Defined in intr-core.s
 	*stack++ = (uint32_t)&intr_return;
 
 	registers_t *reg_frame = (registers_t*)stack;

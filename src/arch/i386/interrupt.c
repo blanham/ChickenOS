@@ -3,9 +3,9 @@
 
 #include <common.h>
 #include <stdio.h>
+#include <chicken/thread.h>
 #include <kernel/memory.h>
 #include <thread/syscall.h>
-#include <kernel/thread.h>
 #include <arch/i386/pic.h>
 #include <arch/i386/interrupt.h>
 #include "i386_defs.h"

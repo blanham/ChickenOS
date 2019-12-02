@@ -1,10 +1,10 @@
 #include <common.h>
+#include <chicken/thread.h>
 #include <chicken/time.h>
 #include <mm/liballoc.h>
 #include <string.h>
 #include <kernel/interrupt.h>
 #include <device/console.h>
-#include <kernel/thread.h>
 #include <net/net_core.h>
 #include <thread/syscall.h>
 #include <stdio.h>
@@ -12,7 +12,7 @@
 #include <errno.h>
 #include <thread/syscall-names2.h>
 
-#define DEBUG
+//#define DEBUG
 
 void syscall_handler (registers_t *regs)
 //int syscall_handler (uint32_t call, void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5)

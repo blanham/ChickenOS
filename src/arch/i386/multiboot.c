@@ -4,10 +4,10 @@
  *	out a struct kernel_boot_info
  */
 #include <common.h>
-#include <kernel/thread.h>
 #include <kernel/memory.h>
 #include <multiboot.h>
 #include <chicken/boot.h>
+#include <chicken/thread.h>
 #include <chicken/vbe.h>
 
 //#define BOOT_DEBUG

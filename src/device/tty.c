@@ -255,11 +255,11 @@ size_t tty_getline(tty_t *tty, uint8_t *buf, size_t len)
 {
 	size_t ret = 0;
 	int c = 0;
-	serial_printf("tty_getline len %i\n", len);
+	//serial_printf("tty_getline len %i\n", len);
 	while(len--)
 	{
 		c = tty_getc(tty);
-		serial_printf("Got char %c %x\n", c, c);
+		//serial_printf("Got char %c %x\n", c, c);
 		if(c == 0x8)
 		{
 			buf[ret] = '\0';

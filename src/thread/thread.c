@@ -6,12 +6,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include <mm/vm.h>
-#include <mm/paging.h>
-#include <kernel/thread.h>
-#include <kernel/memory.h>
+#include <chicken/thread.h>
 #include <kernel/interrupt.h>
+#include <kernel/memory.h>
 #include <mm/liballoc.h>
+#include <mm/paging.h>
+#include <mm/vm.h>
 #include <util/utlist.h>
 
 //struct process_tree_node {

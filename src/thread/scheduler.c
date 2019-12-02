@@ -2,7 +2,7 @@
  *	Very basic scheduler, called on every timer interrupt
  */
 #include <common.h>
-#include <kernel/thread.h>
+#include <chicken/thread.h>
 #include <kernel/memory.h>
 #include <device/console.h>
 #include <kernel/interrupt.h>

@@ -1,13 +1,14 @@
 #include <common.h>
 #include <sys/types.h>
 #include <errno.h>
-#include <kernel/thread.h>
+#include <chicken/thread.h>
 
 pid_t sys_fork(registers_t *regs)
 {
 	return thread_create2(regs->eip, regs->useresp, NULL);
 }
 
+// NOTE: Might be worth using a macro for these?
 uid_t sys_geteuid()
 {
 	return thread_current()->euid;
