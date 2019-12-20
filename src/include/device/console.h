@@ -47,6 +47,6 @@ void console_register(console_t *console);
 void serial_putc(char c);
 int serial_puts(char *string);
 /* device/kbd.c */
-char kbd_getc();
+int kbd_getc();
 void kbd_init();
 #endif

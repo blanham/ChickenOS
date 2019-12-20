@@ -10,5 +10,5 @@ void video_init(struct kernel_boot_info *info)
 //	console = bochs_vga_init();
 	if(console == NULL)
 		console = vga_init();*/
-	new_vga_init(info);
+	vga_init(info);
 }
