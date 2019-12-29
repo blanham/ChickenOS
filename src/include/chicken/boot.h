@@ -20,6 +20,8 @@ struct boot_module {
 struct kernel_boot_info {
 	char *cmdline;
 	uintptr_t mem_size;
+	uint32_t low_mem;
+	uint32_t hi_mem; 
 	void *placement; //beginning of heap
 	//entry
 	//commandline

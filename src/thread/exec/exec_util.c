@@ -1,46 +1,40 @@
 #include <common.h>
+#include <errno.h>
 #include <stdio.h>
-//#include <string.h>
-//#include <memory.h>
-//#include <errno.h>
 #include <chicken/thread.h>
 #include <chicken/thread/exec.h>
-//#include <mm/liballoc.h>
-//#include <mm/vm.h>
-//#include <kernel/interrupt.h>
-//#include <fs/vfs.h>
-//#include <elf.h>
-
 
 static void push_arg(char *arg, uint8_t **sp);
 static int build_table(char **table, char * const source[], uint8_t **stack);
-uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[])
+int stack_prepare(executable_t *exe, char *path, char *const argv[], char *const envp[])
 {
 	uint8_t *stack = (uint8_t *)PHYS_BASE;
-	char **arg_table, **envp_table;
-	int argc = 0, envc = 0;
 
-	//alocate these so we don't blow the stack
-	arg_table = kcalloc(MAX_ARGS, sizeof(uint32_t *));
-	envp_table = kcalloc(MAX_ENVS, sizeof(uint32_t *));
+	// Allocate these so we don't blow the stack
+	char **arg_table = kcalloc(MAX_ARGS, sizeof(uint32_t *));
+	char **envp_table = kcalloc(MAX_ENVS, sizeof(uint32_t *));
 
+	// First thing on stack is an end marker (0)
+	*(uint32_t *)stack-- = 0;
 
-	memset(arg_table, 0, sizeof(char *)*MAX_ARGS);
-	memset(envp_table, 0, sizeof(char *)*MAX_ENVS);
-
-	//first thing on stack is 0
-	*(uint32_t *)stack = 0;
-	stack -= 4;
-
-	//then the executable path
+	// XXX: This is necessary for AT_EXECFN
+	// 		So we need to push this value it
 	push_arg(path, &stack);
 
-	//the environment, and then arguments
-	envc = build_table(envp_table, envp, &stack);
-	argc = build_table(arg_table, argv, &stack);
+	int envc = build_table(envp_table, envp, &stack);
+	if (envc < 0) {
+		//XXX: More error checking would be nice
+		return -E2BIG;
+	}
+	int argc = build_table(arg_table, argv, &stack);
+	if (envc < 0) {
+		return -E2BIG;
+	}
 
-	//align stackpointer to 4 byte boundary
-	stack -= ( ((uintptr_t)stack %4));
+	// Align stackpointer to a 16 byte boundary
+	stack -= (uintptr_t)stack & 0xF;
+
+	//stack -= AT_MAX * sizeof(Elf32_auxv_t);
 
 	//copy tables into stack
 	stack -= 4;
@@ -55,47 +49,49 @@ uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[])
 	stack -= 4;
 	*(uint32_t *)stack = argc;
 
-	//hex_dump((void *)(PHYS_BASE - 16*4), 4);
+	//hex_dump((void *)(PHYS_BASE - 16*8), 8);
 
 	kfree(arg_table);
 	kfree(envp_table);
 
-	//TODO: auxv setup should be here
-	/*uint32_t *auxv = (void *)regs->useresp + 4;
-	kmemset((void *)regs->useresp - 24, 0xff, 48);
-//	build_auxv(&auxv);
-	regs->useresp = (uintptr_t)auxv;/// */
+	exe->sp = (uintptr_t)stack;
 
-	return (uintptr_t)stack;
+	return 0;
 }
 
-//FIXME This should not be using sys_* for file ops
-//		Or maybe not? AT_EXECFD is a thing
-enum exe_type exec_type(const char *path)
+#define BUF_SIZE 512
+executable_t *identify_executable(const char *path, char *const _argv[])
 {
-	int fd;
-	void *magic;
-	enum exe_type ret = EXE_INVALID;
 
-	magic = kcalloc(512,1);
+	// FIXME: remove this:
+	(void)_argv;
+	executable_t *ret = kcalloc(sizeof(*ret), 1);
+	// FIXME: Figure out correct flags to pass to open()
+	// TODO: mark this inode so that it can't be written to
+	struct file * file = vfs_open((char *)path, 0, 0);
+	if(file == NULL) {
+		printf("exec_type: failed to open file: %s with error: (failure)\n", path);
 
-	if((fd = sys_open(path, 0, 0)) < 0) {
-		printf("exec_type: failed to open file: %s with error: %i\n", path, fd);
+		// XXX: This isn't right, once I integrate the new fs code
+		//		we will have a vfs_open that will handle all of the I/O errors
+		ret->err = -1;
+		PANIC("EXE loading failed, and the error handling isn't finished yet");
 		return ret;
 	}
-	//FIXME: check if file is executable or not
-	//       and error if so,probably with fstat
-	sys_read(fd, magic, 512);
+	uint8_t *magic = kcalloc(BUF_SIZE, 1);
+	vfs_read(file, magic, BUF_SIZE);
 
-	if(elf_check_magic(magic))
-		ret = EXE_ELF;
-	else if(memcmp(magic, "#!",2) == 0)
-		ret = EXE_SCRIPT;
+	if(memcmp(magic, "#!",2) == 0) {
+		// TODO: Implement shabangs
+		PANIC("We don't handle shabangs yet");
+	}
 
-	sys_close(fd);
+	if(elf_check_magic(magic)) {
+		ret->file = file;
+		ret->type = EXE_ELF;
+	}
 
 	kfree(magic);
-
 	return ret;
 }
 

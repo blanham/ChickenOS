@@ -8,6 +8,7 @@
 
 uint8_t zero_page[PAGE_SIZE] __attribute__ ((aligned (PAGE_SIZE))) = {0};
 
+// XXX: Why are these enums here?
 enum {
 	VERIFY_R,
 	VERIFY_W
@@ -56,15 +57,17 @@ struct memregion *region_clone(struct memregion *original)
 	{
 		new = kcalloc(sizeof(*new), 1);
 		memcpy(new, p, sizeof(*new));
-		printf("Cloning %x %x\n", p->addr_start, p->addr_end);
+		//printf("Cloning %x %x\n", p->addr_start, p->addr_end);
 		if(ret == NULL)
 			ret = new;
 		else
 			prev->next = new;
-		p->cow = 1;
-		new->cow = 1;
+		// FIXME: Fix copy on write
+		//p->cow = 1;
+		//new->cow = 1;
 		prev = new;
 	}
+
 
 	return ret;
 }
@@ -147,11 +150,13 @@ static int regiongrowth(struct mm *mm, struct memregion *p, uintptr_t address)
 {
 
 	//Try to combine these two blocks
-	if((p->prot == PROT_GROWSDOWN) && (address + PAGE_SIZE >= p->addr_start) &&
+	if((p->prot == PROT_GROWSDOWN) && // (address + PAGE_SIZE >= p->addr_start) &&
 			(address < p->addr_end))
 	{
 		//printf("Growing down %x %x\n", address + PAGE_SIZE, address);
 		p->addr_start -= PAGE_SIZE;
+
+		// FIXME: This should take into account RLIMITs
 
 		return memregion_insert(mm, NULL, address & PAGE_MASK, 0x7);
 	}
@@ -181,7 +186,7 @@ int load_page_from_file(struct mm *mm, struct memregion *p, uintptr_t address)
 	if (offset <= p->file_size) {
 		uint32_t off = p->file_offset + offset;
 		uint32_t len = p->file_size - offset;
-		printf("Loading from file %x %x %x %x\n",page, offset, len, off);
+		//serial_printf("Loading from file %x %x %x %x\n",page, offset, len, off);
 		p->inode->fs->ops->read(p->inode, new, PAGE_SIZE, off);
 		if (len < PAGE_SIZE) {
 			memset(new + len, 0, PAGE_SIZE - len);
@@ -220,8 +225,8 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 {
 	//TODO: Use AVL tree instead
 	for(struct memregion *p = mm->regions; p != NULL; p = p->next) {
-		printf("Ap->addr %x end %x prot %x address %x offset %llx\n",
-				p->addr_start, p->addr_end, prot, address, p->file_offset);
+		//serial_printf("Ap->addr %x end %x prot %x address %x offset %llx\n",
+		//		p->addr_start, p->addr_end, prot, address, p->file_offset);
 		//printf("KBs %i\n", (p->addr_end - p->addr_start + 1) / 1024);
 		//TODO: actually check protection
 		(void)prot;

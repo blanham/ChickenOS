@@ -76,7 +76,7 @@ void serial_init()
 	serial_set_baud(com_port, 0x3);
 //outb(com_port + FCR, 0xC7); //enable fifo, clear it, 14 bytes
 	outb(com_port + FCR, 0x0); //enable fifo, clear it, 14 bytes
-	outb(com_port + LCR, 0x0c);
+	outb(com_port + LCR, 0x03);
 	//interrupt_register(IRQ4, serial_interrupt);
 }
 

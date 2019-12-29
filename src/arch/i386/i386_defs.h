@@ -167,6 +167,8 @@ extern tss_t tss;
 
 void tss_init(void);
 void tss_update(uint32_t esp);
+void gdt_init();
+void gdt_set_entry(int entry, uint32_t base, uint32_t limit, uint8_t flags, uint8_t access);
 
 #endif
 

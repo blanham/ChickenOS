@@ -18,6 +18,8 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <sys/uio.h>
+#include <sys/select.h>
+#include <poll.h>
 //file stuff should be seperated out
 struct file *open_files[100];
 uint8_t file_count = 0;
@@ -31,13 +33,14 @@ int fd_new()
 
 int sys_open(const char *_path, int oflag, mode_t mode)
 {
-	printf("PATH: %s %c\n", _path, _path[1]);
+	if (_path == NULL)
+		return -EFAULT;
 	thread_t *cur = thread_current();
 	char *path = strdup(_path);
 	struct file * fp = vfs_open(path, oflag, mode);
 
 	int td = 0;
-	//	printf("open %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
+	serial_printf("opening file: %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
 
 	if(fp == NULL)
 	{
@@ -85,7 +88,6 @@ ssize_t sys_write(int fildes, void *buf, size_t nbyte)
 		return -1;
 	ssize_t ret;
 	ret = vfs_write(fp, buf, nbyte);
-
 	return ret;
 }
 
@@ -114,9 +116,59 @@ ssize_t sys_readv(int fd, const struct iovec *iov, int iovcnt)
 	return count;
 }
 
+int poll_toggle_hack = 0;
+int sys_poll(struct pollfd *fds UNUSED, nfds_t nfds UNUSED, int timeout UNUSED)
+{
+	//for (unsigned i = 0; i < nfds; i++) {
+		//serial_printf("Test: %i %x %x\n", fds[i].fd, fds[i].events, fds[i].revents);
+	//}
+	//serial_printf("Polling: %i %i\n", nfds, timeout);
+	if (poll_toggle_hack)
+		poll_toggle_hack = 0;
+	else
+		poll_toggle_hack = 1;
+	return poll_toggle_hack;
+}
+
+int fart2 = 0;
+int sys_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
+{
+	(void)nfds;
+	(void)readfds;
+	(void)writefds;
+	(void)exceptfds;
+	//(void)timeout;
+	//serial_printf("select() nfds: %i", nfds);
+	if (readfds) {
+		//serial_printf(" READFDS: %x", readfds->fds_bits[0]);
+	}
+	if (writefds) {
+		//serial_printf(" WRITEFDS: %x", writefds->fds_bits[0]);
+	}
+	if (exceptfds) {
+		//serial_printf(" EXCEPTFDS: %x\n", exceptfds->fds_bits[0]);
+	}
+	if (timeout) {
+		timeout->tv_sec = 0;
+		timeout->tv_usec = 0;
+	}
+	//serial_printf("\n");
+	//if (fart2 < 2)
+		//fart2++;
+	//else
+		//fart2 = 0;
+	//return nfds;
+	if (fart2) {
+		fart2 = 0;
+		return 1;
+	}
+	return 0;//fart2 & 0x3 ? 1 : 0;
+}
+
 ssize_t sys_writev(int fd, const struct iovec *iov, int iovcnt)
 {
 	ssize_t count = 0, ret = 0;
+
 
 	if(iovcnt == 0 || iovcnt > UIO_MAXIOV)
 		return -EINVAL;
@@ -151,37 +203,27 @@ off_t sys_lseek(int fildes, off_t offset, int whence)
 		return -1;
 	return vfs_seek(fp, offset, whence);
 }
-char stat_test[] = {
-	0x0,0x7,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0xA4,0x81,0x0,0x0,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xFE,0xEF,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x4,0x0,0x0,0x7C,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x91,0x38,0x88,0x52,0x0,0x0,0x0,0x0,0x47,0x40,0x88,0x52,0x0,0x0,0x0,0x0,0x47,0x40,0x88,0x52,0x0,0x0,0x0,0x0,0x20,0x0,0x0,0x0,0x0,0x0,0x0,0x0
-};
 
 int sys_stat(const char *filename, struct stat *statbuf)
 {
-	printf("sys_stat: %s %p\n", filename, statbuf);
-	statbuf->st_size = 61438;
-	statbuf->st_ino = 32;
-	//	statbuf->st
-	printf("filename %s\n", filename);
 	return vfs_stat(filename, statbuf);
 }
+
 int sys_stat64(const char *filename, struct stat64 *statbuf)
 {
-	//	statbuf->st_size = 61438;
-	//	statbuf->st_ino = 32;
-	//	statbuf->st
-
-	//	kmemcpy(statbuf, stat_test, sizeof(struct stat));
-	//	printf("filename64 %s\n", filename);
 	return vfs_stat64(filename, statbuf);
+}
+
+int sys_fstat64(int fd, struct stat64 *statbuf)
+{
+	struct file *fp = thread_current()->file_info->files[fd];
+	return vfs_fstat64(fp->inode, statbuf);
 }
 
 int sys_chdir(const char *path)
 {
 	return vfs_chdir(path);
 }
-
-
-
 
 //FIXME: Placeholder
 //For Linux compatibility, return length not buf
@@ -191,8 +233,6 @@ char *sys_getcwd(char *buf, size_t size UNUSED)
 
 	return (char *)strlen(buf);
 }
-
-
 
 //FIXME: Placeholder
 int sys_dup(int oldfd UNUSED)

@@ -3,6 +3,7 @@
  *
  */
 #include <common.h>
+#include <stdbool.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
@@ -14,39 +15,11 @@
 #include <mm/vm.h>
 #include <util/utlist.h>
 
-//struct process_tree_node {
-//	struct process_tree_node *sibling;
-//	struct process_tree_node *children;
-//};
-//struct process_tree_node process_tree_root;
-
 // XXX: This should be removed
 extern struct file *root;
 
-int thread_stack_offset = offsetof(thread_t, sp);
-
-static struct thread_files *thread_files_alloc(struct thread_files *old);
-
-void threading_init()
-{
-	interrupt_disable();
-	
-	extern thread_t *kernel_thread;
-
-	kernel_thread->magic = THREAD_MAGIC;
-	kernel_thread->mm = mm_alloc();
-	kernel_thread->file_info = thread_files_alloc(NULL);
-	kernel_thread->sig_info = kcalloc(sizeof(struct thread_signals), 1);
-
-	kernel_thread->name = strdup("idle");
-
-	scheduler_init(kernel_thread);
-}
-
-void thread_add_child(thread_t *parent, thread_t *child)
-{
-	LL_APPEND2(parent->children, child, child_next);
-}
+// This is used to find the sp member in switch()
+const int thread_stack_offset = offsetof(thread_t, sp);
 
 //I think this should be thread_alloc, should put it on some not ready to run list?
 thread_t *thread_alloc()
@@ -54,6 +27,31 @@ thread_t *thread_alloc()
 	thread_t *new = pallocn(STACK_PAGES);
 	kmemset(new, 0, STACK_SIZE);
 	new->magic = THREAD_MAGIC;
+	return new;
+}
+
+//Write a new thread_new that sets up a thread, similar to thread_clone,
+//but without the signals, mm, and file copy overs
+thread_t *thread_new(bool lol)
+{
+	thread_t *new = thread_alloc();
+	thread_t *cur = thread_current();
+	if (lol) {
+		kmemcpy(new, cur, STACK_SIZE);
+		cur->children = NULL;
+		cur->child_next = NULL;
+		cur->child_prev = NULL;
+	}
+	new->ppid = cur->pid;
+	new->pgid = cur->pgid;
+	new->pid = pid_allocate();
+	new->status = THREAD_NEW;
+	new->sp = (void*)new;
+	new->sp += STACK_SIZE;
+
+	new->sig_info = kcalloc(sizeof(struct thread_signals), 1);
+	//FIXME: It might make sense to do the file allocation here
+	thread_add_child(cur, new);
 	return new;
 }
 
@@ -74,33 +72,16 @@ void thread_free(thread_t *dead UNUSED)
 	//
 }
 
-
-//Write a new thread_new that sets up a thread, similar to thread_clone,
-//but without the signals, mm, and file copy overs
-thread_t *thread_new()
-{
-	thread_t *new = thread_alloc();
-	thread_t *cur = thread_current();
-	new->ppid = cur->pid;
-	new->pgid = cur->pgid;
-	new->pid = pid_allocate();
-	new->status = THREAD_NEW;
-	new->sp = (void*)new;
-	new->sp += STACK_SIZE;
-
-	new->sig_info = kcalloc(sizeof(struct thread_signals), 1);
-	//FIXME: It might make sense to do the file allocation here
-	thread_add_child(cur, new);
-	return new;
-}
-
-//Write a new thread_clone, that uses thread_new + bullshit
 thread_t * thread_clone2(thread_t *parent)
 {
-	thread_t *new = thread_new();
+	thread_t *new = thread_new(true);
 	new->mm = mm_clone(parent->mm);
 	new->file_info = thread_files_alloc(parent->file_info);
 
+	if (parent->tls != NULL) {
+		//new->tls = kcalloc(17,1);
+		//kmemcpy(new->tls, parent->tls, 17);
+	}
 	kmemcpy(new->sig_info->signals, parent->sig_info->signals,
 			sizeof(struct k_sigaction) * NUM_SIGNALS);
 	return new;
@@ -120,14 +101,18 @@ pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
 	uintptr_t esp;
 
 	printf("Creating thread with eip: %x _esp: %x\n", eip, _esp);
+	uintptr_t ebp = 0;
 
 	if(_esp) {
 		thread_t *cur = thread_current();
 		new = thread_clone2(cur);
 
 		esp = _esp;
+		ebp = (uintptr_t)aux;
+		//thread_copy_stackframe(cur, new, 00);
+	thread_build_stackframe((void *)new, eip, esp, ebp);
 	} else {
-		new = thread_new();
+		new = thread_new(false);
 		new->mm = mm_alloc();
 		new->file_info = thread_files_alloc(NULL);
 		new->file_info->cur = root->inode;
@@ -142,14 +127,16 @@ pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
 		*--usersp = (uintptr_t)aux;
 		esp = PHYS_BASE-8;
 		printf("ESP %X USERSP %X\n", esp, usersp);
+	thread_build_stackframe((void *)new, eip, esp, 0);
 	}
 	//XXX: Doesn't handle fork returning new pid
-	thread_build_stackframe((void *)new, eip, esp, 0);
 
 	uint8_t *new_sp = (void*)((uintptr_t)new + STACK_SIZE);
 	// XXX: This is platform specific, and the 5 uint32_t's are so that the stack
 	//		is ready for switch_thread()
 	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + sizeof(uint32_t)*5));
+	serial_printf("CLONE\n");
+	dump_regs((void *)new->sp + (5*4));
 
 	thread_set_ready(new);
 
@@ -157,63 +144,24 @@ pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
 
 	return new->pid;
 }
-
-//TODO: Array? Bitmap?
-pid_t pid_allocate()
-{
-	static pid_t pid_count = 0;
-
-	pid_count++;
-
-	return pid_count;
-}
-
 void thread_yield()
 {
 	// XXX: Why though?
 	PANIC("Don't call thread_yield()!");
 }
 
-thread_t * thread_current()
+void threading_init()
 {
-	thread_t *ret;
+	interrupt_disable();
+	
+	extern thread_t *kernel_thread;
 
-	stackpointer_get(ret);
+	kernel_thread->magic = THREAD_MAGIC;
+	kernel_thread->mm = mm_alloc();
+	kernel_thread->file_info = thread_files_alloc(NULL);
+	kernel_thread->sig_info = kcalloc(sizeof(struct thread_signals), 1);
 
-	ret = (thread_t *) ((uintptr_t)ret & ~(STACK_SIZE -1));
-	if(ret->magic != THREAD_MAGIC)
-	{
-		printf("PID %i\n", ret->pid);
-		THREAD_ASSERT(ret);
-	}
-	return ret;
-}
+	kernel_thread->name = strdup("idle");
 
-static struct thread_files *thread_files_alloc(struct thread_files *old)
-{
-	struct thread_files * new = kcalloc(sizeof(struct thread_files), 1);
-	//thread_t *cur = thread_current();
-	if(old)
-	{
-		kmemcpy(new, old, sizeof(struct thread_files));
-		new->files = kcalloc(sizeof(struct file *), 32);
-		new->files_flags = kcalloc(sizeof(int), 32);
-		//FIXME: increment ref count on root and cur_dir inodes
-		for(int i = 0; i < old->files_count; i++)
-		{
-			//new->files[i] = vfs_reopen(old->files[i]);
-			new->files[i] = old->files[i];
-			//new->files_flags[i] = 0;
-		}
-	}
-	else
-	{
-		//new->root = cur->file_info->root;
-		//new->cur = cur->file_info->cur;
-	//	new->root = new->cur = root->inode;
-		new->files_count = 32;
-		new->files = kcalloc(sizeof(struct file *), 32);
-		new->files_flags = kcalloc(sizeof(int), 32);
-	}
-	return new;
+	scheduler_init(kernel_thread);
 }

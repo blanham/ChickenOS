@@ -1,7 +1,7 @@
 /* copied from kernel definition, but with padding replaced
  * by the corresponding correctly-sized userspace types. */
 
-struct stat
+struct stat64
 {
 	dev_t st_dev;
 	int __st_dev_padding;
@@ -19,4 +19,4 @@ struct stat
 	struct timespec st_mtim;
 	struct timespec st_ctim;
 	ino_t st_ino;
-};
+} __attribute__((packed));

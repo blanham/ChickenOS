@@ -10,7 +10,7 @@
 #include <chicken/thread.h>
 #include <chicken/vbe.h>
 
-//#define BOOT_DEBUG
+#define BOOT_DEBUG
 
 struct kernel_boot_info multiboot_storage;
 char multiboot_cmdline[256];
@@ -80,7 +80,11 @@ static uint32_t multiboot_parse_memmap(struct multiboot_info *mb)
 	void *mmap_end = P2V(mb->mmap_addr + mb->mmap_length);
 	uint32_t last_address = 0;
 	uint32_t mem_size = 0;
-
+#ifdef BOOT_DEBUG
+		serial_printf (" size = 0x%x, base_addr = 0x%x, length = 0x%x, type = 0x%x\n",
+				(unsigned)mmap->size, (unsigned)mmap->addr,
+				(unsigned)mmap->len, (unsigned)mmap->type);
+#endif
 	while((uintptr_t)mmap < (uintptr_t)mmap_end) {
 		mmap = (void *)((uintptr_t)mmap +mmap->size + sizeof(mmap->size));
 #ifdef BOOT_DEBUG
@@ -147,7 +151,10 @@ struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t mag
 	//FIXME: This isn't right, but it is less wrong than before :P
 	(void)last_available_page;
 	info->mem_size = last_available_page ;
+	info->low_mem = mb->mem_lower;
+	info->hi_mem = mb->mem_upper;
 
+	serial_printf("placement: %X\n", placement);
 	multiboot_detect_video_mode(mb, info);
 
 	return info;

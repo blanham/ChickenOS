@@ -24,29 +24,27 @@ void elf_map_regions(Elf32_Ehdr *header, struct file *file)
 		if(phdr->p_type != PT_LOAD)
 			continue;
 
-		elf_print_programs(phdr);
+		//elf_print_programs(phdr);
 
 		//memregion_add(cur->mm, phdr->p_vaddr, phdr->p_memsz, PROT_READ | PROT_EXEC,
 		//		MAP_FILE, file->inode, phdr->p_offset, phdr->p_filesz, NULL);
 
 		uint32_t mem_length = (phdr->p_vaddr & ~PAGE_MASK) + phdr->p_memsz;
 		uint32_t file_length = (phdr->p_offset & ~PAGE_MASK) + phdr->p_filesz;
-		memregion_map_file(cur->mm, phdr->p_vaddr, mem_length, PROT_READ | PROT_WRITE| PROT_EXEC,
+		memregion_map_file(cur->mm, phdr->p_vaddr, mem_length, PROT_READ|PROT_WRITE|PROT_EXEC,
 				MAP_FILE, file->inode, phdr->p_offset & PAGE_MASK, file_length);
-		printf("Vaddr %8x Filesize %x Memsize %x Offset %x\n", phdr->p_vaddr,
+		serial_printf("Vaddr %8x Filesize %x Memsize %x Offset %x\n", phdr->p_vaddr,
 				phdr->p_filesz, phdr->p_memsz, phdr->p_offset);
 	}
 }
 
-int load_elf(const char *path, uintptr_t *eip)
+int load_elf(executable_t *exe)
 {
 	int ret = 0;
 
-	struct file *file = vfs_open((char *)path, 0, 0);
-	if (file == NULL) {
-		printf("Failed to open elf executable\n");
-		return -1;
-	}
+	struct file *file = exe->file;
+	// XXX: Fix this too
+	file->offset = 0;
 
 	Elf32_Ehdr *header = kmalloc(sizeof(*header));
 	if ((ret = vfs_read(file, header, sizeof(*header))) != sizeof(*header)) {
@@ -58,9 +56,10 @@ int load_elf(const char *path, uintptr_t *eip)
 		printf("Missing or invalid ELF magic number!\n");
 		return -1;
 	}
+	//printf("HERE!!!");
 
 	elf_map_regions(header, file);
-	*eip = header->e_entry;
+	exe->ip = header->e_entry;
 
 	kfree(header);
 

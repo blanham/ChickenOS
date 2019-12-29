@@ -3,15 +3,14 @@
  * TODO: Add proper random and implement port access
  * 		 Better access of physical/virtual kernel memory
  * 		 kmem/mem should probably do verification that given
- * 		 	memory is read/writeable (Check your privlege!)
+ * 		 	memory is read/writeable
  */
-#include <kernel/common.h>
-#include <kernel/hw.h>
-#include <memory.h>
-#include <mm/vm.h>
-#include <fs/vfs.h>
-#include <sys/ioctl.h>
+#include <common.h>
 #include <errno.h>
+#include <memory.h>
+#include <sys/stat.h>
+#include <fs/vfs.h>
+#include <mm/vm.h>
 
 size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 {
@@ -70,7 +69,8 @@ int chardevs_ioctl(dev_t dev, int request UNUSED, char *args UNUSED)
 	return -EINVAL;
 }
 
+// FIXME: Pick a better name for this
 void chardevs_init()
 {
-	device_register(FILE_CHAR, 0x100, chardevs_read, chardevs_write, chardevs_ioctl);
+	device_register(S_IFCHR, 0x100, chardevs_read, chardevs_write, chardevs_ioctl);
 }

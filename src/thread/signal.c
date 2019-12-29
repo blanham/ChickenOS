@@ -190,7 +190,7 @@ int sys_sigaction(int sig, const struct k_sigaction *act, struct k_sigaction *oa
 
 	//verify_pointer(act, sizeof(*act));
 	//verify_pointer(oact, sizeof(*oact));
-	interrupt_disable();
+	enum intr_status old_intr = interrupt_disable();
 
 //	printf("%i %x %x cur %x\n", sig, act, oact, cur);
 
@@ -211,19 +211,20 @@ int sys_sigaction(int sig, const struct k_sigaction *act, struct k_sigaction *oa
 	//	printf("%x\n", &cur->sig_info->signals[sig]);
 	}
 
-	interrupt_enable();
+	interrupt_set(old_intr);
 
-	return 0;
+	return -1;
 }
 
 int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
+	return 0;
 	thread_t *cur = thread_current();
 	struct thread_signals *sig_info = cur->sig_info;
 
 	//verify_pointer(set, sizeof(*set));
 	//verify_pointer(oldset, sizeof(*set));
-//	printf("%p %p\n", set, oldset);
+	serial_printf("Problems: %p %p\n", set, oldset);
 	if(oldset != NULL)
 	{
 		kmemcpy(oldset->__bits, sig_info->sigmask.__bits, sizeof(sigset_t));

@@ -212,5 +212,5 @@ void pci_init()
 			continue;
 		pci_bus_scan(i);
 	}
-//	pci_list();
+	pci_list();
 }

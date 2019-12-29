@@ -1,11 +1,11 @@
+#include <common.h>
+#include <sys/stat.h>
 #include <string.h>
-#include <stdio.h>
-#include <kernel/common.h>
-#include <kernel/memory.h>
-#include <fs/vfs.h>
+// FIXME: Move this header?
 #include <fs/initrd.h>
+#include <fs/vfs.h>
 
-//XXX: This is very old cold originally use for the initrd, needs cleanup and
+//XXX: This is very old code originally use for the initrd, needs cleanup and
 //     renaming, but leaving for now.
 
 typedef struct initrd_struct {
@@ -14,7 +14,6 @@ typedef struct initrd_struct {
 } initrd_t;
 initrd_t initrd0_storage;
 initrd_t *initrd0 = &initrd0_storage;
-
 
 int initrd_read_block(void *_disk UNUSED, void *dst, uint32_t blocknum)
 {
@@ -36,14 +35,13 @@ int initrd_write_block(void *_disk UNUSED, void *src, uint32_t blocknum)
 
 }
 
-
 void initrd_init(uintptr_t start, uintptr_t end)
 {
 	initrd0->ramdisk = (uint8_t *)start;
 	initrd0->size = end - start;
 	printf("Initializing initrd @ %x - %i bytes \n",start, initrd0->size);
 
-	device_register(FILE_BLOCK,0x400, initrd_read_block, initrd_write_block, NULL);
+	device_register(S_IFBLK, 0x400, initrd_read_block, initrd_write_block, NULL);
 
 }
 
@@ -65,4 +63,3 @@ void initrd_init(uintptr_t start, uintptr_t end)
 
 }
 */
-

@@ -1,4 +1,5 @@
 #include <kernel/common.h>
+#include <sys/stat.h>
 #include <chicken/time.h>
 #include <kernel/memory.h>
 #include <kernel/hw.h>
@@ -124,6 +125,7 @@ size_t ata_write_block(uint16_t dev, void *_buf, uint32_t block_num)
 
 int ata_ioctl(uint16_t dev UNUSED, int request UNUSED, va_list args UNUSED)
 {
+	// https://www.kernel.org/doc/Documentation/ioctl/hdio.txt
 	return -1;
 }
 
@@ -176,11 +178,18 @@ void ata_identify(int drive)
 		data[i] = ata_read(dev, ATA_DATA);
 
 	//have to byteswap the name
-	for(int i = 27; i < 47; i++)
+	for(int i = 10; i < 20; i++)
 	{
 		uint16_t temp = data[i];// & 0xff00) >> 8;
 		data[i] = ((temp >> 8) & 0xff) + ((temp << 8) & 0xff00);
 	}
+	for(int i = 23; i < 47; i++)
+	{
+		uint16_t temp = data[i];// & 0xff00) >> 8;
+		data[i] = ((temp >> 8) & 0xff) + ((temp << 8) & 0xff00);
+	}
+
+	ata_dump_identify((void *)data);
 
 	kmemcpy(dev->name, dev->info->model_num, 40);
 	dev->capacity = st->bytes_per_sector*st->sectors_per_track*st->num_cylinders*st->num_heads;
@@ -193,7 +202,7 @@ void ata_identify(int drive)
 }
 void ata_init()
 {
-	device_register(FILE_BLOCK, 0x300, ata_read_block, ata_write_block, ata_ioctl);
+	device_register(S_IFBLK, 0x300, ata_read_block, ata_write_block, ata_ioctl);
 	interrupt_register(IRQ14, &ata_intr);
 	ata_identify(0);
 //	printf("test %i\n",sizeof(struct partition_entry));

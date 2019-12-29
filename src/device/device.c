@@ -1,4 +1,4 @@
-/*	ChickenOS - fs/deivce.c - generic block/char device layer
+/*	ChickenOS - fs/device.c - generic block/char device layer
  *	Needs a bit of work
  */
 //Ideally we'll have 2 classes of functions
@@ -6,17 +6,19 @@
 //block_[read|write] -> takes block only, used for lowlevel
 //access
 //then we can have a common struct device again
-
-#include <kernel/common.h>
-#include <kernel/memory.h>
-#include <fs/vfs.h>
-#include <mm/liballoc.h>
+#include <common.h>
+#include <memory.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/stat.h>
+#include <fs/vfs.h>
+#include <mm/liballoc.h>
 
 #define MAX_DEVICES 20
 
+// These probably should be one struct
+// With the functions mapping 1-1 with the posix equivalent
 struct char_device {
 	dev_t dev;
 	char_read_fn read;
@@ -35,7 +37,7 @@ struct char_device char_devices[MAX_DEVICES];
 
 void device_register(uint16_t device_type, dev_t dev, void *read, void *write, void *ioctl)
 {
-	if(device_type == FILE_CHAR)
+	if(device_type == S_IFCHR)
 	{
 		struct char_device *c = &char_devices[MAJOR(dev)];
 		c->read = (char_read_fn)read;
@@ -44,7 +46,7 @@ void device_register(uint16_t device_type, dev_t dev, void *read, void *write, v
 		c->dev = MAJOR(dev);
 
 	}
-	else if(device_type == FILE_BLOCK)
+	else if(device_type == S_IFBLK)
 	{
 		struct block_device *b = &block_devices[MAJOR(dev)];
 		b->read = (block_read_fn )read;
@@ -53,20 +55,23 @@ void device_register(uint16_t device_type, dev_t dev, void *read, void *write, v
 
 	}
 
+	// TODO: log devices registered:
 	//printf("Registered device %x:%x\n", MAJOR(dev),MINOR(dev));
-
 }
 
+// FIXME: we shouldn't need to do either of these tests:
 size_t block_device_read(uint16_t dev, void *buf, uint32_t block)
 {
 	struct block_device *device = &block_devices[MAJOR(dev)];
 	if(device == NULL)
 	{
+		// FIXME: This should be handled by open() and return ENXIO
 		printf("invalid dev passed to block_device_read\n");
 		return 0;
 	}
 	if(device->read == NULL)
 	{
+		// FIXME: We should have a dummy function that return EBADF? EIO?
 		printf("device has no read function\n");
 		return 0;
 	}
@@ -74,6 +79,8 @@ size_t block_device_read(uint16_t dev, void *buf, uint32_t block)
 	return device->read(dev, buf, block);
 
 }
+
+// FIXME: ditto write
 size_t block_device_write(uint16_t dev, void *buf, uint32_t block)
 {
 	struct block_device *device = &block_devices[MAJOR(dev)];
@@ -155,6 +162,11 @@ int read_block(uint16_t dev, void * _buf, int block, int block_size)
 
 	return count;
 }
+
+//int block_rw(struct inode *inode, uint8_t *buf, off_t offset, size_t count)
+//{
+//	return 0;
+//}
 
 
 int read_block_at(uint16_t dev, void * _buf, int block,

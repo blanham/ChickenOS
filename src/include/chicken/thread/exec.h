@@ -3,19 +3,31 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <elf.h>
+#include <fs/vfs.h>
 
 #define MAX_ARGS 256
 #define MAX_ENVS 256
 #define AT_MAX 37
 
 enum exe_type {
-	EXE_INVALID,
+	EXE_INVALID = 0,
 	EXE_ELF,
 	EXE_SCRIPT
 };
 
-uintptr_t stack_prepare(char *path, char *const argv[], char *const envp[]);
-enum exe_type exec_type(const char *path);
+typedef struct {
+	enum exe_type type;
+	union {
+		int err;
+		struct file *file;
+	};
+	uintptr_t ip;
+	uintptr_t sp;
+} executable_t;
+
+int stack_prepare(executable_t *exe, char *path, char *const argv[], char *const envp[]);
+//executable_t *identify_executable(const char *path);
+executable_t *identify_executable(const char *path, char *const _argv[]);
 void duplicate_table(char * dest[], char *const source[]);
 
 void arch_thread_set_ip_and_sp(uintptr_t eip, uintptr_t useresp);
@@ -23,7 +35,7 @@ void arch_thread_set_ip_and_sp(uintptr_t eip, uintptr_t useresp);
 bool elf_check_magic(void *magic);
 void elf_print_sections(Elf32_Shdr  *sections);
 void elf_print_programs(Elf32_Phdr *program);
-int load_elf(const char *path, uintptr_t *eip);
+int load_elf(executable_t *exe);
 
 #define ELF_MIN_ALIGN PAGE_SIZE
 #define ELF_PAGESTART(_v) ((_v) & ~(unsigned long)(ELF_MIN_ALIGN-1))

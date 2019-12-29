@@ -22,6 +22,9 @@ extern "C" {
 
 #include <bits/stat.h>
 
+// FIXME: Something should be done about 32bit vs 64bit stat support
+struct stat;
+
 #define st_atime st_atim.tv_sec
 #define st_mtime st_mtim.tv_sec
 #define st_ctime st_ctim.tv_sec

@@ -83,6 +83,19 @@ struct frame {
 		uintptr_t virt_addr;
 		void *virt_ptr;
 	};
+	size_t blocksize;
+	union {
+		//
+		// if mapped
+		// struct inode * parent?
+		// if swapped
+		struct swapdata{
+			dev_t device;
+			size_t block;
+		} swapdata;
+	};
+	// hmm, then you wouldn't need to store block numbers in the frame
+	// add lock/semaphore/waitqueue
 	atomic_int ref_count;
 } __attribute__((packed));
 

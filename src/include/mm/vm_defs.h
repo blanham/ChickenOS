@@ -1,3 +1,4 @@
+/*
 #include <types.h>
 struct gdt_entry_struct
 {
@@ -19,4 +20,4 @@ typedef struct gdt_ptr_struct gdt_ptr_t;
 
 void gdt_init();
 
-
+*/

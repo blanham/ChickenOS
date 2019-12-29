@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <ext2/ext2fs_defs.h>
+#include "ext2fs_defs.h"
 
 void inode_print(ext2_inode_t inode)
 {
@@ -35,7 +35,7 @@ void gd_print(ext2_group_descriptor_t gdt)
 	printf("free inodes\t%i\n", gdt.bg_free_inodes_count);
 	printf("dir inodes\t%i\n\n", gdt.bg_used_dirs_count);
 }
-//god damnit inode numbering starts with 1, not 0
+
 void print_dir_entry(ext2_directory_t *dir)
 {
 	char buf[256];
@@ -44,5 +44,3 @@ void print_dir_entry(ext2_directory_t *dir)
 	strcpy(buf, dir[0].name);
 	printf("%s \t\tinode %i\n", buf, dir[0].inode);
 }
-
-

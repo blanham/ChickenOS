@@ -51,15 +51,16 @@ void rtc_init()
 	time_set_from_rtc(&system_datetime);
 }
 
-void timer_intr(struct registers * regs UNUSED)
+void timer_intr(struct registers * regs)
 {
 	ticks++;
 	if (ticks % 100 == 0)
 		unix_time++;
-	if (!(ticks & 3))
+	if (!(ticks & 0x3))
 		scheduler_run(regs);
 }
 
+// FIXME: Why not have a busy wait function that takes a timespec?
 
 //XXX: These sleep functions are shit, should be done as a priority queue,
 //		where the priority is the time the thread should be rescheduled
@@ -107,6 +108,7 @@ int sys_clock_gettime(int type, struct timespec *tp)
 	static int s = 0;
 	tp->tv_sec = unix_time;
 	tp->tv_nsec = s;
+	// XXX: lolwat:
 	s += 100;
 	unix_time++;
 	return 0;

@@ -50,8 +50,10 @@ add_executable(kernel.bin
 )
 
 cmake_policy(SET CMP0037 OLD) # Enable using "test" as target name
-add_custom_target(test cd .. && ./new_update.sh &&  DISPLAY=:0 qemu-system-i386 -vga std -rtc base=localtime -m 128 -usb  -hda disk.img -serial file:log && cd src)
+add_custom_target(test cd .. && ./new_update.sh &&  DISPLAY=:0 qemu-system-i386 -vga std -rtc base=localtime -soundhw pcspk -m 128 -usb  -hda disk.img -serial file:log && cd src)
 add_dependencies(test kernel.bin)
+add_custom_target(monitor cd .. && ./new_update.sh &&  qemu-system-i386 -nographic -rtc base=localtime -m 128 -usb  -hda disk.img && cd src USES_TERMINAL)
+add_dependencies(monitor kernel.bin)
 add_custom_target(terminal cd .. && ./new_update.sh &&  qemu-system-i386 -curses -rtc base=localtime -m 128 -usb  -hda disk.img && cd src USES_TERMINAL)
 add_dependencies(terminal kernel.bin)
 

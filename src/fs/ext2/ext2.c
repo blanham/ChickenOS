@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #define BLOCK_SIZE 512
 #define EXT2_SB_SIZE 1024
 #define EXT2_SB_BLOCK 2
@@ -19,15 +20,16 @@
 
 //FIXME
 vfs_ops_t ext2_ops = {
-	ext2_read_inode,//vfs_read_inode_t read;
-	ext2_write_inode,//vfs_write_inode_t write;
-	ext2_read_superblock,//vfs_read_sb_t read_sb;
-	ext2_namei//vfs_namei_t namei;
+	.read = ext2_read_inode,//vfs_read_inode_t read;
+	.write = ext2_write_inode,//vfs_write_inode_t write;
+	.read_sb = ext2_read_superblock,//vfs_read_sb_t read_sb;
+	.namei = ext2_namei,
+	.getdents = ext2_getdents
 };
 
 void ext2_inode_to_vfs(ext2_fs_t *fs,struct inode *vfs,ext2_inode_t *ext2,uint32_t inode)
 {
-	struct stat *st = &vfs->info;
+	struct stat64 *st = &vfs->info;
 	st->st_dev = fs->dev;
 	st->st_ino = inode;
 	st->st_mode = ext2->i_mode;

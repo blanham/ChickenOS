@@ -32,15 +32,19 @@ char kbd_map_unshifted[256] = {
 };
 
 char kbd_map_shifted[256] = {
-	' ',ESC,'!','@','#','$','%','^','&','*','(',41,'_','+',BKSPACE,TAB,
+	' ',ESC,'!','@','#','$','%','^','&','*','(',')','_','+',BKSPACE,TAB,
 	'Q','W','E','R','T','Y','U','I','O','P','{','}',CR, ' ','A','S',
 	'D','F','G','H','J','K','L',':','"',' ',' ', '|', 'Z','X','C',
 	'V','B','N','M','<','>','?'
 };
 
-char kbd_getc()
+int kbd_getc()
 {
-	while(pos == 0);
+	//while(pos == 0);
+	if (pos == 0)
+		return -1;
+		extern int fart2;
+		fart2 = 0;
 	return rbuf[--pos];
 }
 
@@ -144,6 +148,8 @@ void ps2_intr(void)
 			{
 				shutdown();
 			}
+			extern int fart2;
+			fart2 = 1;
 			rbuf[pos++] = c;
 		//	input_queue_putc(c);
 	}

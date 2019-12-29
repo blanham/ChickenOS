@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <util/utlist.h>
 
+#include <arch/i386/interrupt.h>
+
 thread_t *ready_list;
 thread_t *idle_thread = NULL;
 thread_t *thread_table[1024];
@@ -79,6 +81,8 @@ void thread_exit(int exit_code)
 
 	cur->status = THREAD_DEAD;
 	cur->ret_val = exit_code;
+
+	while(1);
 }
 
 //Need usermode stack pointer for signal handling
@@ -89,6 +93,9 @@ void scheduler_run(registers_t *regs UNUSED)
 	//since it's on the kernel stack we can mask and get the current thread,
 	//saving a bit of overhead
 	thread_t *cur = thread_current();
+
+	//printf("Scheduling lol:\n");
+	//dump_regs(regs);
 
 	if (cur->status == THREAD_UNINTERRUPTIBLE)
 		return;
@@ -115,9 +122,13 @@ void scheduler_run(registers_t *regs UNUSED)
 		next = idle_thread;
 	}
 
+	//registers_t *next_regs = (void*)((uintptr_t)next + STACK_SIZE - sizeof(registers_t));
+	//printf("NEXT:\n");
+	//dump_regs(next_regs);
 	//Switch address spaces here?
 	//mm_set_address_space(next->mm);
 
+	pagedir_activate(next->mm->pd);
 	//Handle signals here
 	if (next->sig_info->signal_pending != 0) {
 		//signal_setup_userstack(next);

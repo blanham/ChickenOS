@@ -9,6 +9,8 @@ struct frame *frames;
 
 void frame_init(uintptr_t mem_size)
 {
+	// XXX: Do we really need a frame for every page?
+	// why not use a sparse format?
 	int frame_count = mem_size / PAGE_SIZE;
 	size_t frame_in_memory_size = sizeof(struct frame) * frame_count;
 
@@ -28,6 +30,8 @@ struct frame *frame_get(void *ptr)
 	return ret;
 }
 
+// void frame_lock(frame_t *frame)
+// void frame_unlock(frame_t *frame)
 void frame_put(struct frame *frame)
 {
 	if(atomic_fetch_sub(&frame->ref_count, 1) == 1) {

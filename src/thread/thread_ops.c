@@ -2,9 +2,14 @@
 #include <sys/types.h>
 #include <errno.h>
 #include <chicken/thread.h>
+#include <arch/i386/interrupt.h>
 
-pid_t sys_fork(registers_t *regs)
+pid_t sys_fork(void *aux)
 {
+	// FIXME: 
+	registers_t *regs = aux;
+
+	serial_printf("REGS: User ESP: %X ESP: %X EBP: %X\n", regs->useresp, regs->esp, regs->ebp);
 	return thread_create2(regs->eip, regs->useresp, NULL);
 }
 
@@ -25,6 +30,7 @@ uid_t sys_getuid()
 	return thread_current()->uid;
 }
 
+// TODO: Should return tgid instead
 pid_t sys_getpid()
 {
 	return thread_current()->pid;
@@ -43,6 +49,7 @@ pid_t sys_getpgrp()
 	return pgid;
 }
 
+// FIXME: Incorrect behavior
 int sys_setpgid(pid_t pid, pid_t pgid)
 {
 	thread_t *thread = thread_current();
@@ -68,6 +75,7 @@ int sys_brk(void *_addr)
 {
 	thread_t *cur = thread_current();
 	uintptr_t addr = (uintptr_t)_addr;
+	serial_printf("BRK %X\n", addr);
 	if(addr == 0)
 	{
 		return (int)cur->mm->brk;
@@ -82,6 +90,8 @@ int sys_brk(void *_addr)
 //FIXME: Needs more error/bounds checking
 void *sys_sbrk(intptr_t ptr)
 {
+	printf("SBRK\n");
+	PANIC("SRBK");
 	void * old;
 	thread_t *cur = thread_current();
 

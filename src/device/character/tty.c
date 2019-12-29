@@ -229,7 +229,6 @@ void tty_putchar(tty_t *tty, int c)
 	}
 
 	switch (c) {
-		// TODO: 
 		// FIXME Doesn't handle backspace properly
 		case '\b': // 0x8 - Backspace
 			if (tty->x > 0)

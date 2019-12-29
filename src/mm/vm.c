@@ -11,6 +11,7 @@
 
 uint32_t mem_size;
 
+// TODO: Move this to the i386 directory
 void vm_page_fault_dump(registers_t *regs, uintptr_t addr, int flags)
 {
 	thread_t *cur = thread_current();
@@ -28,6 +29,8 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 {
 	thread_t *cur = thread_current();
 	enum intr_status status = interrupt_disable();
+
+	//serial_printf("Page fault @ %X\n", regs->eip);
 
 	//vm_page_fault_dump(regs, addr, flags);
 	//TODO: Check if this is a swapped out or mmaped or COW etc
@@ -75,9 +78,9 @@ void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pg
 	(void)flags;
 	(void)fd;
 	(void)pgoffset;
-	PANIC("FUCKING THING SUCKS\n");
-	printf("Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n",
+	printf("MMAP! Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n",
 					addr, length, prot, flags, fd, pgoffset);
+	PANIC("FUCKING THING SUCKS\n");
 
 	if(addr == NULL)
 	{
@@ -120,7 +123,7 @@ void mm_clear(struct mm *mm)
 	(void)mm;
 	//Iterate through regions and remove them
 	//	reduce reference counts for physical pages
-	//swap to a new pagedirectory and throw away everything else
+	//swap to the kernel page directory or a new pagedirectory and throw away everything else
 	//pagedir_free(mm->pd);
 }
 
@@ -130,6 +133,8 @@ void mm_free(struct mm *mm)
 }
 
 //Currently used in execve()
+// FIXME: this should probably be in a separate file
+//	      and shoul probably not end in init, to reduce confusion with vm_init()
 void mm_init(struct mm *mm)
 {
 	//This initial allocation is probably not needed,
@@ -142,9 +147,15 @@ void mm_init(struct mm *mm)
 	mm->pd = pagedir_alloc();
 	mm->regions = NULL;
 
+	//FIXME: probably not the best address for break
+	//should be right above the code segment of the
+	//executable
+	mm->brk = (void *)HEAP_BASE;
+
 	memregion_map_data(mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE,
 			PROT_GROWSDOWN, MAP_GROWSDOWN | MAP_FIXED, user_stack);
-	memregion_map_data(mm, HEAP_BASE, PAGE_SIZE,
+	// FIXME: This should be set by sbrk/mmap
+	memregion_map_data(mm, HEAP_BASE, PAGE_SIZE*128,
 			PROT_GROWSUP, MAP_PRIVATE | MAP_FIXED, NULL);
 }
 

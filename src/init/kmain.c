@@ -16,7 +16,8 @@
 #include <stdio.h>
 #include <string.h>
 
-char *BOOT_MSG = "ChickenOS v0.03 booting\n";
+#define VERSION "v0.1.0"
+char *BOOT_MSG = "\033[32;1mChickenOS "VERSION" booting\033[0m\n";
 
 void kmain(struct kernel_boot_info *info)
 {
@@ -67,6 +68,7 @@ void kmain(struct kernel_boot_info *info)
 
 	extern uint32_t mem_size;
 	printf("Found %uMB RAM\n", info->mem_size/1024/1024);
+	printf("Lower: %X Upper: %X\n", info->low_mem, info->hi_mem);
 
 	//init thread is started in user mode
 	//so we don't need to switch into user mode

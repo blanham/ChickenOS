@@ -13,6 +13,7 @@
 #include <util/uthash.h>
 
 #define STACK_SIZE 0x1000
+#define STACK_MASK ~(STACK_SIZE-1)
 #define STACK_PAGES (STACK_SIZE)/(PAGE_SIZE)
 
 #define NUM_SIGNALS 32
@@ -39,7 +40,8 @@ enum thread_stat {
 // 		since we didn't get it working in pintos
 typedef struct thread_struct thread_t;
 typedef struct thread_struct {
-	pid_t pid, ppid, pgid;
+	pid_t pid, tgid, ppid, pgid;
+	// TODO: We need to add tgid and return that instead of ->pid fot getpid(2)
 	uid_t uid, euid;
 	gid_t gid;
 	mode_t umask;
@@ -60,14 +62,16 @@ typedef struct thread_struct {
 	//fs stuff
 	struct thread_files *file_info;
 	//saved kernel stack, user stack, and location of user stack
-	uint8_t *sp, *useresp, *user;
+	uint8_t *sp;//, *useresp, *user;
+	void *registers;
+	void *tls;
 
 	struct thread_signals *sig_info;
 
 	//this pointer to registers on kernel
 	//stack is used for manipulating the user stack
 	//for signal handling
-	struct registers *regs, *signal_regs;
+	//struct registers *regs, *signal_regs;
 
 	struct mm *mm;
 
@@ -79,15 +83,14 @@ typedef struct thread_struct {
 } __attribute__((packed)) thread_t;
 
 
-
-struct thread_files {
+typedef struct thread_files {
 	struct inode *root;
 	struct inode *cur;
 	int files_open;
 	int files_count;
 	struct file **files;
 	int *files_flags;
-};
+} thr_files_t;
 
 struct thread_signals {
 	int signal_pending;
@@ -108,15 +111,11 @@ void arch_thread_reschedule(thread_t *cur, thread_t *next);
 void arch_thread_set_ip_and_usersp(uintptr_t ip, uintptr_t usersp);
 
 /* thread.c */
-thread_t * 	thread_current();
-thread_t *	thread_by_pid(pid_t pid);
 void 	threading_init();
 pid_t	thread_create2(uintptr_t eip, uintptr_t _esp, void *aux);
-pid_t 	thread_create(registers_t *regs, void (*eip)(void *), void * esp);
-pid_t 	pid_allocate();
 
 /* thread_ops.c - system calls */
-pid_t 	sys_fork(registers_t *regs);
+pid_t 	sys_fork(void *regs);
 uid_t 	sys_geteuid();
 pid_t 	sys_getpid();
 pid_t 	sys_getppid();
@@ -130,6 +129,8 @@ int 	sys_brk(void *addr);
 void *	sys_sbrk(intptr_t ptr);
 void 	sys_exit(int exit);
 pid_t 	sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage);
+int sys_get_thread_area(void *desc);
+int sys_set_thread_area(void *desc);
 
 /* thread/exec.c */
 
@@ -154,10 +155,24 @@ int sys_sigsuspend(const sigset_t *mask);
 int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sys_sigreturn(registers_t *regs, unsigned long dunno);
 
+/* thread/thread_util.c */
+pid_t 	pid_allocate();
+struct thread_files *thread_files_alloc(struct thread_files *old); // Copies old to new if not NULL
+thread_t * thread_current();
+thread_t *thread_by_pid(pid_t pid);
+void thread_add_child(thread_t *parent, thread_t *child); // FIXME: Make this a macro instead
+
 /* arch/ARCH/thread.c */
 void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax);
 void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp, uintptr_t eax);
+void thread_set_tls(void *tls_descriptor);
+void thread_get_tls(void *tls_descriptor);
 
 /* arch/ARCH/switch.s */
 void switch_threads(thread_t *cur, thread_t *new);
+
+
+// FIXME: not sure where to put this
+struct uname;
+int sys_uname(struct uname *uname);
 #endif

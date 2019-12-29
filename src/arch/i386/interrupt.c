@@ -41,6 +41,8 @@ static void void_handler(registers_t *regs)
 
 static void i386_syscall_handler(registers_t *regs)
 {
+	//dump_regs(regs);
+	thread_current()->registers = regs;
 	syscall_handler(regs);
 }
 
@@ -48,6 +50,7 @@ static void gpf(registers_t *regs)
 {
 	// TODO: Still would love to make this work again
 	// console_set_color(LT_GREY,WHITE);
+	printf("PID: %i\n",thread_current()->pid);
 	dump_regs(regs);
 	BOCHS_BREAK();
 	PANIC("GENERAL PROTECTION FAULT!");
@@ -182,10 +185,11 @@ void arch_interrupt_disable()
 
 void dump_regs(registers_t *regs)
 {
-	printf("edi %X esi %X ebp %X esp %X\nebx %X edx %X ecx %X eax %X\n",
+	serial_printf("PID %i\n", thread_current()->pid);
+	serial_printf("edi %X esi %X ebp %X esp %X\nebx %X edx %X ecx %X eax %X\n",
 		regs->edi,regs->esi,regs->ebp,regs->esp,regs->ebx,regs->edx,regs->ecx,regs->eax);
-	printf("ds %X es %X fs %X gs %X int_no %i err_code %i\n",
+	serial_printf("ds %X es %X fs %X gs %X int_no %i err_code %X\n",
 		regs->ds,regs->es,regs->fs,regs->gs,regs->int_no,regs->err_code);
-	printf("eip %X cs %X eflags %X useresp %X ss %X\n",
+	serial_printf("eip %X cs %X eflags %X useresp %X ss %X\n",
 		regs->eip, regs->cs, regs->eflags, regs->useresp, regs->ss);
 }

@@ -35,6 +35,7 @@ struct file *vfs_file_new(struct inode *inode, char *name)
 int vfs_file_free(struct file *file)
 {
 	struct inode *inode = file->inode;
+	// No, we mark it as unused
 	kfree(file);
 	//decrement reference count
 	//if 0 take out of cache
@@ -48,7 +49,7 @@ int vfs_file_free(struct file *file)
 //		 Some kind of cache would probably be a good idea
 struct inode * vfs_namei(struct inode *dir, char *file)
 {
-	printf("%X %X\n", dir, root);
+	//printf("%X %X\n", dir, root);
 	if(dir->flags & I_MOUNT && dir != root->inode)
 	{
 		PANIC("traversing mounts not yet implemented");
@@ -85,6 +86,9 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 	else
 		res = thread_current()->file_info->cur;
 
+	if (path[1] == 0)
+		return res;
+
 	if((tok = (char *)strtok_r(path, "/", &saveptr)) == NULL)
 		return NULL;
 
@@ -110,7 +114,8 @@ struct inode * vfs_pathsearch(struct file *dir, char *_path)
 		}
 	}
 	//FIXME: needs to use strcpy or strncpy
-	kmemcpy((uint8_t *)_path, (uint8_t *)filename, 10);
+	// XXX: WTF is this, was stomping all over the stack
+	//kmemcpy((uint8_t *)_path, (uint8_t *)filename, 10);
 //	strcpy(_path, filename);
 	kfree(path);
 	return res;
@@ -266,216 +271,3 @@ int vfs_mount(const char *device, struct file *dir, char *type)
 
 }
 */
-
-struct file *vfs_open(char *path, int oflags, mode_t mode)
-{
-	(void)mode;
-	struct inode *cur = thread_current()->file_info->cur;
-	struct file *tmp = kcalloc(sizeof(*tmp), 1);
-	tmp->inode = cur;
-	struct inode *lookup = vfs_pathsearch(tmp, path);
-
-	if(lookup == NULL)
-	{
-		if((oflags & O_CREAT) != 0)
-		{
-	//		printf("need to create file\n");
-		}
-		return NULL;
-	}
-	kfree(tmp);
-	struct file *new = vfs_file_new(lookup, path);
-	return new;
-}
-
-int vfs_close(struct file *file)
-{
-	if(file == NULL)
-		return -1;
-
-	//vfs_file_free(file);
-
-	return 0;
-}
-
-size_t vfs_read(struct file *file, void *buf, size_t nbyte)
-{
-	int ret = 0;
-	if(file == NULL || buf == NULL)
-		return -1;
-	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_read(file->inode->info.st_rdev,
-			buf, file->offset, nbyte);
-	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-		ret = block_device_readn(file->inode->info.st_rdev,
-			buf, 0, file->offset, nbyte);
-	}else if((file->inode->info.st_mode & S_IFREG) != 0){
-		//printf("READ OFF %x\n", file->offset);
-		if(file->fs == NULL || file->fs->ops == NULL || file->fs->ops->read == NULL)
-			return -1;
-		ret = file->fs->ops->read(file->inode, buf,
-			nbyte, file->offset);
-	}
-	file->offset += ret;
-	return ret;
-
-}
-
-off_t vfs_write(struct file *file, void *buf, size_t nbyte)
-{
-	int ret = 0;
-	if(nbyte == 0)
-		return 0;
-	if(file == NULL || buf == NULL)
-		return -1;
-	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_write(file->inode->info.st_rdev,
-			buf, file->offset, nbyte);
-	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-//FIXME: This returns -1 so we don't fuxxor our disk image accidentally
-	//	ret = block_device_readn(file->inode->rdev,
-	//		buf, 0, file->offset, nbyte);
-		printf("Writing it currently disabled\n");
-		return -1;
-	}else if((file->inode->info.st_mode & S_IFREG) != 0){
-		if(file->fs == NULL || file->fs->ops->write == NULL)
-			return -1;
-		ret = file->fs->ops->write(file->inode, buf,
-			nbyte, file->offset);
-	}
-	file->offset += ret;
-	return ret;
-}
-
-int  vfs_ioctl(struct file *file, int request, char * args)
-{
-	int ret = 0;
-	if(file == NULL)
-		return -1;
-	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_ioctl(file->inode->info.st_rdev,
-			request, args);
-	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-	//	ret = block_device_readn(file->inode->rdev,
-	//		buf, 0, file->offset, nbyte);
-		return -1;
-	}else if((file->inode->info.st_mode & S_IFREG) != 0){
-	//	if(file->fs == NULL || file->fs->ops->write == NULL)
-	//		return -1;
-	//	ret = file->fs->ops->write(file->inode, buf,
-	//		nbyte, file->offset);
-		return -1;
-	}
-	return ret;
-}
-
-
-
-//FIXME: Error catching
-//		check if fd is open and return EBADF
-//		check if file offset is negative and return EINVAL
-//		check if offset overflows off_t and return EOVERFLOW
-//		check if pipe and return ESPIPE
-off_t vfs_seek(struct file *file, off_t offset, int whence)
-{
-	switch(whence)
-	{
-		case SEEK_SET:
-			file->offset = offset;
-			break;
-		case SEEK_CUR:
-			file->offset += offset;
-			break;
-		case SEEK_END:
-			//file->offset = file->end + offset;
-			//break;
-		default:
-			//EINVAL?
-			return 0;
-
-	}
-
-	return file->offset;
-}
-//FIXME: I'm not sure if the logic here checks out
-//FIXME: Add various errors, most importantly
-//		EBADF, EACCES, ENOTDIR and EFAULT
-int vfs_chdir(const char *_path)
-{
-	struct file *file;
-	int ret = -1;
-	char *path = strdup(_path);
-	file  = vfs_open(path, 0, 0);
-	if(file != NULL)
-	{
-		//vfs_close(thread_current()->cur_dir);
-		thread_current()->file_info->cur = file->inode;
-		ret = 0;
-	}
-	kfree(path);
-	return ret;
-}
-
-int vfs_stat(const char *path, struct stat *buf)
-{
-	(void)path;
-	(void)buf;
-
-	return 0;
-}
-
-int vfs_stat64(const char *path, struct stat64 *buf)
-{
-	struct inode *cur = thread_current()->file_info->cur;
-	struct file *tmp = kcalloc(sizeof(*tmp), 1);
-	tmp->inode = cur;
-	struct inode *lookup = vfs_pathsearch(tmp, (char *)path);
-
-	if(lookup == NULL)
-		return -(ENOENT);
-	kfree(tmp);
-	memcpy(buf, &lookup->info, sizeof(struct stat));
-
-	return 0;
-}/*
-struct inode {
-	uint32_t inode_num;
-	uint16_t mode;
-	uint16_t pad;
-	uint32_t size;
-	uint32_t atime;
-	uint32_t ctime;
-	uint32_t dtime;
-	uint32_t mtime;
-	uint32_t time;
-	uint16_t gid;
-	uint16_t uid;
-	uint16_t links_count;
-	uint16_t rdev;
-	//if part of mount point,keep in cache
-	uint32_t flags;
-	void *storage;
-	//may need parent
-	vfs_fs_t *fs;
-};
-
-struct stat64
-{
-	dev_t st_dev;
-	int __st_dev_padding;
-	long __st_ino_truncated;
-	mode_t st_mode;
-	nlink_t st_nlink;
-	uid_t st_uid;
-	gid_t st_gid;
-	dev_t st_rdev;
-	int __st_rdev_padding;
-	off64_t st_size;
-	blksize_t st_blksize;
-	blkcnt64_t st_blocks;
-	struct timespec st_atim;
-	struct timespec st_mtim;
-	struct timespec st_ctim;
-	ino64_t st_ino;
-};:*/
-
