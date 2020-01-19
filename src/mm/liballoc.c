@@ -3,7 +3,7 @@
 /**  Durand's Amazing Super Duper Memory functions.  */
 
 #define VERSION 	"1.1"
-#define ALIGNMENT	4ul				///< This is the byte alignment that memory must be allocated on. IMPORTANT for GTK and other stuff.
+#define ALIGNMENT	16ul				///< This is the byte alignment that memory must be allocated on. IMPORTANT for GTK and other stuff.
 
 #define ALIGN_TYPE		int /// unsigned short
 #define ALIGN_INFO		sizeof(ALIGN_TYPE)	///< Alignment information is stored right before the pointer. This is the number of bytes of information stored there.

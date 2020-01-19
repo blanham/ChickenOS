@@ -21,10 +21,11 @@ void arch_rtc_init(struct c_os_time *time);
 
 /* device/time.c */
 void time_init();
-int sys_gettimeofday(struct timeval *tp, void *tzp);
 void time_sleep(int seconds);
 void time_msleep(int mseconds);
 void time_usleep(int useconds);
 int sys_clock_gettime(int, struct timespec *);
+int sys_gettimeofday(struct timeval *tp, void *tzp);
+int sys_nanosleep(const struct timespec *req, struct timespec *rem);
 
 #endif

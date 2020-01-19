@@ -29,10 +29,6 @@ void kmain(struct kernel_boot_info *info)
 //	console_init();
 	tty_init(info);
 
-	//we start out with one color scheme
-	//but this will be changed if i ever get a framebuffer
-	//console working
-//	console_set_color(BLUE,WHITE);
 	printf(BOOT_MSG);
 
 	threading_init();
@@ -64,15 +60,19 @@ void kmain(struct kernel_boot_info *info)
 	//TODO: move this to a mount_root() function
 	//		can take drive, but should autodetect
 	//		filesytem type from the partition table
-	vfs_mount_root(ATA0_0_DEV, "ext2");
+	// FIXME: this is just for my convenience for testing, remove when we have better ways of specifying the device
+	dev_t root_device = ATA0_0_DEV;
+	if (info->mem_size/1024/1024 >= 254) {
+		root_device = ATA0_3_DEV;
+	}
 
-	extern uint32_t mem_size;
+	vfs_mount_root(root_device, "ext2");
+
 	printf("Found %uMB RAM\n", info->mem_size/1024/1024);
 	printf("Lower: %X Upper: %X\n", info->low_mem, info->hi_mem);
 
 	//init thread is started in user mode
 	//so we don't need to switch into user mode
-	//thread_create(NULL, init, "ass");
 	thread_create2((uintptr_t)init, 0, "Argument");
 
 	//TODO: We should probably use this thread to schedule

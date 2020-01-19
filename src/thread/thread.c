@@ -59,7 +59,7 @@ void thread_free(thread_t *dead UNUSED)
 {
 	//Some of this can possibly handled in thread_exit()
 	//close files
-	//lower ref counts on root and cur directory inodes
+	//lower ref counts on r_inodeoot and cur directory inodes
 	//decrease ref counts on address spaces
 	//reap/reparent children (forgot how this is supposed to work in unix-likes)
 	//other cleanup
@@ -115,8 +115,6 @@ pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
 		new = thread_new(false);
 		new->mm = mm_alloc();
 		new->file_info = thread_files_alloc(NULL);
-		new->file_info->cur = root->inode;
-		new->file_info->root = root->inode;
 		//
 		uint32_t *usersp = palloc();
 		memregion_map_data(new->mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN,

@@ -1,0 +1,4 @@
+#ifndef C_OS_DEVICE_BLOCK_SCSI_H
+#define C_OS_DEVICE_BLOCK_SCSI_H
+
+#endif

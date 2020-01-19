@@ -13,7 +13,7 @@
 #include <thread/syscall-names2.h>
 #include <fcntl.h>
 
-//#define DEBUG
+#define DEBUG
 
 
 void syscall_handler (registers_t *regs)
@@ -23,22 +23,28 @@ void syscall_handler (registers_t *regs)
 	long *arg;
 
 #ifdef DEBUG
-	serial_printf("%s(%i): by %i @ %x\n",syscall_names[call], call, thread_current()->pid,
-			regs->eip);
+	serial_printf("%s(%i): by %i @ %x: ",syscall_names[call], call, thread_current()->pid, regs->eip);
+	serial_printf("%x, %x, %x, %x, %x, %x\n", regs->ebx, regs->ecx, regs->edx, regs->esi, regs->edi, regs->ebp);
 #endif
 
 	switch (call)
 	{
+		case SYS_EXIT:
+			thread_exit(regs->ebx);
+			PANIC("THREAD_EXIT returned!\n");
+			break;
 		case SYS_READ:
 			regs->eax = sys_read((int)regs->ebx, (char *)regs->ecx, (int)regs->edx);
 			break;
 		case SYS_WRITE:
 			regs->eax = sys_write((int)regs->ebx, (char *)regs->ecx, (int)regs->edx);
 			break;
-		case 41:
-			regs->eax = regs->ebx;
+		case SYS_CLOSE:
+			regs->eax = sys_close(regs->ebx);
 			break;
-
+		case SYS_DUP:
+			regs->eax = sys_dup(regs->ebx);
+			break;
 		case SYS_GETPPID:
 			regs->eax = sys_getppid();
 			break;
@@ -64,16 +70,23 @@ void syscall_handler (registers_t *regs)
 		case SYS_CHDIR:
 			regs->eax = sys_chdir((const char *)regs->ebx);
 			break;
+		case SYS_FACCESSAT:
+			regs->eax = sys_faccessat(regs->ebx, (const char *)regs->ecx, regs->edx, regs->esi);
+			break;
+		case SYS_ACCESS:
+			regs->eax = sys_access((const char *)regs->ebx, regs->ecx);
+			break;
+		case SYS_MKDIR:
+			regs->eax = sys_mkdir((const char *)regs->ebx, regs->ecx);
+			break;
 		case SYS_LSEEK:
 			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->ecx, (int) regs->edx);
 			break;
-		case 140:
-			regs->eax = sys_lseek((int)regs->ebx, (off_t)regs->edx, (int) regs->edi);
-			*(long *)regs->esi = regs->eax; //XXX: What is this for?
+		case SYS_LLSEEK:
+			regs->eax = sys_llseek((int)regs->ebx, regs->ecx, regs->edx, (off_t *)regs->esi, regs->edi);
 			break;
 		case SYS_LSTAT64:
-			// TODO: LSTAT processes symlinks differently
-			regs->eax = sys_stat64((char *)regs->ebx, (struct stat64 *)regs->ecx);
+			regs->eax = sys_lstat64((char *)regs->ebx, (struct stat64 *)regs->ecx);
 			break;
 		case SYS_STAT64:
 			regs->eax = sys_stat64((char *)regs->ebx, (struct stat64 *)regs->ecx);
@@ -97,7 +110,9 @@ void syscall_handler (registers_t *regs)
 		case SYS_SETPGID:
 			regs->eax = sys_setpgid(regs->ebx, regs->ecx);
 			break;
-
+		case SYS_GETEGID:
+			regs->eax = sys_getegid();
+			break;
 		case SYS_GETEUID:
 		case SYS_GETEUID16:
 			regs->eax = sys_geteuid();
@@ -145,41 +160,49 @@ void syscall_handler (registers_t *regs)
 			dump_regs(regs);
 			regs->eax = sys_sigsuspend((void*)regs->ebx);
 			break;
-		case 173:
+		case SYS_RT_SIGRETURN:
 		case SYS_SIGRETURN:
 			regs->eax = sys_sigreturn(regs, regs->ebx);
 			break;
-		case SYS_WAIT4:
-			regs->eax = sys_wait4((pid_t)regs->ebx, (int *)regs->ecx, (int)regs->edx,
-											(struct rusage *)regs->esi);
-			//printf("REturn %i\n", regs->eax);
+		case SYS_CLONE:
+			regs->eax = sys_clone(regs->ebx, (void *)regs->ecx, (int *)regs->edx, regs->esi, (int *)regs->edi);
 			break;
-		case SYS_CLOSE:
-			regs->eax = sys_close(regs->ebx);
+		case SYS_WAIT4:
+			regs->eax = sys_wait4((pid_t)regs->ebx, (int *)regs->ecx, (int)regs->edx, (struct rusage *)regs->esi);
+			//printf("REturn %i\n", regs->eax);
 			break;
 		case SYS_GETDENTS64:
 			regs->eax = sys_getdents((int)regs->ebx, (void *)regs->ecx, (unsigned int)regs->edx);
 			break;
-		//case SYS_FCNTL:
 		case SYS_FCNTL64:
 			regs->eax = sys_fcntl64(regs->ebx, regs->ecx, regs->edx);
 			break;
-		case SYS_EXIT:
-			thread_exit(regs->ebx);
-			PANIC("THREAD_EXIT returned!\n");
-			break;
 		case SYS_GETTIMEOFDAY:
 			regs->eax = sys_gettimeofday((struct timeval *)regs->ebx, (void *)regs->ecx);
+			break;
+		case SYS_READLINK:
+			regs->eax = sys_readlink((const char *)regs->ebx, (char *)regs->ecx, regs->edx);
+			break;
+		case SYS_MUNMAP:
+			regs->eax = sys_munmap((void *)regs->ebx, regs->ecx);
+		case SYS_NEWUNAME:
+			regs->eax = sys_uname((void *)regs->ebx);
+			break;
+		case SYS_MPROTECT:
+			regs->eax = sys_mprotect((void *)regs->ebx, regs->ecx, regs->edx);
 			break;
 		case SYS_GETCWD:
 			regs->eax = (uint32_t)sys_getcwd((char *)regs->ebx, (size_t)regs->ecx);
 			break;
 		case SYS_MMAP2:
-			arg = (void *)regs->useresp-8;
+			//arg = (void *)regs->useresp-8;
 			//printf("arg %x\n", regs->edi);
 			//dump_regs(regs);
 			regs->eax = (uint32_t)sys_mmap2((void *)regs->ebx, (size_t)regs->ecx, (int)regs->edx,
-											(int)regs->esi, (int)arg[0], (off_t)arg[1]);
+											(int)regs->esi, (int)regs->edi, (off_t)regs->ebp);
+			break;
+		case SYS_FUTEX:
+			regs->eax = sys_futex((int *)regs->ebx, regs->ecx, regs->edx, (const struct timespec *)regs->esi, (int *)regs->edi, regs->ebp);
 			break;
 		case SYS_SET_THREAD_AREA:
 			regs->eax = sys_set_thread_area((void *)regs->ebx);
@@ -187,25 +210,20 @@ void syscall_handler (registers_t *regs)
 		case SYS_GET_THREAD_AREA:
 			regs->eax = sys_get_thread_area((void *)regs->ebx);
 			break;
-		case SYS_NEWUNAME:
-			regs->eax = sys_uname((void *)regs->ebx);
-			break;
-		case SYS_DUMMY:
-			printf("DUMMY\n");
-			//regs->eax = sys_dummy();
+		case SYS_SET_TID_ADDRESS:
+			regs->eax = sys_set_tid_address((int *)regs->ebx);
 			break;
 		case SYS_CLOCK_GETTIME:
 			regs->eax = sys_clock_gettime((int)regs->ebx, (struct timespec *)regs->ecx);
 			break;
-		case SYS_FUTEX:
-			printf("Futexes not yet supported, halting process\n");
-			printf("op %x\n", regs->ecx);
-			while(1);
-			regs->eax = 0;
+		// TODO: here are syscalls we won't support any time soon:
+		case SYS_BPF: case SYS_SOCKET:
+			regs->eax = -ENOSYS;
+			break;
 		default:
-			serial_printf("undefined system call: ");
-			serial_printf("%s(%i): by %i @ %x\n",syscall_names[call], call, thread_current()->pid,
-			regs->eip);
+			printf("undefined system call: ");
+			printf("%s(%i): by %i @ %x\n",syscall_names[call], call, thread_current()->pid, regs->eip);
+			//PANIC("Unimplemented system call");
 			// FIXME: This failing silently allows things to get further than they would otherwise
 			regs->eax = -ENOSYS;
 	}

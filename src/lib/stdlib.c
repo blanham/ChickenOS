@@ -1,22 +1,17 @@
+#include <common.h>
+#include <stddef.h>
 #include <stdlib.h>
 #include <kernel/memory.h>
-#include <kernel/common.h>
 #include <kernel/interrupt.h>
 #include <mm/vm.h>
 #include <mm/liballoc.h>
-#include <stddef.h>
 
-/*
-void *calloc(size_t num, size_t size)
+div_t div(int numerator, int denominator)
 {
-	return kcalloc(num, size);
+	return (div_t){ numerator/denominator, numerator%denominator};
 }
 
-void free(void *ptr)
-{
-	kfree(ptr);
-}*/
-
+// FIXME: this doesn't support different bases
 long int strtol(const char* str, char **end, int base)
 {
 	(void)base;

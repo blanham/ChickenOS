@@ -6,298 +6,250 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <chicken/thread.h>
+#include <fs/icache.h>
 #include <fs/vfs.h>
 #include <fs/vfs_ops.h>
-/*
-#include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <chicken/thread.h>
-#include <kernel/common.h>
-#include <kernel/memory.h>
-#include <mm/vm.h>
-#include <fs/vfs.h>
-#include <fs/ext2/ext2.h>
-#include <mm/liballoc.h>*/
 
-int sys_fcntl64(int fd UNUSED, int cmd, unsigned long arg UNUSED)
+
+
+// TODO: No EINTR, EROFS, TTY stuff (O_NOCTTY)
+// TODO: If this is a device file, we should check if the major/minor exist
+//       and return EXIO if not
+// TODO: for use in the kernel, this should probably return a dentry instead of a file tbh
+int vfs_open(struct file **new, const char *path, int oflags, mode_t mode UNUSED)
 {
-	//struct file *fp = get_file(fildes);
+	//struct inode *lookup, *parent, *new_inode;
+	int file_flags = 0;
+	//const char *new_file;
 
-	switch(cmd)
-	{
-		case F_DUPFD:
-		//FIXME? Not sure if this needs to eventually be implemented or not
-		//case F_DUPFD_CLOEXEC:
-		case F_GETFD:
-		case F_SETFD:
-		case F_GETFL:
-		case F_SETFL:
-		case F_GETLK:
-		case F_SETLK:
-		case F_SETLKW:
-			serial_printf("fcntl: unimplemented cmd %d\n", cmd);
-			return -ENOSYS;
-		default:
-			//FIXME: invalid commands should actually return 0
-			serial_printf("fcntl: unknown cmd %d\n", cmd);
-			return -ENOSYS;
+	serial_printf("Opening %s\n", path);
+
+	dentry_t *lookup_d = NULL, *parent = NULL;
+	int ret = vfs_pathsearch(path, &lookup_d, &parent);
+	if (lookup_d == NULL)
+		return ret;
+
+	struct inode *lookup = lookup_d->inode;
+
+
+	if (ret < 0 && ret != -ENOENT)
+		return ret;
+
+	if (ret == -ENOENT) {
+		if(!(oflags & O_CREAT))
+			return -ENOENT;
+		// TODO
+		PANIC("File creation not implemented");
+		//ret = vfs_creation_helper(cur, path, &parent, &new_file);
+		//if(ret < 0)
+		//	return ret;
+		//ret = parent->fs->ops->creat(parent, new_file, mode, &new_inode);
+		//icache_put(parent);
+		//if(ret < 0)
+		//	return ret;
+		//lookup = new_inode;
 
 	}
-	return -ENOSYS;
+	else if((oflags & O_EXCL) && (oflags & O_CREAT))
+	{
+		//icache_put(lookup);
+		return -EEXIST;
+	}
+	//TODO: WR testing
+	//if(lookup->fs->flags & read_only)
+	//	{
+	//		icache_put(lookup);
+	//		return -EROFS;
+	//	}
+
+	if (S_ISCHR(lookup->info.st_mode)) {
+		if (oflags & O_NOCTTY) {
+			//set controlling terminal
+		}
+	}
+
+	//printf("MODE %o\n", lookup->info.st_mode);
+
+	// Could support FIFOs and sockets here too!
+	if (S_ISCHR(lookup->info.st_mode) || S_ISBLK(lookup->info.st_mode)) {
+		struct device *dev = get_device(lookup->info.st_mode & (S_IFBLK | S_IFCHR), lookup->info.st_rdev);
+		//printf("This happned %s %p %p %x\n", path, dev->read, dev->ioctl, lookup->info.st_rdev);
+		lookup->read = dev->read;
+		lookup->write = dev->write;
+		lookup->ioctl = dev->ioctl;
+	} else if (S_ISREG(lookup->info.st_mode)) {
+		lookup->read = (void *)lookup->fs->ops->read;
+		//lookup->write = lookup->fs->ops->write;
+	}
+
+	//if (lookup->read == NULL) {
+	//	printf("Path %s\n", path);
+	//	PANIC("ASDFASDF\n");
+	//}
+
+
+	// O_NONBLOCK doesn't apply to regular files and block devices
+	if (!(oflags & O_NONBLOCK)) {
+		if (S_ISCHR(lookup->info.st_mode)) {
+			//if(this device doesn't support nonblocking opens)
+			//wait
+		}
+
+		if (S_ISFIFO(lookup->info.st_mode)) {
+			//do FIFO shit
+		}
+	}
+
+	// FIXME: Document what this is doing
+	if ((oflags & 3) != 3)
+		file_flags = oflags & 3;
+	else
+		file_flags |= O_RDWR;
+
+	file_flags |= oflags & (O_DSYNC | O_NONBLOCK | O_RSYNC | O_SYNC);
+
+	*new = vfs_file_new(lookup, (char *)path);
+	
+	// XXX: Re-enable/rewrite
+	//(*new)->flags = file_flags;
+
+	return ret;
 }
 
-int sys_getdents(int fildes, struct dirent *dirp, unsigned int count)
+
+// TODO: Doesn't handle EINTR, EIO
+int sys_close(int fd)
 {
-	// FIXME: struct file *fp = get_file(fildes);
-    struct file *fp = thread_current()->file_info->files[fildes];
+	struct file *fp = vfs_file_get(fd);
 	if(fp == NULL)
 		return -EBADFD;
 
-	//if(verify_pointer(dirp, sizeof *dirp))
-	//	return -EFAULT;
+	thread_current()->file_info->files[fd] = NULL;
+	icache_put(fp->inode);
 
-	if(!S_ISDIR(fp->inode->info.st_mode))
-	{
-		serial_printf("MODE: %o\n", fp->inode->info.st_mode);
-		return -ENOTDIR;
-	}
-	//TODO: Add this case
-	//if(fp->inode was deleted after we opened it, but we still have a reference)
-	//if(fp->inode->deleted)?
-	//	return -ENOENT;
-	//XXX: This needs to go through the dentry cache so mountpoints will work
-	//XXX: Also, this is nasty, four levels of indirection?
-	//return fp->inode->fs->ops->getdents(fp->inode, dirp, count, &fp->offset);
-    int64_t offset = fp->offset;
-	int ret = fp->inode->fs->ops->getdents(fp->inode, dirp, count, &offset);
-    fp->offset = (uint32_t)offset;
-    return ret;
-}
-
-struct file *vfs_open(char *path, int oflags, mode_t mode)
-{
-	(void)mode;
-	struct inode *cur = thread_current()->file_info->cur;
-	struct file *tmp = kcalloc(sizeof(*tmp), 1);
-	tmp->inode = cur;
-	struct inode *lookup = vfs_pathsearch(tmp, path);
-
-	if(lookup == NULL)
-	{
-		if((oflags & O_CREAT) != 0)
-		{
-	//		printf("need to create file\n");
-		}
-		return NULL;
-	}
-	kfree(tmp);
-	struct file *new = vfs_file_new(lookup, path);
-	return new;
-}
-
-int vfs_close(struct file *file)
-{
-	if(file == NULL)
-		return -1;
-
-	//vfs_file_free(file);
-
+	// FIXME: this isn't safe yet
+	//vfs_file_free(fp);
 	return 0;
 }
 
-size_t vfs_read(struct file *file, void *buf, size_t nbyte)
+size_t vfs_read(struct file *file, void *buf, size_t count)
 {
-	int ret = 0;
-	if(file == NULL || buf == NULL)
+	if (file->inode->read == NULL) {
+		printf("YUP %lli %llx\n", file->inode->info.st_ino, file->inode->info.st_dev);
 		return -1;
-	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_read(file->inode->info.st_rdev,
-			buf, file->offset, nbyte);
-	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-		ret = block_device_readn(file->inode->info.st_rdev,
-			buf, 0, file->offset, nbyte);
-	}else if((file->inode->info.st_mode & S_IFREG) != 0){
-		//printf("READ OFF %x\n", file->offset);
-		if(file->fs == NULL || file->fs->ops == NULL || file->fs->ops->read == NULL)
-			return -1;
-		ret = file->fs->ops->read(file->inode, buf,
-			nbyte, file->offset);
 	}
-	file->offset += ret;
+	int ret = file->inode->read(file->inode, buf, count, file->offset);
+	if (ret > 0)
+		file->offset += ret;
 	return ret;
-
 }
 
-off_t vfs_write(struct file *file, void *buf, size_t nbyte)
+off_t vfs_write(struct file *file, void *buf, size_t count)
 {
-	int ret = 0;
-	if(nbyte == 0)
-		return 0;
-	if(file == NULL || buf == NULL)
-		return -1;
-	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_write(file->inode->info.st_rdev,
-			buf, file->offset, nbyte);
-	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-//FIXME: This returns -1 so we don't fuxxor our disk image accidentally
-	//	ret = block_device_readn(file->inode->rdev,
-	//		buf, 0, file->offset, nbyte);
-		printf("Writing it currently disabled\n");
-		return -1;
-	}else if((file->inode->info.st_mode & S_IFREG) != 0){
-		if(file->fs == NULL || file->fs->ops->write == NULL)
-			return -1;
-		ret = file->fs->ops->write(file->inode, buf,
-			nbyte, file->offset);
-	}
-	file->offset += ret;
+	int ret = file->inode->write(file->inode, buf, count, file->offset);
+	if (ret > 0)
+		file->offset += ret;
 	return ret;
 }
 
 int  vfs_ioctl(struct file *file, int request, char * args)
 {
-	int ret = 0;
-	if(file == NULL)
+	int ret = -ENOTTY; // Yes, that's the correct error
+	if (file->inode == NULL)
 		return -1;
-	if((file->inode->info.st_mode & S_IFCHR) != 0){
-		ret = char_device_ioctl(file->inode->info.st_rdev,
-			request, args);
-	}else if((file->inode->info.st_mode & S_IFBLK) != 0){
-	//	ret = block_device_readn(file->inode->rdev,
-	//		buf, 0, file->offset, nbyte);
-		return -1;
-	}else if((file->inode->info.st_mode & S_IFREG) != 0){
-	//	if(file->fs == NULL || file->fs->ops->write == NULL)
-	//		return -1;
-	//	ret = file->fs->ops->write(file->inode, buf,
-	//		nbyte, file->offset);
-		return -1;
-	}
+	if (file->inode->ioctl)
+		ret = file->inode->ioctl(file->inode, request, args);
 	return ret;
 }
 
-
-
-//FIXME: Error catching
-//		check if fd is open and return EBADF
-//		check if file offset is negative and return EINVAL
-//		check if offset overflows off_t and return EOVERFLOW
-//		check if pipe and return ESPIPE
+// TODO : Error catching
+//			* check if offset overflows off_t and return EOVERFLOW
 off_t vfs_seek(struct file *file, off_t offset, int whence)
 {
-	switch(whence)
-	{
+	if(S_ISFIFO(file->inode->info.st_mode))
+		return -ESPIPE;
+
+	if (offset < 0)
+		return -EINVAL;
+
+	switch (whence) {
 		case SEEK_SET:
+			if (offset < 0)
+				return -EINVAL;
 			file->offset = offset;
 			break;
 		case SEEK_CUR:
+			if (file->offset + offset < 0)
+				return -EINVAL;
 			file->offset += offset;
 			break;
 		case SEEK_END:
-			//file->offset = file->end + offset;
-			//break;
+			if (file->inode->info.st_size + offset < 0)
+				return -EINVAL;
+			file->offset = file->inode->info.st_size + offset;
+			break;
 		default:
-			//EINVAL?
-			return 0;
-
+			return -EINVAL;
 	}
 
 	return file->offset;
 }
-//FIXME: I'm not sure if the logic here checks out
+
 //FIXME: Add various errors, most importantly
 //		EBADF, EACCES, ENOTDIR and EFAULT
-int vfs_chdir(const char *_path)
+int sys_chdir(const char *path)
 {
-	struct file *file;
-	int ret = -1;
-	char *path = strdup(_path);
-	file  = vfs_open(path, 0, 0);
-	if(file != NULL)
-	{
-		//vfs_close(thread_current()->cur_dir);
-		thread_current()->file_info->cur = file->inode;
-		ret = 0;
+	if (verify_pointer(path, -1, VP_READ))
+		return -EFAULT;
+
+	dentry_t *lookup = NULL;
+	int ret = vfs_pathsearch(path, &lookup, NULL);
+	if (!lookup)
+		return ret;
+
+	if (!S_ISDIR(lookup->inode->info.st_mode)) {
+		return -ENOTDIR;
 	}
-	kfree(path);
-	return ret;
-}
 
-int vfs_stat(const char *path, struct stat *buf)
-{
-	(void)path;
-	(void)buf;
-	PANIC("NOT IMPLEMENTED");
+	// FIXME: increase new dentry's ref count, decrease old one
+	thread_current()->file_info->cur = lookup;
 
 	return 0;
 }
 
-int vfs_stat64(const char *path, struct stat64 *buf)
+int sys_stat(const char *filename UNUSED, struct stat *statbuf UNUSED)
 {
-	struct inode *cur = thread_current()->file_info->cur;
-	struct file *tmp = kcalloc(sizeof(*tmp), 1);
-	tmp->inode = cur;
-	struct inode *lookup = vfs_pathsearch(tmp, (char *)path);
+	serial_printf("32-bit stat not implemented yet\n");
+	return -ENOSYS;
+}
 
+int sys_stat64(const char *path, struct stat64 *statbuf)
+{
+	dentry_t *lookup;
+
+	int ret = vfs_pathsearch(path, &lookup, NULL);
 	if(lookup == NULL)
-		return -(ENOENT);
-	kfree(tmp);
-	memcpy(buf, &lookup->info, sizeof(*buf));
-	serial_printf("MODE: %o\n", lookup->info.st_mode);
+		return ret;
 
-	return 0;
-}
-int vfs_fstat64(struct inode *inode, struct stat64 *buf)
-{
-	// FIXME: this isn't the only error I don't think
-	if(inode == NULL)
-		return -(ENOENT);
-	memcpy(buf, &inode->info, sizeof(*buf));
+	if (lookup->inode == NULL)
+		return -ENOENT;
+
+	memcpy(statbuf, &lookup->inode->info, sizeof(*statbuf));
 
 	return 0;
 }
 
-
-/*
-struct inode {
-	uint32_t inode_num;
-	uint16_t mode;
-	uint16_t pad;
-	uint32_t size;
-	uint32_t atime;
-	uint32_t ctime;
-	uint32_t dtime;
-	uint32_t mtime;
-	uint32_t time;
-	uint16_t gid;
-	uint16_t uid;
-	uint16_t links_count;
-	uint16_t rdev;
-	//if part of mount point,keep in cache
-	uint32_t flags;
-	void *storage;
-	//may need parent
-	vfs_fs_t *fs;
-};
-
-struct stat64
+int sys_fstat64(int fd, struct stat64 *statbuf)
 {
-	dev_t st_dev;
-	int __st_dev_padding;
-	long __st_ino_truncated;
-	mode_t st_mode;
-	nlink_t st_nlink;
-	uid_t st_uid;
-	gid_t st_gid;
-	dev_t st_rdev;
-	int __st_rdev_padding;
-	off64_t st_size;
-	blksize_t st_blksize;
-	blkcnt64_t st_blocks;
-	struct timespec st_atim;
-	struct timespec st_mtim;
-	struct timespec st_ctim;
-	ino64_t st_ino;
-};:*/
+	struct file *fp = vfs_file_get(fd);
+	
+	if(fp == NULL)
+		return -EBADFD;
 
+	if(fp->inode == NULL)
+		return -ENOENT;
+
+	memcpy(statbuf, &fp->inode->info, sizeof(*statbuf));
+
+	return 0;
+}

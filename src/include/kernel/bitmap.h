@@ -103,6 +103,16 @@ static inline uint32_t bitmap_find_first(bitmap_t *bitmap)
 
 static inline uint32_t bitmap_find_multiple(bitmap_t *bitmap, int count)
 {
+	// FIXME: Added this to align requests from liballoc to a 16 page boundary
+	//if (count == 16) {
+	//	for (uint32_t i = 0; i < bitmap->size/32; i++) {
+	//		if ((bitmap->data[i] & 0xFFFF) == 0) {
+	//			return i;
+	//		} else if ((bitmap->data[i] & 0xFFFF0000)== 0) {
+	//			return i + 16;
+	//		}
+	//	}
+	//}
 	uint32_t i;
 	for(i = 0; i < bitmap->size; i++)
 		if(bitmap_test(bitmap,i) == -1)

@@ -11,12 +11,14 @@ typedef struct {
 		void *ptr;
 	};
     size_t block_size;
+    size_t block_sizes[4];
 	// block size?
 	// shift?
 	uint64_t number;
 	// use a bitmap for blocks larger than pages/sectors
 	uint64_t sparse_bitmap;
 	union {
+        uint32_t block_nums[8];
 		//dev_t device;
 	};
 	atomic_int ref_count;

@@ -24,7 +24,11 @@ int load_executable(executable_t *exe, const char *_path,
 	// NOTE: After this point all pointers passed in will be invalid, as
 	//       the old user stack is cleared
 	thread_t *cur = thread_current();
+	// TODO: there's probably other things that should be taken care of
+	// 		 CLOXEC files for sure, and co-threads in the same process
 	mm_init(cur->mm);
+
+	printf("STARTING\n");
 
 
 retry:
@@ -55,6 +59,7 @@ retry:
 		default:
 			PANIC("INVALID EXE TYPE!");
 	}
+	printf("Loaded %s\n", path);
 
 	// would it be better to realloc() then strcpyn() here?
 	// FIXME: This is the path and not the name, right?
@@ -69,7 +74,8 @@ failure:
 	//      including file existence, and ELF header, though if someone
 	//      somehow deleted the file between then and here it would fail // XXX: This is accounted for!
 	if (ret < 0) {
-		vfs_close(exe->file);
+		// Reduce inode ref count here
+		//vfs_close(exe->file);
 	}
 	kfree(exe);
 	kfree(path);

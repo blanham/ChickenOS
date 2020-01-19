@@ -86,6 +86,7 @@ struct cfg_addr {
 
 typedef void pci_intr_handler (void *);
 uint32_t pci_get_bar(struct pci_device *dev, uint8_t type);
+uint32_t pci_get_barn(struct pci_device *dev, uint8_t type, uint8_t number);
 void pci_reg_outw(struct pci_device *pci, uint8_t port, uint16_t val);
 uint16_t pci_reg_inw(struct pci_device *pci, uint8_t port);
 struct pci_device *pci_get_device(uint16_t vendor, uint16_t device);

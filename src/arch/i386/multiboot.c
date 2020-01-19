@@ -19,13 +19,15 @@ char multiboot_cmdline[256];
 #define MAX_MODS_COUNT 4
 struct boot_module modules[MAX_MODS_COUNT];
 
-extern void *end;
+extern uintptr_t end;
 
 static void multiboot_detect_video_mode(struct multiboot_info *mb, struct kernel_boot_info *info)
 {
+	info->x_chars = 80;
+	info->y_chars = 25;
 	if (mb->framebuffer_type == MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT) {
-		info->y_res = 25;
 		info->x_res = 80;
+		info->y_res = 25;
 	} else {
 		struct vbe_mode_info *vbe_info = (struct vbe_mode_info *)P2V(mb->vbe_mode_info);
 		info->mode = mb->vbe_mode;
@@ -111,7 +113,7 @@ struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t mag
 {
 	struct kernel_boot_info *info = &multiboot_storage;
 	uintptr_t first_available_page = 0;
-	uintptr_t placement = (uintptr_t )end;
+	uintptr_t placement = (uintptr_t )&end;
 
 	if(magic != MULTIBOOT_BOOTLOADER_MAGIC)
 		return NULL;
@@ -120,6 +122,7 @@ struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t mag
 	extern void serial_init();
 	serial_init();
 #endif
+	serial_printf("placement: %X end: %x\n", placement, end);
 
 	kmemcpy(multiboot_cmdline, (void *)P2V(mb->cmdline), strlen((char *)P2V(mb->cmdline)));
 	info->cmdline = multiboot_cmdline;
@@ -136,6 +139,7 @@ struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t mag
 	uint32_t last_available_page = multiboot_parse_memmap(mb);
 
 	uintptr_t last_mb_data = ((uintptr_t)&mb->vbe_mode & ~0xFFF) + 4096*8;
+	serial_printf("md: %X\n", last_mb_data);
 
 	// Use the highest address as our placement
 	if(last_mb_data > first_available_page)
@@ -154,7 +158,7 @@ struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t mag
 	info->low_mem = mb->mem_lower;
 	info->hi_mem = mb->mem_upper;
 
-	serial_printf("placement: %X\n", placement);
+	serial_printf("placement: %X end: %x\n", placement, &end);
 	multiboot_detect_video_mode(mb, info);
 
 	return info;

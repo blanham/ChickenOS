@@ -41,7 +41,8 @@ void vga_set_cursor_position(void *aux UNUSED , uint32_t x, uint32_t y)
 
 void vga_clear_rows(struct vga_state *state, int row, int n)
 {
-	kmemsetw(&state->videoram[row*80], state->attribute, 80 * n);
+	for (int i = row; i < n; i++)
+	kmemsetw(&state->videoram[i*80], state->attribute, 80);
 }
 
 void vga_clear(struct vga_state *state)

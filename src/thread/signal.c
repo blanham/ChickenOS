@@ -199,13 +199,10 @@ int sys_sigaction(int sig, const struct k_sigaction *act, struct k_sigaction *oa
 
 //	printf("sigaction %ii %i %i %i\n", sig, SIGKILL, SIGSTOP, NUM_SIGNALS-1);
 
-	if(oact != NULL)
-	{
+	if (oact != NULL)
 		kmemcpy(oact, &cur->sig_info->signals[sig], sizeof(*oact));
-	}
 
-	if(act != NULL)
-	{
+	if (act != NULL) {
 	//	printf("%x\n", act->handler);
 		kmemcpy(&cur->sig_info->signals[sig], act, sizeof(*act));
 	//	printf("%x\n", &cur->sig_info->signals[sig]);

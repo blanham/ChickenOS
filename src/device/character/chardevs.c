@@ -12,9 +12,11 @@
 #include <fs/vfs.h>
 #include <mm/vm.h>
 
-size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
+size_t chardevs_read(struct inode *inode, uint8_t *buf, size_t count, off_t off)
 {
 	void *ptr = (void *)(uintptr_t)off;
+	dev_t dev = inode->info.st_rdev;
+	printf("MAJOR %x dev %x\n", MAJOR(dev), dev);
 	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{
@@ -40,9 +42,10 @@ size_t chardevs_read(dev_t dev, void *buf, size_t count, off_t off)
 	return -EINVAL;
 }
 
-size_t chardevs_write(dev_t dev, void *buf, size_t count, off_t off)
+size_t chardevs_write(struct inode *inode, uint8_t *buf, size_t count, off_t off)
 {
 	void *ptr = (void *)(uintptr_t)off;
+	dev_t dev = inode->info.st_rdev;
 	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	switch(MINOR(dev))
 	{
@@ -62,8 +65,9 @@ size_t chardevs_write(dev_t dev, void *buf, size_t count, off_t off)
 	return -EINVAL;
 }
 
-int chardevs_ioctl(dev_t dev, int request UNUSED, char *args UNUSED)
+int chardevs_ioctl(struct inode *inode, int request UNUSED, char *args UNUSED)
 {
+	dev_t dev = inode->info.st_rdev;
 	ASSERT(MAJOR(dev) == 1, "Bad device passed");
 	printf("Invalid ioctl of character device 0x1%.2X\n", MINOR(dev));
 	return -EINVAL;

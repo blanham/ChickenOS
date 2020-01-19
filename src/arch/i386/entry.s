@@ -77,6 +77,13 @@ higher_half:
 	mov esp, kernel_thread_top
 	;push multiboot magic number
 	push eax
+
+	;setup FPU?
+	mov eax, cr4
+	or eax, 0x200
+	mov cr4, eax
+	fninit
+
 	;ebx contains address of multiboot info
 	;Convert to virtual address
 	add ebx, PHYS_BASE

@@ -4,19 +4,16 @@
 #include <chicken/thread.h>
 #include <arch/i386/interrupt.h>
 
-pid_t sys_fork(void *aux)
+// NOTE: Might be worth using a macro for these?
+uid_t sys_getegid()
 {
-	// FIXME: 
-	registers_t *regs = aux;
-
-	serial_printf("REGS: User ESP: %X ESP: %X EBP: %X\n", regs->useresp, regs->esp, regs->ebp);
-	return thread_create2(regs->eip, regs->useresp, NULL);
+	return thread_current()->egid;
 }
 
 // NOTE: Might be worth using a macro for these?
 uid_t sys_geteuid()
 {
-	return thread_current()->euid;
+	return 2;//thread_current()->euid;
 }
 
 int sys_setuid(uid_t uid)
@@ -27,13 +24,13 @@ int sys_setuid(uid_t uid)
 
 uid_t sys_getuid()
 {
-	return thread_current()->uid;
+	return 2;//thread_current()->uid;
 }
 
 // TODO: Should return tgid instead
 pid_t sys_getpid()
 {
-	return thread_current()->pid;
+	return thread_current()->tgid;
 }
 
 pid_t sys_getppid()
@@ -95,12 +92,9 @@ void *sys_sbrk(intptr_t ptr)
 	void * old;
 	thread_t *cur = thread_current();
 
-	if(ptr == 0)
-	{
+	if (ptr == 0) {
 		return cur->mm->brk;
-	}
-	else
-	{
+	} else {
 		old = cur->mm->brk;
 		cur->mm->brk = cur->mm->brk + ptr;
 		return old;
@@ -109,14 +103,13 @@ void *sys_sbrk(intptr_t ptr)
 
 void sys_exit(int exit_code)
 {
-
 	thread_exit(exit_code);
 }
 
 //TODO: For threading, exit()s all with the same tgid
-void sys_exit_group(int status)
+void sys_exit_group(int return_code)
 {
-	(void)status;
+	(void)return_code;
 }
 
 //FIXME: Busy waiting :c
@@ -135,7 +128,7 @@ pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
 			ret = child->pid;
 			if(child->status == THREAD_DEAD)
 			{
-				printf("Child %x %i\n", child, child->pid);
+				//printf("Child %x %i\n", child, child->pid);
 				cur->children = NULL;
 				*status = 0x80;
 				return ret;
@@ -157,4 +150,12 @@ pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
 	}
 	PANIC("lulz\n");
 	return -ECHILD;
+}
+
+
+int sys_set_tid_address(int *ptr)
+{
+	thread_t *cur = thread_current();
+	cur->clear_child_tid = ptr;
+	return cur->pid;
 }

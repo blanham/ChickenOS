@@ -5,6 +5,7 @@
 #include <chicken/thread.h>
 #include <chicken/time.h>
 #include <kernel/hw.h>
+#include <errno.h>
 #include <sys/time.h>
 
 struct c_os_time system_datetime;
@@ -111,5 +112,19 @@ int sys_clock_gettime(int type, struct timespec *tp)
 	// XXX: lolwat:
 	s += 100;
 	unix_time++;
+	return 0;
+}
+
+int sys_nanosleep(const struct timespec *req, struct timespec *rem)
+{
+	if (verify_pointer(req, sizeof(req), VP_READ))
+		return -EFAULT;
+
+
+	(void)rem;
+
+
+
+	// FIXME: If a signal happened before we return, return -EINTR, write remaining time into rem if rem not null
 	return 0;
 }

@@ -6,6 +6,7 @@
  */
 #include <kernel/common.h>
 #include <mm/vm.h>
+#include <chicken/boot.h>
 #include <kernel/interrupt.h>
 #include <kernel/bitmap.h>
 #include <kernel/memory.h>
@@ -45,14 +46,14 @@ void palloc_internal_free(void *addr, int pages)
 	kmemset(addr, 0xBC, PAGE_SIZE * pages);
 }
 
-void palloc_free(void *addr)
+void palloc_free(void *addr UNUSED)
 {
-	palloc_internal_free(addr,1);
+	//palloc_internal_free(addr,1);
 }
 
-int pallocn_free(void *addr, int pages)
+int pallocn_free(void *addr UNUSED, int pages UNUSED)
 {
-	palloc_internal_free(addr,pages);
+	//palloc_internal_free(addr,pages);
 	return 0;
 }
 
@@ -66,7 +67,10 @@ void *palloc_internal(int pages)
 	bitmap_set_multiple(&page_bitmap, first,pages);
 	virt = palloc_start + (first * PAGE_SIZE);
 	//XXX: This is just a test
+	//serial_printf("VIRT %x\n", virt);
 	memset((void *)virt, 0, PAGE_SIZE * pages);
+	//serial_printf("BALLS\n");
+
 
 	return (void *)virt;
 }
@@ -81,24 +85,29 @@ void *pallocn(uint32_t count)
 	return palloc_internal(count);
 }
 
-void *palloc_len(size_t len)
+void *palloc_len(size_t len UNUSED)
 {
 	return pallocn(PAGE_COUNT(len));
 }
 
 //XXX: WTF?
-void palloc_init(uint32_t page_count, uintptr_t placement)
+void palloc_init(struct kernel_boot_info *info)
 {
-	void *start = 0;
-	uintptr_t bitmap_ptr = placement;//+ 0x100000;
+	uintptr_t bitmap_ptr = (uintptr_t)info->placement;// + 0x800000;
+	uint32_t page_count = (info->mem_size)/PAGE_SIZE;
 	uint32_t bitmap_length = (page_count/32) * sizeof(uint32_t);
 
-	start = (void *)(placement + bitmap_length);
+	uintptr_t start = bitmap_ptr + bitmap_length;
+	//if(start & ~PAGE_MASK)
+	//	start = (start & PAGE_MASK) + PAGE_SIZE;
 
-	if(((uint32_t)start & ~PAGE_MASK) != 0)
-		start = (void *)(((uint32_t)start & PAGE_MASK) + PAGE_SIZE);
+	uint32_t masker = PAGE_SIZE * 16;
+	if(start & (masker-1))
+		start = (start & ~(masker-1)) + masker;
 
 	bitmap_init_phys(&page_bitmap, page_count, (uint32_t *)bitmap_ptr);
 
-	palloc_start = (phys_addr_t)start;
+	palloc_start = (phys_addr_t)start;// + 0x1000000;
+
+	serial_printf("PALLOC START %p bitmap %p\n", palloc_start, bitmap_ptr);
 }

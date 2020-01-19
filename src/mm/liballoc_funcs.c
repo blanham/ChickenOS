@@ -18,6 +18,7 @@ int liballoc_unlock() {
 }
 
 void* liballoc_alloc(size_t pages) {
+	serial_printf("PAGES liballoc %i\n", pages);
 	return pallocn(pages);
 }
 

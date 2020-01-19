@@ -50,11 +50,13 @@ add_executable(kernel.bin
 )
 
 cmake_policy(SET CMP0037 OLD) # Enable using "test" as target name
-add_custom_target(test cd .. && ./new_update.sh &&  DISPLAY=:0 qemu-system-i386 -vga std -rtc base=localtime -soundhw pcspk -m 128 -usb  -hda disk.img -serial file:log && cd src)
+add_custom_target(test cd .. && ./new_update.sh && DISPLAY=:0 qemu-system-i386 -vga std -no-reboot  -rtc base=localtime -m 128 -usb -hda disk.img -cdrom ~/disk_images/alpine-standard-3.11.2-x86.iso -soundhw pcspk -serial file:log && cd src)
 add_dependencies(test kernel.bin)
-add_custom_target(monitor cd .. && ./new_update.sh &&  qemu-system-i386 -nographic -rtc base=localtime -m 128 -usb  -hda disk.img && cd src USES_TERMINAL)
+add_custom_target(debug cd .. && ./new_update.sh && DISPLAY=:0 qemu-system-i386 -vga std   -rtc base=localtime -m 128 -usb -hda disk.img -cdrom ~/disk_images/alpine-standard-3.11.2-x86.iso -soundhw pcspk -serial file:log -gdb tcp::1212 -S  && cd src)
+add_dependencies(debug kernel.bin)
+add_custom_target(monitor  cd .. && ./new_update.sh &&        qemu-system-i386 -nographic -rtc base=localtime -m 128 -usb -hda disk.img -cdrom ~/disk_images/alpine-standard-3.11.2-x86.iso && cd src USES_TERMINAL)
 add_dependencies(monitor kernel.bin)
-add_custom_target(terminal cd .. && ./new_update.sh &&  qemu-system-i386 -curses -rtc base=localtime -m 128 -usb  -hda disk.img && cd src USES_TERMINAL)
+add_custom_target(terminal cd .. && ./new_update.sh &&        qemu-system-i386 -curses    -rtc base=localtime -m 128 -usb -hda disk.img -cdrom ~/disk_images/alpine-standard-3.11.2-x86.iso && cd src USES_TERMINAL)
 add_dependencies(terminal kernel.bin)
 
 set_target_properties(kernel.bin PROPERTIES C_STANDARD 11)

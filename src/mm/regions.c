@@ -94,16 +94,6 @@ struct memregion *memregion_new(struct mm *mm, uintptr_t address, size_t len, in
 	return new;
 }
 
-int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
-		int flags, struct inode *inode, off_t offset, size_t size)
-{
-	ASSERT(inode != NULL, "NULL inode passed in");
-	struct memregion *new = memregion_new(mm, address, len, prot, flags);
-	new->inode = inode;
-	new->file_offset = offset;
-	new->file_size = size;
-	return 0;
-}
 
 //TODO: Is this needed? This implementation is pretty brain dead at the moment
 int memregion_map_data(struct mm *mm, uintptr_t address, size_t len, int prot, int flags,
@@ -139,9 +129,12 @@ int memregion_insert(struct mm *mm, void *data, uintptr_t address, uint8_t prot)
 	//XXX: This doesn't support setting protection levels at the moment, might have to
 	//re-add flags to pagedir_map
 	(void)prot;
+	//serial_printf("FUCK %x\n", address);
 	pagedir_map(mm->pd, (uintptr_t)data, address, true);
+	//serial_printf("FUCK\n");
 	//pagedir_insert_page(mm->pd, (uintptr_t)data, address, prot);
 	pagedir_activate(mm->pd);
+	//serial_printf("FUCK\n");
 
 	return 0;
 }
@@ -150,16 +143,16 @@ static int regiongrowth(struct mm *mm, struct memregion *p, uintptr_t address)
 {
 
 	//Try to combine these two blocks
-	if((p->prot == PROT_GROWSDOWN) && // (address + PAGE_SIZE >= p->addr_start) &&
+	if((p->prot == PROT_GROWSDOWN) && // (address + PAGE_SIZE >= p->addr_start) && // FIXME: Why did I comment this out?
 			(address < p->addr_end))
 	{
-		//printf("Growing down %x %x\n", address + PAGE_SIZE, address);
+		//serial_printf("Growing down %x %x\n", address + PAGE_SIZE, address);
 		p->addr_start -= PAGE_SIZE;
 
 		// FIXME: This should take into account RLIMITs
 
 		return memregion_insert(mm, NULL, address & PAGE_MASK, 0x7);
-	}
+	} else
 
 	if((p->prot == PROT_GROWSUP) && (address - PAGE_SIZE <= p->addr_end)
 			&& (address >= p->addr_start))
@@ -173,7 +166,61 @@ static int regiongrowth(struct mm *mm, struct memregion *p, uintptr_t address)
 	return 1;
 }
 
+int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
+		int flags, struct inode *inode, off_t offset, size_t size)
+{
+	ASSERT(inode != NULL, "NULL inode passed in");
+	struct memregion *new = memregion_new(mm, address, len, prot, flags);
+	new->inode = inode;
+	new->file_offset = offset;
+	new->file_size = size;
+	//printf("offset %llx size %x\n", offset, size);
+	return 0;
+}
+
 int load_page_from_file(struct mm *mm, struct memregion *p, uintptr_t address)
+{
+	ASSERT(p->inode != NULL, "Inode is a NULL pointer");
+
+
+
+
+	off_t pages_from_start = (address & PAGE_MASK)  - p->addr_start;
+	off_t file_offset = p->file_offset + pages_from_start;
+
+	void *new = palloc();
+	memset(new, 0, PAGE_SIZE);
+	//printf("LLL %p\n", address);
+	if (pages_from_start < p->file_size) {
+
+
+		size_t len = PAGE_SIZE;
+		//if (p->file_size - file_offset < PAGE_SIZE)
+		//	len = p->file_size - file_offset;
+	//	if (p->file_size - file_offset < PAGE_SIZE)
+	//		len = p->file_size - (size_t)file_offset;
+	//	
+		//printf("LEN: %i\n", len);
+		void *temp = palloc();
+		size_t ret = p->inode->read(p->inode, temp, len, file_offset);
+
+		size_t f = PAGE_SIZE;
+		if (p->file_size - pages_from_start < PAGE_SIZE)
+			f= p->file_size - pages_from_start;
+			//printf("TTT %x\n", p->file_size - pages_from_start);
+		memcpy(new,temp, f);
+		(void)ret;
+
+		//printf("Address: %p start: %p\n", address, p->addr_start);
+		//printf("Loading from file %8llx %8x %6llx %8x ret: %4x other: %i\n", pages_from_start, p->file_size, file_offset, len, ret, p->file_size - file_offset);
+	}
+	memregion_insert(mm, new, address, 0x7);
+
+	return 0;
+}
+
+
+int load_page_from_files(struct mm *mm, struct memregion *p, uintptr_t address)
 {
 	ASSERT(p->inode != NULL, "Inode is a NULL pointer");
 
@@ -186,7 +233,7 @@ int load_page_from_file(struct mm *mm, struct memregion *p, uintptr_t address)
 	if (offset <= p->file_size) {
 		uint32_t off = p->file_offset + offset;
 		uint32_t len = p->file_size - offset;
-		//serial_printf("Loading from file %x %x %x %x\n",page, offset, len, off);
+		//printf("Loading from file %x %x %x %x\n",page, offset, len, off);
 		p->inode->fs->ops->read(p->inode, new, PAGE_SIZE, off);
 		if (len < PAGE_SIZE) {
 			memset(new + len, 0, PAGE_SIZE - len);
@@ -224,12 +271,14 @@ int memregion_cow(struct mm *mm, struct memregion *p, uintptr_t address)
 int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 {
 	//TODO: Use AVL tree instead
+
 	for(struct memregion *p = mm->regions; p != NULL; p = p->next) {
-		//serial_printf("Ap->addr %x end %x prot %x address %x offset %llx\n",
-		//		p->addr_start, p->addr_end, prot, address, p->file_offset);
 		//printf("KBs %i\n", (p->addr_end - p->addr_start + 1) / 1024);
+		//printf("Ap->addr %x end %x prot %x address %x offset %llx\n", p->addr_start, p->addr_end, prot, address, p->file_offset);
 		//TODO: actually check protection
 		(void)prot;
+	if (address < 4096)
+		return 1;
 		if(address >= p->addr_start && address < p->addr_end) {
 			if(p->cow)
 				return memregion_cow(mm, p, address);

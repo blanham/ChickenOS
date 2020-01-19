@@ -32,7 +32,7 @@ void arch_thread_reschedule(thread_t *cur, thread_t *next)
 		struct user_desc *desc = next->tls;
 		gdt_set_entry(6, desc->base_addr, desc->limit, GDTF_BOTH, GDTA_USER_DATA);
 	} else {
-		//gdt_set_entry(6, 0, 0xFFFFFFFF, GDTF_BOTH, GDTA_USER_DATA);
+		gdt_set_entry(6, 0x4000, 0xFFFFFFFF, GDTF_BOTH, GDTA_USER_DATA);
 
 	}
 
@@ -69,9 +69,14 @@ void thread_set_ip_and_sp_kernel(uintptr_t ip, uintptr_t usersp)
 }
 
 void print_desc(struct user_desc *desc) {
-	serial_printf("Entry: %i Base Addresss: %X Limit: %X\n", desc->entry_number, desc->base_addr, desc->limit);
-	serial_printf("32bit: %i Contents: %X  Read exec only: %i\n", desc->seg_32bit, desc->contents, desc->read_exec_only);
-	serial_printf("Limit in pages: %i Segment not preset: %i  useable: %i\n", desc->limit_in_pages, desc->seg_not_present, desc->useable);
+	printf("Entry: %i Base Addresss: %X Limit: %X\n", desc->entry_number, desc->base_addr, desc->limit);
+	printf("32bit: %i Contents: %X  Read exec only: %i\n", desc->seg_32bit, desc->contents, desc->read_exec_only);
+	printf("Limit in pages: %i Segment not preset: %i  useable: %i\n", desc->limit_in_pages, desc->seg_not_present, desc->useable);
+}
+
+void thread_dump_tls(void *tls)
+{
+	print_desc(tls);
 }
 
 void thread_set_tls(void *tls_descriptor)
@@ -90,7 +95,6 @@ int sys_get_thread_area(void *desc) {
 	//desc->entry_number = 4;
 	return 0;
 }
-
 // XXX: Not finished
 int sys_set_thread_area(void *desc2) {
 

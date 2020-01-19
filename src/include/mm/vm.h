@@ -26,17 +26,15 @@ typedef uintptr_t virt_addr_t;
 #define PAGE_USER	   0x04
 #define PAGE_ERR_MASK (PAGE_VIOLATION|PAGE_WRITE|PAGE_USER)
 
-//#define PTE_PRESENT 0x00000001
-
-#define KERNEL_SEG 0x10
-
-
 #define PHYS_BASE 0xC0000000
 #define HEAP_BASE 0x09000000
 #define V2P(p) ((void *)((char *)(p) - PHYS_BASE))
 #define P2V(p) ((void *)((char *)(p) + PHYS_BASE))
 
-//If we implement joining memregions, we just decrease refcounts on
+#define MM_PRESENT	0x0001
+#define MM_WRITE	0x0002
+#define MM_COW		0x0008
+
 struct memregion {
 	uintptr_t addr_start, addr_end;
 	uintptr_t requested_start, requested_end;
@@ -71,6 +69,7 @@ struct mm {
 	struct memregion *regions;
 	//Tree here
 	void * brk;
+	void *mmap_base;
 	uintptr_t sbrk;
 };
 
@@ -90,7 +89,7 @@ struct frame {
 		// struct inode * parent?
 		// if swapped
 		struct swapdata{
-			dev_t device;
+		//	dev_t device;
 			size_t block;
 		} swapdata;
 	};
@@ -106,6 +105,7 @@ struct mm *mm_alloc();
 void mm_init(struct mm *mm);
 struct mm *mm_clone(struct mm *old);
 void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset);
+int sys_munmap(void *addr, size_t length);
 
 /* mm/regions.c */
 struct memregion *region_clone(struct memregion *original);
@@ -118,7 +118,11 @@ int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
 		int flags, struct inode *inode, off_t offset, size_t size);
 //struct memregion *memregion_new();
 void mm_clear(struct mm *mm);
-int verify_pointer(const void *ptr, size_t len, int rw);
+
+// XXX: Hmm, should this just use the MM_* constants above?
+#define VP_READ  0
+#define VP_WRITE 1
+int verify_pointer(const void *ptr, size_t len, int rw); // XXX: For now, rw = 1 means write
 
 /* mm/frame.c */
 void frame_init(uintptr_t mem_size);
@@ -127,10 +131,15 @@ void frame_put(struct frame *frame);
 void *palloc_user();
 
 /* mm/palloc.c */
-void palloc_init(uint32_t page_count, uintptr_t placement);
+#include <chicken/boot.h>
+void palloc_init(struct kernel_boot_info *info);
 void *pallocn(uint32_t count);
 void *palloc();
 void *palloc_len(size_t len);
 void palloc_free(void *addr);
 int  pallocn_free(void *addr, int pages);
+
+/* mm/mm_ops.c */
+int sys_mprotect(void *addr, size_t len, int prot);
+
 #endif

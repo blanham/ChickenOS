@@ -41,7 +41,7 @@ void initrd_init(uintptr_t start, uintptr_t end)
 	initrd0->size = end - start;
 	printf("Initializing initrd @ %x - %i bytes \n",start, initrd0->size);
 
-	device_register(S_IFBLK, 0x400, initrd_read_block, initrd_write_block, NULL);
+	//device_register(S_IFBLK, 0x400, initrd_read_block, initrd_write_block, NULL);
 
 }
 

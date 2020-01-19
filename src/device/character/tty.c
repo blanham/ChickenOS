@@ -56,7 +56,18 @@ void tty_clear_rows(tty_t *tty, int row, int count)
 	for (int i = row; i < count; i++)
 		kmemset(TTY_GET_ROW_PTR(i), 0, tty->winsize.ws_col);
 
-	global_ops->clear_rows(global_ops->aux, 0, count);
+	printf("COUNT %i\n", count);
+	global_ops->clear_rows(global_ops->aux, row, count);
+}
+
+void tty_scroll(tty_t *tty)
+{
+	// XXX: Should I make a wrapper for this?
+	kmemset(tty->cur_ring->buf[tty->cur_ring->r_top & (TTY_HISTORY_SIZE-1)], 0, 80);
+	tty->cur_ring->r_top++;
+
+	global_ops->scroll(global_ops->aux);
+	global_ops->set_row(global_ops->aux, tty->y, TTY_GET_ROW_PTR(tty->y));
 }
 
 void tty_escape(tty_t *tty, int c)
@@ -133,11 +144,13 @@ void tty_escape(tty_t *tty, int c)
 			global_ops->set_cursor_xy(global_ops->aux, tty->x, tty->y);
 			break;
 		case 'J': // Clear screen from cursor
-			cmd = 1; // No cmd # and cmd #1 do the same thing
+			cmd = 0; // No cmd # and cmd #0 do the same thing
 			if (tty->bufpos > 0) {
 				tty->ansibuf[tty->bufpos] = 0;
 				cmd = strtol(tty->ansibuf, 0, 10);
 			}
+
+			//printf("WINSIZE: %x %x %x %x\n", tty->bufpos, cmd, tty->winsize.ws_row, tty->y);
 
 			switch (cmd) {
 				case 0:
@@ -151,6 +164,16 @@ void tty_escape(tty_t *tty, int c)
 					break;
 			}
 			break;
+		//case 'd': // Move cursor to indicted row, current column
+		//	{
+		//		char *p;
+		//		tty->ansibuf[tty->bufpos] = 0;
+		//		p = (char *)&tty->ansibuf;
+		//		int x = strtol(tty->ansibuf, &p, 10);
+		//		//printf("XX%i\n", x);
+		//		global_ops->set_cursor_xy(global_ops->aux, x, tty->y);
+		//	}
+		//	break;
 		case 'K': // Clear line from cursor
 			if (tty->bufpos > 0) {
 				tty->ansibuf[tty->bufpos] = 0;
@@ -172,6 +195,8 @@ void tty_escape(tty_t *tty, int c)
 			kmemset(row_ptr, ' ', count);
 			global_ops->set_row(global_ops->aux, tty->y, TTY_GET_ROW_PTR(tty->y));
 			break;
+		case 'M':
+
 		case 'm': // Set graphics mode
 			{
 				char *p, *d;
@@ -192,15 +217,6 @@ void tty_escape(tty_t *tty, int c)
 	tty->escape = 0;
 }
 
-void tty_scroll(tty_t *tty)
-{
-	// XXX: Does this still need to be cleared?
-	//kmemset(tty->ringbuf[tty->r_top & 0x7f], 0, 80);
-	tty->cur_ring->r_top++;
-
-	global_ops->scroll(global_ops->aux);
-	global_ops->set_row(global_ops->aux, tty->y, TTY_GET_ROW_PTR(tty->y));
-}
 
 // NOTE: This is used by the kernel printf
 void tty_putc(int c)
@@ -303,18 +319,22 @@ size_t tty_getline(tty_t *tty, uint8_t *buf, size_t len)
 
 //int tty_read(struct inode *inode, void *_buf, off_t off UNUSED, size_t count)?
 // TODO: Implement more termios checking/functionality
-int tty_read(dev_t dev, void *_buf, size_t count, off_t offset UNUSED)
+size_t tty_read(struct inode *inode, uint8_t *buf, size_t count, off_t offset UNUSED)
 {
-	char *buf = _buf;
+	(void)inode;
+	//dev_t dev = inode->info.st_rdev;
 	size_t ret = 0;
-	int tty_num = MINOR(dev);
+	int tty_num = 0;//MINOR(dev) - 1;
+
+	//if (MAJOR(dev) == 0x3)
+	//	tty_num = 0;
 	tty_t *tty = ttys[tty_num];
 
 	uint32_t vmin = (unsigned)tty->termios.c_cc[VMIN];
 	//int time = tty->termios.c_cc[VTIME];
 
 	if (tty->termios.c_lflag & ICANON)
-		return tty_getline(tty, _buf, count);
+		return tty_getline(tty, buf, count);
 
 	while (count--) {
 		int c = tty_getc(tty, true);
@@ -325,8 +345,7 @@ int tty_read(dev_t dev, void *_buf, size_t count, off_t offset UNUSED)
 			tty_putchar(tty, c);
 
 		if (c == 0xa) {
-			if((tty->termios.c_iflag & INLCR) == 0)
-			{
+			if ((tty->termios.c_iflag & INLCR) == 0) {
 			//	c = '\r';
 			}
 		}
@@ -341,13 +360,17 @@ int tty_read(dev_t dev, void *_buf, size_t count, off_t offset UNUSED)
 	return ret;
 }
 
-//int tty_write(struct inode *inode, void *_buf, off_t off UNUSED, size_t count)
-// XXX: Incompatible type signature here, will have to fix in many places
 // XXX: Might be worth moving the putchar logic here instead of iterating over buffer
-int tty_write(dev_t dev, const void *_buf, size_t count, off_t offset UNUSED)
+size_t tty_write(struct inode *inode, uint8_t *_buf, size_t count, off_t offset UNUSED)
 {
-	int tty_num = MINOR(dev);
-	const char *p = _buf;
+	(void)inode;
+	//dev_t dev = inode->info.st_rdev;
+	int tty_num = 0;//MINOR(dev) - 1;
+	//if (MAJOR(dev) == 0x3)
+	//	tty_num = 0;
+	//if (MAJOR(dev) == 0x4)
+	//	tty_num = 0;
+	const char *p = (const char *)_buf;
 
 	while (count--) {
 		serial_putc(*p);
@@ -359,9 +382,14 @@ int tty_write(dev_t dev, const void *_buf, size_t count, off_t offset UNUSED)
 
 // XXX: This is probably just temporary:
 #define ENOIOCTLCMD 515
-int tty_ioctl(dev_t dev, int request, char *args)
+
+int tty_ioctl(struct inode *inode, int request, char *args)
 {
-	int tty_num = MINOR(dev);
+	(void)inode;
+	//dev_t dev = inode->info.st_dev;
+	int tty_num = 0;//MINOR(dev) - 1;
+	//if (MAJOR(dev) == 0x3)
+	//	tty_num = 0;
 	tty_t *tty = ttys[tty_num];
 
 	// These don't use arguments, so process them first
@@ -376,6 +404,8 @@ int tty_ioctl(dev_t dev, int request, char *args)
 			serial_printf("Unimplemented tty ioctl %.4X\n", request);
 			return -ENOIOCTLCMD;
 	}
+
+	//printf("REQ %x args %x\n", request, args);
 
 	if (args == NULL || (uintptr_t)args >= PHYS_BASE)
 		return -EFAULT;
@@ -436,15 +466,15 @@ void termios_init(struct termios *termios)
 	termios->c_cflag |= B38400;
 }
 
-void tty_init(struct kernel_boot_info *info)
+void tty_init(struct kernel_boot_info *info UNUSED)
 {
 	for (int i = 0; i < TTY_COUNT; i++) {
 		ttys[i] = kcalloc(sizeof(tty_t), 1);
 		ttys[i]->pgrp = 0;
 
 		termios_init(&ttys[i]->termios);
-		ttys[i]->winsize.ws_col = info->x_res;
-		ttys[i]->winsize.ws_row = info->y_res;
+		ttys[i]->winsize.ws_col = info->x_chars;
+		ttys[i]->winsize.ws_row = 25;//info->y_chars;
 
 		ttys[i]->ringbuffers[0].buf = kcalloc(TTY_HISTORY_SIZE, sizeof(char *));
 		ttys[i]->ringbuffers[1].buf = kcalloc(TTY_HISTORY_SIZE, sizeof(char *));
@@ -460,5 +490,6 @@ void tty_init(struct kernel_boot_info *info)
 	ttys[0]->foreground = true;
 
 	device_register(S_IFCHR, 0x500, tty_read, tty_write, tty_ioctl);
+	device_register(S_IFCHR, 0x400, tty_read, tty_write, tty_ioctl);
 	device_register(S_IFCHR, 0x800, tty_read, tty_write, tty_ioctl);
 }

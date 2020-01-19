@@ -2,27 +2,24 @@
  *	Patterned after the Linux 2.4 vfs
  *
  */
-#include <kernel/common.h>
+#include <common.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-#include <stdio.h>
+//#include <stdio.h>
 #include <chicken/thread.h>
-#include <kernel/memory.h>
-#include <mm/vm.h>
 #include <fs/vfs.h>
-#include <fs/ext2/ext2.h>
-#include <mm/liballoc.h>
-#include <thread/syscall.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+//#include <kernel/memory.h>
+//#include <mm/vm.h>
+//#include <fs/ext2/ext2.h>
+//#include <mm/liballoc.h>
+//#include <thread/syscall.h>
 #include <errno.h>
-#include <sys/uio.h>
-#include <sys/select.h>
-#include <poll.h>
-//file stuff should be seperated out
-struct file *open_files[100];
-uint8_t file_count = 0;
+#include <fcntl.h>
+#include <sys/stat.h>
+//#include <sys/uio.h>
+//#include <sys/select.h>
+//#include <poll.h>
 
 int fd_new()
 {
@@ -31,138 +28,70 @@ int fd_new()
 	return fd++;
 }
 
-int sys_open(const char *_path, int oflag, mode_t mode)
+
+
+int sys_open(const char *path, int oflag, mode_t mode)
 {
-	if (_path == NULL)
-		return -EFAULT;
-	thread_t *cur = thread_current();
-	char *path = strdup(_path);
-	struct file * fp = vfs_open(path, oflag, mode);
+	struct file * file = NULL;
+	int ret = vfs_open(&file, path, oflag, mode);
 
-	int td = 0;
-	serial_printf("opening file: %s flag %x %p %x\n", _path, oflag, fp, O_CREAT);
+	if(file == NULL)
+		return ret;
 
-	if(fp == NULL)
-	{
-		goto fail;
-	}
+	serial_printf("opening file: %s flag %x %p %x\n", path, oflag, file, mode);
+	ret = put_file(file, 0);
 
-	for(int i = 0; i < cur->file_info->files_count; i++)
-	{
-		if(cur->file_info->files[i] == NULL)
-		{
-			td = i;
-			cur->file_info->files[i] = fp;
-			break;
-		}
-	}
-	kfree(path);
-	///	printf("FD %i\n", td);
-	return td;
-fail:
-	kfree(path);
-	return -1;
-}
-int sys_close(int fd)
-{
-	struct file *fp = thread_current()->file_info->files[fd];
-	thread_current()->file_info->files[fd] = NULL;
-	if(fp == NULL)
-		return -1;
-	return vfs_close(fp);
+	if(oflag & O_APPEND)
+		file->offset = file->inode->info.st_size;
+
+	return ret;
 }
 
-
-ssize_t sys_read(int fildes, void *buf, size_t nbyte)
+ssize_t sys_read(int fd, void *buf, size_t nbyte)
 {
-	struct file *fp = thread_current()->file_info->files[fildes];
-	if(fp == NULL || fildes < 0)
-		return -1;
+	struct file *fp = vfs_file_get(fd);
+	if(fp == NULL)
+		return -EBADFD;
+
+	struct inode *inode = fp->inode;
+
+	if (S_ISDIR(inode->info.st_mode)) // XXX: Do I care?
+		return -EISDIR;
+
 	return vfs_read(fp, buf, nbyte);
 }
-ssize_t sys_write(int fildes, void *buf, size_t nbyte)
-{
-	struct file *fp = thread_current()->file_info->files[fildes];
 
-	if(fp == NULL)
-		return -1;
-	ssize_t ret;
-	ret = vfs_write(fp, buf, nbyte);
-	return ret;
+ssize_t sys_write(int fd, void *buf, size_t nbyte)
+{
+	struct file *fp = vfs_file_get(fd);
+	if (fp == NULL)
+		return -EBADFD;
+
+	return vfs_write(fp, buf, nbyte);
 }
 
 ssize_t sys_readv(int fd, const struct iovec *iov, int iovcnt)
 {
 	ssize_t count = 0, ret = 0;
 
-	if(iovcnt == 0 || iovcnt > UIO_MAXIOV)
+	if (iovcnt == 0 || iovcnt > UIO_MAXIOV)
 		return -EINVAL;
 
-	if(verify_pointer(iov, sizeof(*iov)*iovcnt, 0))
+	if (verify_pointer(iov, sizeof(*iov)*iovcnt, VP_WRITE))
 		return -EFAULT;
 
-	for(int i = 0; i < iovcnt; i++)
-	{
+	for (int i = 0; i < iovcnt; i++) {
 		ret = sys_read(fd, iov[i].iov_base, iov[i].iov_len);
-		if(ret < 0)
+		if (ret < 0)
 			return ret;
 
 		count += ret;
 	}
 	//If we overflowed:
-	if(count < 0)
+	if (count < 0)
 		return -EINVAL;
 
 	return count;
-}
-
-int poll_toggle_hack = 0;
-int sys_poll(struct pollfd *fds UNUSED, nfds_t nfds UNUSED, int timeout UNUSED)
-{
-	//for (unsigned i = 0; i < nfds; i++) {
-		//serial_printf("Test: %i %x %x\n", fds[i].fd, fds[i].events, fds[i].revents);
-	//}
-	//serial_printf("Polling: %i %i\n", nfds, timeout);
-	if (poll_toggle_hack)
-		poll_toggle_hack = 0;
-	else
-		poll_toggle_hack = 1;
-	return poll_toggle_hack;
-}
-
-int fart2 = 0;
-int sys_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
-{
-	(void)nfds;
-	(void)readfds;
-	(void)writefds;
-	(void)exceptfds;
-	//(void)timeout;
-	//serial_printf("select() nfds: %i", nfds);
-	if (readfds) {
-		//serial_printf(" READFDS: %x", readfds->fds_bits[0]);
-	}
-	if (writefds) {
-		//serial_printf(" WRITEFDS: %x", writefds->fds_bits[0]);
-	}
-	if (exceptfds) {
-		//serial_printf(" EXCEPTFDS: %x\n", exceptfds->fds_bits[0]);
-	}
-	if (timeout) {
-		timeout->tv_sec = 0;
-		timeout->tv_usec = 0;
-	}
-	//serial_printf("\n");
-	//if (fart2 < 2)
-		//fart2++;
-	//else
-		//fart2 = 0;
-	//return nfds;
-	if (fart2) {
-		fart2 = 0;
-		return 1;
-	}
-	return 0;//fart2 & 0x3 ? 1 : 0;
 }
 
 ssize_t sys_writev(int fd, const struct iovec *iov, int iovcnt)
@@ -170,22 +99,21 @@ ssize_t sys_writev(int fd, const struct iovec *iov, int iovcnt)
 	ssize_t count = 0, ret = 0;
 
 
-	if(iovcnt == 0 || iovcnt > UIO_MAXIOV)
+	if (iovcnt == 0 || iovcnt > UIO_MAXIOV)
 		return -EINVAL;
 
-	if(verify_pointer(iov, sizeof(*iov)*iovcnt, 1))
+	if (verify_pointer(iov, sizeof(*iov)*iovcnt, 1))
 		return -EFAULT;
 
-	for(int i = 0; i < iovcnt; i++)
-	{
+	for (int i = 0; i < iovcnt; i++) {
 		ret = sys_write(fd, iov[i].iov_base, iov[i].iov_len);
-		if(ret < 0)
+		if (ret < 0)
 			return ret;
 
 		count += ret;
 	}
 	//If we overflowed:
-	if(count < 0)
+	if (count < 0)
 		return -EINVAL;
 
 	return count;
@@ -196,66 +124,228 @@ ssize_t sys_writev(int fd, const struct iovec *iov, int iovcnt)
   {
   return -1;
   }*/
-off_t sys_lseek(int fildes, off_t offset, int whence)
+
+int sys_access(const char *path, mode_t mode)
 {
-	struct file *fp = thread_current()->file_info->files[fildes];
+	thread_t *cur = thread_current();
+	//dentry_t *cwd = cur->file_info->cur;
+
+	dentry_t *lookup = NULL;
+	serial_printf("Lookinf for %s\n", path);
+	int ret = vfs_pathsearch(path, &lookup, NULL);
+	if (lookup == NULL) {
+		serial_printf("Not found\n");
+		goto finish;
+	}
+
+	//get mode
+	mode_t imode = lookup->inode->info.st_mode & 0777;
+	mode &= 0007;
+
+	//if uid:
+	if (cur->uid == lookup->inode->info.st_uid) {
+		imode >>= 6;
+	} else if (cur->gid == lookup->inode->info.st_gid){
+		imode >>= 3;
+	}
+	//mask bottom three bits
+	//S_IRWXU
+	//
+	//check them
+	// FIXME: !!!!
+	if (mode != imode) {
+		//ret = -EACCES;
+		goto finish;
+	}
+
+	ret = 0;
+
+finish:
+	return ret;
+}
+
+// TODO: make sys_access a call to this instead
+int sys_faccessat(int dirfd, const char *path, mode_t mode, int flags)
+{
+	if (dirfd == AT_FDCWD) {
+		return sys_access(path, mode);
+	}
+
+	if (flags & AT_EACCESS) {
+		// FIXME: user EUID/EGID for access checks instead of UID/GID
+	}
+
+	bool follow_link = true;
+	if (flags & AT_SYMLINK_NOFOLLOW)
+		follow_link = false;
+
+	struct file *fp = vfs_file_get(dirfd);
+	if (fp == NULL)
+		return -EBADFD;
+
+	if (!S_ISDIR(fp->dentry->inode->info.st_mode))
+		return -ENOTDIR;
+
+	dentry_t *dir = fp->dentry; 
+	dentry_t *lookup;
+	int ret = dcache_pathsearch(path, &lookup, dir, NULL, 0, follow_link);
+	if (lookup == NULL) {
+		serial_printf("Not found\n");
+		goto finish;
+	}
+
+	//get mode
+	mode_t imode = lookup->inode->info.st_mode & 0777;
+	mode &= 0007;
+
+	thread_t *cur = thread_current();
+	//if uid:
+	if (cur->uid == lookup->inode->info.st_uid) {
+		imode >>= 6;
+	} else if (cur->gid == lookup->inode->info.st_gid){
+		imode >>= 3;
+	}
+	//mask bottom three bits
+	//S_IRWXU
+	//
+	//check them
+	// FIXME: !!!!
+	if (mode != imode) {
+		//ret = -EACCES;
+		goto finish;
+	}
+
+	ret = 0;
+
+finish:
+	return ret;
+	return 0;
+}
+
+off_t sys_llseek(int fd, unsigned long off_h, unsigned long off_l, off_t *result, int whence)
+{
+	struct file *fp = vfs_file_get(fd);
 	if(fp == NULL)
-		return -1;
+		return -EBADFD;
+
+	off_t offset = off_l + ((off_t)off_h << 32);
+	off_t ret = vfs_seek(fp, offset, whence);
+	if ((signed)ret < 0)
+		return ret;
+
+	*result = ret;
+
+	return 0;
+}
+
+off_t sys_lseek(int fd, off_t offset, int whence)
+{
+	struct file *fp = vfs_file_get(fd);
+	if(fp == NULL)
+		return -EBADFD;
 	return vfs_seek(fp, offset, whence);
 }
 
-int sys_stat(const char *filename, struct stat *statbuf)
+int sys_lstat64(const char *filename, struct stat64 *buf)
 {
-	return vfs_stat(filename, statbuf);
+	dentry_t *lookup;
+
+	int ret = vfs_pathsearch_nofollow(filename,  &lookup, NULL);
+	if(lookup == NULL)
+		return ret;
+
+	// TODO: it might make more sense to have this as a separate inode function
+	memcpy(buf, &lookup->inode->info, sizeof(*buf));
+
+	return 0;
 }
 
-int sys_stat64(const char *filename, struct stat64 *statbuf)
+int sys_readlink(const char *filename, char *buf, size_t size)
 {
-	return vfs_stat64(filename, statbuf);
+	dentry_t *lookup;
+
+	int ret = vfs_pathsearch_nofollow(filename,  &lookup, NULL);
+	if(lookup == NULL)
+		return ret;
+
+	if (lookup->inode == NULL) {
+		return -ENOENT;
+	}
+
+	return lookup->inode->fs->ops->readlink(lookup->inode, buf, size);
 }
 
-int sys_fstat64(int fd, struct stat64 *statbuf)
+int sys_mkdir(const char *path UNUSED, mode_t mode UNUSED)
 {
-	struct file *fp = thread_current()->file_info->files[fd];
-	return vfs_fstat64(fp->inode, statbuf);
+	return -ENOSYS;;
 }
 
-int sys_chdir(const char *path)
+//FIXME: Doesn't handle EACCES
+int sys_getcwd(char *buf, size_t size)
 {
-	return vfs_chdir(path);
+	dentry_t *cur = thread_current()->file_info->cur;
+	if (cur->inode == NULL)
+		return -ENOENT;
+
+	size_t path_len = strlen(cur->path) + 1;
+	if (path_len > size)
+		return -ERANGE;
+
+	if (verify_pointer(buf, size, VP_WRITE))
+		return -EFAULT;
+
+	if (size == 0)
+		return -EINVAL;
+
+	strncpy(buf, cur->path, size);
+
+	*(buf + path_len) = '\0';
+
+// For Linux compatibility, return length not buf
+	return path_len;
 }
 
-//FIXME: Placeholder
-//For Linux compatibility, return length not buf
-char *sys_getcwd(char *buf, size_t size UNUSED)
+int _sys_dup(int oldfd, int newfd, int flags)
 {
-	strcpy(buf, "/");
+	struct file *oldfp = vfs_file_get(oldfd);
+	int ret = -EBADFD;
 
-	return (char *)strlen(buf);
+	if(oldfp == NULL)
+		return -EBADFD;
+
+	if(newfd != -1)
+	{
+		ret = sys_close(newfd);
+		//XXX: Not sure if this is correct
+		if(ret != 0 && ret != -EBADFD)
+			return ret;
+	}
+	ret = put_file2(oldfp, newfd, flags);
+
+	return ret;
 }
 
-//FIXME: Placeholder
-int sys_dup(int oldfd UNUSED)
+int sys_dup(int oldfd)
 {
-	return -1;//ENOSYS;
+	return _sys_dup(oldfd, -1, 0);
 }
 
-//FIXME: Placeholder
-int sys_dup2(int oldfd UNUSED, int newfd UNUSED)
+int sys_dup2(int oldfd, int newfd)
 {
-	return -1;//ENOSYS;
+	//probably needs a check that newfd isn't -1
+	return _sys_dup(oldfd, newfd, 0);
 }
 
-//FIXME: doesn't handle varargs
-int sys_ioctl(int fildes, int request, char * argp)
+int sys_dup3(int oldfd, int newfd, int flags)
 {
-	struct file *fp;
-	if(fildes == -1)
-		return -1;
-	fp = thread_current()->file_info->files[fildes];
+	return _sys_dup(oldfd, newfd, flags);
+}
+
+int sys_ioctl(int fd, int request, char * argp)
+{
+	struct file *fp = vfs_file_get(fd);
 	if(fp == NULL)
-		return -1;
-	//printf("fildes %i\n", fildes);
+		return -EBADFD;
+
 	return vfs_ioctl(fp, request, argp);
 }
-

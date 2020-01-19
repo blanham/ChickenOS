@@ -172,12 +172,13 @@ struct pci_device *pci_get_device(uint16_t vendor, uint16_t device)
 }
 
 uint32_t pci_get_bar(struct pci_device *dev, uint8_t type)
+//uint32_t pci_get_bar_by_type(struct pci_device *dev, uint8_t type)
 {
 	uint32_t bar = 0;
 	for(int i = 0; i < 6; i++)
 	{
 		bar = dev->header->bars[i];
-		if((bar & 0x1) == type)
+		if((bar & 0x1) == type) // XXX: ???
 			return bar;
 	}
 
@@ -192,6 +193,9 @@ uint32_t pci_get_barn(struct pci_device *dev, uint8_t type, uint8_t num)
 		bar = dev->header->bars[num];
 		if((bar & 0x1) == type)
 			return bar;
+
+		if (bar == 0)
+			return 0;
 	}
 
 	return 0xFFFFFFFF;
@@ -212,5 +216,5 @@ void pci_init()
 			continue;
 		pci_bus_scan(i);
 	}
-	pci_list();
+	//pci_list();
 }

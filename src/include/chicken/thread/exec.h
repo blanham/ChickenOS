@@ -19,10 +19,18 @@ typedef struct {
 	enum exe_type type;
 	union {
 		int err;
-		struct file *file;
+		// FIXME: Should be dentry_t
+		struct inode *inode;
 	};
 	uintptr_t ip;
 	uintptr_t sp;
+
+	uintptr_t at_entry;
+	uintptr_t at_flags;
+	uintptr_t at_base;
+	uintptr_t at_phnum;
+	uintptr_t at_phent;
+	uintptr_t at_phdr;
 } executable_t;
 
 int stack_prepare(executable_t *exe, char *path, char *const argv[], char *const envp[]);

@@ -8,6 +8,7 @@
 #include <mm/vm.h>
 #include <chicken/thread.h>
 #include <kernel/hw.h>
+#include <errno.h>
 
 uint32_t mem_size;
 
@@ -34,11 +35,10 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 
 	//vm_page_fault_dump(regs, addr, flags);
 	//TODO: Check if this is a swapped out or mmaped or COW etc
-	if(memregion_fault(cur->mm, addr, flags) == 0)
+	if (memregion_fault(cur->mm, addr, flags) == 0)
 		return;
 
-	if(flags & PAGE_USER)
-	{
+	if (flags & PAGE_USER) {
 		vm_page_fault_dump(regs, addr, flags);
 
 		//TODO: send sigsegv to thread
@@ -55,9 +55,7 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 
 		thread_yield();
 		thread_exit(1);
-	}
-	else
-	{
+	} else {
 		vm_page_fault_dump(regs, addr, flags);
 		PANIC("Page fault in kernel space!");
 	}
@@ -67,37 +65,41 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 
 //FIXME Taken from linux, only applicable to i386?
 #define TASK_UNMAPPED_BASE (PHYS_BASE/3)
+#define MMAP_BASE 0x5000000
 
-void *mmap_base = (void *)0x5000000;
 //Move this to the region code?
 void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset)
 {
-	(void)addr;
-	(void)length;
-	(void)prot;
-	(void)flags;
-	(void)fd;
-	(void)pgoffset;
-	printf("MMAP! Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n",
-					addr, length, prot, flags, fd, pgoffset);
-	PANIC("FUCKING THING SUCKS\n");
+	(void)prot; // TODO: implement actual memory protections :P
+	//printf("MMAP! Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n", addr, length, prot, flags, fd, pgoffset);
 
-	if(addr == NULL)
-	{
-		//Starting with mmap base
-		//look through threads memregions
-		//if
-		addr = mmap_base;
-
+	if ((flags & MAP_FIXED) == 0) {
+		thread_t *cur = thread_current();
+		addr += (uintptr_t)cur->mm->mmap_base;
+		cur->mm->mmap_base += length;
 	}
-//	void *new = palloc(length / PAGE_SIZE);
-//	pagedir_t pd = thread_current()->pd;
-//	pagedir_insert_pagen(pd, (uintptr_t)new, (uintptr_t)mmap_base, 0x7, length/PAGE_SIZE);
 
-	addr = mmap_base;
-	mmap_base += length;
+	if ((flags & MAP_ANONYMOUS)) {
+		thread_t *cur = thread_current();
+		memregion_map_data(cur->mm, (uintptr_t)addr, length, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_FIXED, NULL);
+		return addr;
+	}
 
-	return addr;//(void*)-1;//NULL;
+	struct file *file = vfs_file_get(fd);
+	if (file == NULL)
+		return (void *)-EBADF; // 
+
+	thread_t *cur = thread_current();
+	memregion_map_file(cur->mm, (uintptr_t)addr &PAGE_MASK, length, PROT_READ|PROT_WRITE|PROT_EXEC,
+				MAP_FILE, file->inode, pgoffset*4096, file->inode->info.st_size);
+	return (void *) (((uintptr_t)addr + 4096 -1) & PAGE_MASK);
+}
+
+int sys_munmap(void *addr, size_t length)
+{
+	printf("MUNAMP: %p %x\n", addr, length);
+
+	return -ENOSYS;
 }
 
 struct mm *mm_alloc()
@@ -134,7 +136,7 @@ void mm_free(struct mm *mm)
 
 //Currently used in execve()
 // FIXME: this should probably be in a separate file
-//	      and shoul probably not end in init, to reduce confusion with vm_init()
+//	      and should probably not end in init, to reduce confusion with vm_init()
 void mm_init(struct mm *mm)
 {
 	//This initial allocation is probably not needed,
@@ -151,23 +153,25 @@ void mm_init(struct mm *mm)
 	//should be right above the code segment of the
 	//executable
 	mm->brk = (void *)HEAP_BASE;
+	mm->mmap_base = (void *)MMAP_BASE;
 
 	memregion_map_data(mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE,
 			PROT_GROWSDOWN, MAP_GROWSDOWN | MAP_FIXED, user_stack);
 	// FIXME: This should be set by sbrk/mmap
-	memregion_map_data(mm, HEAP_BASE, PAGE_SIZE*128,
+	memregion_map_data(mm, HEAP_BASE, PAGE_SIZE*256, // XXX: Set high so that things work
 			PROT_GROWSUP, MAP_PRIVATE | MAP_FIXED, NULL);
 }
 
 void vm_init(struct kernel_boot_info *info)
 {
-	uint32_t page_count = info->mem_size/PAGE_SIZE;
 	mem_size = info->mem_size;
 
-	//palloc_init should take the info struct
-	palloc_init(page_count, (uintptr_t)info->placement);
+	serial_printf("MEM size: %x\n", mem_size);
+
+	palloc_init(info);
+
 	//paging_init should take the info struct
-	paging_init(mem_size);
+	paging_init(info->mem_size);
 
 	//frame_init should take the info struct
 	frame_init(info->mem_size);

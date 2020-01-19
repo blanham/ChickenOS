@@ -4,6 +4,7 @@
 #include <mm/vm.h>
 #include <mm/paging.h>
 #include <util/utlist.h>
+#include <fs/dentry.h>
 #include <fs/vfs.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -43,7 +44,7 @@ typedef struct thread_struct {
 	pid_t pid, tgid, ppid, pgid;
 	// TODO: We need to add tgid and return that instead of ->pid fot getpid(2)
 	uid_t uid, euid;
-	gid_t gid;
+	gid_t gid, egid;
 	mode_t umask;
 	char *name;
 	int ret_val;
@@ -59,14 +60,20 @@ typedef struct thread_struct {
 	thread_t *children; // Why not have a pointer to a master tree of processes?
 	thread_t *child_next, *child_prev;
 
+
+
 	//fs stuff
 	struct thread_files *file_info;
 	//saved kernel stack, user stack, and location of user stack
 	uint8_t *sp;//, *useresp, *user;
+	uintptr_t ip, usersp; // For fork() and clone()
 	void *registers;
 	void *tls;
 
 	struct thread_signals *sig_info;
+
+	// linux thread id stuff
+	int *set_child_tid, *clear_child_tid;
 
 	//this pointer to registers on kernel
 	//stack is used for manipulating the user stack
@@ -84,8 +91,8 @@ typedef struct thread_struct {
 
 
 typedef struct thread_files {
-	struct inode *root;
-	struct inode *cur;
+	dentry_t *root;
+	dentry_t *cur;
 	int files_open;
 	int files_count;
 	struct file **files;
@@ -109,6 +116,7 @@ typedef struct thread_queue thq_t;
 /* arch/$ARCH/thread.c */
 void arch_thread_reschedule(thread_t *cur, thread_t *next);
 void arch_thread_set_ip_and_usersp(uintptr_t ip, uintptr_t usersp);
+void thread_dump_tls(void *tls);
 
 /* thread.c */
 void 	threading_init();
@@ -123,18 +131,26 @@ pid_t 	sys_getpgrp();
 int		sys_setuid(uid_t uid);
 uid_t	sys_getuid();
 gid_t	sys_getgid();
+gid_t	sys_getegid();
 int		sys_setgid(gid_t gid);
 int 	sys_setpgid(pid_t pid, pid_t pgid);
 int 	sys_brk(void *addr);
 void *	sys_sbrk(intptr_t ptr);
-void 	sys_exit(int exit);
+void 	sys_exit(int return_code);
+void 	sys_exit_group(int return_code);
 pid_t 	sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage);
 int sys_get_thread_area(void *desc);
 int sys_set_thread_area(void *desc);
+int sys_set_tid_address(int *ptr);
+
+/* thread/clone.c */
+int sys_clone(unsigned long flags, void *stack, int *parent_tid, unsigned long tls, int *child_tid);
 
 /* thread/exec.c */
-
 int	sys_execve(const char *path, char *const argv[], char *const envp[]);
+
+/* thread/futex.c */
+int sys_futex(int *uaddr, int futex_op, int val, const struct timespec *timeout, int *uaddr2, int val3);
 
 /* thread/scheduler.c */
 void scheduler_init(thread_t *kernel_thread);

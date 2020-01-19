@@ -29,7 +29,6 @@ void thread_add_child(thread_t *parent, thread_t *child)
 struct thread_files *thread_files_alloc(struct thread_files *old)
 {
 	struct thread_files * new = kcalloc(sizeof(struct thread_files), 1);
-	//thread_t *cur = thread_current();
 	if(old)
 	{
 		kmemcpy(new, old, sizeof(struct thread_files));
@@ -45,9 +44,12 @@ struct thread_files *thread_files_alloc(struct thread_files *old)
 	}
 	else
 	{
-		//new->root = cur->file_info->root;
-		//new->cur = cur->file_info->cur;
-	//	new->root = new->cur = root->inode;
+		thread_t *cur = thread_current();
+		if (cur->file_info) {
+			new->cur = cur->file_info->cur;
+			new->root = cur->file_info->root;
+		}
+
 		new->files_count = 32;
 		new->files = kcalloc(sizeof(struct file *), 32);
 		new->files_flags = kcalloc(sizeof(int), 32);

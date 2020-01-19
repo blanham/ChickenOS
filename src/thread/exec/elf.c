@@ -10,60 +10,118 @@
 #include <errno.h>
 #include <fs/vfs.h>
 
-void elf_map_regions(Elf32_Ehdr *header, struct file *file)
+#define ELF_ET_DYN_BASE (PHYS_BASE / 3*2)
+
+int load_elf_internal(executable_t *exe, bool is_interpreter);
+static int elf_map_regions(executable_t *exe, Elf32_Ehdr *header, bool is_interpreter UNUSED)
 {
-	thread_t *cur = thread_current();
 	Elf32_Phdr *phdr = kcalloc(sizeof(*phdr), header->e_phnum);
 
-	//NO //XXX: Why did I say no?
-	file->offset = header->e_phoff;
-	vfs_read(file, phdr, sizeof(*phdr)*header->e_phnum);
+	int ret = exe->inode->read(exe->inode, (void *)phdr, sizeof(*phdr)*header->e_phnum, header->e_phoff);
+	if (ret != sizeof(*phdr)*header->e_phnum)
+		PANIC("File reading failed while trying to map regions\n");
 
-	for(uint16_t i = 0; i < header->e_phnum; i++, phdr++)
-	{
-		if(phdr->p_type != PT_LOAD)
+	uintptr_t adjust = 0;
+	if (header->e_type == ET_DYN) {
+		if (is_interpreter)
+			adjust = ELF_ET_DYN_BASE;
+		else 
+			adjust = 0x8084000;
+
+		exe->at_entry = adjust + header->e_entry;
+		exe->at_phdr =  adjust + header->e_phoff;
+	} else {
+
+		exe->at_entry = header->e_entry;
+		exe->at_phdr =  (exe->at_entry&PAGE_MASK) + header->e_phoff;
+	}
+	//printf("PHDR %x %x %x\n", adjust, exe->at_entry, exe->at_phdr)
+	char *interpreter = NULL;
+	for (uint16_t i = 0; i < header->e_phnum; i++, phdr++) {
+		if (phdr->p_type == PT_INTERP) {
+			size_t len = (size_t)phdr->p_filesz; // includes null terminator
+			interpreter = kcalloc(len, 1);
+			size_t ret = exe->inode->read(exe->inode, (uint8_t *)interpreter, len, phdr->p_offset);
+			if (ret != len)
+				PANIC("Error reading interperter name");
+			continue;
+		}
+
+		if (phdr->p_type != PT_LOAD)
 			continue;
 
 		//elf_print_programs(phdr);
 
-		//memregion_add(cur->mm, phdr->p_vaddr, phdr->p_memsz, PROT_READ | PROT_EXEC,
-		//		MAP_FILE, file->inode, phdr->p_offset, phdr->p_filesz, NULL);
+		thread_t *cur = thread_current();
 
-		uint32_t mem_length = (phdr->p_vaddr & ~PAGE_MASK) + phdr->p_memsz;
+;
+		uintptr_t vaddr = adjust + phdr->p_vaddr;
+
+
+		uint32_t mem_length = (vaddr & ~PAGE_MASK) + phdr->p_memsz;
 		uint32_t file_length = (phdr->p_offset & ~PAGE_MASK) + phdr->p_filesz;
-		memregion_map_file(cur->mm, phdr->p_vaddr, mem_length, PROT_READ|PROT_WRITE|PROT_EXEC,
-				MAP_FILE, file->inode, phdr->p_offset & PAGE_MASK, file_length);
-		serial_printf("Vaddr %8x Filesize %x Memsize %x Offset %x\n", phdr->p_vaddr,
-				phdr->p_filesz, phdr->p_memsz, phdr->p_offset);
+
+		// TODO: rename this memregion_map_inode
+		memregion_map_file(cur->mm, vaddr, mem_length, PROT_READ|PROT_WRITE|PROT_EXEC,
+				MAP_FILE, exe->inode, phdr->p_offset & PAGE_MASK, file_length);
+
+		printf("Vaddr %x Filesize %x Memsize %x Offset %x\n", vaddr,
+			phdr->p_filesz, phdr->p_memsz, phdr->p_offset);
 	}
-}
 
-int load_elf(executable_t *exe)
-{
-	int ret = 0;
-
-	struct file *file = exe->file;
-	// XXX: Fix this too
-	file->offset = 0;
-
-	Elf32_Ehdr *header = kmalloc(sizeof(*header));
-	if ((ret = vfs_read(file, header, sizeof(*header))) != sizeof(*header)) {
-		printf("Error reading ELF header\nShould have read %x bytes, actually read %x bytes\n",
-				sizeof(*header), ret);
-		return -1;
+	if (interpreter) {
+		executable_t *interp = identify_executable(interpreter, NULL);
+		kfree(interpreter);
+		if (interp->type != EXE_ELF)
+			return -1;
+		int ret = load_elf_internal(interp, true);
+		if (ret == 0) {
+			//printf("ENTRY base %x %x\n", interp->at_base, interp->entry);
+			exe->at_base = ELF_ET_DYN_BASE;
+			exe->ip = interp->ip; // XXX: Hmmmmm
+			//printf("EEE %x %x\n", exe->entry, exe->ip);
+		}
+		return ret;
+	} else {
+		exe->ip = exe->at_entry;
 	}
-	if (memcmp(header->e_ident, ELFMAG, SELFMAG)) {
-		printf("Missing or invalid ELF magic number!\n");
-		return -1;
-	}
-	//printf("HERE!!!");
-
-	elf_map_regions(header, file);
-	exe->ip = header->e_entry;
-
-	kfree(header);
 
 	return 0;
 }
 
+int load_elf_internal(executable_t *exe, bool is_interpreter)
+{
+	Elf32_Ehdr *header = kmalloc(sizeof(*header));
 
+	int ret = exe->inode->read(exe->inode, (void *)header, sizeof(*header), 0);
+	if (ret != sizeof(*header)) {
+		printf("Error reading ELF header\nShould have read %x bytes, actually read %x bytes\n",
+				sizeof(*header), ret);
+		return -1;
+	}
+
+	if (memcmp(header->e_ident, ELFMAG, SELFMAG)) {
+		printf("Missing or invalid ELF magic number!\n");
+		return -1;
+	}
+
+	exe->at_phent = sizeof(Elf32_Phdr);
+	exe->at_phnum = header->e_phnum;
+	ret = elf_map_regions(exe, header, is_interpreter);
+		printf("PHDR %x\n", exe->at_phdr);
+
+
+	//printf("AT base: %x %x %x %x %x\n", exe->at_base, exe->at_phdr, exe->at_phent, exe->at_phnum, exe->entry);
+
+	//printf("ENTRYYY %x IP %x\n", exe->entry, exe->ip);
+
+	kfree(header);
+
+	return ret;
+}
+
+
+int load_elf(executable_t *exe)
+{
+	return load_elf_internal(exe, false);
+}
