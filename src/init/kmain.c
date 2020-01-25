@@ -1,20 +1,14 @@
-#include <common.h>
-#include <stdlib.h>
-#include <chicken/boot.h>
-#include <chicken/init.h>
-#include <chicken/time.h>
-#include <chicken/thread.h>
-#include <kernel/interrupt.h>
-#include <device/pci.h>
-#include <device/usb.h>
-#include <device/video.h>
-#include <device/tty.h>
-#include <device/audio.h>
-#include <mm/vm.h>
-#include <fs/vfs.h>
-#include <net/net_core.h>
 #include <stdio.h>
-#include <string.h>
+#include <chicken/boot.h>
+#include <chicken/common.h>
+#include <chicken/device/pci.h>
+#include <chicken/device/tty.h>
+#include <chicken/device/video.h>
+#include <chicken/fs/device.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/init.h>
+#include <chicken/thread.h>
+#include <chicken/time.h>
 
 #define VERSION "v0.1.0"
 char *BOOT_MSG = "\033[32;1mChickenOS "VERSION" booting\033[0m\n";

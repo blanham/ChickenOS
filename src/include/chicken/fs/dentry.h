@@ -1,11 +1,13 @@
 #ifndef C_OS_FS_DENTRY_H
 #define C_OS_FS_DENTRY_H
 #include <stdbool.h>
-#include <fs/vfs.h>
 #include <dirent.h>
+#include <sys/types.h>
 
 #define DCACHE_PRESENT	0x01
 #define DCACHE_MOUNT	0x10
+
+struct inode;
 
 // How do we keep track of the full path?
 typedef struct dentry {

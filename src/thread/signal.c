@@ -2,16 +2,13 @@
  *	Thread level support of signals
  *	XXX: This is hot garbage
  */
-#include <common.h>
 #include <errno.h>
-#include <chicken/thread.h>
-#include <kernel/memory.h>
-#include <device/console.h>
-#include <kernel/interrupt.h>
-#include <mm/vm.h>
-#include <thread/syscall.h>
+#include <stdbool.h>
 #include <stdio.h>
-#include <mm/liballoc.h>
+#include <string.h>
+#include <chicken/common.h>
+#include <chicken/interrupt.h>
+#include <chicken/thread.h>
 
 /*
 	Signal control flow:
@@ -87,7 +84,7 @@ int sys_sigreturn(registers_t *regs, unsigned long dunno UNUSED)
 //	dump_regs(regs);
 //	printf("eax %i\n", regs->eax);
 
-	kmemcpy(regs_bottom, cur->signal_regs, sizeof(*regs_bottom));
+	memcpy(regs_bottom, cur->signal_regs, sizeof(*regs_bottom));
 //
 //	printf("eax %i\n", regs->eax);
 
@@ -139,7 +136,7 @@ void signal_do(registers_t *regs, thread_t *next)
 	if(next->signal_regs == NULL)
 		next->signal_regs = kcalloc(1, sizeof(registers_t));
 
-	kmemcpy(next->signal_regs, (void *)regs_bottom, sizeof(*regs_bottom));
+	memcpy(next->signal_regs, (void *)regs_bottom, sizeof(*regs_bottom));
 	next->useresp = (uint8_t *)regs_bottom->useresp;
 
 	push = (uint32_t *)regs_bottom->useresp;
@@ -160,14 +157,14 @@ void signal_do(registers_t *regs, thread_t *next)
 int sys_sigsuspend(const sigset_t *mask)
 {
 	thread_t *cur = thread_current();
-	struct thread_signals *sig_info = cur->sig_info;
+	thread_signals_t *sig_info = cur->sig_info;
 	sigset_t save;
 
 	interrupt_disable();
 	//verify_pointer(mask, sizeof(*mask));
 
-	kmemcpy(&save, &sig_info->sigmask, sizeof(sig_info->sigmask));
-	kmemcpy(&sig_info->sigmask, (void *)mask, sizeof(*mask));
+	memcpy(&save, &sig_info->sigmask, sizeof(sig_info->sigmask));
+	memcpy(&sig_info->sigmask, (void *)mask, sizeof(*mask));
 //	printf("Blocking! Esp ~= %x\n", &mask);
 	cur->status = THREAD_BLOCKED;
 //	thread_scheduler(sig_info->regs);
@@ -175,7 +172,7 @@ int sys_sigsuspend(const sigset_t *mask)
 	while(cur->status == THREAD_BLOCKED);
 	printf("We woke up! pid %i\n", thread_current()->pid);
 //	printf("We woke up! pid %i\n", sig_info->pid);
-	kmemcpy(&sig_info->sigmask, &save, sizeof(sig_info->sigmask));
+	memcpy(&sig_info->sigmask, &save, sizeof(sig_info->sigmask));
 //	registers_t *regs_bottom = (void *)sig_info + STACK_SIZE - sizeof(registers_t);
 //	dump_regs(regs_bottom);
 
@@ -200,11 +197,11 @@ int sys_sigaction(int sig, const struct k_sigaction *act, struct k_sigaction *oa
 //	printf("sigaction %ii %i %i %i\n", sig, SIGKILL, SIGSTOP, NUM_SIGNALS-1);
 
 	if (oact != NULL)
-		kmemcpy(oact, &cur->sig_info->signals[sig], sizeof(*oact));
+		memcpy(oact, &cur->sig_info->signals[sig], sizeof(*oact));
 
 	if (act != NULL) {
 	//	printf("%x\n", act->handler);
-		kmemcpy(&cur->sig_info->signals[sig], act, sizeof(*act));
+		memcpy(&cur->sig_info->signals[sig], act, sizeof(*act));
 	//	printf("%x\n", &cur->sig_info->signals[sig]);
 	}
 
@@ -217,14 +214,14 @@ int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
 	return 0;
 	thread_t *cur = thread_current();
-	struct thread_signals *sig_info = cur->sig_info;
+	thread_signals_t *sig_info = cur->sig_info;
 
 	//verify_pointer(set, sizeof(*set));
 	//verify_pointer(oldset, sizeof(*set));
 	serial_printf("Problems: %p %p\n", set, oldset);
 	if(oldset != NULL)
 	{
-		kmemcpy(oldset->__bits, sig_info->sigmask.__bits, sizeof(sigset_t));
+		memcpy(oldset->__bits, sig_info->sigmask.__bits, sizeof(sigset_t));
 	}
 //	printf(" HOW %i\n", how);
 	if(set != NULL)
@@ -239,7 +236,7 @@ int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 			sig_info->sigmask.__bits[1] &= ~set->__bits[1];
 			return 0;
 		case SIG_SETMASK:
-			kmemcpy(sig_info->sigmask.__bits, set->__bits, sizeof(sigset_t));
+			memcpy(sig_info->sigmask.__bits, set->__bits, sizeof(sigset_t));
 			return 0;
 		default:
 			return -EINVAL;

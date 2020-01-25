@@ -1,10 +1,8 @@
-#include <common.h>
 #include <stdio.h>
+#include <chicken/common.h>
+#include <chicken/device/input.h>
+#include <chicken/device/ioport.h>
 #include <chicken/thread.h>
-#include <kernel/hw.h>
-#include <kernel/memory.h>
-#include <device/console.h>
-#include <device/input.h>
 
 #define L_CTRL  0x0001
 #define R_CTRL  0x0002
@@ -154,4 +152,3 @@ void ps2_intr(void)
 		//	input_queue_putc(c);
 	}
 }
-

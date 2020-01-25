@@ -1,7 +1,6 @@
-#include <common.h>
-#include <string.h>
-#include <mm/liballoc.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 char * strcat(char *restrict dst, const char *restrict src)
 {

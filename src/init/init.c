@@ -1,8 +1,8 @@
-#include <common.h>
 #include <stdio.h>
 #include <string.h>
-#include <thread/syscall.h>
+#include <chicken/common.h>
 #include <chicken/init.h>
+#include <chicken/thread/syscall.h>
 
 char *e = "/dev/tty0";
 void init(void *aux UNUSED)
@@ -10,10 +10,10 @@ void init(void *aux UNUSED)
 	char *envp[] = {"TERM=linux", "HOME=/home/blanham"};// {"PATH=/", NULL};
 	//char *argv[] = {"python3", "-v", "-c", "print(\"farts\")", NULL};
 	//char *path = "/usr/bin/python3";
-	char *path = "/home/blanham/chocolate-doom/build/src/chocolate-doom";
-	char *argv[] = {"chocolate-doom", "-iwad", "/home/blanham/chocolate-doom/build/doom1.wad", NULL};
-	//char *path = "/bin/bash_old";
-	//char *argv[] = {"bash", NULL};
+	//char *path = "/home/blanham/chocolate-doom/build/src/chocolate-doom";
+	//char *argv[] = {"chocolate-doom", "-iwad", "/home/blanham/chocolate-doom/build/doom1.wad", NULL};
+	char *path = "/bin/bash_old";
+	char *argv[] = {"bash", NULL};
 
 	//char *argv[] = {"frotz", "/home/blanham/infocom/hhgg.z5", NULL};
 	//char *path = "/usr/bin/frotz";

@@ -1,14 +1,13 @@
 /*	ChickenOS - thread/scheduler.c
  *	Very basic scheduler, called on every timer interrupt
  */
-#include <common.h>
-#include <chicken/thread.h>
-#include <kernel/memory.h>
-#include <device/console.h>
-#include <kernel/interrupt.h>
-#include <mm/vm.h>
-#include <thread/syscall.h>
 #include <stdio.h>
+#include <chicken/common.h>
+#include <chicken/device/console.h>
+#include <chicken/interrupt.h>
+#include <chicken/mm/vm.h>
+#include <chicken/thread.h>
+#include <chicken/thread/syscall.h>
 #include <util/utlist.h>
 
 #include <arch/i386/interrupt.h>
@@ -27,6 +26,7 @@ void scheduler_init(thread_t *_idle_thread)
 	//Or it lives in a idle_thread global:
 	idle_thread = _idle_thread;
 	idle_thread->status = THREAD_READY;
+	ready_list = idle_thread;
 }
 
 thread_t *thread_by_pid(pid_t pid)
@@ -35,15 +35,14 @@ thread_t *thread_by_pid(pid_t pid)
 	HASH_FIND_INT(thread_list, &pid, ret);
 	return ret;
 }
-thread_t *other_thread = NULL;
 
 void thread_set_ready(thread_t *thread)
 {
 	thread->status = THREAD_READY;
-	if(ready_list == NULL)
-	ready_list = thread;
-	else
-		other_thread = thread;
+	thread_t *t;
+	for (t = ready_list; t->next; t = t->next);
+
+	t->next = thread;
 	//Might add an assertion that checks if thread is still on a blocked queue
 	///XXX: add this
 	//add_to_list(ready_list, thread);
@@ -53,15 +52,23 @@ void thread_set_ready(thread_t *thread)
 thread_t *thread_next()
 {
 	thread_t *cur = thread_current();
-	thread_t *next = ready_list;
+	thread_t *next = cur->next;
+
+	if (next == NULL)
+		return NULL;
 
 	//TODO: Next thread selection logic
 
-	if (next == NULL)
-		next = idle_thread;
+	while (next->status != THREAD_READY) {
+		next = next->next;
+		if (next == NULL)
+			next = ready_list;
+	}
 
-	if(cur == ready_list)
-		next = other_thread;
+
+
+	//if(cur == ready_list)
+	//	next = other_thread;
 
 	return next;
 }
@@ -133,6 +140,11 @@ void scheduler_run(registers_t *regs UNUSED)
 	if (next->sig_info->signal_pending != 0) {
 		//signal_setup_userstack(next);
 	}
+	serial_printf("CUR: pid: %i tgid: %i Next: pid: %i tgid: %i\n", cur->pid, cur->tgid, next->pid, next->tgid);
+	if (cur->registers)
+		registers_dump(cur->registers);
+	if (next->registers)
+		registers_dump(next->registers);
 
 	arch_thread_reschedule(cur, next);
 }

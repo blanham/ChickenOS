@@ -1,10 +1,12 @@
+// TODO : Actually implement audio support
+/*
 #include <common.h>
 #include <mm/liballoc.h>
-#include <device/audio.h>
 #include <device/pci.h>
-#include <hw.h>
-#include <sys/types.h>
+#include <device/audio.h>
 #include <device/audio/ac97.h>
+#include <chicken/device/ioport.h>
+#include <sys/types.h>
 struct audio_device {
 
 //ioctl_fn
@@ -101,4 +103,4 @@ int audio_init()
 
 	return 0;
 }
-
+*/

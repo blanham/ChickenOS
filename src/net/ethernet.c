@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
+#include <stdlib.h>
 #include <string.h>
+#include <chicken/net/net_core.h>
+
 void ethernet_printmac(char *name, uint8_t *mac)
 {
 	if(name != NULL)
@@ -81,12 +81,12 @@ error:
 void ethernet_send2(struct network_dev *dev, uint8_t *payload, size_t len, uint16_t ethertype, char dest_mac[6])
 {
 	
-	struct ether_header *eth = kmalloc(len + sizeof(*eth));
+	struct ether_header *eth = kcalloc(len + sizeof(*eth), 1);
 	uint8_t *pay = (uint8_t *)eth + sizeof(*eth);
-	kmemcpy(pay, payload, len);
+	memcpy(pay, payload, len);
 	eth->ether_type = htons(ethertype);
-	kmemcpy(eth->ether_dhost, dest_mac, 6);
-	kmemcpy(eth->ether_shost, dev->mac, 6);
+	memcpy(eth->ether_dhost, dest_mac, 6);
+	memcpy(eth->ether_shost, dev->mac, 6);
 //	ethernet_print(eth);
 
 	dev->send(dev, (uint8_t *)eth, len + sizeof(*eth));

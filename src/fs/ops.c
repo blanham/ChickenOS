@@ -2,24 +2,15 @@
  *	Patterned after the Linux 2.4 vfs
  *
  */
-#include <common.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <string.h>
-//#include <stdio.h>
-#include <chicken/thread.h>
-#include <fs/vfs.h>
-//#include <kernel/memory.h>
-//#include <mm/vm.h>
-//#include <fs/ext2/ext2.h>
-//#include <mm/liballoc.h>
-//#include <thread/syscall.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <sys/stat.h>
-//#include <sys/uio.h>
-//#include <sys/select.h>
-//#include <poll.h>
+#include <chicken/common.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/thread.h>
 
 int fd_new()
 {
@@ -27,8 +18,6 @@ int fd_new()
 
 	return fd++;
 }
-
-
 
 int sys_open(const char *path, int oflag, mode_t mode)
 {
@@ -283,7 +272,7 @@ int sys_mkdir(const char *path UNUSED, mode_t mode UNUSED)
 //FIXME: Doesn't handle EACCES
 int sys_getcwd(char *buf, size_t size)
 {
-	dentry_t *cur = thread_current()->file_info->cur;
+	dentry_t *cur = thread_current()->fs_info->cur;
 	if (cur->inode == NULL)
 		return -ENOENT;
 

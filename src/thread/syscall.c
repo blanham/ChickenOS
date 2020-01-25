@@ -1,17 +1,11 @@
-#include <common.h>
-#include <chicken/thread.h>
-#include <chicken/time.h>
-#include <mm/liballoc.h>
-#include <string.h>
-#include <kernel/interrupt.h>
-#include <device/console.h>
-#include <net/net_core.h>
-#include <thread/syscall.h>
-#include <stdio.h>
-#include <string.h>
 #include <errno.h>
-#include <thread/syscall-names2.h>
-#include <fcntl.h>
+#include <stdio.h>
+#include <chicken/common.h>
+#include <chicken/thread.h>
+#include <chicken/thread/syscall.h>
+#include <chicken/thread/syscall-names.h>
+#include <chicken/time.h>
+//#include <fcntl.h>
 
 #define DEBUG
 
@@ -23,6 +17,7 @@ void syscall_handler (registers_t *regs)
 	long *arg;
 
 #ifdef DEBUG
+	serial_printf("Regs-> %p\n", regs);
 	serial_printf("%s(%i): by %i @ %x: ",syscall_names[call], call, thread_current()->pid, regs->eip);
 	serial_printf("%x, %x, %x, %x, %x, %x\n", regs->ebx, regs->ecx, regs->edx, regs->esi, regs->edi, regs->ebp);
 #endif
@@ -130,7 +125,7 @@ void syscall_handler (registers_t *regs)
 			regs->eax = sys_getgid();
 			break;
 		case SYS_FORK:
-			regs->eax = sys_fork(regs);
+			regs->eax = sys_fork();
 			break;
 		case SYS_EXECVE:
 			regs->eax = sys_execve((char *)regs->ebx, (char **)regs->ecx, (char **)regs->edx);
@@ -157,7 +152,7 @@ void syscall_handler (registers_t *regs)
 		case SYS_RT_SIGSUSPEND:
 		case SYS_SIGSUSPEND:
 			printf("IN syscall\n");
-			dump_regs(regs);
+			registers_dump(regs);
 			regs->eax = sys_sigsuspend((void*)regs->ebx);
 			break;
 		case SYS_RT_SIGRETURN:

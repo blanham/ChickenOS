@@ -1,4 +1,3 @@
-#include <common.h>
 #include <string.h>
 
 #define UNAME_LEN 65

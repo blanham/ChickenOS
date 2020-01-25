@@ -1,7 +1,7 @@
-#include <common.h>
-#include <device/video.h>
-#include <device/video/vga.h>
-#include <device/video/bochs_vga.h>
+#include <chicken/common.h>
+#include <chicken/device/video.h>
+#include <chicken/device/video/vga.h>
+#include <chicken/device/video/bochs_vga.h>
 
 void video_init(struct kernel_boot_info *info)
 {

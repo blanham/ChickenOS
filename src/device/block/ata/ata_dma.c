@@ -1,14 +1,8 @@
-#include <kernel/common.h>
-#include <sys/stat.h>
-#include <chicken/time.h>
-#include <device/pci.h>
-#include <kernel/memory.h>
-#include <kernel/hw.h>
-#include <kernel/interrupt.h>
-#include <mm/vm.h>
-#include <mm/liballoc.h>
-#include <fs/vfs.h>
-#include <device/ata.h>
+#include <stdint.h>
+#include <chicken/common.h>
+#include <chicken/device/block/ata.h>
+//#include <device/pci.h>
+//#include <fs/vfs.h>
 
 struct prd {
 	uint32_t phys_address;

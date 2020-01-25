@@ -1,11 +1,11 @@
-#include <kernel/hw.h>
+#include <chicken/device/ioport.h>
 
-/* taken from: http://www.jamesmolloy.co.uk/ */
-// FIXME: Shouldn't these be inlined?
+// TODO: replace these with assembly
 void outb(uint16_t port, uint8_t value)
 {
 	asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
 }
+
 void outw(uint16_t port, uint16_t value)
 {
 	asm volatile ("outw %1, %0" : : "dN" (port), "a" (value));
@@ -37,6 +37,7 @@ uint32_t inl(uint16_t port)
 	return ret;
 }
 
+// TODO: move this elsewhere
 /* shutsdown qemu/bochs */
 void shutdown()
 {
@@ -50,4 +51,3 @@ void shutdown()
 	while(1)
 	asm volatile ("hlt");
 }
-

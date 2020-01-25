@@ -4,19 +4,16 @@
  *
  */
 
-
-
-
-
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <device/pci.h>
-#include <net/net_core.h>
-#include <kernel/hw.h>
-#include <mm/vm.h>
-#include <mm/paging.h>
-#include <kernel/memory.h>
-#include <device/net/e1000.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/device/ioport.h>
+#include <chicken/device/pci.h>
+#include <chicken/device/net/e1000.h>
+#include <chicken/mm/vm.h>
+#include <chicken/mm/paging.h>
+#include <chicken/net/net_core.h>
+
 struct e1000 *e1000_global;
 #define E1000_DEV 0x100E
 
@@ -131,7 +128,7 @@ void e1000_received(struct e1000 *e)
 		uint16_t len = e->rx_descs[e->rx_cur]->length;
 
 		sb = sockbuf_alloc(e->dev, len);
-		kmemcpy(sb->data, buf, len);
+		memcpy(sb->data, buf, len);
 		network_received(sb);
 		e->rx_descs[e->rx_cur]->status = 0;
 		old_cur = e->rx_cur;

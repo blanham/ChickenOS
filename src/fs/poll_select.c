@@ -1,21 +1,10 @@
-#include <common.h>
-//#include <stdint.h>
 #include <stddef.h>
-//#include <string.h>
-//#include <stdio.h>
-//#include <chicken/thread.h>
-//#include <kernel/memory.h>
-//#include <mm/vm.h>
-//#include <fs/vfs.h>
-//#include <fs/ext2/ext2.h>
-//#include <mm/liballoc.h>
-//#include <thread/syscall.h>
-//#include <sys/stat.h>
-//#include <fcntl.h>
 #include <errno.h>
 #include <sys/uio.h>
 #include <sys/select.h>
 #include <poll.h>
+#include <chicken/common.h>
+
 int poll_toggle_hack = 0;
 int sys_poll(struct pollfd *fds UNUSED, nfds_t nfds UNUSED, int timeout UNUSED)
 {

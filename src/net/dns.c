@@ -1,8 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
+#include <chicken/net/net_core.h>
 
 struct dns {
 	uint16_t id;
@@ -42,7 +41,7 @@ char *dns_breakstr(char *name)
 	{
 		cnt = strlen(p);
 		*out++ = cnt;
-		kmemcpy(out, p, cnt);
+		memcpy(out, p, cnt);
 		out += cnt;
 
 		p = strtok_r (NULL, ".", &save);
@@ -66,7 +65,7 @@ void dns_sendquery(struct network_dev *dev, char * name)
 	dns->num_ques = htons(1);
 	dom = dns_breakstr(name);
 	len += strlen(dom) + 1;
-	kmemcpy(queries, dom, strlen(dom) + 1);
+	memcpy(queries, dom, strlen(dom) + 1);
 	foot = (void *)((uint8_t*)dns + len);
 	foot->type = htons(1);
 	foot->class = htons(1);

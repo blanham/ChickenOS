@@ -1,14 +1,17 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
-#include <net/dhcp.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/mm/liballoc.h>
+#include <chicken/net/net_core.h>
+#include <chicken/net/dhcp.h>
+
 //#define DHCP_DEBUG
 #ifdef DHCP_DEBUG
 	#define DPRINTF(fmt, ...) printf("DHCP:" fmt,  ## __VA_ARGS__);
 #else
 	#define DPRINTF(fmt, ...) 
 #endif
+
 struct dhcp_message {
 	uint8_t op;
 	uint8_t htype;
@@ -52,7 +55,7 @@ int  dhcp_getoption(struct dhcp_message *dhcp, uint8_t msg, void *out, size_t le
 	}	
 	if(len == 0)
 	len = options[1];
-	kmemcpy(out, options  +2, len);
+	memcpy(out, options  +2, len);
 	return 0;
 }
 void dhcp_populateheader(struct network_dev *dev, struct dhcp_message *dhcp, uint8_t **options, uint8_t op, uint8_t msg)
@@ -60,9 +63,9 @@ void dhcp_populateheader(struct network_dev *dev, struct dhcp_message *dhcp, uin
 	dhcp->op = op;
 	dhcp->htype = 1;
 	dhcp->hlen = 6;
-	kmemcpy(&dhcp->xid,&dev->mac[2], 4);
-	kmemcpy(dhcp->chaddr, dev->mac, 6);
-	kmemcpy(*options, magic, 4);
+	memcpy(&dhcp->xid,&dev->mac[2], 4);
+	memcpy(dhcp->chaddr, dev->mac, 6);
+	memcpy(*options, magic, 4);
 	*options+=4;
 	
 	*(*options)++ = 0x35;
@@ -97,12 +100,12 @@ void dhcp_release(struct network_dev *dev)
 	//ask for certain ip address
 	*options++ = 0x32;
 	*options++ = 0x04;
-	kmemcpy(options, &dev->ip, 4);
+	memcpy(options, &dev->ip, 4);
 	options+=4;
 	*options++ = 0x3d;
 	*options++ = 0x07;
 	*options++ = 0x01;
-	kmemcpy(options, (void *)dev->mac, 6);
+	memcpy(options, (void *)dev->mac, 6);
 	options +=6;
 
 	dhcp_endheader(&options);

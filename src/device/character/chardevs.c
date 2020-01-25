@@ -5,12 +5,13 @@
  * 		 kmem/mem should probably do verification that given
  * 		 	memory is read/writeable
  */
-#include <common.h>
 #include <errno.h>
-#include <memory.h>
+#include <string.h>
 #include <sys/stat.h>
-#include <fs/vfs.h>
-#include <mm/vm.h>
+#include <chicken/common.h>
+#include <chicken/fs/device.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/vm.h>
 
 size_t chardevs_read(struct inode *inode, uint8_t *buf, size_t count, off_t off)
 {
@@ -23,7 +24,7 @@ size_t chardevs_read(struct inode *inode, uint8_t *buf, size_t count, off_t off)
 		case 1: //mem (Physical)
 			ptr = P2V(ptr);
 		case 2: //kmem (Virtual)
-			kmemcpy(buf, ptr, count);
+			memcpy(buf, ptr, count);
 			return count;
 		case 3: //null
 			return 0;
@@ -31,11 +32,11 @@ size_t chardevs_read(struct inode *inode, uint8_t *buf, size_t count, off_t off)
 			return -EINVAL;
 		case 7: //full
 		case 5: //zero
-			kmemset(buf, 0x00, count);
+			memset(buf, 0x00, count);
 			return count;
 		//FIXME: Add random numbers
 		case 8: case 9: //random | urandom
-			kmemset(buf, 4, count);
+			memset(buf, 4, count);
 			return count;
 	}
 	printf("Invalid read of character device 0x1%.2X\n", MINOR(dev));
@@ -52,7 +53,7 @@ size_t chardevs_write(struct inode *inode, uint8_t *buf, size_t count, off_t off
 		case 1: //mem (Physical)
 			ptr = P2V(ptr);
 		case 2: //kmem (Virtual)
-			kmemcpy(ptr, buf, count);
+			memcpy(ptr, buf, count);
 			return count;
 		case 4: //port
 			return -EINVAL;

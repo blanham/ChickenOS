@@ -1,12 +1,7 @@
-/*	ChickenOS - interrupt.c
+/*	ChickenOS - interrupt.c - most of the guts are in in the i386 code atm
  */
-#include <common.h>
-#include <stdio.h>
-#include <chicken/thread.h>
-#include <kernel/hw.h>
-#include <kernel/interrupt.h>
-#include <kernel/memory.h>
-#include <device/console.h>
+#include <chicken/common.h>
+#include <chicken/interrupt.h>
 
 static enum intr_status interrupt_status = INTR_DISABLED;
 

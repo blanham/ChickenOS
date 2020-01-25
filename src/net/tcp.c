@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
+#include <stdlib.h>
+#include <chicken/net/net_core.h>
+
 enum tcp_states {CLOSED, LISTEN, SYN_RCVD, SYN_SENT, ESTABLISHED, FIN_WAIT_1, FIN_WAIT_2,CLOSE_WAIT, CLOSING, LAST_ACK,TIME_WAIT, BREAK};
 
 struct tcp_state {

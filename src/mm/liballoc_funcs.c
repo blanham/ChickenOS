@@ -1,8 +1,7 @@
-#include <kernel/common.h>
-#include <kernel/interrupt.h>
 #include <stddef.h>
-#include <mm/vm.h>
-#include <mm/liballoc.h>
+#include <chicken/interrupt.h>
+#include <chicken/mm/liballoc.h>
+#include <chicken/mm/vm.h>
 
 enum intr_status alloc_intr_status = INTR_DISABLED;
 
@@ -18,11 +17,9 @@ int liballoc_unlock() {
 }
 
 void* liballoc_alloc(size_t pages) {
-	serial_printf("PAGES liballoc %i\n", pages);
 	return pallocn(pages);
 }
 
 int liballoc_free(void* ptr, size_t pages) {
 	return pallocn_free(ptr, pages);
 }
-

@@ -1,11 +1,11 @@
 /*	ChickenOS - i386/interrupt.c
  */
 
-#include <common.h>
 #include <stdio.h>
+#include <string.h>
+#include <chicken/common.h>
 #include <chicken/thread.h>
-#include <kernel/memory.h>
-#include <thread/syscall.h>
+#include <chicken/thread/syscall.h>
 #include <arch/i386/pic.h>
 #include <arch/i386/interrupt.h>
 #include "i386_defs.h"
@@ -41,7 +41,7 @@ static void void_handler(registers_t *regs)
 
 static void i386_syscall_handler(registers_t *regs)
 {
-	//dump_regs(regs);
+	//registers_dump(regs);
 	thread_current()->registers = regs;
 	syscall_handler(regs);
 }
@@ -51,7 +51,7 @@ static void gpf(registers_t *regs)
 	// TODO: Still would love to make this work again
 	// console_set_color(LT_GREY,WHITE);
 	printf("PID: %i\n",thread_current()->pid);
-	dump_regs(regs);
+	registers_dump(regs);
 	BOCHS_BREAK();
 	PANIC("GENERAL PROTECTION FAULT!");
 }
@@ -65,35 +65,35 @@ static void page_fault(registers_t * regs)
 
 static void double_fault(registers_t * regs)
 {
-	dump_regs(regs);
+	registers_dump(regs);
 	BOCHS_BREAK();
 	PANIC("DOUBLE FAULT!");
 }
 
 static void invalid_opcode(registers_t * regs)
 {
-	dump_regs(regs);
+	registers_dump(regs);
 	BOCHS_BREAK();
 	PANIC("INVALID OPCODE!");
 }
 
 static void divide_error(registers_t * regs)
 {
-	dump_regs(regs);
+	registers_dump(regs);
 	BOCHS_BREAK();
 	PANIC("DIVISION BY ZERO!");
 }
 
 static void stack_exception(registers_t * regs)
 {
-	dump_regs(regs);
+	registers_dump(regs);
 	BOCHS_BREAK();
 	PANIC("STACK EXCEPTION!");
 }
 
 static void other_exception(registers_t * regs)
 {
-	dump_regs(regs);
+	registers_dump(regs);
 	BOCHS_BREAK();
 	PANIC("UNHANDLED EXCEPTION!");
 }
@@ -118,7 +118,7 @@ void idt_init()
 {
 	idt_ptr.base = (uintptr_t)&idt_table;
 	idt_ptr.limit = sizeof(idt_entry_t)*256 - 1;
-	kmemset(idt_table, 0, sizeof(idt_entry_t) * NUM_INTRS);
+	memset(idt_table, 0, sizeof(idt_entry_t) * NUM_INTRS);
 }
 
 static void idt_build_entry(idt_entry_t *entry, void *func, uint16_t sel, uint8_t flags)
@@ -181,15 +181,4 @@ void arch_interrupt_enable()
 void arch_interrupt_disable()
 {
 	asm volatile ("cli");
-}
-
-void dump_regs(registers_t *regs)
-{
-	serial_printf("PID %i\n", thread_current()->pid);
-	serial_printf("edi %X esi %X ebp %X esp %X\nebx %X edx %X ecx %X eax %X\n",
-		regs->edi,regs->esi,regs->ebp,regs->esp,regs->ebx,regs->edx,regs->ecx,regs->eax);
-	serial_printf("ds %X es %X fs %X gs %X int_no %i err_code %X\n",
-		regs->ds,regs->es,regs->fs,regs->gs,regs->int_no,regs->err_code);
-	serial_printf("eip %X cs %X eflags %X useresp %X ss %X\n",
-		regs->eip, regs->cs, regs->eflags, regs->useresp, regs->ss);
 }

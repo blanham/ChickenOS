@@ -1,6 +1,5 @@
 #ifndef C_OS_FS_EXT2FS_DEFS_H
 #define C_OS_FS_EXT2FS_DEFS_H
-#include <fs/vfs.h>
 
 // inodes are indexed starting at 1
 #define INODE(x) (x-1)

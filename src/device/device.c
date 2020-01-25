@@ -1,15 +1,14 @@
 /*	ChickenOS - fs/device.c - generic block/char device layer
  *	Needs a bit of work
  */
-#include <common.h>
-#include <memory.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/stat.h>
-#include <fs/device.h>
-#include <fs/vfs.h>
-#include <mm/liballoc.h>
+#include <chicken/common.h>
+#include <chicken/fs/device.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/liballoc.h>
 
 #define MAX_DEVICES 20
 

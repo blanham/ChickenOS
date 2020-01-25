@@ -1,6 +1,5 @@
-#include <common.h>
-#include <mm/vm.h>
-#include <kernel/memory.h>
+#include <string.h>
+#include <chicken/common.h>
 #include "i386_defs.h"
 
 #define GDT_CNT 9
@@ -45,7 +44,7 @@ void gdt_init(void)
 	gdt_set_entry(7, 0, 0, 0, 0);
 	gdt_set_entry(8, 0, 0, 0, 0);
 
-	kmemset(&tss, 0, 104);
+	memset(&tss, 0, 104);
 	tss.ss0  = 0x10;
 	tss.cs = 0xb;
 	tss.ss = tss.ds = tss.es = tss.fs = tss.gs = 0x13;
@@ -55,7 +54,6 @@ void gdt_init(void)
 	asm volatile ("":::"memory");
 	gdt_flush(&gdt_desc);
 }
-
 
 void gdt_floosh() {
 	asm volatile ("":::"memory");

@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/net/net_core.h>
 
 #ifdef UDP_DEBUG
 #define DPRINTF(fmt, ...) 
@@ -10,15 +10,15 @@
 	#define DPRINTF(fmt, ...) 
 #endif
 
-
-
 extern void hex_dump(void *ptr, int n);
+
 struct udp {
 	uint16_t src;
 	uint16_t dst;
 	uint16_t length;
 	uint16_t checksum;
 };
+
 struct udp_bound {
 	uint16_t port;
 	uint32_t num;
@@ -45,8 +45,6 @@ void udp_print(struct udp *udp)
 	printf("src %i dst %i length %x\n",ntohs(udp->src), ntohs(udp->dst),ntohs(udp->length));
 }
 
-
-
 uint16_t udp_get_next_ephermeral()
 {
 	static uint16_t port = 41592;
@@ -56,6 +54,7 @@ uint16_t udp_get_next_ephermeral()
 
 
 }
+
 void udp_send2(struct sockbuf *sb, uint16_t src, uint16_t dst)
 {
 	struct udp *udp = kmalloc(sizeof(*udp) + sb->p_len);
@@ -65,11 +64,12 @@ void udp_send2(struct sockbuf *sb, uint16_t src, uint16_t dst)
 	udp->length = htons(sb->length + sizeof(*udp));
 	udp->checksum = 0;
 	sb->transport = udp;
-	kmemcpy(pay, sb->payload, sb->p_len);
+	memcpy(pay, sb->payload, sb->p_len);
 	sb->t_len = sizeof(*udp) + sb->p_len;
 	sb->t_proto = 0x11;
 	ip_send2(sb);
 }
+
 void udp_received(struct sockbuf *sb)
 {
 	struct udp *udp = sb->transport;
@@ -105,10 +105,11 @@ bound:
 	rx->src = ntohs(udp->src);
 	rx->length = ntohs(udp->length);
 	rx->data = kmalloc(rx->length);
-	kmemcpy(rx->data, sb->payload, rx->length);
+	memcpy(rx->data, sb->payload, rx->length);
 	TAILQ_INSERT_HEAD(&udp_cache, rx, elem);
 	
 }
+
 size_t udp_receive(uint32_t num, uint8_t *buf, size_t len)
 {
 	struct udp_bound *iter;
@@ -140,12 +141,13 @@ good:
 		kfree(rx);
 		return -1;
 	}
-	kmemcpy(buf, rx->data, rx_len);
+	memcpy(buf, rx->data, rx_len);
 	kfree(rx->data);
 	kfree(rx);
 	return rx_len;		
 
 }
+
 uint32_t udp_bind(struct network_dev *dev, uint16_t port)
 {
 	static uint32_t num = 0;

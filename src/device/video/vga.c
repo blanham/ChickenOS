@@ -1,10 +1,10 @@
-#include <common.h>
 #include <stdint.h>
-#include <hw.h>
-#include <memory.h>
-#include <device/tty.h>
-#include <device/video.h>
-#include <device/video/vga.h>
+#include <chicken/common.h>
+#include <chicken/device/ioport.h>
+#include <chicken/device/tty.h>
+#include <chicken/device/video.h>
+#include <chicken/device/video/vga.h>
+#include <chicken/memory.h> // XXX: This is deprecated
 
 #define EGA_TEXT_BASE 0xC00B8000
 #define EGA_TEXT_LENGTH 80*25*2

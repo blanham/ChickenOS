@@ -1,18 +1,17 @@
-#include <common.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
-#include <memory.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
+#include <chicken/common.h>
+#include <chicken/fs/dentry.h>
+#include <chicken/fs/device.h>
+#include <chicken/fs/ext2/ext2.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/vm.h>
+#include <chicken/mm/liballoc.h>
 #include <chicken/thread.h>
-#include <fs/dentry.h>
-#include <fs/ext2/ext2.h>
-//#include <fs/partition.h>
-#include <fs/vfs.h>
-#include <mm/vm.h>
-#include <mm/liballoc.h>
 
 #define DENTRY_CACHE_LEN 	1024
 #define DENTRY_CACHE_MASK	(DENTRY_CACHE_LEN-1)
@@ -105,9 +104,9 @@ int dcache_pathsearch(const char *path, dentry_t **lookup, dentry_t *override_pa
 	}
 
 	const char *p = path;
-	dentry_t *cur = thread_current()->file_info->cur;
+	dentry_t *cur = thread_current()->fs_info->cur;
 	if (*p == '/') {
-		cur = thread_current()->file_info->root;
+		cur = thread_current()->fs_info->root;
 		p++;
 	} else if (override_parent != NULL) {
 		cur = override_parent;
@@ -250,8 +249,8 @@ void vfs_mount_root(uint16_t dev, char *type)
 
 
 	thread_t *cur = thread_current();
-	cur->file_info->root = root_dentry;
-	cur->file_info->cur = root_dentry;
+	cur->fs_info->root = root_dentry;
+	cur->fs_info->cur = root_dentry;
 
 	printf("Mounted %s fs @ dev %i:%i as root\n",type, MAJOR(dev),MINOR(dev));
 	return;

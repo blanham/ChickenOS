@@ -1,3 +1,4 @@
+/*
 #include <common.h>
 #include <device/usb.h>
 #include <device/usb/uhci.h>
@@ -138,9 +139,8 @@ struct uhci_controller * uhci_init()
 			new->frames[i].terminate = 1;
 		}
 
-		/* first we need to write to the legacy register in
-		 * the PCI config space
-		 */
+		// first we need to write to the legacy register in
+		// the PCI config space
 		pci_reg_outw(new->pci, UHCI_PCI_LEGACY/4, 0x8f00);
 
 		//Issue a HCRESET
@@ -242,3 +242,4 @@ void uhci_handler(void *uhci_ptr)
 	printf("uhci interrupt\n");
 
 }
+*/

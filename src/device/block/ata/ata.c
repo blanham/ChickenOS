@@ -1,13 +1,13 @@
-#include <common.h>
-#include <memory.h>
-#include <chicken/time.h>
-#include <device/ata.h>
-#include <device/pci.h>
-#include <fs/vfs.h>
-#include <kernel/interrupt.h>
-#include <mm/vm.h>
+#include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <chicken/common.h>
+#include <chicken/device/block/ata.h>
+#include <chicken/device/pci.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/interrupt.h>
+#include <chicken/mm/vm.h>
+#include <chicken/time.h>
 
 // TODO: Add spinlock to protect r/w sector calls
 
@@ -209,7 +209,7 @@ void ata_device_init(ata_dev_t *dev)
 	// Dump id to serial log
 	ata_dump_identify(id);
 
-	kmemcpy(&dev->name, id->model_num, 40);
+	memcpy(&dev->name, id->model_num, 40);
 
 	// FIXME: No LBA48 support yet
 	//if (id->sectors_lba48) {

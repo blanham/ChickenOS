@@ -2,12 +2,12 @@
  * TODO:
  * Cleanup
  */
-#include <common.h>
-#include <device/console.h>
-#include <device/tty.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <chicken/common.h>
+#include <chicken/device/console.h>
+#include <chicken/device/tty.h>
 
 void putc(char c)
 {

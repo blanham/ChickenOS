@@ -1,2 +1,1 @@
-#include <common.h>
-#include <device/block/scsi.h>
+#include <chicken/device/block/scsi.h>

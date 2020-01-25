@@ -1,8 +1,8 @@
-#include <common.h>
-#include <sys/types.h>
 #include <errno.h>
-#include <chicken/thread.h>
+#include <sys/types.h>
 #include <arch/i386/interrupt.h>
+#include <chicken/common.h>
+#include <chicken/thread.h>
 
 // NOTE: Might be worth using a macro for these?
 uid_t sys_getegid()
@@ -67,40 +67,6 @@ int sys_setgid(gid_t gid)
 	return 0;
 }
 
-//XXX: This and sbrk should be using the memregion interface
-int sys_brk(void *_addr)
-{
-	thread_t *cur = thread_current();
-	uintptr_t addr = (uintptr_t)_addr;
-	serial_printf("BRK %X\n", addr);
-	if(addr == 0)
-	{
-		return (int)cur->mm->brk;
-	}
-
-	cur->mm->brk = _addr;
-//	printf("addr %x cur %x\n", addr, cur->brk);
-//	cur->brk = (void *)((uintptr_t)0x8000000 + (uintptr_t)addr);
-	return (int)addr;
-}
-
-//FIXME: Needs more error/bounds checking
-void *sys_sbrk(intptr_t ptr)
-{
-	printf("SBRK\n");
-	PANIC("SRBK");
-	void * old;
-	thread_t *cur = thread_current();
-
-	if (ptr == 0) {
-		return cur->mm->brk;
-	} else {
-		old = cur->mm->brk;
-		cur->mm->brk = cur->mm->brk + ptr;
-		return old;
-	}
-}
-
 void sys_exit(int exit_code)
 {
 	thread_exit(exit_code);
@@ -110,46 +76,6 @@ void sys_exit(int exit_code)
 void sys_exit_group(int return_code)
 {
 	(void)return_code;
-}
-
-//FIXME: Busy waiting :c
-pid_t sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage)
-{
-	(void)pid; (void)status; (void)options; (void)rusage;
-	thread_t *cur = thread_current();
-	thread_t *child;
-	pid_t ret = 0;
-//	printf("STATUS %i\n", *status);
-
-	while(1)
-	{
-		LL_FOREACH2(cur->children, child, child_next)
-		{
-			ret = child->pid;
-			if(child->status == THREAD_DEAD)
-			{
-				//printf("Child %x %i\n", child, child->pid);
-				cur->children = NULL;
-				*status = 0x80;
-				return ret;
-			}
-
-		}
-		if(ret)
-		{
-			if(options & WNOHANG)
-				return 0;
-			//wait
-			if(!sigismember(&cur->sig_info->pending, SIGCHLD))
-				continue;
-			else
-				return -EINTR;
-		}
-
-		return -ECHILD;
-	}
-	PANIC("lulz\n");
-	return -ECHILD;
 }
 
 

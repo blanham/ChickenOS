@@ -4,10 +4,8 @@
  * 	Contains commonly used routines such as kprintf and PANIC, and macros such as UNUSED
  */
 #include <stdbool.h>
-
-//fix this once I have a kernel printf
-#include <device/console.h>
 #include <stdio.h>
+#include <chicken/device/console.h>
 
 #ifdef ARCH_ARM
 #include <arch/arm/common.h>
@@ -71,7 +69,9 @@ static inline void panic(char *file, int line,char* msg)
 	print_stack_trace();
 	kernel_halt();
 }
+
 #define ASSERT(condition, msg) kassert(__FILE__, __LINE__,condition, msg, __func__)
+
 static inline void
 kassert(char *file, int line, bool condition, char *msg, const char *function)
 {

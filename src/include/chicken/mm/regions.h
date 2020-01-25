@@ -2,7 +2,7 @@
 #define C_OS_CHICKEN_MM_REGIONS_H
 #include <stdatomic.h>
 #include <stdint.h>
-#include <fs/dentry.h>
+#include <chicken/fs/dentry.h>
 
 #define MM_PRESENT	0x0001
 #define MM_WRITE	0x0002

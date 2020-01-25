@@ -1,6 +1,6 @@
 #ifndef C_OS_DEVICE_VIDEO_BOCHS_VGA_H
 #define C_OS_DEVICE_VIDEO_BOCHS_VGA_H
-#include <device/console.h>
+#include <chicken/device/console.h>
 
 #define VBE_DISPI_IOPORT_INDEX 	0x01CE
 #define VBE_DISPI_IOPORT_DATA 	0x01CF

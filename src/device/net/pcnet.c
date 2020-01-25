@@ -3,16 +3,16 @@
  *
  */
 
-#include <common.h>
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <device/net/pcnet.h>
-#include <device/pci.h>
-#include <net/net_core.h>
-#include <kernel/hw.h>
-#include <mm/vm.h>
-#include <kernel/memory.h>
-//#include "rtl8139.h"
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/common.h>
+#include <chicken/device/ioport.h>
+#include <chicken/device/pci.h>
+#include <chicken/device/net/pcnet.h>
+#include <chicken/mm/vm.h>
+#include <chicken/net/net_core.h>
+
 //http://code.google.com/searchframe#gufiwQeQ0iA/trunk/boot/u-boot-1.1.4/drivers/pcnet.c&q=pcnet&ct=rc&cd=3
 
 #define PCNET_RDPW	0x10
@@ -55,6 +55,43 @@ char pkt[] = {
 0x29, 0x53, 0x9d, 0x79, 0x0a, 0x78, 0x9b, 0x8c, 
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x78, 
 0x9b, 0x01 };
+
+
+
+// TODO: remove these and replace with new IO port interface
+
+static inline uint8_t pcnet_inb(struct pcnet *l, uint8_t port)
+{
+	return inb(l->io_base + port);
+}
+
+//static inline uint16_t pcnet_inw(struct pcnet *l, uint8_t port)
+//{
+//	return inw(l->io_base + port);
+//}
+
+static inline uint32_t pcnet_inl(struct pcnet *l, uint8_t port)
+{
+	return inl(l->io_base + port);
+}
+
+//static inline void pcnet_outb(struct pcnet *l, uint8_t port, uint8_t value)
+//{
+//	outb(l->io_base + port, value);
+//}
+
+//static inline void pcnet_outw(struct pcnet *l, uint8_t port, uint16_t value)
+//{
+//	outw(l->io_base + port, value);
+//}
+
+static inline void pcnet_outl(struct pcnet *l, uint8_t port, uint32_t value)
+{
+	outl(l->io_base + port, value);
+}
+
+
+
 
 void pcnet_csr_outw(struct pcnet *l, uint16_t addr, uint16_t val)
 {
@@ -127,7 +164,7 @@ size_t pcnet_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 {
 	struct pcnet *l = dev->device;
 //	interrupt_disable();	
-	kmemcpy(l->tx_buffers[l->cur_tx], _buf, length);
+	memcpy(l->tx_buffers[l->cur_tx], _buf, length);
 	l->tx_descs[l->cur_tx].addr = (uintptr_t)V2P(l->tx_buffers[l->cur_tx]);
 	l->tx_descs[l->cur_tx].flags2 = 0;
 	l->tx_descs[l->cur_tx].status |= 0x8300;
@@ -146,8 +183,8 @@ struct network_dev *temp_net;
 void send_packet()//truct rtl8139 *rtl)
 {
 //	uint8_t *test = kmalloc(60);
-//	kmemcpy(test, packet, 60);
-//	kmemcpy(&test[6], global->mac,6);
+//	memcpy(test, packet, 60);
+//	memcpy(&test[6], global->mac,6);
 //	pcnet_send(temp_net, (uint8_t*)test, 60);
 //	kfree(test);
 }
@@ -178,7 +215,7 @@ void pcnet_receive(struct pcnet *l)
 			len = l->rx_descs[l->cur_rx].flags2 & 0xFFFF;
 			buf = l->rx_buffers[l->cur_rx];
 			sb = sockbuf_alloc(l->dev, len);
-			kmemcpy(sb->data, buf, len);
+			memcpy(sb->data, buf, len);
 			network_received(sb);
 		}	
 
@@ -246,7 +283,7 @@ void pcnet_start2(struct pcnet *l)
 	pcnet_bcr_outl(l, 20, 0x0102);
 
 	pcnet_getmac(l, (char *)&mac);
-	kmemcpy(global->mac, mac, 6);
+	memcpy(global->mac, mac, 6);
 	print_mac((char *)mac);
 
 	//5) Stop card

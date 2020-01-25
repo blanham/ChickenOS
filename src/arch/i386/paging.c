@@ -4,12 +4,12 @@
  * 		 Maybe a bit more cleanup
  */
 
-#include <common.h>
-#include <mm/vm.h>
-#include <kernel/memory.h>
+#include <string.h>
+#include <chicken/common.h>
+#include <chicken/mm/vm.h>
 #include "i386_defs.h"
 
-//Might make more sense to put these into the asm file
+//Might make more sense to put this into the asm file
 uint32_t kernel_pd[1024] __attribute__((aligned (4096)));
 
 //XXX: Not sure if I want to bother with this here, should be somewhere else anyway
@@ -19,14 +19,14 @@ uint32_t kernel_pd[1024] __attribute__((aligned (4096)));
 uint32_t *pagedir_alloc()
 {
 	uint32_t *new = palloc();
-	kmemcpy(new, kernel_pd, PAGE_SIZE);
+	memcpy(new, kernel_pd, PAGE_SIZE);
 	return new;
 }
 
 uint32_t *pagetable_alloc()
 {
 	uint32_t *new = palloc();
-	kmemset(new, 0, PAGE_SIZE);
+	memset(new, 0, PAGE_SIZE);
 	return new;
 }
 
@@ -64,6 +64,18 @@ void pagedir_map(uint32_t *pd, uintptr_t kvaddr, uintptr_t vaddr, bool rw)
 
 	uint32_t *pt = P2V(*pde & PAGE_MASK);
 	pt[pt_idx] = (uintptr_t)V2P(kvaddr) | (rw ? PTE_RW : 0) | PTE_USER | PTE_P;
+}
+
+void pagedir_map2(uint32_t *pd, uintptr_t kvaddr, uintptr_t vaddr, bool rw, bool present)
+{
+	uint32_t pt_idx = (vaddr & PTE_MASK) >> PTE_SHIFT;
+	uint32_t *pde = &pd[vaddr >> PDE_SHIFT];
+
+	if (!(*pde & PDE_P))
+		*pde = (uintptr_t)V2P(palloc()) | PDE_RW | PDE_USER | PDE_P;
+
+	uint32_t *pt = P2V(*pde & PAGE_MASK);
+	pt[pt_idx] = (uintptr_t)V2P(kvaddr) | (rw ? PTE_RW : 0) | PTE_USER | (present ? PTE_P : 0);
 }
 
 void pagedir_map_kernel(uintptr_t kvaddr, uintptr_t vaddr, bool rw)
@@ -132,7 +144,7 @@ uint32_t *pagedir_clone(uint32_t *pd)
 				//mark all pages as read only
 				//old_pt[i] &= ~PTE_RW;
 				void * new = palloc();
-				kmemcpy(new, P2V(old_pt[i] &PAGE_MASK), PAGE_SIZE);
+				memcpy(new, P2V(old_pt[i] &PAGE_MASK), PAGE_SIZE);
 				new_pt[i] = (uintptr_t)V2P(new) | (old_pt[i] & ~PAGE_MASK) ;
 
 			}
@@ -144,7 +156,7 @@ uint32_t *pagedir_clone(uint32_t *pd)
 
 void paging_init(uint32_t mem_size)
 {
-	kmemset(kernel_pd, 0, PAGE_SIZE);
+	memset(kernel_pd, 0, PAGE_SIZE);
 
 	for (uintptr_t i = PHYS_BASE; i < PHYS_BASE + mem_size; i += PAGE_SIZE) {
 		pagedir_map(kernel_pd, i, i, true);

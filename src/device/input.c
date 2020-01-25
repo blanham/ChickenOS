@@ -1,6 +1,6 @@
-#include <common.h>
-#include <device/input.h>
-#include <interrupt.h>
+#include <chicken/common.h>
+#include <chicken/device/input.h>
+#include <chicken/interrupt.h>
 
 char input_buf[256];
 int queue_pos = 0;

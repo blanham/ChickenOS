@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <chicken/fs/vfs.h>
 #include "ext2fs_defs.h"
 
 void ext2_superblock_dump(ext2_superblock_t *sb)

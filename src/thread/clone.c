@@ -1,35 +1,292 @@
-#include <common.h>
-#include <chicken/thread.h>
-#include <kernel/interrupt.h>
-#include <arch/i386/interrupt.h> // FIXME this import should be made redundant
 #include <errno.h>
+#include <sched.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/mman.h>
+#include <arch/i386/interrupt.h> // FIXME this import should be made redundant
+#include <chicken/common.h>
+#include <chicken/interrupt.h>
+#include <chicken/mm/vm.h>
+#include <chicken/mm/regions.h>
+#include <chicken/thread.h>
 
 void clone_flags_dump(uint32_t flags);
 
+void user_thread_exited(void) __attribute__((section(".user")));
+void user_thread_exited(void)
+{
+	//Should probably call SYSCALL_1N(SYS_EXIT, current_value_of_eax);
+	PANIC("User thread exited!");
+}
+
+pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
+{
+	enum intr_status old_level = interrupt_disable();
+	thread_t *new;
+	uintptr_t esp;
+
+	printf("Creating thread with eip: %x _esp: %x\n", eip, _esp);
+	uintptr_t ebp = 0;
+
+	if(_esp) {
+		thread_t *parent = thread_current();
+		new = thread_new(true);
+	new->mm = mm_clone(parent->mm);
+	new->files = thread_files_alloc(parent->files);
+
+	if (parent->tls != NULL) {
+		//new->tls = kcalloc(17,1);
+		//kmemcpy(new->tls, parent->tls, 17);
+	}
+	memcpy(new->sig_info->signals, parent->sig_info->signals,
+			sizeof(struct k_sigaction) * NUM_SIGNALS);
+
+		esp = _esp;
+		ebp = (uintptr_t)aux;
+		//thread_copy_stackframe(cur, new, 00);
+	thread_build_stackframe((void *)new, eip, esp, ebp);
+	} else {
+		new = thread_new(false);
+		new->mm = mm_alloc();
+		new->files = thread_files_alloc(NULL);
+
+		new->fs_info = kcalloc(sizeof(*new->fs_info), 1);
+		thread_t *cur = thread_current();
+		new->fs_info->cur = cur->fs_info->cur;
+		new->fs_info->root = cur->fs_info->root;
+		new->tgid = 1;
+		//
+		uint32_t *usersp = palloc();
+		memregion_map_data(new->mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN,
+			MAP_GROWSDOWN | MAP_FIXED, usersp);
+
+		usersp += 1024;
+		*--usersp = (uintptr_t)user_thread_exited;
+		*--usersp = (uintptr_t)aux;
+		esp = PHYS_BASE-8;
+		printf("ESP %X USERSP %X\n", esp, usersp);
+	thread_build_stackframe((void *)new, eip, esp, 0);
+	}
+	//XXX: Doesn't handle fork returning new pid
+
+	uint8_t *new_sp = (void*)((uintptr_t)new + STACK_SIZE);
+	// XXX: This is platform specific, and the 5 uint32_t's are so that the stack
+	//		is ready for switch_thread()
+	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + sizeof(uint32_t)*5));
+	serial_printf("CLONE\n");
+	registers_dump((void *)new->sp + (5*4));
+
+	thread_set_ready(new);
+
+	interrupt_set(old_level);
+
+	return new->pid;
+}
+
+thread_t *thread_clone_new(unsigned long flags, void *stack, uintptr_t tls)
+{
+	thread_t *parent = thread_current();
+	thread_t *new = thread_new(true);
+
+	if (flags & CLONE_FILES) {
+		new->files = parent->files;
+		new->files->ref++;
+	} else {
+		new->files = thread_files_alloc(parent->files);
+		new->files->ref++;
+	}
+
+	if (flags & CLONE_FS) {
+		new->fs_info = parent->fs_info;
+		new->fs_info->ref++;
+	} else {
+		new->fs_info = kcalloc(sizeof(*new->fs_info),1);
+		new->fs_info->cur = parent->fs_info->cur;
+		new->fs_info->root = parent->fs_info->root;
+		new->fs_info->ref++;
+	}
+
+	if (flags & CLONE_PARENT) {
+		new->ppid = parent->ppid;
+	} else {
+		new->ppid = parent->pid;
+	}
+
+	if (flags & CLONE_SETTLS) {
+		if (verify_pointer((void *)tls, -1, VP_READ))
+			//return -EFAULT;
+			PANIC("BAD POINTER");
+		thread_set_tls(new, (void *)tls);
+	}
+
+	if (flags & CLONE_SIGHAND) {
+		new->sig_info = parent->sig_info;
+		new->sig_info->ref++;
+	} else {
+		memcpy(new->sig_info->signals, parent->sig_info->signals, sizeof(struct k_sigaction) * NUM_SIGNALS);
+	}
+
+	if (flags & CLONE_SYSVSEM) {
+		// XXX: Implement this when i have SysV semaphores
+	}
+
+	if (flags & CLONE_VFORK) {
+		// XXX: block parent until child exits or execs()
+	}
+
+	if (flags & CLONE_THREAD) {
+		new->tgid = parent->tgid;
+	} else {
+		// put in new thread group
+		new->tgid = new->pid;
+	}
+
+	// NOTE: is there a race here?
+	if (flags & CLONE_VM) {
+		new->mm = parent->mm;
+		new->mm->ref++;
+	} else {
+		new->mm = mm_clone(parent->mm);
+		new->mm->ref++;
+	}
+
+	registers_t *regs = parent->registers;
+	registers_dump(regs);
+	thread_build_stackframe((void *)new, REGS_IP(regs), (uintptr_t)stack, 0);
+
+	uint8_t *new_sp = (void*)((uintptr_t)new + STACK_SIZE);
+	// XXX: This is platform specific, and the 5 uint32_t's are so that the stack
+	//		is ready for switch_thread()
+	// TODO: return the stack pointer from thread_build_stackframe
+	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + sizeof(uint32_t)*5));
+	
+	return new;
+}
+
+struct start_args {
+	void *(*start_func)(void *);
+	void *start_arg;
+	volatile int control;
+	unsigned long sig_mask[_NSIG/8/sizeof(long)];
+};
 
 // XXX: On x86-64 these arguments aren't in the same order?
 //int sys_clone(unsigned long flags, void *stack, int *parent_tid, int *child_tid, unsigned long tls);
+// TODO:
+//      * Check if too many processes are open, return EAGAIN
+// XXX: We need to be sure that another thread isn't exec()ing
 int sys_clone(unsigned long flags, void *stack, int *parent_tid, unsigned long tls, int *child_tid)
 {
+	thread_t *cur = thread_current();
+	int ret = 0;
+
+	struct pthread *test = (void *)parent_tid - 7*4;
+	printf("Address: %p\n", test);
+	//printf("%p %x %p %x %x\n", test->map_base, test->map_size, test->stack, test->stack_size, test->tsd);
+
+	struct start_args *sargs = stack;
+	printf("start func %p arg: %p\n", sargs->start_func, sargs->start_arg);
+	registers_dump(cur->registers);
+
+
+
+
+
+
+	if (flags & CLONE_SIGHAND)
+		if (!(flags & CLONE_VM))
+			return -EINVAL;
+
+	if (flags & CLONE_THREAD)
+		if (!(flags & CLONE_SIGHAND))
+			return -EINVAL;
+
+	// TODO: there's more EINVAL checks to add
+
+	// Who knows if I'll ever support these
+	if ((ret = (flags & CLONE_NEWIPC)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_NEWNET)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_NEWPID)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_NEWUSER)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_NEWUTS)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_NEWCGROUP)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_NEWNS)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_PIDFD)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_PTRACE)))
+		goto unsupported_flag;
+
+	if ((ret = (flags & CLONE_UNTRACED)))
+		goto unsupported_flag;
+
+	// This flag is for advanced IO scheduling that we don't support
+	if ((ret = (flags & CLONE_IO)))
+		goto unsupported_flag;
+
+	enum intr_status old_level = interrupt_disable();
     printf("CLONE: %x %p %p %p %p\n", flags, stack, parent_tid, tls, child_tid);
-    thread_t *cur = thread_current();
     printf("Current TLS:\n");
     if (cur->tls)
         thread_dump_tls(cur->tls);
+	thread_t *new = thread_clone_new(flags, stack, tls);
+
+	if (flags & CLONE_PARENT_SETTID) {
+		*(int *)parent_tid = cur->pid;
+	}
+
+	if (flags & CLONE_CHILD_SETTID) {
+		*(int *)child_tid = new->pid;
+	}
+
+	if (flags & CLONE_CHILD_CLEARTID) {
+		new->clear_child_tid = child_tid;
+	}
+
+	if (flags & CLONE_VFORK) {
+		printf("VFORK doesn't work yet!\n");
+		PANIC("OOPS");
+		return -EINVAL;
+	}
+
+
     printf("New TLS:\n");
     if (tls)
         thread_dump_tls((void *)tls);
     clone_flags_dump(flags);
-    return 0;//-ENOSYS;
+	thread_set_ready(new);
+	interrupt_set(old_level);
+    return new->pid;//-ENOSYS;
+unsupported_flag:
+	serial_printf("CLONE: Unsupported flag: %8x all: %x\n", ret, flags);
+	PANIC("OOPS");
+	return -EINVAL;
 }
 
-pid_t sys_fork(void *aux)
+pid_t sys_fork()
 {
 	// FIXME: 
-	registers_t *regs = aux;
-
-	serial_printf("REGS: User ESP: %X ESP: %X EBP: %X\n", regs->useresp, regs->esp, regs->ebp);
-	return thread_create2(regs->eip, regs->useresp, NULL);
+	registers_t *regs = thread_current()->registers;
+	uint32_t flags = 0;//CLONE_VM | CLONE_FS | CLONE_SIGHAND | 
+	registers_dump(regs);
+	return sys_clone(flags, (void *)REGS_SP(regs), NULL, 0, NULL);
+//	serial_printf("REGS: User ESP: %X ESP: %X EBP: %X\n", regs->useresp, regs->esp, regs->ebp);
+	//return thread_create2(REGS_IP(regs), REGS_SP(regs), NULL);
 }
 
 // This is crap but good enough for now

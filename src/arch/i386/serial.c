@@ -1,8 +1,8 @@
-#include <common.h>
-#include <device/console.h>
-#include <kernel/hw.h>
-#include <interrupt.h>
 #include <arch/i386/serial.h>
+#include <chicken/common.h>
+#include <chicken/device/ioport.h>
+#include <chicken/device/console.h>
+#include <chicken/interrupt.h>
 
 uint16_t com_port = COM1;
 

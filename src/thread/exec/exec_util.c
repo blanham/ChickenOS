@@ -1,6 +1,8 @@
-#include <common.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/common.h>
 #include <chicken/thread.h>
 #include <chicken/thread/exec.h>
 
@@ -22,7 +24,6 @@ executable_t *identify_executable(const char *path, char *const _argv[] UNUSED)
 		return ret;
 	}
 
-
 	// TODO: check permissions here
 
 	uint8_t *magic = kcalloc(4096, 1);
@@ -43,6 +44,7 @@ executable_t *identify_executable(const char *path, char *const _argv[] UNUSED)
 		ret->type = EXE_ELF;
 	}
 
+	ret->dentry = lookup;
 
 	kfree(magic);
 	return ret;

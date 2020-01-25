@@ -1,9 +1,8 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
-#include <queue.h>
+#include <stdlib.h>
 #include <string.h>
+#include <queue.h>
+#include <chicken/net/net_core.h>
 //use stupid timeout for now
 //since i am too lazy to implement
 //a proper clock as of yet
@@ -43,16 +42,16 @@ void arp_send(struct network_dev *dev, uint32_t ip)
 	arp->hlen = 6;
 	arp->plen = 4;
 	arp->op = htons(1);
-	kmemcpy(arp->arp_sha,dev->mac, 6);
-	kmemset(arp->arp_tha,0, 6);
-	kmemcpy(arp->arp_spa,&dev->ip, 4);
-	kmemcpy(arp->arp_tpa,&ip, 4);
+	memcpy(arp->arp_sha,dev->mac, 6);
+	memset(arp->arp_tha,0, 6);
+	memcpy(arp->arp_spa,&dev->ip, 4);
+	memcpy(arp->arp_tpa,&ip, 4);
 
 	sb = sockbuf_alloc(dev, sizeof(*arp));
 	sb->arp = kmalloc(sizeof(*arp));
-	kmemcpy(sb->arp, arp, sizeof(*arp));	
-	kmemcpy(sb->data, arp, sizeof(*arp));	
-	kmemset(sb->dest_mac, 0xff, 6);
+	memcpy(sb->arp, arp, sizeof(*arp));	
+	memcpy(sb->data, arp, sizeof(*arp));	
+	memset(sb->dest_mac, 0xff, 6);
 	sb->length = 42;
 	ethernet_send(sb, ETHERTYPE_ARP);
 	sockbuf_free(sb);
@@ -80,22 +79,22 @@ void arp_received_request(struct sockbuf *sb)
 	if(!ememcmp(arp->arp_tpa, (uint8_t *)&dev->ip, 4))
 	{
 		entry = kmalloc(sizeof(*entry) + 64);
-		kmemcpy(&entry->arp, arp, sizeof(*arp));
+		memcpy(&entry->arp, arp, sizeof(*arp));
 		entry->arp.op = htons(2);
-		kmemcpy(entry->arp.arp_sha,dev->mac, 6);
-		kmemcpy(entry->arp.arp_tha,arp->arp_sha, 6);
-		kmemcpy(entry->arp.arp_spa,arp->arp_tpa, 4);
-		kmemcpy(entry->arp.arp_tpa,arp->arp_spa, 4);
+		memcpy(entry->arp.arp_sha,dev->mac, 6);
+		memcpy(entry->arp.arp_tha,arp->arp_sha, 6);
+		memcpy(entry->arp.arp_spa,arp->arp_tpa, 4);
+		memcpy(entry->arp.arp_tpa,arp->arp_spa, 4);
 		entry->timeout = 0;
 		new_sb = sockbuf_alloc(dev, sizeof(*arp));
 		new_sb->arp = kmalloc(sizeof(*arp));
-		kmemcpy(new_sb->arp, &entry->arp, sizeof(*arp));	
-		kmemcpy(new_sb->data, &entry->arp, sizeof(*arp));	
-		kmemcpy(new_sb->dest_mac, arp->arp_sha, 6);
+		memcpy(new_sb->arp, &entry->arp, sizeof(*arp));	
+		memcpy(new_sb->data, &entry->arp, sizeof(*arp));	
+		memcpy(new_sb->dest_mac, arp->arp_sha, 6);
 		ethernet_send(new_sb, ETHERTYPE_ARP);
 		sockbuf_free(new_sb);
-		kmemcpy(entry->mac, arp->arp_sha, 6);
-		kmemcpy(&entry->ip, arp->arp_spa, 4);
+		memcpy(entry->mac, arp->arp_sha, 6);
+		memcpy(&entry->ip, arp->arp_spa, 4);
 		LIST_INSERT_HEAD(&arp_cache, entry, elem);
 	}
 	LIST_FOREACH(iter, &arp_cache, elem)
@@ -117,15 +116,15 @@ void arp_received_reply(struct sockbuf *sb)
 	struct arp_cache_entry *entry;
 	
 	entry = kmalloc(sizeof(*entry) + 64);
-	kmemcpy(&entry->arp, arp, sizeof(*arp));
+	memcpy(&entry->arp, arp, sizeof(*arp));
 	entry->arp.op = htons(2);
-	kmemcpy(entry->arp.arp_sha,sb->dev->mac, 6);
-	kmemcpy(entry->arp.arp_tha,arp->arp_sha, 6);
-	kmemcpy(entry->arp.arp_spa,arp->arp_tpa, 4);
-	kmemcpy(entry->arp.arp_tpa,arp->arp_spa, 4);
+	memcpy(entry->arp.arp_sha,sb->dev->mac, 6);
+	memcpy(entry->arp.arp_tha,arp->arp_sha, 6);
+	memcpy(entry->arp.arp_spa,arp->arp_tpa, 4);
+	memcpy(entry->arp.arp_tpa,arp->arp_spa, 4);
 	entry->timeout = 0;
-	kmemcpy(entry->mac, arp->arp_sha, 6);
-	kmemcpy(&entry->ip, arp->arp_spa, 4);
+	memcpy(entry->mac, arp->arp_sha, 6);
+	memcpy(&entry->ip, arp->arp_spa, 4);
 	LIST_INSERT_HEAD(&arp_cache, entry, elem);
 	
 	
@@ -175,7 +174,7 @@ int arp_lookup(struct sockbuf *sb, uint32_t ip)//struct network_dev *dev, uint32
 	{
 		if(iter->ip == n_ip)
 		{
-			kmemcpy(sb->dest_mac, iter->mac, 6);
+			memcpy(sb->dest_mac, iter->mac, 6);
 			return 0;
 		}	
 

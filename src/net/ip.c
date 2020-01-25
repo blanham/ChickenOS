@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
+#include <stdlib.h>
+#include <string.h>
 #include <queue.h>
+#include <chicken/net/net_core.h>
 
 //taken from www.netfor2.com/ipsum.htm
 uint16_t cksum(uint16_t *buf, size_t nbytes)
@@ -67,10 +67,10 @@ size_t ip_send(struct network_dev *dev, uint8_t proto,uint8_t *payload, size_t l
 	ip->ip_hl = 5;
 	ip->ip_len = htons(len + ip->ip_hl*4);
 	ip->ip_p = proto;
-	//kmemcpy(&ip->ip_src, our_ip, 4);
+	//memcpy(&ip->ip_src, our_ip, 4);
 	char dest_mac[6] = {0xff,0xff,0xff,0xff,0xff,0xff};
 	ip->ip_sum = cksum((uint16_t*)ip, ip->ip_hl*4);
-	kmemcpy(pay, payload, len);
+	memcpy(pay, payload, len);
 
 	ethernet_send(dev, (uint8_t *)ip, len+sizeof(*ip), ethertype, dest_mac);
 	kfree(ip);	
@@ -105,10 +105,10 @@ void ip_send2(struct sockbuf *sb)
 			goto send_cleanup;
 		}
 	}else{
-		kmemset(sb->dest_mac, 0xff, 6);	
+		memset(sb->dest_mac, 0xff, 6);	
 	}
 
-	kmemcpy(pay, sb->transport, len);
+	memcpy(pay, sb->transport, len);
 	
 	sb->i_len = len + sizeof(*ip);
 	sb->data = ip;

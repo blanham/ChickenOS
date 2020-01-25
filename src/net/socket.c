@@ -1,11 +1,8 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/common.h>
-#include <kernel/memory.h>
-#include <sys/socket.h>
-#include <queue.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <chicken/common.h>
+#include <chicken/net/net_core.h>
 
 int socketfd = 0;
 

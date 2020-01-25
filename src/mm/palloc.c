@@ -4,14 +4,13 @@
  *	FIXME: Seems to deadlock after allocating 225MB worth
  *	of pages
  */
-#include <kernel/common.h>
-#include <mm/vm.h>
-#include <chicken/boot.h>
-#include <kernel/interrupt.h>
-#include <kernel/bitmap.h>
-#include <kernel/memory.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
+#include <chicken/common.h>
+#include <chicken/bitmap.h>
+#include <chicken/boot.h>
+#include <chicken/interrupt.h>
+#include <chicken/mm/vm.h>
 
 
 phys_addr_t palloc_start = 0;
@@ -43,7 +42,7 @@ void palloc_internal_free(void *addr, int pages)
 	//Inspired by Pintos, sets pages to a magic number
 	//so if we accidentally keep using a freed page
 	//we'll know
-	kmemset(addr, 0xBC, PAGE_SIZE * pages);
+	memset(addr, 0xBC, PAGE_SIZE * pages);
 }
 
 void palloc_free(void *addr UNUSED)
@@ -93,21 +92,20 @@ void *palloc_len(size_t len UNUSED)
 //XXX: WTF?
 void palloc_init(struct kernel_boot_info *info)
 {
-	uintptr_t bitmap_ptr = (uintptr_t)info->placement;// + 0x800000;
+	uintptr_t bitmap_ptr = (uintptr_t)info->placement;
 	uint32_t page_count = (info->mem_size)/PAGE_SIZE;
 	uint32_t bitmap_length = (page_count/32) * sizeof(uint32_t);
 
 	uintptr_t start = bitmap_ptr + bitmap_length;
-	//if(start & ~PAGE_MASK)
-	//	start = (start & PAGE_MASK) + PAGE_SIZE;
 
+	// Ensure that we're aligned to a 64KB boundary
 	uint32_t masker = PAGE_SIZE * 16;
 	if(start & (masker-1))
 		start = (start & ~(masker-1)) + masker;
 
 	bitmap_init_phys(&page_bitmap, page_count, (uint32_t *)bitmap_ptr);
 
-	palloc_start = (phys_addr_t)start;// + 0x1000000;
+	palloc_start = (phys_addr_t)start;
 
 	serial_printf("PALLOC START %p bitmap %p\n", palloc_start, bitmap_ptr);
 }

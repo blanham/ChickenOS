@@ -1,11 +1,11 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <device/net/rtl8139.h>
-#include <device/pci.h>
-#include <net/net_core.h>
-#include <kernel/hw.h>
-#include <mm/vm.h>
-#include <kernel/memory.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/device/ioport.h>
+#include <chicken/device/pci.h>
+#include <chicken/device/net/rtl8139.h>
+#include <chicken/mm/vm.h>
+#include <chicken/net/net_core.h>
 #include "rtl8139.h"
 
 struct rtl8139 *global;
@@ -36,9 +36,9 @@ void rtl_receive(struct rtl8139 *rtl)
 
 			if(offset < 0)
 				offset = 0;
-			kmemcpy(sb->data, rtl->rx_buffer + rtl->rx_offset + 4, len - offset);
+			memcpy(sb->data, rtl->rx_buffer + rtl->rx_offset + 4, len - offset);
 			//uintptr_t off2 = len - offset;
-			kmemcpy(sb->data + (len - offset), rtl->rx_buffer, offset);
+			memcpy(sb->data + (len - offset), rtl->rx_buffer, offset);
 			network_received(sb); 
 			
 		}else{
@@ -99,8 +99,8 @@ size_t rtl8139_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 	struct rtl8139 *rtl = dev->device;
 	
 	void* tx_buffer = (void *)(rtl->tx_buffers + 8192*rtl->tx_cur);
-	kmemset(tx_buffer, 0, (length <60) ? 60 : length);
-	kmemcpy(tx_buffer, _buf, length);
+	memset(tx_buffer, 0, (length <60) ? 60 : length);
+	memcpy(tx_buffer, _buf, length);
 		
 	if(length < 60)
 		length = 60;
@@ -128,7 +128,7 @@ void rtl8139_start(struct rtl8139 *rtl)
 	rtl_outb(rtl, 0x37, 0x10);
 	while((rtl_inb(rtl, 0x37) & 0x10) != 0);
 	
-	kmemset(rtl->rx_buffer, 0, (8192*8)+16+1500);
+	memset(rtl->rx_buffer, 0, (8192*8)+16+1500);
 	rtl_outl(rtl, 0x30,(uintptr_t)V2P(rtl->rx_buffer));
 	rtl_outb(rtl, 0x37, 0xc);
 	

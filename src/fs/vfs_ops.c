@@ -1,14 +1,16 @@
 /*	ChickenOS - fs/vfs.c - virtual file system systemcalls
  *
  */
-#include <common.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <string.h>
 #include <sys/stat.h>
+#include <chicken/common.h>
+#include <chicken/fs/device.h>
+#include <chicken/fs/icache.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/fs/vfs_ops.h>
 #include <chicken/thread.h>
-#include <fs/icache.h>
-#include <fs/vfs.h>
-#include <fs/vfs_ops.h>
 
 
 
@@ -108,7 +110,9 @@ int vfs_open(struct file **new, const char *path, int oflags, mode_t mode UNUSED
 
 	file_flags |= oflags & (O_DSYNC | O_NONBLOCK | O_RSYNC | O_SYNC);
 
-	*new = vfs_file_new(lookup, (char *)path);
+	lookup_d->inode = lookup;
+
+	*new = vfs_file_new(lookup_d);
 	
 	// XXX: Re-enable/rewrite
 	//(*new)->flags = file_flags;
@@ -124,7 +128,7 @@ int sys_close(int fd)
 	if(fp == NULL)
 		return -EBADFD;
 
-	thread_current()->file_info->files[fd] = NULL;
+	thread_current()->files->files[fd] = NULL;
 	icache_put(fp->inode);
 
 	// FIXME: this isn't safe yet
@@ -212,7 +216,7 @@ int sys_chdir(const char *path)
 	}
 
 	// FIXME: increase new dentry's ref count, decrease old one
-	thread_current()->file_info->cur = lookup;
+	thread_current()->fs_info->cur = lookup;
 
 	return 0;
 }

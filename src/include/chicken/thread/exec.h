@@ -1,10 +1,10 @@
 #ifndef C_OS_CHICKEN_THREAD_EXEC_H
 #define C_OS_CHICKEN_THREAD_EXEC_H
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <elf.h>
-#include <fs/vfs.h>
-#include <fs/dentry.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/fs/dentry.h>
 
 #define MAX_ARGS 256
 #define MAX_ENVS 256

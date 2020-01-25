@@ -1,9 +1,8 @@
-#include <common.h>
-#include <sys/stat.h>
 #include <string.h>
-// FIXME: Move this header?
-#include <fs/initrd.h>
-#include <fs/vfs.h>
+#include <sys/stat.h>
+#include <chicken/common.h>
+#include <chicken/device/block/ramdisk.h>
+#include <chicken/fs/device.h>
 
 //XXX: This is very old code originally use for the initrd, needs cleanup and
 //     renaming, but leaving for now.

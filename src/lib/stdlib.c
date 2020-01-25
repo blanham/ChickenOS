@@ -1,10 +1,6 @@
-#include <common.h>
+#include <ctype.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <kernel/memory.h>
-#include <kernel/interrupt.h>
-#include <mm/vm.h>
-#include <mm/liballoc.h>
 
 div_t div(int numerator, int denominator)
 {
@@ -32,4 +28,3 @@ long int strtol(const char* str, char **end, int base)
 
 	return ret * sign;
 }
-

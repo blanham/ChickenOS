@@ -2,8 +2,8 @@
 #define C_OS_VFS_H
 #include <stdint.h>
 #include <sys/stat.h>
-#include <fs/dentry.h>
-#include <fs/vfs_ops.h>
+#include <chicken/fs/dentry.h>
+#include <chicken/fs/vfs_ops.h>
 
 typedef struct vfs_sb {
 	void *sb;
@@ -37,7 +37,7 @@ typedef struct inode {
 typedef struct file {
 	uint32_t flags; // Used for O_CLOEXEC
 	struct inode *inode;
-	struct dentry *dentry;
+	dentry_t *dentry;
 	off_t offset;
 	vfs_fs_t *fs;
 } file_t;
@@ -68,27 +68,6 @@ int put_file(struct file *file, int flags);
 int put_file2(struct file *file, int givenfd, int flags);
 
 // FIXME: further extract this later (make it an independent header)
-#include <fs/sys.h>
+#include <chicken/fs/sys.h>
 
-/* device.c - device fs */
-#define INITRD_DEV 0x400
-#define ATA0_0_DEV 0x301
-#define ATA0_3_DEV 0x303
-
-#define SECTOR_SIZE 512
-
-#define MAJOR(x) ((x & ~0xFF) >> 8)
-#define MINOR(x) (x & 0xFF)
-
-struct device {
-    dev_t dev;
-    uint16_t type;
-    vfs_read_inode_t read;
-    vfs_write_inode_t write;
-    vfs_ioctl_inode_t ioctl;
-};
-
-void device_register(uint16_t type, dev_t dev, vfs_read_inode_t read, vfs_write_inode_t write, vfs_ioctl_inode_t ioctl);
-struct device *get_device(uint16_t type, dev_t dev);
-inode_t *device_get_inode(uint16_t type, dev_t dev);
 #endif

@@ -1,14 +1,14 @@
-#include <common.h>
-#include <stdio.h>
-#include <string.h>
+#include <errno.h>
 #include <stdbool.h>
-#include <memory.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/common.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/vm.h>
+#include <chicken/mm/regions.h>
 #include <chicken/thread.h>
 #include <chicken/thread/exec.h>
-#include <mm/vm.h>
-#include <mm/liballoc.h>
-#include <errno.h>
-#include <fs/vfs.h>
 
 #define ELF_ET_DYN_BASE (PHYS_BASE / 3*2)
 
@@ -24,9 +24,11 @@ static int elf_map_regions(executable_t *exe, Elf32_Ehdr *header, bool is_interp
 	uintptr_t adjust = 0;
 	if (header->e_type == ET_DYN) {
 		if (is_interpreter)
-			adjust = ELF_ET_DYN_BASE;
+			exe->at_base = adjust = 0xb7f70000;//ELF_ET_DYN_BASE;
+			//adjust = 0xb00000;
 		else 
-			adjust = 0x8084000;
+			//adjust = 0x8084000;
+			adjust = 0x40000;
 
 		exe->at_entry = adjust + header->e_entry;
 		exe->at_phdr =  adjust + header->e_phoff;
@@ -35,7 +37,7 @@ static int elf_map_regions(executable_t *exe, Elf32_Ehdr *header, bool is_interp
 		exe->at_entry = header->e_entry;
 		exe->at_phdr =  (exe->at_entry&PAGE_MASK) + header->e_phoff;
 	}
-	//printf("PHDR %x %x %x\n", adjust, exe->at_entry, exe->at_phdr)
+	//printf("PHDR %x %x %x\n", adjust, exe->at_entry, exe->at_phdr);
 	char *interpreter = NULL;
 	for (uint16_t i = 0; i < header->e_phnum; i++, phdr++) {
 		if (phdr->p_type == PT_INTERP) {
@@ -63,10 +65,10 @@ static int elf_map_regions(executable_t *exe, Elf32_Ehdr *header, bool is_interp
 
 		// TODO: rename this memregion_map_inode
 		memregion_map_file(cur->mm, vaddr, mem_length, PROT_READ|PROT_WRITE|PROT_EXEC,
-				MAP_FILE, exe->inode, phdr->p_offset & PAGE_MASK, file_length);
+				MAP_FILE, exe->dentry, phdr->p_offset & PAGE_MASK, file_length);
 
-		printf("Vaddr %x Filesize %x Memsize %x Offset %x\n", vaddr,
-			phdr->p_filesz, phdr->p_memsz, phdr->p_offset);
+		//printf("Vaddr %x Filesize %x Memsize %x Offset %x\n", vaddr,
+		//	phdr->p_filesz, phdr->p_memsz, phdr->p_offset);
 	}
 
 	if (interpreter) {
@@ -77,7 +79,7 @@ static int elf_map_regions(executable_t *exe, Elf32_Ehdr *header, bool is_interp
 		int ret = load_elf_internal(interp, true);
 		if (ret == 0) {
 			//printf("ENTRY base %x %x\n", interp->at_base, interp->entry);
-			exe->at_base = ELF_ET_DYN_BASE;
+			exe->at_base = interp->at_base;;
 			exe->ip = interp->ip; // XXX: Hmmmmm
 			//printf("EEE %x %x\n", exe->entry, exe->ip);
 		}
@@ -108,12 +110,12 @@ int load_elf_internal(executable_t *exe, bool is_interpreter)
 	exe->at_phent = sizeof(Elf32_Phdr);
 	exe->at_phnum = header->e_phnum;
 	ret = elf_map_regions(exe, header, is_interpreter);
-		printf("PHDR %x\n", exe->at_phdr);
+	//printf("PHDR %x\n", exe->at_phdr);
 
 
-	//printf("AT base: %x %x %x %x %x\n", exe->at_base, exe->at_phdr, exe->at_phent, exe->at_phnum, exe->entry);
+	//printf("AT base: %x %x %x %x %x\n", exe->at_base, exe->at_phdr, exe->at_phent, exe->at_phnum, exe->at_entry);
 
-	//printf("ENTRYYY %x IP %x\n", exe->entry, exe->ip);
+	//printf("ENTRYYY %x IP %x\n", exe->at_entry, exe->ip);
 
 	kfree(header);
 

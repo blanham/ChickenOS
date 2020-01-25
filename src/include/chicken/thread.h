@@ -1,17 +1,18 @@
 #ifndef C_OS_THREAD_H
 #define C_OS_THREAD_H
 #include <stdatomic.h>
-#include <kernel/interrupt.h>
-#include <mm/vm.h>
-#include <mm/paging.h>
-#include <util/utlist.h>
-#include <fs/dentry.h>
-#include <fs/vfs.h>
 #include <signal.h>
-#include <sys/types.h>
-#include <thread/ksigaction.h>
 #include <sys/resource.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/fs/dentry.h>
+#include <chicken/interrupt.h>
+#include <chicken/mm/vm.h>
+#include <chicken/mm/paging.h>
+#include <chicken/thread/ksigaction.h>
+
+#include <util/utlist.h>
 #include <util/uthash.h>
 
 #define STACK_SIZE 0x1000

@@ -1,7 +1,7 @@
 #ifndef C_OS_STDLIB_H
 #define C_OS_STDLIB_H
 #include <stddef.h>
-#include <mm/liballoc.h>
+#include <chicken/mm/liballoc.h>
 // FIXME: why not just have them be named this to begin with?
 #define calloc kcalloc
 #define free kfree
@@ -20,4 +20,5 @@ div_t div(int numerator, int denominator);
 void exit(int e);
 
 long strtol(const char * restrict str, char ** restrict ptr, int base);
+
 #endif

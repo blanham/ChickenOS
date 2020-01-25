@@ -1,7 +1,7 @@
 #ifndef C_OS_DEV_USB_H
 #define C_OS_DEV_USB_H
 
-#include <kernel/interrupt.h>
+#include <chicken/interrupt.h>
 
 /* http://www.beyondlogic.org/usbnutshell/usb3.shtml:
  * There are 4 bits to the PID, however to insure it is received correctly, 

@@ -1,8 +1,8 @@
-#include <common.h>
 #include <stdlib.h>
 #include <string.h>
-#include <memory.h>
-#include <fs/vfs.h>
+#include <chicken/common.h>
+#include <chicken/fs/ext2/ext2.h>
+#include <chicken/fs/vfs.h>
 #include "ext2fs_defs.h"
 
 //#define EXT2_DEBUG
@@ -237,7 +237,7 @@ size_t ext2_read_inode(struct inode *inode,	uint8_t *buf, size_t nbytes, off_t o
 				goto done;
 			}
 
-			kmemcpy(buf + count, bounce + block_ofs,cur_size);
+			memcpy(buf + count, bounce + block_ofs,cur_size);
 		}
 
 		count  += cur_size;

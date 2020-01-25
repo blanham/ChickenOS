@@ -2,17 +2,17 @@
  *	Driver for the Bochs VBE device include in Bochs/QEMU
  */
 
-#include <common.h>
 #include <stdio.h>
-#include <hw.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/common.h>
+#include <chicken/device/console.h>
+#include <chicken/device/ioport.h>
+#include <chicken/device/pci.h>
+#include <chicken/device/video/bochs_vga.h>
+#include <chicken/mm/paging.h>
+#include <chicken/mm/vm.h>
 #include <chicken/thread.h>
-#include <device/video/bochs_vga.h>
-#include <device/pci.h>
-#include <mm/vm.h>
-#include <memory.h>
-#include <mm/paging.h>
-#include <mm/liballoc.h>
-#include <device/console.h>
 #include <vincent.h>
 #include <font2.h>
 
@@ -157,7 +157,7 @@ uint32_t * bochs_vga_init_internal(int w, int h, int bpp)
 //	pagedir_insert_pagen_physical(cur->pd, (uintptr_t)framebuffer, (uintptr_t)framebuffer, 0x7, size);
 //	pagedir_install(cur->pd);
 	bochs_vga_setmode(w, h, bpp, true, true);
-	kmemset(framebuffer, 0x0, h*w*(bpp/4));
+	memset(framebuffer, 0x0, h*w*(bpp/4));
 
 	return ptr;
 }
@@ -191,7 +191,7 @@ console_t * bochs_vga_init()
 		test_ptr = (uint8_t *)background_image;
 		uint32_t offset = *(uint32_t *)(test_ptr + 0xa);
 		test_ptr = test_ptr + offset;
-		kmemcpy(framebuffer, test_ptr, 640*480*4);
+		memcpy(framebuffer, test_ptr, 640*480*4);
 		ptr = (void *)test_ptr;
 		for(int i = 0; i < 640*480; i++)
 		{
@@ -219,7 +219,7 @@ console_t * bochs_vga_init()
 
 		new[i].putc = &bochs_vga_putc;
 		new[i].switch_fn = &bochs_vga_switch;	
-		kmemcpy(framebuffer + 640*480*i, test_ptr, 640*480*4);
+		memcpy(framebuffer + 640*480*i, test_ptr, 640*480*4);
 
 	//	console_register(&new[i]);	
 

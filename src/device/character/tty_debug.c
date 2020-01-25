@@ -1,10 +1,9 @@
-#include <common.h>
 #include <stdio.h>
 #include <termios.h>
-#include <device/tty.h>
-#include <device/video/vga.h>
-#include <memory.h>
-#include <mm/liballoc.h>
+#include <chicken/common.h>
+#include <chicken/device/tty.h>
+#include <chicken/device/video/vga.h>
+#include <chicken/mm/liballoc.h>
 
 char *termios_cc[NCCS] = {
 	"VINTR   ",
@@ -59,4 +58,3 @@ void tty_termios_print(struct termios *termios)
 	serial_printf("\nIspeed %o Ospeed %o\n", termios->__c_ispeed, termios->__c_ospeed);
 
 }
-

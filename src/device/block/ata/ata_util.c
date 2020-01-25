@@ -1,7 +1,8 @@
-#include <common.h>
 #include <stdint.h>
-#include <device/ata.h>
-#include <kernel/hw.h>
+#include <chicken/common.h>
+#include <chicken/device/block/ata.h>
+#include <chicken/device/ioport.h>
+
 //XXX: Why is this switch statement like this?
 inline void ata_port_write(struct ata_drive *dev, uint16_t port, uint16_t value)
 {

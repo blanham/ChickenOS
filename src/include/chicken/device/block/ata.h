@@ -1,6 +1,7 @@
 #ifndef C_OS_DEVICE_ATA_H
 #define C_OS_DEVICE_ATA_H
 #include <stdbool.h>
+#include <chicken/fs/device.h>
 
 enum ata_cmds {
 	ATA_REG_DATA,

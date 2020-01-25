@@ -1,11 +1,10 @@
-#include <common.h>
 #include <errno.h>
-#include <memory.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
-#include <mm/liballoc.h>
-#include <fs/vfs.h>
+#include <chicken/common.h>
+#include <chicken/fs/vfs.h>
 #include "ext2fs_defs.h"
 #include "ext2fs.h"
 

@@ -3,12 +3,14 @@
  *  Heap allocation is implemented with liballoc
  *  which uses pages from the page allocator
  */
-#include <common.h>
-#include <stdio.h>
-#include <mm/vm.h>
-#include <chicken/thread.h>
-#include <kernel/hw.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <chicken/common.h>
+#include <chicken/mm/vm.h>
+#include <chicken/mm/regions.h>
+#include <chicken/thread.h>
 
 uint32_t mem_size;
 
@@ -22,7 +24,7 @@ void vm_page_fault_dump(registers_t *regs, uintptr_t addr, int flags)
 	printf("%s\t", (flags & PAGE_WRITE) ? "write" : "read");
 	printf("%s\n", (flags & PAGE_VIOLATION) ? "protection violation" : "page not present");
 	printf("\nREGS:\n");
-	dump_regs(regs);
+	registers_dump(regs);
 	printf("\n");
 }
 
@@ -63,44 +65,6 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 	PANIC("Unhandled page fault");
 }
 
-//FIXME Taken from linux, only applicable to i386?
-#define TASK_UNMAPPED_BASE (PHYS_BASE/3)
-#define MMAP_BASE 0x5000000
-
-//Move this to the region code?
-void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset)
-{
-	(void)prot; // TODO: implement actual memory protections :P
-	//printf("MMAP! Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n", addr, length, prot, flags, fd, pgoffset);
-
-	if ((flags & MAP_FIXED) == 0) {
-		thread_t *cur = thread_current();
-		addr += (uintptr_t)cur->mm->mmap_base;
-		cur->mm->mmap_base += length;
-	}
-
-	if ((flags & MAP_ANONYMOUS)) {
-		thread_t *cur = thread_current();
-		memregion_map_data(cur->mm, (uintptr_t)addr, length, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_FIXED, NULL);
-		return addr;
-	}
-
-	struct file *file = vfs_file_get(fd);
-	if (file == NULL)
-		return (void *)-EBADF; // 
-
-	thread_t *cur = thread_current();
-	memregion_map_file(cur->mm, (uintptr_t)addr &PAGE_MASK, length, PROT_READ|PROT_WRITE|PROT_EXEC,
-				MAP_FILE, file->inode, pgoffset*4096, file->inode->info.st_size);
-	return (void *) (((uintptr_t)addr + 4096 -1) & PAGE_MASK);
-}
-
-int sys_munmap(void *addr, size_t length)
-{
-	printf("MUNAMP: %p %x\n", addr, length);
-
-	return -ENOSYS;
-}
 
 struct mm *mm_alloc()
 {

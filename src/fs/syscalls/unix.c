@@ -1,10 +1,10 @@
-#include <common.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <chicken/common.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/fs/vfs_ops.h>
 #include <chicken/thread.h>
-#include <fs/vfs.h>
-#include <fs/vfs_ops.h>
 
 int sys_fcntl64(int fd, int cmd, unsigned long arg)
 {

@@ -1,6 +1,7 @@
 #ifndef C_OS_PCI_H
 #define C_OS_PCI_H
-#include <kernel/interrupt.h>
+#include <chicken/interrupt.h>
+
 union pci_iobar {
     struct{
 	unsigned region:1;
@@ -76,11 +77,9 @@ struct cfg_addr {
     unsigned ecd:1;
 } __attribute__((packed));
 
-
 #define PCI_BAR_MEM  0x0
 #define PCI_BAR_IO 	 0x1
 #define PCI_BAR_NONE 0x3
-
 
 #define INTEL_VEND 0x8086
 
@@ -92,4 +91,5 @@ uint16_t pci_reg_inw(struct pci_device *pci, uint8_t port);
 struct pci_device *pci_get_device(uint16_t vendor, uint16_t device);
 void pci_register_irq(struct pci_device *pci, pci_intr_handler *handler, void *aux);
 void pci_init();
+
 #endif

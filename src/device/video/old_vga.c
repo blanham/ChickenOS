@@ -1,3 +1,4 @@
+/*
 #include <common.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -9,7 +10,7 @@
 #include <device/console.h>
 #include <device/video/vga.h>
 #include <mm/vm.h>
-
+*/
 /*
 void vga_init(struct multiboot_info *mb)
 {

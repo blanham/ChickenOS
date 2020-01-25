@@ -1,29 +1,28 @@
 /*	ChickenOS - fs/vfs.c - virtual file system
  *
  */
+#include <errno.h>
+#include <fcntl.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <chicken/common.h>
+#include <chicken/fs/ext2/ext2.h>
+#include <chicken/fs/icache.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/vm.h>
 #include <chicken/thread.h>
-#include <kernel/common.h>
-#include <kernel/memory.h>
-#include <mm/vm.h>
-#include <fs/icache.h>
-#include <fs/vfs.h>
-#include <fs/ext2/ext2.h>
-#include <fcntl.h>
-#include <errno.h>
 
 //FIXME: Probably shouldn't be a table
 vfs_fs_t * filesystems[10];
 
-struct file *vfs_file_new(struct inode *inode, char *name)
+struct file *vfs_file_new(dentry_t *dentry)
 {
 	struct file *new = kcalloc(sizeof(*new),1);
-	new->inode = inode;
-	new->fs = inode->fs;
-	// XXX: 
-	strcpy(new->name, name);
+	new->dentry = dentry;
+	new->inode = dentry->inode;
+	new->fs = dentry->inode->fs;
 	return new;
 }
 
@@ -33,7 +32,7 @@ struct file *vfs_file_get(int fd)
 
 	struct file *ret = NULL;
 	if(fd >= 0)// && fd <= cur->file_info->files_open) // XXX: This should probably check a new variable named max_fd
-		ret = cur->file_info->files[fd];
+		ret = cur->files->files[fd];
 
 	return ret;
 }
@@ -129,6 +128,7 @@ void vfs_init()
 {
 	printf("Initialzing VFS\n");
 	chardevs_init();
+	icache_init();
 	if(ext2_init() < 0)
 		PANIC("failed to init ext2 fs\n");
 }

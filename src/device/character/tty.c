@@ -1,12 +1,12 @@
-#include <common.h>
-#include <memory.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <string.h>
 #include <termios.h>
-#include <device/tty.h>
-#include <fs/vfs.h>
-#include <mm/liballoc.h>
-#include <mm/vm.h>
+#include <chicken/common.h>
+#include <chicken/device/tty.h>
+#include <chicken/fs/device.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/vm.h>
 
 #define TTY_HISTORY_SIZE 128 // MUST BE POWER OF TWO!
 #define TTY_HISTORY_MASK (TTY_HISTORY_SIZE - 1)
@@ -54,7 +54,7 @@ void tty_redraw(tty_t *tty)
 void tty_clear_rows(tty_t *tty, int row, int count)
 {
 	for (int i = row; i < count; i++)
-		kmemset(TTY_GET_ROW_PTR(i), 0, tty->winsize.ws_col);
+		memset(TTY_GET_ROW_PTR(i), 0, tty->winsize.ws_col);
 
 	printf("COUNT %i\n", count);
 	global_ops->clear_rows(global_ops->aux, row, count);
@@ -63,7 +63,7 @@ void tty_clear_rows(tty_t *tty, int row, int count)
 void tty_scroll(tty_t *tty)
 {
 	// XXX: Should I make a wrapper for this?
-	kmemset(tty->cur_ring->buf[tty->cur_ring->r_top & (TTY_HISTORY_SIZE-1)], 0, 80);
+	memset(tty->cur_ring->buf[tty->cur_ring->r_top & (TTY_HISTORY_SIZE-1)], 0, 80);
 	tty->cur_ring->r_top++;
 
 	global_ops->scroll(global_ops->aux);
@@ -192,7 +192,7 @@ void tty_escape(tty_t *tty, int c)
 					break;
 			}
 
-			kmemset(row_ptr, ' ', count);
+			memset(row_ptr, ' ', count);
 			global_ops->set_row(global_ops->aux, tty->y, TTY_GET_ROW_PTR(tty->y));
 			break;
 		case 'M':
@@ -413,21 +413,21 @@ int tty_ioctl(struct inode *inode, int request, char *args)
 	// FIXME: Do we need to lock the termios when r/w it?
 	switch (request) {
 		case TCGETS:
-			kmemcpy(args, &tty->termios, sizeof(struct termios));
+			memcpy(args, &tty->termios, sizeof(struct termios));
 			break;
 		case TCSETSW:
 			// FIXME: TCSETSW should allow the output buffer to drain
 		case TCSETSF:
 			// FIXME: TCSETSF should allow the output buffer to drain, and discard pending input
 		case TCSETS:
-			kmemcpy(&tty->termios, args, sizeof(struct termios));
+			memcpy(&tty->termios, args, sizeof(struct termios));
 			break;
 		case TIOCSWINSZ:
 			// FIXME: This should send SIGWINCH to foreground process group
-			kmemcpy(&tty->winsize, args, sizeof(struct winsize));
+			memcpy(&tty->winsize, args, sizeof(struct winsize));
 			break;
 		case TIOCGWINSZ:
-			kmemcpy(args, &tty->winsize, sizeof(struct winsize));
+			memcpy(args, &tty->winsize, sizeof(struct winsize));
 			break;
 		case TIOCGPGRP:
 			*(int *)args = tty->pgrp;
@@ -461,7 +461,7 @@ struct termios default_termios = {
 
 void termios_init(struct termios *termios)
 {
-	kmemcpy(termios, &default_termios, sizeof(*termios));
+	memcpy(termios, &default_termios, sizeof(*termios));
 
 	termios->c_cflag |= B38400;
 }

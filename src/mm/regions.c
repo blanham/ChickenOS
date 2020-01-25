@@ -1,10 +1,13 @@
-#include <common.h>
 #include <stdint.h>
-#include <chicken/thread.h>
-#include <sys/tree.h>
+#include <stdlib.h>
+#include <string.h>
 #include <errno.h>
-#include <mm/vm.h>
-#include <fs/vfs.h>
+#include <sys/tree.h>
+#include <chicken/common.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/vm.h>
+#include <chicken/mm/regions.h>
+#include <chicken/thread.h>
 
 uint8_t zero_page[PAGE_SIZE] __attribute__ ((aligned (PAGE_SIZE))) = {0};
 
@@ -110,7 +113,10 @@ int memregion_map_data(struct mm *mm, uintptr_t address, size_t len, int prot, i
 	//re-add flags to pagedir_map?
 	//XXX: Nah, just don't bother to support PROT_EXEC, just PROT_READ/PROT_WRITE
 	//		will still be POSIX compliant
-			pagedir_map(mm->pd, (uintptr_t)data + offset, address + offset, true);
+			//if (prot == PROT_NONE)
+			//	pagedir_map2(mm->pd, (uintptr_t)data + offset, address + offset, false, false);
+		//	else
+				pagedir_map(mm->pd, (uintptr_t)data + offset, address + offset, true);
 		}
 		//pagedir_insert_pagen(mm->pd, (uintptr_t)data, address, 0x7, new->pages);
 		pagedir_activate(mm->pd);
@@ -167,11 +173,15 @@ static int regiongrowth(struct mm *mm, struct memregion *p, uintptr_t address)
 }
 
 int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
-		int flags, struct inode *inode, off_t offset, size_t size)
+		int flags, dentry_t *dentry, off_t offset, size_t size)
 {
-	ASSERT(inode != NULL, "NULL inode passed in");
+	//printf("Dentry %p\n", dentry);
+	//if (dentry->inode == NULL)
+	//	printf("Dentry %s\n", dentry->path);
+	ASSERT(dentry->inode != NULL, "NULL inode passed in");
 	struct memregion *new = memregion_new(mm, address, len, prot, flags);
-	new->inode = inode;
+	new->inode = dentry->inode;
+	new->dentry = dentry;
 	new->file_offset = offset;
 	new->file_size = size;
 	//printf("offset %llx size %x\n", offset, size);
@@ -268,18 +278,30 @@ int memregion_cow(struct mm *mm, struct memregion *p, uintptr_t address)
 	return 1;
 }
 
+
 int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 {
 	//TODO: Use AVL tree instead
 
 	for(struct memregion *p = mm->regions; p != NULL; p = p->next) {
 		//printf("KBs %i\n", (p->addr_end - p->addr_start + 1) / 1024);
-		//printf("Ap->addr %x end %x prot %x address %x offset %llx\n", p->addr_start, p->addr_end, prot, address, p->file_offset);
+		//printf("Ap->addr %x end %x prot %x address %x offset %llx", p->addr_start, p->addr_end, prot, address, p->file_offset);
+		//if (p->inode)
+		//	printf(" file: %s\n", p->dentry->name);
+		//else 
+		//	printf("\n");
 		//TODO: actually check protection
+		
 		(void)prot;
-	if (address < 4096)
-		return 1;
+		if (address < 4096)
+			return 1;
 		if(address >= p->addr_start && address < p->addr_end) {
+			if (p->prot == 0) {
+			//	printf("R/w of guard page!\n");
+
+				//return 1;
+			}
+
 			if(p->cow)
 				return memregion_cow(mm, p, address);
 
@@ -301,34 +323,10 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 //TODO:  Can probably just have this call memregion_fault, since if it's
 //       valid but not loaded in we might as well load it in instead of
 //       faulting it in
-int verify_pointer(const void *ptr, size_t len, int rw)
+int verify_pointer(const void *ptr, size_t len UNUSED, int rw UNUSED)
 {
-//	thread_t *cur = thread_current();
-	//size_t count = 0;
-	//struct memregion *p = NULL;
-	(void)rw;
-	(void)len;
-
-	if((uintptr_t)ptr > PHYS_BASE)
+	if((uintptr_t)ptr > PHYS_BASE || ptr == NULL)
 		return -EFAULT;
 
 	return 0;
-	/*
-	while (count < len)
-	{
-		//lookup in tree
-
-		if(p == NULL)
-			return -EFAULT;
-		//Here we do stuff
-		if(p->present)
-		{}//g2g
-		if(!p->present && p->file != NULL)
-		{}//map in file pages
-
-		count += p->len;
-		ptr += count;
-	}
-
-	return 0;*/
 }

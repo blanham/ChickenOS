@@ -1,5 +1,4 @@
-#include <common.h>
-#include <memory.h>
+#include <chicken/common.h>
 #include <chicken/thread.h>
 
 thread_t * thread_current()
@@ -21,35 +20,35 @@ pid_t pid_allocate()
 	return pid_count;
 }
 
+// TODO: Array? Bitmap? Possibly should be in scheduler instead?
+pid_t tgid_allocate()
+{
+	static pid_t tgid_count = 0;
+
+	tgid_count++;
+
+	return tgid_count;
+}
+
 void thread_add_child(thread_t *parent, thread_t *child)
 {
 	LL_APPEND2(parent->children, child, child_next);
 }
 
-struct thread_files *thread_files_alloc(struct thread_files *old)
+thread_files_t *thread_files_alloc(thread_files_t *old)
 {
-	struct thread_files * new = kcalloc(sizeof(struct thread_files), 1);
-	if(old)
-	{
-		kmemcpy(new, old, sizeof(struct thread_files));
+	thread_files_t * new = kcalloc(sizeof(*new), 1);
+	if (old) {
+		memcpy(new, old, sizeof(*new));
 		new->files = kcalloc(sizeof(struct file *), 32);
 		new->files_flags = kcalloc(sizeof(int), 32);
 		//FIXME: increment ref count on root and cur_dir inodes
-		for(int i = 0; i < old->files_count; i++)
-		{
+		for (int i = 0; i < old->files_count; i++) {
 			//new->files[i] = vfs_reopen(old->files[i]);
 			new->files[i] = old->files[i];
 			//new->files_flags[i] = 0;
 		}
-	}
-	else
-	{
-		thread_t *cur = thread_current();
-		if (cur->file_info) {
-			new->cur = cur->file_info->cur;
-			new->root = cur->file_info->root;
-		}
-
+	} else {
 		new->files_count = 32;
 		new->files = kcalloc(sizeof(struct file *), 32);
 		new->files_flags = kcalloc(sizeof(int), 32);

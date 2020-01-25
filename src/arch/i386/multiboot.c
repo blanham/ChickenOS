@@ -3,10 +3,10 @@
  *	This file takes the multiboot structs and uses them to fill
  *	out a struct kernel_boot_info
  */
-#include <common.h>
-#include <kernel/memory.h>
+#include <string.h>
 #include <multiboot.h>
 #include <chicken/boot.h>
+#include <chicken/common.h>
 #include <chicken/thread.h>
 #include <chicken/vbe.h>
 
@@ -124,7 +124,7 @@ struct kernel_boot_info *multiboot_parse(struct multiboot_info *mb, uint32_t mag
 #endif
 	serial_printf("placement: %X end: %x\n", placement, end);
 
-	kmemcpy(multiboot_cmdline, (void *)P2V(mb->cmdline), strlen((char *)P2V(mb->cmdline)));
+	memcpy(multiboot_cmdline, (void *)P2V(mb->cmdline), strlen((char *)P2V(mb->cmdline)));
 	info->cmdline = multiboot_cmdline;
 
 	// Keep a reference to the multiboot info just in case

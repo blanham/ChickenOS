@@ -1,7 +1,7 @@
-#include <common.h>
-#include <hw.h>
-#include <arch/i386/pic.h>
 #include <arch/i386/interrupt.h>
+#include <arch/i386/pic.h>
+#include <chicken/common.h>
+#include <chicken/device/ioport.h>
 
 void pic_init()
 {

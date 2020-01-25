@@ -1,14 +1,13 @@
-#include <common.h>
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <mm/vm.h>
-#include <kernel/memory.h>
-#include <net/net_core.h>
-#include <device/net/rtl8139.h>
-#include <device/net/pcnet.h>
-#include <device/net/e1000.h>
-#include <net/dhcp.h>
-#include <sys/queue.h>
+#include <stdlib.h>
+#include <queue.h>
+#include <chicken/common.h>
+#include <chicken/device/net/rtl8139.h>
+#include <chicken/device/net/pcnet.h>
+#include <chicken/device/net/e1000.h>
+#include <chicken/net/dhcp.h>
+#include <chicken/net/net_core.h>
+
 uint8_t our_ip[] = {128,135,155,203};
 
 uint8_t their_ip[] = {128,135,155,44};
@@ -119,10 +118,8 @@ void sockbuf_send(struct sockbuf *sb UNUSED)
 struct sockbuf *sockbuf_alloc(struct network_dev *dev, uint32_t len)
 {
 	struct sockbuf *new = kcalloc(sizeof(*new), 1);// + 256);
-	new->data = kmalloc(len);
+	new->data = kcalloc(len, 1);
 	new->dev = dev;
-	if((uintptr_t)dev < PHYS_BASE)
-		printf("error in %s\n",__func__);
 	new->length = len;
 	sockbuf_queue(new);
 	return new;

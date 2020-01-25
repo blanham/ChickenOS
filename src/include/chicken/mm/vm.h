@@ -1,18 +1,18 @@
 #ifndef C_OS_MM_VM_H
 #define C_OS_MM_VM_H
-#include <common.h>
 #include <stdint.h>
 #include <stddef.h>
 #include <stdatomic.h>
 #include <sys/mman.h>
-#include <kernel/interrupt.h>
 #include <chicken/boot.h>
-#include <fs/vfs.h>
-#include <fs/dentry.h>
+#include <chicken/common.h>
+#include <chicken/interrupt.h>
+#include <chicken/fs/dentry.h>
+#include <chicken/fs/vfs.h>
+#include <chicken/mm/paging.h>
+
 typedef uintptr_t phys_addr_t;
 typedef uintptr_t virt_addr_t;
-
-#include <mm/paging.h>
 
 #define PAGE_SIZE 4096
 #define PAGE_MASK 0xFFFFF000
@@ -29,6 +29,7 @@ typedef uintptr_t virt_addr_t;
 #define PAGE_ERR_MASK (PAGE_VIOLATION|PAGE_WRITE|PAGE_USER)
 
 #define PHYS_BASE 0xC0000000
+#define MMAP_BASE 0x5000000
 #define HEAP_BASE 0x09000000
 #define V2P(p) ((void *)((char *)(p) - PHYS_BASE))
 #define P2V(p) ((void *)((char *)(p) + PHYS_BASE))

@@ -1,4 +1,3 @@
-#include <common.h>
 //#include <device/serial.h>
 enum klog_level {KLOG1};
 

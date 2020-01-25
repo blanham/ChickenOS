@@ -1,20 +1,8 @@
 #ifndef C_OS_VFS_OPS_H
 #define C_OS_VFS_OPS_H
-#include <sys/types.h>
-//#include <stdarg.h>
-//#include <stdint.h>
-//#include <stddef.h>
-//#include <dirent.h>
-//#include <fcntl.h>
-//#include <sys/select.h>
-//#include <sys/stat.h>
-//#include <sys/time.h>
-//#include <sys/types.h>
-//#include <sys/uio.h>
-//#include <poll.h>
-
 #include <dirent.h>
-#include <fs/vfs.h>
+#include <sys/types.h>
+#include <chicken/fs/vfs.h>
 
 typedef struct inode inode_t;
 typedef struct vfs_fs vfs_fs_t;

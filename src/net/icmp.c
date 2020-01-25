@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include <mm/liballoc.h>
-#include <net/net_core.h>
-#include <kernel/memory.h>
-
+#include <string.h>
+#include <chicken/net/net_core.h>
 
 struct icmp {
 	uint8_t type;
@@ -17,8 +15,6 @@ struct icmp {
 	uint32_t rest;	
 } __attribute__((packed));*/
 
-
-
 void icmp_echoreceived(struct sockbuf *rsb)
 {
 	struct sockbuf *sb;
@@ -27,7 +23,7 @@ void icmp_echoreceived(struct sockbuf *rsb)
 	len = rsb->t_len;
 //	len = sizeof(struct icmp);
 //	icmp = kmalloc(len);
-//	kmemset(icmp, 0, len);	
+//	memset(icmp, 0, len);	
 	icmp->type = 0;
 	icmp->code = 0;
 	icmp->checksum = 0;
@@ -38,12 +34,13 @@ void icmp_echoreceived(struct sockbuf *rsb)
 	sb->t_len = len;
 	sb->t_proto = 0x1;
 	sb->dest_ip = htonl(rsb->ip->ip_src.s_addr);
-	kmemcpy(sb->dest_mac, ((struct ether_header *)rsb->data)->ether_shost ,6);
+	memcpy(sb->dest_mac, ((struct ether_header *)rsb->data)->ether_shost ,6);
 	ip_send2(sb);
 	//kfree(icmp);
 	sockbuf_free(sb);
 
 }
+
 void icmp_received(struct sockbuf *sb)
 {
 	struct icmp *icmp = sb->transport;

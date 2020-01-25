@@ -1,8 +1,8 @@
-#include <device/pci.h>
-#include <kernel/hw.h>
 #include <stdio.h>
-#include <kernel/memory.h>
-#include <mm/liballoc.h>
+#include <stdlib.h>
+#include <chicken/common.h>
+#include <chicken/device/ioport.h>
+#include <chicken/device/pci.h>
 
 struct pci_device *pci_device_list;
 

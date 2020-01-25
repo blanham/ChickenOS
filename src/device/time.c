@@ -1,12 +1,12 @@
 /*	ChickenOS time routines
  */
-#include <common.h>
+#include <errno.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <chicken/common.h>
+#include <chicken/device/ioport.h>
 #include <chicken/thread.h>
 #include <chicken/time.h>
-#include <kernel/hw.h>
-#include <errno.h>
-#include <sys/time.h>
 
 struct c_os_time system_datetime;
 uint32_t ticks = 0;

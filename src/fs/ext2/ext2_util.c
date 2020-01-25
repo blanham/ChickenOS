@@ -1,11 +1,10 @@
-#include <common.h>
-#include <stdio.h>
-#include <string.h>
-#include <memory.h>
-#include <fs/vfs.h>
-#include <mm/liballoc.h>
 #include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
+#include <chicken/common.h>
+#include <chicken/fs/vfs.h>
 
 #include "ext2fs_defs.h"
 #include "ext2fs.h"
@@ -42,7 +41,6 @@ void ext2_inode_to_vfs(ext2_fs_t *fs,struct inode *vfs,ext2_inode_t *ext2,uint32
 }
 
 
-#include <mm/vm.h>
 #define EXT2_NDIR_BLOCKS 12
 #define EXT2_DIR_BLOCKS 12
 int byte_to_block(ext2_fs_t *fs, ext2_inode_t *inode, off_t offset)
