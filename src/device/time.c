@@ -52,7 +52,7 @@ void rtc_init()
 	time_set_from_rtc(&system_datetime);
 }
 
-void timer_intr(struct registers * regs)
+void timer_intr(registers_t * regs)
 {
 	ticks++;
 	if (ticks % 100 == 0)

@@ -4,6 +4,7 @@
 #ifdef ARCH_I386
 #include <arch/i386/syscall.h>
 #include <arch/i386/interrupt.h>
+#include <arch/i386/registers.h>
 #elif ARCH_ARM
 #include <arch/arm/syscall.h>
 #else

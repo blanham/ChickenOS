@@ -19,14 +19,19 @@
 typedef struct inode inode_t;
 typedef struct vfs_fs vfs_fs_t;
 
+//typedef inode_t * (*inode_open_t)	   ()
+//typedef inode_t * (*inode_close_t)	   (inode_t *);
 typedef size_t	  (*vfs_read_inode_t)  (inode_t *, uint8_t *buf, size_t length, off_t offset);
 typedef size_t	  (*vfs_write_inode_t) (inode_t *, uint8_t *buf, size_t length, off_t offset);
 typedef int    	  (*vfs_ioctl_inode_t) (inode_t *, int request, char *arg);
+
 typedef ssize_t   (*vfs_readlink_t)    (inode_t *, char *path, size_t length);
+
 typedef inode_t * (*vfs_namei_old_t)   (inode_t *, const char *path);
 typedef inode_t * (*vfs_namei_t)       (inode_t *, const char *path, size_t length);
 
 typedef int       (*vfs_getdents_t)    (inode_t *, struct dirent *, int, off_t*);
+
 typedef int       (*vfs_read_sb_t)     (inode_t *, vfs_fs_t *fs);
 typedef uint64_t  (*vfs_bmap_t)        (inode_t *, off_t);
 typedef int       (*vfs_mount_t)       (uint16_t dev);

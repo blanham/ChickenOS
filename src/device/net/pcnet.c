@@ -23,6 +23,7 @@
 #define PCNET_RAPL	0x14
 #define PCNET_RSTL	0x18
 #define PCNET_BDPL	0x1c
+
 //values taken from linux driver
 #define PCNET_LOG_TX_BUFFERS	0
 #define PCNET_LOG_RX_BUFFERS	2
@@ -34,6 +35,7 @@
 #define RX_RING_LEN_BITS	((PCNET_LOG_RX_BUFFERS) << 4)
 
 #define PKT_BUF_SZ		1544
+
 static struct pcnet *global;
 
 char packet[] = {
@@ -45,6 +47,7 @@ char packet[] = {
 0x9b, 0x59, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
 0x00, 0x00, 0x00, 0x00 };
+
 char pkt[] = {
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x0c, 
 0x29, 0x53, 0x9d, 0x79, 0x08, 0x06, 0x00, 0x01, 
@@ -52,21 +55,25 @@ char pkt[] = {
 0x29, 0x53, 0x9d, 0x79, 0x0a, 0x78, 0x9b, 0x8c, 
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a, 0x78, 
 0x9b, 0x01 };
+
 void pcnet_csr_outw(struct pcnet *l, uint16_t addr, uint16_t val)
 {
 	pcnet_outl(l, PCNET_RAPW, addr);
 	pcnet_outl(l, PCNET_RDPW, val); 
-} 
+}
+
 uint16_t pcnet_csr_inw(struct pcnet *l, uint16_t addr)
 {
 	pcnet_outl(l, PCNET_RAPW, addr);
 	return pcnet_inl(l, PCNET_RDPW); 
 }
+
 void pcnet_csr_outl(struct pcnet *l, uint16_t addr, uint32_t val)
 {
 	pcnet_outl(l, PCNET_RAPL, addr);
 	pcnet_outl(l, PCNET_RDPL, val); 
-} 
+}
+
 uint32_t pcnet_csr_inl(struct pcnet *l, uint16_t addr)
 {
 	pcnet_outl(l, PCNET_RAPL, addr);
@@ -77,17 +84,20 @@ void pcnet_bcr_outw(struct pcnet *l, uint16_t addr, uint16_t val)
 {
 	pcnet_outl(l, PCNET_RAPW, addr);
 	pcnet_outl(l, PCNET_BDPW, val); 
-} 
+}
+
 uint16_t pcnet_bcr_inw(struct pcnet *l, uint16_t addr)
 {
 	pcnet_outl(l, PCNET_RAPW, addr);
 	return pcnet_inl(l, PCNET_BDPW); 
-} 
+}
+
 void pcnet_bcr_outl(struct pcnet *l, uint16_t addr, uint32_t val)
 {
 	pcnet_outl(l, PCNET_RAPL, addr);
 	pcnet_outl(l, PCNET_BDPL, val); 
-} 
+}
+
 uint32_t pcnet_bcr_inl(struct pcnet *l, uint16_t addr)
 {
 	pcnet_outl(l, PCNET_RAPL, addr);
@@ -96,20 +106,18 @@ uint32_t pcnet_bcr_inl(struct pcnet *l, uint16_t addr)
  
 void pcnet_reset(struct pcnet *l)
 {
-/*	if(l->bit32)
+/*	if (l->bit32)
 		pcnet_inl(l, PCNET_RSTL);
-	else*/
-	{
+	else*/ {
 		pcnet_inl(l, PCNET_RSTW);
 		//pcnet_outl(l, PCNET_RSTW, 0);
 	}
 }
 void pcnet_resetl(struct pcnet *l)
 {
-/*	if(l->bit32)
+/*	if (l->bit32)
 		pcnet_inl(l, PCNET_RSTL);
-	else*/
-	{
+	else*/ {
 		pcnet_inl(l, PCNET_RSTW);
 		//pcnet_outl(l, PCNET_RSTW, 0);
 	}
@@ -137,7 +145,7 @@ size_t pcnet_send(struct network_dev *dev, uint8_t *_buf, size_t length)
 struct network_dev *temp_net;
 void send_packet()//truct rtl8139 *rtl)
 {
-	//uint8_t *test = kmalloc(60);
+//	uint8_t *test = kmalloc(60);
 //	kmemcpy(test, packet, 60);
 //	kmemcpy(&test[6], global->mac,6);
 //	pcnet_send(temp_net, (uint8_t*)test, 60);
@@ -146,41 +154,34 @@ void send_packet()//truct rtl8139 *rtl)
 
 void pcnet_dumpregs(struct pcnet *l)
 {
-	for(int i = 0; i < 0x20; i++)
-	{
+	for (int i = 0; i < 0x20; i++) {
 		printf("%.2X:",pcnet_csr_inl(l, i));
-		if(i %8 == 7)
+		if (i %8 == 7)
 			printf("\n");
 	}
 }
+
 void pcnet_getmac(struct pcnet *l, char *mac)
 {
-	for(int i = 0; i < 6; i++)
-	{
+	for (int i = 0; i < 6; i++) {
 		mac[i] = pcnet_inb(l, i);
 	}
-
 }
-
 
 void pcnet_receive(struct pcnet *l)
 {
 	size_t len;
 	uint8_t *buf;
 	struct sockbuf *sb;
-	while((l->rx_descs[l->cur_rx].status & 0x8000) == 0)
-	{
-		if(!(l->rx_descs[l->cur_rx].status & 0x4000) &&
-			(l->rx_descs[l->cur_rx].status & 0x0300) == 0x0300)
-		{
+	while ((l->rx_descs[l->cur_rx].status & 0x8000) == 0) {
+		if (!(l->rx_descs[l->cur_rx].status & 0x4000) && (l->rx_descs[l->cur_rx].status & 0x0300) == 0x0300) {
 			len = l->rx_descs[l->cur_rx].flags2 & 0xFFFF;
 			buf = l->rx_buffers[l->cur_rx];
 			sb = sockbuf_alloc(l->dev, len);
 			kmemcpy(sb->data, buf, len);
 			network_received(sb);
-
-
 		}	
+
 		l->rx_descs[l->cur_rx].addr = (uint32_t)V2P(l->rx_buffers[l->cur_rx]);
 		l->rx_descs[l->cur_rx].status = 0x8000;
 		l->rx_descs[l->cur_rx].len = -2048;
@@ -206,26 +207,24 @@ void pcnet_handler(void *aux)
 		printf("something\n");
 		return;
 	}
-	if(csr & 0x0200){
-	//	printf("Tx finished \n");
-
-	}else if(csr & 0x0400){
+	if (csr & 0x0200) {
+	//rintf("Tx finished \n");
+	} else if(csr & 0x0400) {
 		if(csr & 0x8000)
 			printf("error: ");
-//		printf("rx packet\n");
+		//printf("rx packet\n");
 
 		pcnet_receive(l);
-
 	}
 //}
 	pcnet_csr_outl(l, 0, csr);
 }
-void pcnet_handler_old(struct registers *regs UNUSED)
+
+void pcnet_handler_old(registers_t *regs UNUSED)
 {
 	pcnet_handler(global);
-
-
 }
+
 void pcnet_start2(struct pcnet *l)
 {
 	//1) setup PCI io enable and possibly bus master
@@ -235,7 +234,7 @@ void pcnet_start2(struct pcnet *l)
 	uint16_t val = 0;
 	pci_register_irq(l->pci, &pcnet_handler, l);
 
-	for(int i = 0; i < 0x40; i++)
+	for (int i = 0; i < 0x40; i++)
 		pcnet_csr_outl(l, i, 0);
 	pcnet_csr_outl(l, 0, 4);
 	//3) reset
@@ -260,8 +259,7 @@ void pcnet_start2(struct pcnet *l)
 	l->cur_tx = 0;
 	//7) fill table, flags2 in tx, and flags/2 in rx = 0, taken care of by calloc
 	void *buf;
-	for(int i = 0; i < 8; i++)
-	{
+	for (int i = 0; i < 8; i++) {
 		buf = palloc();//kmalloc(2048);
 		l->rx_buffers[i] = buf;
 		l->rx_descs[i].addr = (uint32_t)V2P(buf);
@@ -293,9 +291,7 @@ void pcnet_start2(struct pcnet *l)
 	//10) final setup
 //	pcnet_bcr_outl(l, 9, 1 << 2);
 	pcnet_csr_outl(l, 0, 0x1);
-	int i;
-	for(i = 100000; i > 0; i--)
-	{
+	for(int i = 100000; i > 0; i--) {
 		if(pcnet_csr_inl(l,0) & 0x100)
 			break;
 
@@ -306,6 +302,7 @@ void pcnet_start2(struct pcnet *l)
 	val = pcnet_csr_inl(l, 4);
 	pcnet_csr_outl(l, 4, val | 0xC00);
 }
+
 struct network_dev * pcnet_init()
 {
 	struct network_dev *device = kmalloc(sizeof(*device));
@@ -317,8 +314,7 @@ struct network_dev * pcnet_init()
 	l->pci = pci_get_device(AMD_VEND, PCNET_DEV);
 //	l->rcv_buffer = kmalloc((8192*8)+16+1500);
 //	l->tx_buffers = (void *)P2V(0x3380000);//kmalloc((8192+16+1500)*4);
-	if(l->pci != NULL)
-	{
+	if (l->pci != NULL) {
 		l->bit32 = 0;
 		l->pci_hdr = l->pci->header;
 		printf("AMD PCNET Ethernet adapter found Rev %i IRQ %i\n", l->pci_hdr->rev, l->pci_hdr->int_line);
@@ -328,25 +324,19 @@ struct network_dev * pcnet_init()
 		
 		l->mem_base = (uint8_t *)(pci_get_bar(l->pci, PCI_BAR_MEM) & ~3);
 		printf("mem base %x\n",l->mem_base);
-//uint16_t out = pci_reg_inw(l->pci, 4);
-//	pci_reg_outw(l->pci, 4, out|4|1);
+		//uint16_t out = pci_reg_inw(l->pci, 4);
+		//pci_reg_outw(l->pci, 4, out|4|1);
 		pcnet_start2(l);
-	//	pcnet_dumpregs(l);
+		//pcnet_dumpregs(l);
 		pcnet_getmac(l,(char *)&device->mac);
 		print_mac((char *)l->mac);
 		device->send = pcnet_send;
 		//device->receive = pcnet_receive;
 
-	}
-	else
-	{
+	} else {
 		kfree(l);
-
-		l = NULL;
 		return NULL;
 	}
 
 	return device;
-
 }
-

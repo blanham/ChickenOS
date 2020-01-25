@@ -1,5 +1,6 @@
 #ifndef C_OS_THREAD_H
 #define C_OS_THREAD_H
+#include <stdatomic.h>
 #include <kernel/interrupt.h>
 #include <mm/vm.h>
 #include <mm/paging.h>
@@ -37,6 +38,28 @@ enum thread_stat {
 	THREAD_UNINTERRUPTIBLE
 };
 
+typedef struct {
+	int files_open;
+	int files_count;
+	struct file **files;
+	int *files_flags;
+	int ref;
+} thread_files_t;
+
+typedef struct {
+	dentry_t *root;
+	dentry_t *cur;
+	mode_t umask;
+	int ref;
+} thread_fs_t;
+
+typedef struct {
+	int signal_pending;
+	struct k_sigaction signals[NUM_SIGNALS];
+	sigset_t sigmask, pending;
+	int ref;
+} thread_signals_t;
+
 //TODO: Priorities? Would really like to maybe implement the 4.3BSD scheduler
 // 		since we didn't get it working in pintos
 typedef struct thread_struct thread_t;
@@ -60,17 +83,16 @@ typedef struct thread_struct {
 	thread_t *children; // Why not have a pointer to a master tree of processes?
 	thread_t *child_next, *child_prev;
 
-
-
 	//fs stuff
-	struct thread_files *file_info;
+	thread_files_t *files;
+	thread_fs_t *fs_info;
 	//saved kernel stack, user stack, and location of user stack
 	uint8_t *sp;//, *useresp, *user;
 	uintptr_t ip, usersp; // For fork() and clone()
 	void *registers;
 	void *tls;
 
-	struct thread_signals *sig_info;
+	thread_signals_t *sig_info;
 
 	// linux thread id stuff
 	int *set_child_tid, *clear_child_tid;
@@ -85,25 +107,12 @@ typedef struct thread_struct {
 	/* status of thread (DEAD, READY, RUNNING, BLOCKED, ) */
 	enum thread_stat status;
 
+	thread_t *next;
+
 	/* magic number so we can detect if stack collided with thread info */
 	uint32_t magic;
 } __attribute__((packed)) thread_t;
 
-
-typedef struct thread_files {
-	dentry_t *root;
-	dentry_t *cur;
-	int files_open;
-	int files_count;
-	struct file **files;
-	int *files_flags;
-} thr_files_t;
-
-struct thread_signals {
-	int signal_pending;
-	struct k_sigaction signals[NUM_SIGNALS];
-	sigset_t sigmask, pending;
-};
 
 // Possible design for a thread queue
 struct thread_queue {
@@ -120,10 +129,9 @@ void thread_dump_tls(void *tls);
 
 /* thread.c */
 void 	threading_init();
-pid_t	thread_create2(uintptr_t eip, uintptr_t _esp, void *aux);
+thread_t *thread_new(bool copy_old);
 
 /* thread_ops.c - system calls */
-pid_t 	sys_fork(void *regs);
 uid_t 	sys_geteuid();
 pid_t 	sys_getpid();
 pid_t 	sys_getppid();
@@ -139,12 +147,14 @@ void *	sys_sbrk(intptr_t ptr);
 void 	sys_exit(int return_code);
 void 	sys_exit_group(int return_code);
 pid_t 	sys_wait4(pid_t pid, int *status, int options, struct rusage *rusage);
-int sys_get_thread_area(void *desc);
-int sys_set_thread_area(void *desc);
-int sys_set_tid_address(int *ptr);
+int		sys_get_thread_area(void *desc);
+int		sys_set_thread_area(void *desc);
+int		sys_set_tid_address(int *ptr);
 
 /* thread/clone.c */
-int sys_clone(unsigned long flags, void *stack, int *parent_tid, unsigned long tls, int *child_tid);
+pid_t 	sys_fork();
+int		sys_clone(unsigned long flags, void *stack, int *parent_tid, unsigned long tls, int *child_tid);
+pid_t	thread_create2(uintptr_t eip, uintptr_t _esp, void *aux);
 
 /* thread/exec.c */
 int	sys_execve(const char *path, char *const argv[], char *const envp[]);
@@ -172,8 +182,9 @@ int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
 int sys_sigreturn(registers_t *regs, unsigned long dunno);
 
 /* thread/thread_util.c */
-pid_t 	pid_allocate();
-struct thread_files *thread_files_alloc(struct thread_files *old); // Copies old to new if not NULL
+pid_t	pid_allocate();
+pid_t	tgid_allocate();
+thread_files_t *thread_files_alloc(thread_files_t *old); // Copies old to new if not NULL
 thread_t * thread_current();
 thread_t *thread_by_pid(pid_t pid);
 void thread_add_child(thread_t *parent, thread_t *child); // FIXME: Make this a macro instead
@@ -181,7 +192,7 @@ void thread_add_child(thread_t *parent, thread_t *child); // FIXME: Make this a 
 /* arch/ARCH/thread.c */
 void thread_copy_stackframe(thread_t *thread, void *stack, uintptr_t eax);
 void thread_build_stackframe(void * stack, uintptr_t eip, uintptr_t esp, uintptr_t eax);
-void thread_set_tls(void *tls_descriptor);
+void thread_set_tls(thread_t *thread, void *tls_descriptor);
 void thread_get_tls(void *tls_descriptor);
 
 /* arch/ARCH/switch.s */
@@ -191,4 +202,60 @@ void switch_threads(thread_t *cur, thread_t *new);
 // FIXME: not sure where to put this
 struct uname;
 int sys_uname(struct uname *uname);
+
+
+typedef struct __locale_struct
+{
+  /* Note: LC_ALL is not a valid index into this array.  */
+  void *__locales[13]; /* 13 = __LC_LAST. */
+  /* To increase the speed of this solution we add some special members.  */
+  const unsigned short int *__ctype_b;
+  const int *__ctype_tolower;
+  const int *__ctype_toupper;
+  /* Note: LC_ALL is not a valid index into this array.  */
+  const char *__names[13];
+} locale_t;
+
+struct pthread {
+	/* Part 1 -- these fields may be external or
+	 * internal (accessed via asm) ABI. Do not change. */
+	struct pthread *self;
+	uintptr_t *dtv;
+	struct pthread *prev, *next; /* non-ABI */
+	uintptr_t sysinfo;
+	uintptr_t canary, canary2;
+
+	/* Part 2 -- implementation details, non-ABI. */
+	int tid;
+	int errno_val;
+	volatile int detach_state;
+	volatile int cancel;
+	volatile unsigned char canceldisable, cancelasync;
+	unsigned char tsd_used:1;
+	unsigned char dlerror_flag:1;
+	unsigned char *map_base;
+	size_t map_size;
+	void *stack;
+	size_t stack_size;
+	size_t guard_size;
+	void *result;
+	struct __ptcb *cancelbuf;
+	void **tsd;
+	struct {
+		volatile void *volatile head;
+		long off;
+		volatile void *volatile pending;
+	} robust_list;
+	volatile int timer_id;
+	locale_t locale;
+	volatile int killlock[1];
+	char *dlerror_buf;
+	void *stdio_locks;
+
+	/* Part 3 -- the positions of these fields relative to
+	 * the end of the structure is external and internal ABI. */
+	uintptr_t canary_at_end;
+	uintptr_t *dtv_copy;
+};
+
 #endif

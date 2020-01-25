@@ -2,6 +2,7 @@
 #define C_OS_VFS_H
 #include <stdint.h>
 #include <sys/stat.h>
+#include <fs/dentry.h>
 #include <fs/vfs_ops.h>
 
 typedef struct vfs_sb {
@@ -22,7 +23,7 @@ typedef struct inode {
 	ino_t number;
 	struct stat64 info;
 	uint32_t flags;
-	void *storage;
+	void *storage; // filesytem specific data
 	//may need parent
 	vfs_fs_t *fs;
     vfs_read_inode_t read;
@@ -30,23 +31,22 @@ typedef struct inode {
     vfs_ioctl_inode_t ioctl;
 
 	struct inode *parent;
+	int refs;
 } inode_t;
 
-struct file {
-	// XXX: Get rid of this
-	char name[256];
+typedef struct file {
 	uint32_t flags; // Used for O_CLOEXEC
 	struct inode *inode;
 	struct dentry *dentry;
 	off_t offset;
 	vfs_fs_t *fs;
-};
+} file_t;
 
 /* vfs.c */
 vfs_fs_t *vfs_alloc(const char *name, vfs_ops_t *ops);
 vfs_fs_t * vfs_find_fs(const char *type);
 int vfs_register_fs(vfs_fs_t *fs);
-struct file *vfs_file_new(struct inode *inode, char *name);
+struct file *vfs_file_new(dentry_t *dentry);
 struct file *vfs_file_get(int fd);
 void vfs_file_free(struct file *file);
 void vfs_init();
@@ -90,4 +90,5 @@ struct device {
 
 void device_register(uint16_t type, dev_t dev, vfs_read_inode_t read, vfs_write_inode_t write, vfs_ioctl_inode_t ioctl);
 struct device *get_device(uint16_t type, dev_t dev);
+inode_t *device_get_inode(uint16_t type, dev_t dev);
 #endif

@@ -15,7 +15,7 @@ enum ata_cmds {
 	ATA_REG_STATUS = 7,	// Status register, read only (resets interrupts)
 	ATA_CTRL_ALTSTAT = 0, // Alternate status regsiter, read only (no effect on interrupts)
 	ATA_CTRL_DEVCTRL = 0, // Device control register, write only
-	ATA_CTRL_DEVADDR = 1, // Device address regsiter, read only
+	ATA_CTRL_DEVADDR = 1, // Device address register, read only // XXX: this WILL NOT work with ata_read*, so something needs to change
 };
 
 #define ATA_IO_BASE 0x1F0

@@ -18,7 +18,6 @@ static struct ata_drive drives[4] = {
 	{.io_base = 0x170, .ctrl_base = 0x376, .slave = true},
 };
 
-// XXX: Just disable interrupts for now
 enum intr_status ata_intr_status;
 void ata_lock()
 {
@@ -33,9 +32,11 @@ void ata_unlock()
 void ata_pio_cmd2(ata_dev_t *dev, uint8_t command, uint64_t lba, size_t count)
 {
 	uint8_t select_query = ATA_DRVHD_SET | (dev->slave ? ATA_DRVHD_DRV : 0);
+
 	if (command == ATA_CMD_READ_PIO || command == ATA_CMD_WRITE_PIO) {
 		select_query |= ATA_DRVHD_LBA | ((lba >> 24) & 0xf);
 	}
+
 	ata_port_write(dev, ATA_REG_DRVHD, select_query);
 	ata_port_write(dev, ATA_REG_SEC_CNT, (uint8_t)count);
 	ata_port_write(dev, ATA_REG_LBALO,  (uint8_t)(lba & 0xff));
@@ -72,7 +73,7 @@ size_t ata_sector_read(struct ata_drive *dev, void *buf, unsigned long long lba,
 
 		//ata_busy_wait(dev);
 		while((ata_port_read(dev, ATA_REG_STATUS) & (ATA_STAT_BSY)))
-			;//serial_printf("welp\n");
+			;
 	}
 
 	return 512 * count;
@@ -118,6 +119,7 @@ size_t ata_read_blocks(uint16_t dev, void *_buf, uint32_t block_num, size_t bloc
 	return ata_sector_read(drive, _buf, parti->rel_sector + block_num, blocks);
 }
 
+// FIXME: this is a wrapper from when I changed the prototype to use an inode, clean up when I can
 size_t ata_read_thing(struct inode *inode, uint8_t *buf, size_t count, off_t offset)
 {
 	uint32_t lba = offset / SECTOR_SIZE;
@@ -244,10 +246,10 @@ void ata_detect_and_initialize(struct ata_drive *dev)
 	ata_port_write(dev, ATA_REG_DRVHD, ATA_DRVHD_SET | (dev->slave ? ATA_DRVHD_DRV : 0));
 	ata_busy_wait(dev);
 
-	// Wait for bus to no longer be busy
+	// Wait for bus to be free
 	while((ata_port_read(dev, ATA_REG_STATUS) & ATA_STAT_BSY) != 0);
 
-	// Check if any drives on bus, and return if not (if no drive bus returns 0xFF)
+	// ATA Status register returns 0xFF if the bus is empty, so we return
 	if (ata_port_read(dev, ATA_REG_STATUS) == 0xFF) {
 		return;
 	}
@@ -258,7 +260,6 @@ void ata_detect_and_initialize(struct ata_drive *dev)
 		case 0xC33C:
 			ata_device_init(dev);
 			printf("Detected ATA drive: %.14s Capacity: %iMB\n", dev->name, dev->capacity/(1024*1024));
-
 			break;
 		case 0xEB14:
 		case 0x9669:
@@ -276,7 +277,7 @@ void ata_init()
 	// XXX: Can't I do this at compile time?
 	ASSERT(sizeof(ata_id_t) == SECTOR_SIZE, "ATA identify structure wrong size!");
 
-	// XXX: This should look for Class 0x0101 
+	// TODO: This should look for Class 0x0101 
 	struct pci_device *intel_ata = pci_get_device(INTEL_VEND, 0x7010);
 
 	if (intel_ata != NULL) {

@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <device/ata.h>
 #include <kernel/hw.h>
-
 //XXX: Why is this switch statement like this?
 inline void ata_port_write(struct ata_drive *dev, uint16_t port, uint16_t value)
 {

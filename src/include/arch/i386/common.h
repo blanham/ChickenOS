@@ -2,12 +2,13 @@
 #define C_OS_ARCH_I386_COMMON_H
 
 #define stackpointer_get(x)  asm volatile ("mov %%esp, %0": "=m"(x) )
- 
+
 static inline void kernel_halt()
 {
 	while(1)
 		asm volatile ("hlt");
 }
+
 static inline void print_user_trace (uint32_t *ebp)
 {
       uint32_t *eip;
@@ -35,6 +36,5 @@ static inline void print_stack_trace ()
 		//	break;
       }
 }
-
 
 #endif

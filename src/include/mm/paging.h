@@ -10,6 +10,7 @@ void		pagedir_activate(uint32_t *pd);
 uint32_t *	pagedir_clone(uint32_t * pd);
 uintptr_t	pagedir_lookup(uint32_t * pd, uintptr_t virtual);
 void		pagedir_map(uint32_t *pd, uintptr_t kvaddr, uintptr_t vaddr, bool rw);
+void        pagedir_map2(uint32_t *pd, uintptr_t kvaddr, uintptr_t vaddr, bool rw, bool present);
 void		pagedir_map_kernel(uintptr_t kvaddr, uintptr_t vaddr, bool rw);
 
 #endif

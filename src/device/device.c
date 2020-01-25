@@ -35,6 +35,21 @@ void device_register(uint16_t device_type, dev_t dev, vfs_read_inode_t read, vfs
 	//printf("Registered device %x:%x\n", MAJOR(dev),MINOR(dev));
 }
 
+
+/*
+inode_t *device_get_inode(uint16_t type, dev_t dev);
+{
+	struct device *inode = inode_;
+
+	if (device_type == S_IFCHR) {
+		ret = &char_devices[MAJOR(dev)];
+	} else if(device_type == S_IFBLK) {
+		ret = &block_devices[MAJOR(dev)];
+	}
+
+	return ret
+}*/
+
 struct device *get_device(uint16_t device_type, dev_t dev)
 {
 	struct device *ret = NULL;

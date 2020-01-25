@@ -7,6 +7,8 @@
 #include <sys/mman.h>
 #include <kernel/interrupt.h>
 #include <chicken/boot.h>
+#include <fs/vfs.h>
+#include <fs/dentry.h>
 typedef uintptr_t phys_addr_t;
 typedef uintptr_t virt_addr_t;
 
@@ -31,39 +33,6 @@ typedef uintptr_t virt_addr_t;
 #define V2P(p) ((void *)((char *)(p) - PHYS_BASE))
 #define P2V(p) ((void *)((char *)(p) + PHYS_BASE))
 
-#define MM_PRESENT	0x0001
-#define MM_WRITE	0x0002
-#define MM_COW		0x0008
-
-struct memregion {
-	uintptr_t addr_start, addr_end;
-	uintptr_t requested_start, requested_end;
-	int pages;
-	size_t len;
-	atomic_int ref_count;
-
-	// XXX: These should be a bitfield
-	int present;
-	int cow;
-	int flags;
-	int prot;
-
-	// XXX: This should be a struct
-	//struct file *file;
-	struct inode *inode;
-	off_t file_offset;
-	size_t file_size;
-	
-	// NOTE: Maybe we should represent all mapped memory as files?
-	// say, /dev/zero for zero pages
-	// could greatly simplify code paths
-	// literally use file offset and len of /dev/mem loaded as a struct inode?
-	// would make swapping easier too....
-
-	struct memregion *next;
-	struct memregion *prev;
-};
-
 struct mm {
 	void *pd;
 	struct memregion *regions;
@@ -71,9 +40,10 @@ struct mm {
 	void * brk;
 	void *mmap_base;
 	uintptr_t sbrk;
+	int ref;
 };
 
-struct frame {
+typedef struct frame {
 	union {
 		uintptr_t phys_addr;
 		void *phys_ptr;
@@ -96,50 +66,39 @@ struct frame {
 	// hmm, then you wouldn't need to store block numbers in the frame
 	// add lock/semaphore/waitqueue
 	atomic_int ref_count;
-} __attribute__((packed));
+} __attribute__((packed)) frame_t;
 
 /* mm/vm.c */
 void vm_init(struct kernel_boot_info *info);
 void vm_page_fault(registers_t *regs, uintptr_t addr, int flags);
 struct mm *mm_alloc();
-void mm_init(struct mm *mm);
 struct mm *mm_clone(struct mm *old);
-void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset);
-int sys_munmap(void *addr, size_t length);
+void mm_init(struct mm *mm);
 
-/* mm/regions.c */
-struct memregion *region_clone(struct memregion *original);
-//int memregion_add(struct mm *mm, uintptr_t address, size_t len, int prot,
-//						int flags, struct inode *inode, off_t offset, size_t file_len, void *data);
-int memregion_fault(struct mm *mm, uintptr_t address, int prot);
-int memregion_map_data(struct mm *mm, uintptr_t address, size_t len, int prot, int flags,
-		void *data);
-int memregion_map_file(struct mm *mm, uintptr_t address, size_t len, int prot,
-		int flags, struct inode *inode, off_t offset, size_t size);
-//struct memregion *memregion_new();
-void mm_clear(struct mm *mm);
-
-// XXX: Hmm, should this just use the MM_* constants above?
+// XXX: Hmm, should this just use the MM_* constants from region.h?
+// NOTE: This is in region.c, but left here because of the huge mess of includes it would affect
 #define VP_READ  0
 #define VP_WRITE 1
 int verify_pointer(const void *ptr, size_t len, int rw); // XXX: For now, rw = 1 means write
 
 /* mm/frame.c */
-void frame_init(uintptr_t mem_size);
-struct frame *frame_get(void *ptr);
-void frame_put(struct frame *frame);
-void *palloc_user();
+void	 frame_init(uintptr_t mem_size);
+frame_t *frame_get(void *ptr);
+void	 frame_put(struct frame *frame);
+void *	 palloc_user();
 
 /* mm/palloc.c */
 #include <chicken/boot.h>
-void palloc_init(struct kernel_boot_info *info);
-void *pallocn(uint32_t count);
-void *palloc();
-void *palloc_len(size_t len);
-void palloc_free(void *addr);
-int  pallocn_free(void *addr, int pages);
+void	palloc_init(struct kernel_boot_info *info);
+void *	pallocn(uint32_t count);
+void *	palloc();
+void *	palloc_len(size_t len);
+void	palloc_free(void *addr);
+int		pallocn_free(void *addr, int pages);
 
 /* mm/mm_ops.c */
-int sys_mprotect(void *addr, size_t len, int prot);
+int		sys_mprotect(void *addr, size_t len, int prot);
+void *	sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset);
+int		sys_munmap(void *addr, size_t length);
 
 #endif

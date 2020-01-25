@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <elf.h>
 #include <fs/vfs.h>
+#include <fs/dentry.h>
 
 #define MAX_ARGS 256
 #define MAX_ENVS 256
@@ -22,6 +23,7 @@ typedef struct {
 		// FIXME: Should be dentry_t
 		struct inode *inode;
 	};
+	dentry_t *dentry;
 	uintptr_t ip;
 	uintptr_t sp;
 
