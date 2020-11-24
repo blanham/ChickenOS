@@ -1,4 +1,5 @@
 #include <ctype.h>
+
 int isprint(char c)
 {
 	if(('a' <= c) && (c <= 'z'))
@@ -32,6 +33,7 @@ int isxdigit(int c)
 
 	return 0;
 }
+
 int isalpha(int c)
 {
 	if(('A' <= c) && (c <= 'Z'))
@@ -41,6 +43,7 @@ int isalpha(int c)
 
 	return 0;
 }
+
 int isalnum(int c)
 {
 	if(isalpha(c))
@@ -49,16 +52,19 @@ int isalnum(int c)
 		return 1;
 	return 0;
 }
+
 int islower(int c)
 {
 	if(('a' <= c) && (c <= 'z'))
 		return 1;
 	return 0;
 }
+
 int isspace(int c)
 {
 	return c == ' ' || (unsigned)c-'\t' < 5;
 }
+
 int toupper(int c)
 {
 	int dif = 'A' - 'a';

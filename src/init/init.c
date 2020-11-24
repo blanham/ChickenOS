@@ -25,7 +25,6 @@ void init(void *aux UNUSED)
 	SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
 	SYSCALL_3N(SYS_OPEN, "/dev/tty", 0, NULL);
 
-	//XXX: Fix this
 	//if(!SYSCALL_0N(SYS_FORK))
 	{
 		//uintptr_t p = 0;

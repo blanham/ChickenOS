@@ -1,10 +1,10 @@
 /*	ChickenOS PIT and RTC routines
  */
-#include <arch/i386/interrupt.h>
 #include <chicken/common.h>
 #include <chicken/interrupt.h>
 #include <chicken/time.h>
 #include <chicken/device/ioport.h>
+#include <_interrupt.h>
 #include "i386_defs.h"
 
 #define PIT0_DATA	0x40

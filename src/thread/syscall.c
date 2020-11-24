@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <chicken/common.h>
 #include <chicken/thread.h>
+#include <chicken/thread/signal.h>
 #include <chicken/thread/syscall.h>
 #include <chicken/thread/syscall-names.h>
 #include <chicken/time.h>

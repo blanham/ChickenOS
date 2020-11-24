@@ -23,7 +23,7 @@ int strcmp(const char * str1, const char * str2)
 	return *(unsigned char *)str1 - *(unsigned char *)str2;
 }
 
-// This is trickier then you would expect: https://stackoverflow.com/questions/1356741/strcmp-and-signed-unsigned-chars
+// This is trickier than you would expect: https://stackoverflow.com/questions/1356741/strcmp-and-signed-unsigned-chars
 int strncmp(const char *str1, const char *str2, size_t num)
 {
 	if (!num--) return 0;

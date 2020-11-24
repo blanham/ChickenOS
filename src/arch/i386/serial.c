@@ -1,4 +1,4 @@
-#include <arch/i386/serial.h>
+#include <serial.h>
 #include <chicken/common.h>
 #include <chicken/device/ioport.h>
 #include <chicken/device/console.h>

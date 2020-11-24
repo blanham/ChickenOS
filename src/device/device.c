@@ -10,7 +10,7 @@
 #include <chicken/fs/vfs.h>
 #include <chicken/mm/liballoc.h>
 
-#define MAX_DEVICES 20
+#define MAX_DEVICES 256
 
 struct device block_devices[MAX_DEVICES];
 struct device char_devices[MAX_DEVICES];
@@ -60,4 +60,10 @@ struct device *get_device(uint16_t device_type, dev_t dev)
 	}
 
 	return ret;
+}
+
+inode_t *device_open(inode_t *fs)
+{
+	(void)fs;
+	return NULL;
 }

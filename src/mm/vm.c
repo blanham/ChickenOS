@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <chicken/common.h>
+#include <chicken/mm/frame.h>
 #include <chicken/mm/vm.h>
 #include <chicken/mm/regions.h>
 #include <chicken/thread.h>
@@ -33,7 +34,7 @@ void vm_page_fault(registers_t *regs, uintptr_t addr, int flags)
 	thread_t *cur = thread_current();
 	enum intr_status status = interrupt_disable();
 
-	//serial_printf("Page fault @ %X\n", regs->eip);
+	//printf("Page fault @ %X\n", regs->eip);
 
 	//vm_page_fault_dump(regs, addr, flags);
 	//TODO: Check if this is a swapped out or mmaped or COW etc
@@ -71,6 +72,7 @@ struct mm *mm_alloc()
 	struct mm *new = kcalloc(sizeof(*new), 1);
 
 	new->pd = pagedir_alloc();
+	new->tree = rbtree_alloc();
 
 	return new;
 }
@@ -80,6 +82,7 @@ struct mm *mm_clone(struct mm *old)
 	struct mm *new = kcalloc(sizeof(*new), 1);
 	new->pd = pagedir_clone(old->pd);
 	new->regions = region_clone(old->regions);
+	new->tree = rbtree_alloc();
 
 	return new;
 }
@@ -112,6 +115,8 @@ void mm_init(struct mm *mm)
 	//instead of just blanking the regions and adding a new pagedirectory
 	mm->pd = pagedir_alloc();
 	mm->regions = NULL;
+
+	mm->tree = rbtree_alloc();
 
 	//FIXME: probably not the best address for break
 	//should be right above the code segment of the

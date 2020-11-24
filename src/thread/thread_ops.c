@@ -1,6 +1,5 @@
 #include <errno.h>
 #include <sys/types.h>
-#include <arch/i386/interrupt.h>
 #include <chicken/common.h>
 #include <chicken/thread.h>
 

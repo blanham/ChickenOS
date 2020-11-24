@@ -7,6 +7,7 @@
 #include <chicken/fs/vfs.h>
 #include <chicken/mm/liballoc.h>
 #include <chicken/mm/vm.h>
+#include <chicken/thread/synchro.h>
 
 // FIXME: This should probably dynamically grow
 #define MAX_OPEN_INODES 2048
@@ -15,13 +16,17 @@ struct icache {
 //	struct lock *free_lock, cache_lock;
 	int count;
 
-	//hash table
-	struct inode *cache;
-	int keylen;
+	inode_t *cache_buffer;
 
 	// XXX: Might be worth having the pointer for this be a union, or re-use the hash pointer
-	struct inode *free_list;
+	lock_t free_lock;
+	inode_t *free_list;
 } icache_storage, *inode_cache = &icache_storage;
+
+
+// New icache stores inodes in a big table, which can grow if need be
+// Lookup is done by tree, which stores their IDs
+// Implement a heap 
 
 struct inode *icache_alloc(dev_t dev, ino_t inode)
 {
@@ -68,6 +73,7 @@ int icache_init()
 
 	void *icache_base = pallocn(pages);
 	printf("%p %x\n", icache_base, pages);
+
 
 
 

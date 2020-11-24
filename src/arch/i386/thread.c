@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include <string.h>
-#include <arch/i386/interrupt.h>
-#include <arch/i386/registers.h>
+#include <_interrupt.h>
+#include <_registers.h>
 #include <chicken/common.h>
 #include <chicken/interrupt.h>
 #include <chicken/mm/liballoc.h>

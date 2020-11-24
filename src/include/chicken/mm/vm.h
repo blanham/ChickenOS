@@ -10,6 +10,7 @@
 #include <chicken/fs/dentry.h>
 #include <chicken/fs/vfs.h>
 #include <chicken/mm/paging.h>
+#include <chicken/lib/rbtree.h>
 
 typedef uintptr_t phys_addr_t;
 typedef uintptr_t virt_addr_t;
@@ -36,6 +37,7 @@ typedef uintptr_t virt_addr_t;
 
 struct mm {
 	void *pd;
+	rbtree_t *tree;
 	struct memregion *regions;
 	//Tree here
 	void * brk;
@@ -44,30 +46,18 @@ struct mm {
 	int ref;
 };
 
-typedef struct frame {
-	union {
-		uintptr_t phys_addr;
-		void *phys_ptr;
-	};
-	union {
-		uintptr_t virt_addr;
-		void *virt_ptr;
-	};
-	size_t blocksize;
-	union {
-		//
-		// if mapped
-		// struct inode * parent?
-		// if swapped
-		struct swapdata{
-		//	dev_t device;
-			size_t block;
-		} swapdata;
-	};
-	// hmm, then you wouldn't need to store block numbers in the frame
-	// add lock/semaphore/waitqueue
-	atomic_int ref_count;
-} __attribute__((packed)) frame_t;
+typedef struct memregion address_region_t;
+
+typedef struct {
+	uint32_t *page_directory;
+	rbtree_t *tree;
+	address_region_t *heap;
+	address_region_t *stack;
+	address_region_t *mmap;
+
+
+	atomic_int ref;
+} address_space_t;
 
 /* mm/vm.c */
 void vm_init(struct kernel_boot_info *info);
@@ -82,14 +72,7 @@ void mm_init(struct mm *mm);
 #define VP_WRITE 1
 int verify_pointer(const void *ptr, size_t len, int rw); // XXX: For now, rw = 1 means write
 
-/* mm/frame.c */
-void	 frame_init(uintptr_t mem_size);
-frame_t *frame_get(void *ptr);
-void	 frame_put(struct frame *frame);
-void *	 palloc_user();
-
 /* mm/palloc.c */
-#include <chicken/boot.h>
 void	palloc_init(struct kernel_boot_info *info);
 void *	pallocn(uint32_t count);
 void *	palloc();

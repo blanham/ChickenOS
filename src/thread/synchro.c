@@ -1,9 +1,10 @@
 // FIXME: actually use locks and semaphores 
+#include <stdatomic.h>
 #include <chicken/thread.h>
 
 struct semaphore {
-	int count; //this should only be accessed with atomic operations
-	thread_t *waiters;
+	atomic_uint count;
+	thread_t *owner;
 };
 
 int semaphore_down(struct semaphore *sema) {

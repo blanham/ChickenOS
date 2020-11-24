@@ -1,15 +1,10 @@
 #ifndef C_OS_SYSCALL_H
 #define C_OS_SYSCALL_H
 
-#ifdef ARCH_I386
-#include <arch/i386/syscall.h>
-#include <arch/i386/interrupt.h>
-#include <arch/i386/registers.h>
-#elif ARCH_ARM
-#include <arch/arm/syscall.h>
-#else
-#error unsupported architecture
-#endif
+// Architecture specific defs
+#include <_syscall.h>
+#include <_interrupt.h>
+#include <_registers.h>
 
 enum { 
 	SYS_EXIT = 1, 

@@ -7,11 +7,8 @@
 #include <stdio.h>
 #include <chicken/device/console.h>
 
-#ifdef ARCH_ARM
-#include <arch/arm/common.h>
-#elif ARCH_I386
-#include <arch/i386/common.h>
-#endif
+// Architecture specific definitions here
+#include <_common.h>
 
 #ifndef NULL
 #define NULL 0

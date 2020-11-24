@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <ctype.h>
+
 void putc(char c);
 void putchar(int c);
 int puts(char *string);
@@ -15,4 +16,5 @@ int serial_printf(const char *fmt, ...);
 int sprintf(char *buf, const char *fmt, ...);
 int snprintf(char *buf, size_t size, const char *fmt, ...);
 void hex_dump(void *ptr, int n);
+
 #endif

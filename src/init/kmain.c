@@ -10,6 +10,9 @@
 #include <chicken/thread.h>
 #include <chicken/time.h>
 
+
+#include <chicken/lib/rbtree.h>
+
 #define VERSION "v0.1.0"
 char *BOOT_MSG = "\033[32;1mChickenOS "VERSION" booting\033[0m\n";
 
@@ -63,14 +66,12 @@ void kmain(struct kernel_boot_info *info)
 	vfs_mount_root(root_device, "ext2");
 
 	printf("Found %uMB RAM\n", info->mem_size/1024/1024);
-	printf("Lower: %X Upper: %X\n", info->low_mem, info->hi_mem);
+	//printf("Lower: %X Upper: %X\n", info->low_mem, info->hi_mem);
 
-	//init thread is started in user mode
-	//so we don't need to switch into user mode
-	thread_create2((uintptr_t)init, 0, "Argument");
+	thread_start_init(init, NULL);
 
-	//TODO: We should probably use this thread to schedule
-	//		bottom halves
+	// TODO: Add bottom halves/software interupts, other kernel threads, etc
+
 	kernel_halt();
 
 	//should never return, unless things get really fucked

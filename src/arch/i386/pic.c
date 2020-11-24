@@ -1,5 +1,5 @@
-#include <arch/i386/interrupt.h>
-#include <arch/i386/pic.h>
+#include <_interrupt.h>
+#include <pic.h>
 #include <chicken/common.h>
 #include <chicken/device/ioport.h>
 

@@ -66,12 +66,14 @@ typedef struct {
 typedef struct thread_struct thread_t;
 typedef struct thread_struct {
 	pid_t pid, tgid, ppid, pgid;
-	// TODO: We need to add tgid and return that instead of ->pid fot getpid(2)
+	// linux thread id stuff
+	int *set_child_tid, *clear_child_tid;
+	// TODO: We need to add tgid and return that instead of ->pid for getpid(2)
 	uid_t uid, euid;
 	gid_t gid, egid;
 	mode_t umask;
 	char *name;
-	int ret_val;
+	int ret_val; // this is the value passed into close()
 
 	//Scheduler hash
 	UT_hash_handle hh;
@@ -87,16 +89,14 @@ typedef struct thread_struct {
 	//fs stuff
 	thread_files_t *files;
 	thread_fs_t *fs_info;
-	//saved kernel stack, user stack, and location of user stack
-	uint8_t *sp;//, *useresp, *user;
-	uintptr_t ip, usersp; // For fork() and clone()
-	void *registers;
-	void *tls;
-
 	thread_signals_t *sig_info;
 
-	// linux thread id stuff
-	int *set_child_tid, *clear_child_tid;
+	//saved kernel stack
+	uint8_t *sp;
+	uintptr_t ip, usersp; // For fork() and clone()
+	void *registers; // system calls and fork()/clone() need access to the interrupt context
+	void *tls; // pointer to a architecture specific TLS description
+
 
 	//this pointer to registers on kernel
 	//stack is used for manipulating the user stack
@@ -155,7 +155,7 @@ int		sys_set_tid_address(int *ptr);
 /* thread/clone.c */
 pid_t 	sys_fork();
 int		sys_clone(unsigned long flags, void *stack, int *parent_tid, unsigned long tls, int *child_tid);
-pid_t	thread_create2(uintptr_t eip, uintptr_t _esp, void *aux);
+pid_t	thread_start_init(void (*fn)(void *), void *aux);
 
 /* thread/exec.c */
 int	sys_execve(const char *path, char *const argv[], char *const envp[]);
@@ -173,14 +173,6 @@ void thread_queue(thread_t *thread);
 void scheduler_run(registers_t *regs);
 thread_t *thread_next();
 
-/* thread/signal.c */
-void signal_do(registers_t *regs, thread_t *);
-int sys_kill(int pid, int sig);
-int sigisemptyset(const sigset_t *set);
-int sys_sigaction(int sig, const struct k_sigaction *act, struct k_sigaction *oact);
-int sys_sigsuspend(const sigset_t *mask);
-int sys_sigprocmask(int how, const sigset_t *set, sigset_t *oldset);
-int sys_sigreturn(registers_t *regs, unsigned long dunno);
 
 /* thread/thread_util.c */
 pid_t	pid_allocate();
@@ -203,7 +195,6 @@ void switch_threads(thread_t *cur, thread_t *new);
 // FIXME: not sure where to put this
 struct uname;
 int sys_uname(struct uname *uname);
-
 
 typedef struct __locale_struct
 {

@@ -3,6 +3,7 @@
  * Keeps track of page reference counts
  *
  */
+#include <chicken/mm/frame.h>
 #include <chicken/mm/vm.h>
 
 struct frame *frames;

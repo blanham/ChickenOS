@@ -11,19 +11,6 @@
 
 uint8_t zero_page[PAGE_SIZE] __attribute__ ((aligned (PAGE_SIZE))) = {0};
 
-// XXX: Why are these enums here?
-enum {
-	VERIFY_R,
-	VERIFY_W
-};
-
-enum {
-	REGION_R,
-	REGION_W,
-	REGION_COW
-};
-
-
 //XXX: Do the following in mm/regions.c:
 //iterate through entries less than PHYS_BASE
 //reduce reference counts
@@ -93,6 +80,10 @@ struct memregion *memregion_new(struct mm *mm, uintptr_t address, size_t len, in
 
 	new->next = mm->regions;
 	mm->regions = new;
+	
+	atomic_fetch_add(&new->ref_count, 1);
+
+	rbtree_insert_range(mm->tree, new->addr_start, new->pages * PAGE_SIZE, (uintptr_t)new);
 
 	return new;
 }
@@ -152,7 +143,7 @@ static int regiongrowth(struct mm *mm, struct memregion *p, uintptr_t address)
 	if((p->prot == PROT_GROWSDOWN) && // (address + PAGE_SIZE >= p->addr_start) && // FIXME: Why did I comment this out?
 			(address < p->addr_end))
 	{
-		//serial_printf("Growing down %x %x\n", address + PAGE_SIZE, address);
+		printf("Growing down %x %x\n", address + PAGE_SIZE, address);
 		p->addr_start -= PAGE_SIZE;
 
 		// FIXME: This should take into account RLIMITs
@@ -163,7 +154,7 @@ static int regiongrowth(struct mm *mm, struct memregion *p, uintptr_t address)
 	if((p->prot == PROT_GROWSUP) && (address - PAGE_SIZE <= p->addr_end)
 			&& (address >= p->addr_start))
 	{
-		//printf("Growing up %x %x end %x\n", address + PAGE_SIZE, address, p->addr_end);
+		printf("Growing up %x %x end %x\n", address + PAGE_SIZE, address, p->addr_end);
 		p->addr_end += PAGE_SIZE;
 
 		return memregion_insert(mm, NULL, address & PAGE_MASK, 0x7);
@@ -283,7 +274,42 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 {
 	//TODO: Use AVL tree instead
 
-	for(struct memregion *p = mm->regions; p != NULL; p = p->next) {
+	struct memregion *p = NULL;//(void *)rbtree_search_range(mm->tree, address);
+	//serial_printf("PP%p\n", p);
+	//printf("Addresss: %p\n", address);
+	//rbtree_dump(mm->tree);//, rbnode_t *x) {
+		//while(1);
+	//printf("DDD %p\n", p);
+	//if ((p == NULL) || ((uintptr_t)p == 0xFFFFFFFF)) {
+		//printf("Address: %p %p\n", address, p);
+		//rbtree_dump(mm->tree);
+		//p = (void *)rbtree_search_range2(mm->tree, address, 4096);
+		//if ((p == NULL) || ((uintptr_t)p == 0xFFFFFFFF)) {
+			//printf("LOL\n");
+			//return 1;
+
+		//}
+
+		//if(regiongrowth(mm, p, address) == 0)
+		//		return 0;
+	//} else {
+		//printf("Ap->addr %x end %x prot %x address %x offset %llx\n", p->addr_start, p->addr_end, prot, address, p->file_offset);
+			//if(p->cow)
+			//	return memregion_cow(mm, p, address);
+
+//			if(p->flags & MAP_FIXED)
+		//		return memregion_insert(mm, NULL, address, 0x7);
+
+//			if((p->flags & MAP_FILE) == 0)
+		//		return load_page_from_file(mm, p, address);
+//	}
+	
+	//return 1;
+
+	//struct memregion *rrr = p;
+
+
+	for(p = mm->regions; p != NULL; p = p->next) {
 		//printf("KBs %i\n", (p->addr_end - p->addr_start + 1) / 1024);
 		//printf("Ap->addr %x end %x prot %x address %x offset %llx", p->addr_start, p->addr_end, prot, address, p->file_offset);
 		//if (p->inode)
@@ -295,7 +321,11 @@ int memregion_fault(struct mm *mm, uintptr_t address, int prot)
 		(void)prot;
 		if (address < 4096)
 			return 1;
+
 		if(address >= p->addr_start && address < p->addr_end) {
+			//if ( p != rrr)
+			//printf("%p %p\n", p, rrr);
+
 			if (p->prot == 0) {
 			//	printf("R/w of guard page!\n");
 

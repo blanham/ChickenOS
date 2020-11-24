@@ -6,8 +6,8 @@
 #include <chicken/common.h>
 #include <chicken/thread.h>
 #include <chicken/thread/syscall.h>
-#include <arch/i386/pic.h>
-#include <arch/i386/interrupt.h>
+#include <pic.h>
+#include <_interrupt.h>
 #include "i386_defs.h"
 
 extern idt_entry_t idt_table[NUM_INTRS];

@@ -110,7 +110,7 @@ void ps2_intr(void)
 	//		rbuf[pos++] = 0x1B;
 	//		break;
 		case 15:
-			sys_kill(2, SIGCHLD);
+			//sys_kill(2, SIGCHLD);
 			break;
 
 		case 0xe0:
@@ -139,8 +139,8 @@ void ps2_intr(void)
 			//TODO: This needs to be in the terminal driver
 			if((c == 'c') && (shifts & (L_CTRL)))
 			{
-				sys_kill(2, SIGINT);
-				return;
+				//sys_kill(2, SIGINT);
+				//return;
 			}
 			if(c == '\\')
 			{

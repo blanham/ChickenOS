@@ -15,6 +15,9 @@ struct memregion {
 	size_t len;
 	atomic_int ref_count;
 
+	uint32_t protection_flags;
+	uint32_t map_flags;
+
 	// XXX: These should be a bitfield
 	int present;
 	int cow;

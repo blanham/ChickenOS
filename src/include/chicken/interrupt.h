@@ -1,15 +1,10 @@
 #ifndef C_OS_INTERRUPT_H
 #define C_OS_INTERRUPT_H
 
-#ifdef ARCH_I386
-#include <arch/i386/interrupt.h>
-#include <arch/i386/registers.h>
-#elif ARCH_ARM
-#include <arch/arm/interrupt.h>
-#include <arch/arm/registers.h>
-#endif
-
 #include <stdint.h>
+// Architecture specific defs
+#include <_interrupt.h>
+#include <_registers.h>
 
 enum intr_status { INTR_DISABLED, INTR_ENABLED};
 

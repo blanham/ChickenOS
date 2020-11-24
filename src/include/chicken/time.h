@@ -15,7 +15,6 @@ struct c_os_time {
 };
 
 /* arch/$ARCH/time.c */
-
 void arch_timer_init(uint32_t frequency);
 void arch_rtc_init(struct c_os_time *time);
 

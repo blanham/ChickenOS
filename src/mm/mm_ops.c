@@ -20,7 +20,6 @@ int sys_mprotect(void *addr UNUSED, size_t len UNUSED, int prot UNUSED)
 //Move this to the region code?
 void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pgoffset)
 {
-	(void)prot; // TODO: implement actual memory protections :P
 	printf("MMAP! Addr %p, length %x prot %x flags %x fd %i pgoffset %i\n", addr, length, prot, flags, fd, pgoffset);
 
 	if ((flags & MAP_FIXED) == 0) {
@@ -40,15 +39,14 @@ void *sys_mmap2(void *addr, size_t length, int prot, int flags, int fd, off_t pg
 		return (void *)-EBADF; // 
 
 	thread_t *cur = thread_current();
-	printf("harp %p\n", file->dentry);
-	memregion_map_file(cur->mm, (uintptr_t)addr &PAGE_MASK, length, PROT_READ|PROT_WRITE|PROT_EXEC,
-				MAP_FILE, file->dentry, pgoffset*4096, file->inode->info.st_size);
-	return (void *) (((uintptr_t)addr + 4096 -1) & PAGE_MASK);
+	memregion_map_file(cur->mm, (uintptr_t)addr&PAGE_MASK, length, prot, MAP_FILE, file->dentry, pgoffset*4096, file->inode->info.st_size);
+
+	return (void *) (((uintptr_t)addr + PAGE_SIZE - 1) & PAGE_MASK);
 }
 
 int sys_munmap(void *addr, size_t length)
 {
-	printf("MUNAMP: %p %x\n", addr, length);
+	printf("MUNMAP: %p %x\n", addr, length);
 
 	return -ENOSYS;
 }

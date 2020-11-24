@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
-#include <arch/i386/interrupt.h> // FIXME this import should be made redundant
+//#include <arch/i386/interrupt.h> // FIXME this import should be made redundant
 #include <chicken/common.h>
 #include <chicken/interrupt.h>
 #include <chicken/mm/vm.h>
@@ -13,69 +13,45 @@
 
 void clone_flags_dump(uint32_t flags);
 
-void user_thread_exited(void) __attribute__((section(".user")));
-void user_thread_exited(void)
+static void init_exited(void) __attribute__((section(".user")));
+static void init_exited(void)
 {
-	//Should probably call SYSCALL_1N(SYS_EXIT, current_value_of_eax);
-	PANIC("User thread exited!");
+	PANIC("init() exited!");
 }
 
-pid_t thread_create2(uintptr_t eip, uintptr_t _esp, void *aux)
+// This function manually builds a new thread so we can get to userspace
+pid_t thread_start_init(void (*fn)(void *), void *aux)
 {
 	enum intr_status old_level = interrupt_disable();
-	thread_t *new;
-	uintptr_t esp;
 
-	printf("Creating thread with eip: %x _esp: %x\n", eip, _esp);
-	uintptr_t ebp = 0;
+	//printf("Creating thread with eip: %x _esp: %x\n", eip, _esp);
 
-	if(_esp) {
-		thread_t *parent = thread_current();
-		new = thread_new(true);
-	new->mm = mm_clone(parent->mm);
-	new->files = thread_files_alloc(parent->files);
+	thread_t *new = thread_new(false);
+	new->mm = mm_alloc();
+	new->files = thread_files_alloc(NULL);
+	new->tgid = 1;
 
-	if (parent->tls != NULL) {
-		//new->tls = kcalloc(17,1);
-		//kmemcpy(new->tls, parent->tls, 17);
-	}
-	memcpy(new->sig_info->signals, parent->sig_info->signals,
-			sizeof(struct k_sigaction) * NUM_SIGNALS);
+	thread_t *cur = thread_current();
+	new->fs_info = kcalloc(sizeof(*new->fs_info), 1);
+	new->fs_info->cur = cur->fs_info->cur;
+	new->fs_info->root = cur->fs_info->root;
 
-		esp = _esp;
-		ebp = (uintptr_t)aux;
-		//thread_copy_stackframe(cur, new, 00);
-	thread_build_stackframe((void *)new, eip, esp, ebp);
-	} else {
-		new = thread_new(false);
-		new->mm = mm_alloc();
-		new->files = thread_files_alloc(NULL);
+	uint32_t *usersp = palloc();
+	memregion_map_data(new->mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN, MAP_GROWSDOWN | MAP_FIXED, usersp);
 
-		new->fs_info = kcalloc(sizeof(*new->fs_info), 1);
-		thread_t *cur = thread_current();
-		new->fs_info->cur = cur->fs_info->cur;
-		new->fs_info->root = cur->fs_info->root;
-		new->tgid = 1;
-		//
-		uint32_t *usersp = palloc();
-		memregion_map_data(new->mm, PHYS_BASE - PAGE_SIZE, PAGE_SIZE, PROT_GROWSDOWN,
-			MAP_GROWSDOWN | MAP_FIXED, usersp);
+	usersp += 1024;
+	*--usersp = (uintptr_t)init_exited;
+	*--usersp = (uintptr_t)aux;
 
-		usersp += 1024;
-		*--usersp = (uintptr_t)user_thread_exited;
-		*--usersp = (uintptr_t)aux;
-		esp = PHYS_BASE-8;
-		printf("ESP %X USERSP %X\n", esp, usersp);
-	thread_build_stackframe((void *)new, eip, esp, 0);
-	}
-	//XXX: Doesn't handle fork returning new pid
+	uintptr_t esp = PHYS_BASE - 8;
+	thread_build_stackframe((void *)new, (uintptr_t)fn, esp, 0);
+
+	//printf("ESP %X USERSP %X\n", esp, usersp);
 
 	uint8_t *new_sp = (void*)((uintptr_t)new + STACK_SIZE);
-	// XXX: This is platform specific, and the 5 uint32_t's are so that the stack
-	//		is ready for switch_thread()
 	new->sp = (uint8_t *)(new_sp - (sizeof(registers_t) + sizeof(uint32_t)*5));
-	serial_printf("CLONE\n");
-	registers_dump((void *)new->sp + (5*4));
+
+	//registers_dump((void *)new->sp + (5*4));
 
 	thread_set_ready(new);
 
@@ -118,6 +94,8 @@ thread_t *thread_clone_new(unsigned long flags, void *stack, uintptr_t tls)
 			//return -EFAULT;
 			PANIC("BAD POINTER");
 		thread_set_tls(new, (void *)tls);
+	} else {
+		// XXX: Do we need to do something here?
 	}
 
 	if (flags & CLONE_SIGHAND) {

@@ -5,9 +5,10 @@
 #include <sys/types.h>
 
 #define DCACHE_PRESENT	0x01
+#define DCACHE_DEVICE	0x02
 #define DCACHE_MOUNT	0x10
 
-struct inode;
+typedef struct inode inode_t;
 
 // How do we keep track of the full path?
 typedef struct dentry {
@@ -23,6 +24,7 @@ typedef struct dentry {
 	ino_t parent_ino;
 
 	struct inode *inode, *parent;
+	struct inode *on_disk; // Only set if this inode is a device file
 
 	struct dentry *hash_prev, *hash_next;
 	struct dentry *lru_next, *lru_prev;

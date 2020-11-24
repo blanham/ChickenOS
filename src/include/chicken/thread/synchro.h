@@ -13,8 +13,5 @@ typedef struct {
 
 } semaphore_t;
 
-typedef struct {
-
-} semaphore_t;
 
 #endif

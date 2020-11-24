@@ -1,7 +1,10 @@
 *.sw*
+user_scripts/
 bochsout.txt
+bin/
+*.img
 log
-build/*
+build/
 disk/
 info/
 tmp/
