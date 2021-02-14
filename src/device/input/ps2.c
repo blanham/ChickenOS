@@ -41,8 +41,8 @@ int kbd_getc()
 	//while(pos == 0);
 	if (pos == 0)
 		return -1;
-		extern int fart2;
-		fart2 = 0;
+	extern int fart2;
+	fart2 = 0;
 	return rbuf[--pos];
 }
 

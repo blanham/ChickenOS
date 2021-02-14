@@ -218,10 +218,10 @@ int sys_clone(unsigned long flags, void *stack, int *parent_tid, unsigned long t
 		goto unsupported_flag;
 
 	enum intr_status old_level = interrupt_disable();
-    printf("CLONE: %x %p %p %p %p\n", flags, stack, parent_tid, tls, child_tid);
-    printf("Current TLS:\n");
-    if (cur->tls)
-        thread_dump_tls(cur->tls);
+	printf("CLONE: %x %p %p %p %p\n", flags, stack, parent_tid, tls, child_tid);
+	printf("Current TLS:\n");
+	if (cur->tls)
+		thread_dump_tls(cur->tls);
 	thread_t *new = thread_clone_new(flags, stack, tls);
 
 	if (flags & CLONE_PARENT_SETTID) {

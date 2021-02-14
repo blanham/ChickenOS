@@ -134,21 +134,21 @@ uint32_t *pagedir_clone(uint32_t *pd)
 		if (!(pde & PDE_P))
 			continue;
 
-			uint32_t *new_pt = pagetable_alloc();
-			uint32_t *old_pt = P2V(pde & PAGE_MASK);
+		uint32_t *new_pt = pagetable_alloc();
+		uint32_t *old_pt = P2V(pde & PAGE_MASK);
 
-			for (int i = 0; i < 1024; i++) {
-				if(!(old_pt[i] & PTE_P))
-					continue;
-				//XXX: This should also increase reference count
-				//mark all pages as read only
-				//old_pt[i] &= ~PTE_RW;
-				void * new = palloc();
-				memcpy(new, P2V(old_pt[i] &PAGE_MASK), PAGE_SIZE);
-				new_pt[i] = (uintptr_t)V2P(new) | (old_pt[i] & ~PAGE_MASK) ;
+		for (int i = 0; i < 1024; i++) {
+			if(!(old_pt[i] & PTE_P))
+				continue;
+			//XXX: This should also increase reference count
+			//mark all pages as read only
+			//old_pt[i] &= ~PTE_RW;
+			void * new = palloc();
+			memcpy(new, P2V(old_pt[i] &PAGE_MASK), PAGE_SIZE);
+			new_pt[i] = (uintptr_t)V2P(new) | (old_pt[i] & ~PAGE_MASK) ;
 
-			}
-			new[i] = (uintptr_t)V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
+		}
+		new[i] = (uintptr_t)V2P(new_pt) | PDE_RW | PDE_USER | PDE_P;
 	}
 
 	return new;

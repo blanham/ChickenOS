@@ -18,7 +18,7 @@ set(CMAKE_C_FLAGS
 				-fno-builtin -DARCH_I386\
                 -Wextra"
 )
-set(CMAKE_LINKER "/usr/bin/clang")
+set(CMAKE_LINKER "clang")
 file(GLOB LINKER_SCRIPT "src/arch/i386/linker.ld")
 set(CMAKE_EXE_LINKER_FLAGS "-m32 -target i686-pc-none-elf -nostdlib -T ${LINKER_SCRIPT}")
 
