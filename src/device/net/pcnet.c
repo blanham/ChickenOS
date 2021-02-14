@@ -359,7 +359,8 @@ struct network_dev * pcnet_init()
 		l->io_base = pci_get_bar(l->pci, PCI_BAR_IO) & ~1;
 		printf("io base %x\n",l->io_base);
 		
-		l->mem_base = (uint8_t *)(pci_get_bar(l->pci, PCI_BAR_MEM) & ~3);
+		// XXX: This might be severely broken on 64bit machines
+		l->mem_base = (uint8_t *)(uintptr_t)(pci_get_bar(l->pci, PCI_BAR_MEM) & ~3);
 		printf("mem base %x\n",l->mem_base);
 		//uint16_t out = pci_reg_inw(l->pci, 4);
 		//pci_reg_outw(l->pci, 4, out|4|1);

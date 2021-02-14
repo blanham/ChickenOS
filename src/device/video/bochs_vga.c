@@ -147,10 +147,11 @@ uint32_t * bochs_vga_init_internal(int w, int h, int bpp)
 	if((pci = pci_get_device(0x1234, 0x1111)) != NULL)
 	{
 			bar = pci_get_bar(pci, 0);
-			ptr = framebuffer = (uint32_t *)(bar & ~0xfff);
+			// XXX: Questionable on 64bit machines
+			ptr = framebuffer = (uint32_t *)(uintptr_t)(bar & ~0xfff);
 	}else{
 
-			ptr = framebuffer = (uint32_t *)(0xe0000000 & ~0xfff);
+			ptr = framebuffer = (uint32_t *)(uintptr_t)(0xe0000000 & ~0xfff);
 	//	return NULL;
 	}
 //	uint32_t size = w*h*(bpp / 4)*10 / 4096;

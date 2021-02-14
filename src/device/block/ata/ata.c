@@ -289,8 +289,8 @@ void ata_init()
 		device_register(S_IFBLK, 0x300, ata_read_thing, NULL, ata_ioctl);
 	}
 
-	interrupt_register(IRQ14, (void *)&ata_interrupt);
-	interrupt_register(IRQ15, (void *)&ata_interrupt_secondary);
+	//interrupt_register(IRQ14, (void *)&ata_interrupt);
+	//interrupt_register(IRQ15, (void *)&ata_interrupt_secondary);
 
 	for (int i = 0; i < 4; i++)
 		ata_detect_and_initialize(&drives[i]);
