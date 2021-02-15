@@ -192,7 +192,7 @@ int load_page_from_file(struct mm *mm, struct memregion *p, uintptr_t address)
 	void *new = palloc();
 	memset(new, 0, PAGE_SIZE);
 	//printf("LLL %p\n", address);
-	if (pages_from_start < p->file_size) {
+	if ((unsigned)pages_from_start < p->file_size) {
 
 
 		size_t len = PAGE_SIZE;

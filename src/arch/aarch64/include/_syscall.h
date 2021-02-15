@@ -1,53 +1,66 @@
-#ifndef C_OS_ARCH_I386_SYSCALL_H
-#define C_OS_ARCH_I386_SYSCALL_H
+#ifndef C_OS_ARCH_AARCH64_SYSCALL_H
+#define C_OS_ARCH_AARCH64_SYSCALL_H
 
 #define SYSCALL_0N(num) ({				\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num)			\
+	register long x0 asm("x0");			\
+	register long x8 asm("x8") = (long)num;\
+	asm volatile (	"svc 0"				\
+				   	: "=r"(x0) 			\
+				   	: "r" (x8),			\
+					  "0" (x0) 			\
+					  : "memory", "cc"	\
 				   	);					\
-					ret;})
-
+					x0;})
 #define SYSCALL_1N(num, arg0) ({		\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0) 		\
+	register long x0 asm("x0") = (long)arg0;\
+	register long x8 asm("x8") = (long)num;	\
+	asm volatile (	"svc 0"				\
+				   	: "=r"(x0) 			\
+				   	: "r" (x8),			\
+					  "0" (x0)			\
+					  : "memory", "cc"	\
 				   	);					\
-					ret;})
-
-#define SYSCALL_2N(num, arg0,arg1) ({	\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0), 		\
-					  "c" (arg1)		\
-										\
+					x0;})
+#define SYSCALL_2N(num, arg0, arg1) ({	\
+	register long x0 asm("x0") = (long)arg0;\
+	register long x8 asm("x8") = (long)num;	\
+	register long x1 asm("x1") = (long)arg1;\
+	asm volatile (	"svc 0"				\
+				   	: "=r"(x0) 			\
+				   	: "r" (x8),			\
+					  "0" (x0), 		\
+					  "r" (x1)			\
+					  : "memory", "cc"	\
 				   	);					\
-					ret;})
-#define SYSCALL_3N(num, arg0,arg1, arg2) ({	\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0), 		\
-					  "c" (arg1),		\
-					  "d" (arg2) 		\
+					x0;})
+#define SYSCALL_3N(num, arg0, arg1, arg2) ({\
+	register long x0 asm("x0") = (long)arg0;\
+	register long x8 asm("x8") = (long)num;	\
+	register long x1 asm("x1") = (long)arg1;\
+	register long x2 asm("x2") = (long)arg2;\
+	asm volatile (	"svc 0"				\
+				   	: "=r"(x0) 			\
+				   	: "r" (x8),			\
+					  "0" (x0), 		\
+					  "r" (x1),			\
+					  "r" (x2) 			\
+					  : "memory", "cc"	\
 				   	);					\
-					ret;})
-#define SYSCALL_4N(num, arg0,arg1, arg2, arg3) ({	\
-					int ret;			\
-	asm volatile (	"int $0x80"			\
-				   	: "=a"(ret) 		\
-				   	: "0" (num),		\
-					  "b" (arg0), 		\
-					  "c" (arg1),		\
-					  "d" (arg2), 		\
-					  "S" (arg3)		\
+					x0;})
+#define SYSCALL_4N(num, arg0, arg1, arg2, arg3) ({	\
+	register long x0 asm("x0") = (long)arg0;\
+	register long x8 asm("x8") = (long)num;	\
+	register long x1 asm("x1") = (long)arg1;\
+	register long x2 asm("x2") = (long)arg2;\
+	register long x3 asm("x3") = (long)arg3;\
+	asm volatile (	"svc 0"				\
+				   	: "=r"(x0) 			\
+				   	: "r" (x8),			\
+					  "0" (x0), 		\
+					  "r" (x1),			\
+					  "r" (x2), 		\
+					  "r" (x3)			\
+					  : "memory", "cc"	\
 				   	);					\
-					ret;})
-
+					x0;})
 #endif

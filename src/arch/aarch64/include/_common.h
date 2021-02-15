@@ -1,7 +1,9 @@
 #ifndef C_OS_ARCH_AARCH64_COMMON_H
 #define C_OS_ARCH_AARCH64_COMMON_H
 
-//#define stackpointer_get(x)  asm volatile ("mov %%esp, %0": "=m"(x) )
+#define stackpointer_get(x)  {x = 0;}
+
+//asm volatile ("mov %%r0, %0": "=m"(x) )
 
 static inline void kernel_halt()
 {

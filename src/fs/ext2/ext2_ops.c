@@ -121,14 +121,17 @@ ssize_t ext2_readlink(struct inode *inode, char *path, size_t length)
 	ext2_inode_t *ext2_ino = inode->storage;
 
 	off_t size = inode->info.st_size;
+
+	// XXX: The two following (size > length) comparisons are suspect
+	// 		For one, what's the correct behavior for a negative length value?
 	if (size <= 60) {
-		if (size > length)
+		if (size > (unsigned)length)
 			size = length;
 		memcpy(path, ext2_ino->symlink, size);
 		return size;
 	}
 
-	if (size > length)
+	if (size > (unsigned)length)
 		size = length;
 
 	return inode->read(inode, (uint8_t *)path, size, 0);

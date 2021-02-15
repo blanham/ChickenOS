@@ -5,7 +5,7 @@
 
 typedef struct _node {
 	struct _node *l, *r;
-	int64_t key, max;
+	uint64_t key, max;
 	uintptr_t value;
 	bool red;
 } rbnode_t;
@@ -30,7 +30,7 @@ struct nodeinfo {
 	rbnode_t *x, *parent, *grandparent, *greatgrandparent;
 };
 
-static rbnode_t *rbtree_rotate(rbnode_t *y, int64_t key) {
+static rbnode_t *rbtree_rotate(rbnode_t *y, uint64_t key) {
 	rbnode_t *gc = NULL;
 	rbnode_t *c = (key < y->value) ? y->l : y->r;
 
@@ -45,7 +45,7 @@ static rbnode_t *rbtree_rotate(rbnode_t *y, int64_t key) {
 	return gc;
 }
 
-static void rbtree_split(rbtree_t *tree, struct nodeinfo *state, int64_t key) {
+static void rbtree_split(rbtree_t *tree, struct nodeinfo *state, uint64_t key) {
 	state->x->red = true; state->x->l->red = false; state->x->r->red = false;
 
 	if (state->parent->red) {
@@ -58,7 +58,7 @@ static void rbtree_split(rbtree_t *tree, struct nodeinfo *state, int64_t key) {
 	tree->head->r->red = false;
 }
 
-void rbtree_insert_range(rbtree_t *tree, int64_t key, size_t range, uintptr_t value) {
+void rbtree_insert_range(rbtree_t *tree, uint64_t key, size_t range, uintptr_t value) {
 	struct nodeinfo info = {
 		.x = tree->head, .parent = tree->head, .grandparent = tree->head, .greatgrandparent = NULL
 	};
@@ -86,15 +86,15 @@ void rbtree_insert_range(rbtree_t *tree, int64_t key, size_t range, uintptr_t va
 	//rbtree_dump(tree);
 }
 
-void rbtree_insert(rbtree_t *tree, int64_t key, uintptr_t value) {
+void rbtree_insert(rbtree_t *tree, uint64_t key, uintptr_t value) {
 	rbtree_insert_range(tree, key, 0, value);
 }
 
-void rbtree_insert_ptr(rbtree_t *tree, int64_t key, void *ptr) {
+void rbtree_insert_ptr(rbtree_t *tree, uint64_t key, void *ptr) {
 	rbtree_insert_range(tree, key, 0, (uintptr_t)ptr);
 }
 
-uintptr_t rbtree_search(rbtree_t *tree, int64_t key) {
+uintptr_t rbtree_search(rbtree_t *tree, uint64_t key) {
 	rbnode_t *x = tree->head->r;
 	tree->zero->key = key; // See Sedgwick page 203
 	while (key != x->key && x != tree->zero) 
@@ -103,7 +103,7 @@ uintptr_t rbtree_search(rbtree_t *tree, int64_t key) {
 }
 
 // TODO: Give these better names
-uintptr_t rbtree_search_range(rbtree_t *tree, int64_t key) {
+uintptr_t rbtree_search_range(rbtree_t *tree, uint64_t key) {
 	rbnode_t *x = tree->head->r;
 	//tree->zero->key = key; // See Sedgwick page 203
 	while (!((key >= x->key) && (key < x->max)) && x != tree->zero)
@@ -111,7 +111,7 @@ uintptr_t rbtree_search_range(rbtree_t *tree, int64_t key) {
 	return x->value;
 }
 
-uintptr_t rbtree_search_range2(rbtree_t *tree, int64_t key, size_t range) {
+uintptr_t rbtree_search_range2(rbtree_t *tree, uint64_t key, size_t range) {
 	rbnode_t *x = tree->head->r;
 	//tree->zero->key = key; // See Sedgwick page 203
 	while (!((key >= x->key) && (key < x->max + range)) && x != tree->zero)
@@ -119,7 +119,7 @@ uintptr_t rbtree_search_range2(rbtree_t *tree, int64_t key, size_t range) {
 	return x->value;
 }
 
-uintptr_t rbtree_search_range3(rbtree_t *tree, int64_t key, size_t range) {
+uintptr_t rbtree_search_range3(rbtree_t *tree, uint64_t key, size_t range) {
 	rbnode_t *x = tree->head->r;
 	//tree->zero->key = key; // See Sedgwick page 203
 	while (!((key >= x->key-range) && (key < x->max)) && x != tree->zero)
@@ -129,7 +129,7 @@ uintptr_t rbtree_search_range3(rbtree_t *tree, int64_t key, size_t range) {
 
 
 
-void rbtree_update_range(rbtree_t *tree, int64_t key, size_t range) {
+void rbtree_update_range(rbtree_t *tree, uint64_t key, size_t range) {
 	rbnode_t *x = tree->head->r;
 	tree->zero->key = key; // See Sedgwick page 203
 	while (!((key >= x->key) && (key < x->max)))

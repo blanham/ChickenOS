@@ -14,6 +14,8 @@
 void syscall_handler (registers_t *regs)
 //int syscall_handler (uint32_t call, void *arg0, void *arg1, void *arg2, void *arg3, void *arg4, void *arg5)
 {
+	(void)regs;
+	/*
 	int call = regs->eax;
 	long *arg;
 
@@ -226,4 +228,5 @@ void syscall_handler (registers_t *regs)
 #ifdef DEBUG
 	serial_printf("%8i/%.8x\n", regs->eax, regs->eax);
 #endif
+	*/
 }

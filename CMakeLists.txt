@@ -6,11 +6,13 @@ project(ChickenOS C)
 
 set(CAN_USE_ASSEMBLER TRUE)
 
+set(CMAKE_C_COMPILER "clang")
+#set(CMAKE_LINKER "clang")
+
+set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
 include(src/arch/aarch64/CMakeLists.txt)
 include_directories(src/arch/aarch64/include src/include src/fs src/include/kernel)
 
-set(CMAKE_C_COMPILER "clang")
-set(CMAKE_LINKER "clang")
 
 file(GLOB_RECURSE DEV_FILES src/device/*.c)
 file(GLOB_RECURSE FS_FILES src/fs/*.c)
@@ -45,4 +47,4 @@ add_custom_target(terminal cd .. && ./new_update.sh &&        qemu-system-i386 -
 add_dependencies(terminal kernel.bin)
 
 set_target_properties(kernel.bin PROPERTIES C_STANDARD 11)
-target_link_libraries(kernel.bin ${CMAKE_SOURCE_DIR}/src/clangrt.a) # FIXME: This should be removed heh
+#target_link_libraries(kernel.bin ${CMAKE_SOURCE_DIR}/src/clangrt.a) # FIXME: This should be removed heh
