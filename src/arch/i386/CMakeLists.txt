@@ -1,14 +1,26 @@
 cmake_minimum_required(VERSION 3.1.0)
 
 enable_language(ASM_NASM)
+set(CMAKE_CROSSCOMPILING TRUE)
+SET(CMAKE_SYSTEM_NAME Generic)
+set(CMAKE_SYSTEM_PROCESSOR i386)
+
+SET(TARGET i386-elf)
+
+SET(CMAKE_C_COMPILER_TARGET ${TARGET})
+SET(CMAKE_C_COMPILER clang)
+SET(CMAKE_CXX_COMPILER_TARGET ${TARGET})
+SET(CMAKE_CXX_COMPILER clang++)
+SET(CMAKE_ASM_COMPILER_TARGET ${TARGET})
+SET(CMAKE_ASM_COMPILER clang)
 
 set(CMAKE_ASM_NASM_OBJECT_FORMAT elf32)
-set(CMAKE_NASM_LINK_EXECUTABLE "clang <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_NASM_LINK_EXECUTABLE "ld.lld <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
 set(CMAKE_ASM_NASM_COMPILE_OBJECT "<CMAKE_ASM_NASM_COMPILER> <INCLUDES> <FLAGS> -f ${CMAKE_ASM_NASM_OBJECT_FORMAT} -o <OBJECT> <SOURCE>")
 set(CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS ${CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS} s S)
 
 set(CMAKE_C_FLAGS
-    "-m32 -target i686-pc-none-elf -mno-sse -mno-mmx -g -Wall -Werror\
+    "-m32 -target i686-pc-none-elf -mno-sse -mno-mmx -g -Wall \
 				-std=gnu11\
 				-ffreestanding\
 				-fno-stack-protector\
@@ -17,7 +29,8 @@ set(CMAKE_C_FLAGS
                 -Wextra"
 )
 file(GLOB LINKER_SCRIPT "src/arch/i386/linker.ld")
-set(CMAKE_EXE_LINKER_FLAGS "-m32 -target i686-pc-none-elf -nostdlib -T ${LINKER_SCRIPT}")
+#set(CMAKE_EXE_LINKER_FLAGS "-m32 -target i686-pc-none-elf -nostdlib -T ${LINKER_SCRIPT}")
+set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -T ${LINKER_SCRIPT}")
 
 file(GLOB_RECURSE ASM_FILES "src/arch/i386/*.s")
 set_source_files_properties(${ASM_FILES} PROPERTIES LANGUAGE ASM_NASM)
