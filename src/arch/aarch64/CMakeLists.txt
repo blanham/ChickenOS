@@ -13,8 +13,6 @@ SET(CMAKE_CXX_COMPILER_TARGET ${TARGET})
 SET(CMAKE_CXX_COMPILER clang++)
 SET(CMAKE_ASM_COMPILER_TARGET ${TARGET})
 SET(CMAKE_ASM_COMPILER clang)
-#SET(CMAKE_LINKER_TARGET ${TARGET})
-SET(CMAKE_LINKER ld)
 
 #set(CMAKE_ASM_NASM_OBJECT_FORMAT elf64)
 #set(CMAKE_NASM_LINK_EXECUTABLE "clang <LINK_FLAGS> <OBJECTS> -o <TARGET> <LINK_LIBRARIES>")
@@ -22,7 +20,7 @@ SET(CMAKE_LINKER ld)
 #set(CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS ${CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS} s S)
 
 set(CMAKE_C_FLAGS
-    "-m64 -target aarch64-elf -mgeneral-regs-only -g -Wall -Werror\
+    "-m64 -target aarch64-elf -mgeneral-regs-only -g -Wall\
 				-std=gnu11\
 				-ffreestanding\
 				-fno-stack-protector\

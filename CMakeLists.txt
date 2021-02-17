@@ -9,7 +9,8 @@ set(CAN_USE_ASSEMBLER TRUE)
 set(CMAKE_C_COMPILER "clang")
 #set(CMAKE_LINKER "clang")
 
-set(CMAKE_C_LINK_EXECUTABLE "ld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
+set(CMAKE_C_LINK_FLAGS "")
+set(CMAKE_C_LINK_EXECUTABLE "ld.lld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
 include(src/arch/aarch64/CMakeLists.txt)
 include_directories(src/arch/aarch64/include src/include src/fs src/include/kernel)
 
