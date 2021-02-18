@@ -12,6 +12,16 @@ typedef struct {
 	uint32_t eip, cs, eflags, useresp, ss; // Pushed by the processor automatically.
 } __attribute__((packed)) registers_t;
 
+typedef struct {
+	uint32_t arg4, arg3, arg5, stack_pointer, arg0, arg2, arg1, return_value; // Pushed by pusha.
+	uint16_t ds, :16;
+	uint16_t es, :16;
+	uint16_t fs, :16;
+	uint16_t gs, :16;         	    // Data segment selectors
+	uint32_t int_no, err_code;		// Interrupt number and error code (if applicable)
+	uint32_t instruction_pointer, cs, eflags, useresp, ss; // Pushed by the processor automatically.
+} __attribute__((packed)) registers2_t;
+
 
 #define REGS_IP(x) ((x)->eip)
 #define REGS_SP(x) ((x)->useresp)

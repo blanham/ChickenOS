@@ -6,6 +6,9 @@ SECTIONS {
 	 *
 	 */
 	. = 0x80000;
+	.text.boot : {
+		*(.text.boot)
+	}
 	.text : AT(ADDR(.text)) {
 		*(.text)
 		*(.rodata*)

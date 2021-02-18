@@ -21,6 +21,7 @@ void kmain(struct kernel_boot_info *info)
 	if(info == NULL)
 		kernel_halt(); //Something went wrong, hang
 
+#ifndef ARCH_AARCH64
 	vm_init(info);
 	video_init(info);
 //	console_init();
@@ -72,6 +73,7 @@ void kmain(struct kernel_boot_info *info)
 
 	// TODO: Add bottom halves/software interupts, other kernel threads, etc
 
+#endif
 	kernel_halt();
 
 	//should never return, unless things get really fucked

@@ -16,12 +16,16 @@
 uint32_t mem_size;
 
 // TODO: Move this to the i386 directory
-void vm_page_fault_dump(registers_t *regs, uintptr_t addr, int flags)
+void vm_page_fault_dump(registers_t *_regs, uintptr_t addr, int flags)
 {
+	// XXX: This is just a temp bodge to get this to compile
+	registers2_t *regs = (registers2_t *)_regs;
 	thread_t *cur = thread_current();
 	printf("Page fault in %s space @ %X PID %i eip %x\n",
 			(flags & PAGE_USER) ? "user" : "kernel",
-			addr, cur->pid, regs->eip);
+			addr, cur->pid, regs->instruction_pointer);
+			// XXX: change this back when this is moved to i386
+			//addr, cur->pid, regs->eip);
 	printf("%s\t", (flags & PAGE_WRITE) ? "write" : "read");
 	printf("%s\n", (flags & PAGE_VIOLATION) ? "protection violation" : "page not present");
 	printf("\nREGS:\n");

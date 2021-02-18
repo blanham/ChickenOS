@@ -19,14 +19,14 @@ _start:
     mov     sp, x5
 
     // clear bss
-    ldr     x5, =__bss_start
-    ldr     w6, =__bss_size
+    ldr     x5, =_sbss
+    ldr     w6, =_ebss
 3:  cbz     w6, 4f
     str     xzr, [x5], #8
     sub     w6, w6, #1
     cbnz    w6, 3b
 
     // jump to C code, should not return
-4:  bl      kernel_main
+4:  bl      aarch64_main
     // for failsafe, halt this core too
     b 4b

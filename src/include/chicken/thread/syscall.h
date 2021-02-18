@@ -118,7 +118,7 @@ enum {
 };
 #define ERROR_RETURN(x) return (-x)
 
-void syscall_handler (registers_t *regs);
+void syscall_handler (registers2_t *regs);
 
 int fork();
 int dummy();

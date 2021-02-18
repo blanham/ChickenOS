@@ -13,17 +13,19 @@ set(CMAKE_C_LINK_FLAGS "")
 SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)
 set(CMAKE_C_LINK_EXECUTABLE "ld.lld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
 
-include(src/arch/i386/CMakeLists.txt)
-include_directories(src/arch/i386/include src/include src/fs src/include/kernel)
+set(CHICKEN_TARGET "aarch64")
 
-file(GLOB_RECURSE DEV_FILES src/device/*.c)
-file(GLOB_RECURSE FS_FILES src/fs/*.c)
+include(src/arch/${CHICKEN_TARGET}/CMakeLists.txt)
+include_directories(src/arch/${CHICKEN_TARGET}/include src/include src/fs src/include/kernel)
+
+#file(GLOB_RECURSE DEV_FILES src/device/*.c)
+#file(GLOB_RECURSE FS_FILES src/fs/*.c)
 file(GLOB_RECURSE INIT_FILES src/init/*.c)
 file(GLOB_RECURSE LIB_FILES src/lib/*.c)
 file(GLOB_RECURSE MISC_FILES src/misc/*.c)
-file(GLOB_RECURSE MM_FILES src/mm/*.c)
-file(GLOB_RECURSE NET_FILES src/net/*.c)
-file(GLOB_RECURSE THREAD_FILES src/thread/*.c)
+#file(GLOB_RECURSE MM_FILES src/mm/*.c)
+#file(GLOB_RECURSE NET_FILES src/net/*.c)
+#file(GLOB_RECURSE THREAD_FILES src/thread/*.c)
 
 add_executable(kernel.bin
     ${ARCH_FILES}

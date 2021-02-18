@@ -1,3 +1,3 @@
-void main() {
+void aarch64_main() {
 
 }
