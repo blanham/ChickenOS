@@ -2,18 +2,19 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(ChickenOS C)
 
-#ASM_NASM)
-
 set(CAN_USE_ASSEMBLER TRUE)
+# We don't use CTest, and being able to use 'make test' is nice too
+set(BUILD_TESTING FALSE)
 
 set(CMAKE_C_COMPILER "clang")
-#set(CMAKE_LINKER "clang")
 
 set(CMAKE_C_LINK_FLAGS "")
+# This is necessay to prevent extraneous linker options (-rdynamic for instance)
+SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)
 set(CMAKE_C_LINK_EXECUTABLE "ld.lld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
+
 include(src/arch/i386/CMakeLists.txt)
 include_directories(src/arch/i386/include src/include src/fs src/include/kernel)
-
 
 file(GLOB_RECURSE DEV_FILES src/device/*.c)
 file(GLOB_RECURSE FS_FILES src/fs/*.c)
@@ -37,7 +38,7 @@ add_executable(kernel.bin
     ${ASM_FILES}
 )
 
-cmake_policy(SET CMP0037 OLD) # Enable using "test" as target name
+#cmake_policy(SET CMP0037 OLD) # Enable using "test" as target name
 add_custom_target(test cd .. && ./new_update.sh && DISPLAY=:0 qemu-system-i386 -vga std -no-reboot  -rtc base=localtime -m 128 -usb -hda disk.img -cdrom ~/disk_images/alpine-standard-3.11.2-x86.iso -soundhw pcspk -serial file:log && cd src)
 add_dependencies(test kernel.bin)
 add_custom_target(debug cd .. && ./new_update.sh && DISPLAY=:0 qemu-system-i386 -vga std   -rtc base=localtime -m 128 -usb -hda disk.img -cdrom ~/disk_images/alpine-standard-3.11.2-x86.iso -soundhw pcspk -serial file:log -gdb tcp::1212 -S  && cd src)
