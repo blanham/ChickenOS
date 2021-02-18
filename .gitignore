@@ -1,5 +1,7 @@
 *.sw*
+.vscode/
 user_scripts/
+tests/
 bochsout.txt
 bin/
 *.img
