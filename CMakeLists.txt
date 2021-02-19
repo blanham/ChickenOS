@@ -18,14 +18,14 @@ set(CHICKEN_TARGET "aarch64")
 include(src/arch/${CHICKEN_TARGET}/CMakeLists.txt)
 include_directories(src/arch/${CHICKEN_TARGET}/include src/include src/fs src/include/kernel)
 
-#file(GLOB_RECURSE DEV_FILES src/device/*.c)
-#file(GLOB_RECURSE FS_FILES src/fs/*.c)
+file(GLOB_RECURSE DEV_FILES src/device/*.c)
+file(GLOB_RECURSE FS_FILES src/fs/*.c)
 file(GLOB_RECURSE INIT_FILES src/init/*.c)
 file(GLOB_RECURSE LIB_FILES src/lib/*.c)
 file(GLOB_RECURSE MISC_FILES src/misc/*.c)
-#file(GLOB_RECURSE MM_FILES src/mm/*.c)
-#file(GLOB_RECURSE NET_FILES src/net/*.c)
-#file(GLOB_RECURSE THREAD_FILES src/thread/*.c)
+file(GLOB_RECURSE MM_FILES src/mm/*.c)
+file(GLOB_RECURSE NET_FILES src/net/*.c)
+file(GLOB_RECURSE THREAD_FILES src/thread/*.c)
 
 add_executable(kernel.bin
     ${ARCH_FILES}

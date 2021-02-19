@@ -26,7 +26,8 @@ struct user_desc {
 void arch_thread_reschedule(thread_t *cur, thread_t *next)
 {
 	//this could be done with a straight assignment, instead of having to call a function
-	tss_update((uintptr_t)next + STACK_SIZE);
+	// TODO: set correct interrupt stackpointer?
+	//tss_update((uintptr_t)next + STACK_SIZE);
 
 
 	//PANIC("NOT IMPLEMENTED");
@@ -161,9 +162,10 @@ void thread_build_signal_stackframe(void *stack, int sig_num, void * restore)
 void thread_build_stackframe(void *sp, uintptr_t eip, uintptr_t esp, uintptr_t eax)
 {
 	uint32_t *stack = (void *)((sp + STACK_SIZE) - sizeof(registers_t) - sizeof(int));
+	(void)stack;
 
-	extern uintptr_t intr_return; // Defined in intr-core.s
-	*stack++ = (uint32_t)&intr_return;
+	//extern uintptr_t intr_return; // Defined in intr-core.s
+	//*stack++ = (uint32_t)&intr_return;
 
 /*
 	registers_t *reg_frame = (registers_t*)stack;
