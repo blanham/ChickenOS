@@ -21,12 +21,12 @@ SET(CMAKE_ASM_COMPILER clang)
 
 set(CMAKE_C_FLAGS
     "-m64 -target aarch64-elf -mgeneral-regs-only -g -Wall\
-				-std=gnu11\
-				-ffreestanding\
-				-fno-stack-protector\
-                -Wextra\
-				-fno-builtin -DARCH_AARCH64\
-                -Wextra"
+    -std=gnu11\
+    -ffreestanding\
+    -fno-stack-protector\
+    -Wextra\
+    -fno-builtin -DARCH_AARCH64\
+    -Wextra"
 )
 file(GLOB LINKER_SCRIPT "src/arch/aarch64/linker.ld")
 set(CMAKE_EXE_LINKER_FLAGS "-nostdlib -T ${LINKER_SCRIPT}")

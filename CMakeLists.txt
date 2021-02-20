@@ -7,13 +7,14 @@ set(CAN_USE_ASSEMBLER TRUE)
 set(BUILD_TESTING FALSE)
 
 set(CMAKE_C_COMPILER "clang")
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 set(CMAKE_C_LINK_FLAGS "")
 # This is necessay to prevent extraneous linker options (-rdynamic for instance)
 SET(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS)
 set(CMAKE_C_LINK_EXECUTABLE "ld.lld <CMAKE_C_LINK_FLAGS> <LINK_FLAGS> <OBJECTS>  -o <TARGET> <LINK_LIBRARIES>")
 
-set(CHICKEN_TARGET "aarch64")
+set(CHICKEN_TARGET "i386")
 
 include(src/arch/${CHICKEN_TARGET}/CMakeLists.txt)
 include_directories(src/arch/${CHICKEN_TARGET}/include src/include src/fs src/include/kernel)

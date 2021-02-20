@@ -21,12 +21,12 @@ set(CMAKE_ASM_NASM_SOURCE_FILE_EXTENSIONS ${CMAKE_ASM_NASM_SOURCE_FILE_EXTENSION
 
 set(CMAKE_C_FLAGS
     "-m32 -target i686-pc-none-elf -mno-sse -mno-mmx -g -Wall \
-				-std=gnu11\
-				-ffreestanding\
-				-fno-stack-protector\
-                -Wextra\
-				-fno-builtin -DARCH_I386\
-                -Wextra"
+    -std=gnu11\
+    -ffreestanding\
+    -fno-stack-protector\
+    -Wextra\
+    -fno-builtin -DARCH_I386\
+    -Wextra"
 )
 file(GLOB LINKER_SCRIPT "src/arch/i386/linker.ld")
 #set(CMAKE_EXE_LINKER_FLAGS "-m32 -target i686-pc-none-elf -nostdlib -T ${LINKER_SCRIPT}")
